@@ -6,6 +6,8 @@
 
 ## Features
 
+[![Join the chat at https://gitter.im/Graphite-Web-Framework/Lobby](https://badges.gitter.im/Graphite-Web-Framework/Lobby.svg)](https://gitter.im/Graphite-Web-Framework/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 - Fark
 
 
