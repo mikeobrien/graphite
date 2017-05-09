@@ -1,0 +1,34 @@
+﻿using System;
+using System.Threading.Tasks;
+using Graphite.Readers;
+
+namespace Tests.Common.Fakes
+{
+    public class TestRequestReader1 : TestRequestReader { }
+    public class TestRequestReader2 : TestRequestReader { }
+
+    public class TestRequestReader : IRequestReader
+    {
+        public TestRequestReader()
+        {
+            ReadFunc = () => Task.FromResult<object>(null);
+        }
+
+        public Func<bool> AppliesFunc { get; set; }
+        public Func<Task<object>> ReadFunc { get; set; }
+        public bool AppliesCalled { get; set; }
+        public bool ReadCalled { get; set; }
+
+        public bool Applies()
+        {
+            AppliesCalled = true;
+            return AppliesFunc?.Invoke() ?? true;
+        }
+
+        public Task<object> Read()
+        {
+            ReadCalled = true;
+            return ReadFunc();
+        }
+    }
+}
