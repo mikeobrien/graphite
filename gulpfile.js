@@ -7,7 +7,7 @@ var gulp = require('gulp'),
 
 gulp.task('deploy', ['nuget-push']);
 
-gulp.task('ci', ['nuget-package']);
+gulp.task('ci', ['nuget-pack']);
 
 gulp.task('assemblyInfo', function() {
     return gulp
