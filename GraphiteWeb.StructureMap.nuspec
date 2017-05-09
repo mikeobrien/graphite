@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+   <metadata>
+      <id>GraphiteWeb.StructureMap</id>
+      <version>0.0.0.0</version>
+      <title>StructureMap Integration for the Graphite Web Framework</title>
+      <authors>Mike O'Brien</authors>
+      <description>Integrates StructureMap with the Graphite web framework.</description>
+      <releaseNotes />
+      <copyright />
+      <language>en-US</language>
+      <licenseUrl>https://github.com/mikeobrien/graphite/blob/master/LICENSE</licenseUrl>
+      <projectUrl>http://graphiteweb.io/</projectUrl>
+      <owners>Mike O'Brien</owners>
+      <summary>Integrates StructureMap with the Graphite web framework.</summary>
+      <iconUrl>https://github.com/mikeobrien/graphite/raw/master/misc/logo128x128.png</iconUrl>
+      <tags>graphite web api rest structuremap ioc dependency injection</tags>
+      <dependencies>
+         <dependency id="GraphiteWeb" version="1.0.0" />
+         <dependency id="StructureMap" version="4.0.0" />
+      </dependencies>
+   </metadata>
+</package>
