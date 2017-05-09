@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+   <metadata>
+      <id>GraphiteWeb.Bender</id>
+      <version>0.0.0.0</version>
+      <title>Bender Integration for the Graphite Web Framework</title>
+      <authors>Mike O'Brien</authors>
+      <description>Integrates Bender with the Graphite web framework.</description>
+      <releaseNotes />
+      <copyright />
+      <language>en-US</language>
+      <licenseUrl>https://github.com/mikeobrien/graphite/blob/master/LICENSE</licenseUrl>
+      <projectUrl>https://github.com/mikeobrien/graphite/</projectUrl>
+      <owners>Mike O'Brien</owners>
+      <summary>Integrates Bender with the Graphite web framework.</summary>
+      <iconUrl>https://github.com/mikeobrien/graphite/raw/master/misc/logo128x128.png</iconUrl>
+      <tags>graphite web api bender rest xml json serializer</tags>
+      <dependencies>
+         <dependency id="Graphite" version="1.0.0" />
+         <dependency id="Bender" version="3.0.0" />
+      </dependencies>
+   </metadata>
+</package>
