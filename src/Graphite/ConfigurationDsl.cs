@@ -1,0 +1,734 @@
+﻿using System;
+using System.Linq;
+using System.Net;
+using System.Reflection;
+using System.Web.Http.Routing;
+using Graphite.Actions;
+using Graphite.Behaviors;
+using Graphite.Binding;
+using Graphite.DependencyInjection;
+using Graphite.Extensibility;
+using Graphite.Extensions;
+using Graphite.Http;
+using Graphite.Readers;
+using Graphite.Reflection;
+using Graphite.Routing;
+using Graphite.Writers;
+using Newtonsoft.Json;
+
+namespace Graphite
+{
+    public class ConfigurationDsl
+    {
+        private readonly Configuration _configuration;
+
+        public ConfigurationDsl(Configuration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        /// <summary>
+        /// Allows you to configure Json.NET.
+        /// </summary>
+        public ConfigurationDsl ConfigureJsonNet(Action<JsonSerializerSettings> configure)
+        {
+            var settings = new JsonSerializerSettings();
+            configure?.Invoke(settings);
+            return ConfigureRegistry(x => x.Register(settings));
+        }
+
+        /// <summary>
+        /// Includes the assembly of the specified type.
+        /// This call is additive, so you can specify multiple assemblies.
+        /// </summary>
+        public ConfigurationDsl IncludeTypeAssembly<T>()
+        {
+            IncludeTypeAssembly(typeof(T));
+            return this;
+        }
+
+        /// <summary>
+        /// Includes the assembly of the specified type.
+        /// This call is additive, so you can specify multiple assemblies..
+        /// </summary>
+        public ConfigurationDsl IncludeTypeAssembly(Type type)
+        {
+            return IncludeAssemblies(type.Assembly);
+        }
+
+        /// <summary>
+        /// Includes the specified assemblies.
+        /// </summary>
+        public ConfigurationDsl IncludeAssemblies(params Assembly[] assemblies)
+        {
+            _configuration.Assemblies.AddRange(assemblies
+                .Where(x => !_configuration.Assemblies.Contains(x)));
+            return this;
+        }
+
+        /// <summary>
+        /// Clears the default assemblies.
+        /// </summary>
+        public ConfigurationDsl ClearAssemblies()
+        {
+            _configuration.Assemblies.Clear();
+            return this;
+        }
+
+        /// <summary>
+        /// Disables the built in metrics.
+        /// </summary>
+        public ConfigurationDsl DisableMetrics()
+        {
+            _configuration.Metrics = false;
+            return this;
+        }
+
+        /// <summary>
+        /// Returns the stack trace of unhandled exceptions.
+        /// </summary>
+        public ConfigurationDsl ReturnErrorMessages()
+        {
+            _configuration.ReturnErrorMessage = true;
+            return this;
+        }
+
+        /// <summary>
+        /// Returns the stack trace of unhandled exceptions
+        /// when calling assembly is in debug mode.
+        /// </summary>
+        public ConfigurationDsl ReturnErrorMessagesInDebugMode()
+        {
+            _configuration.ReturnErrorMessage = Assembly
+                .GetCallingAssembly().IsInDebugMode();
+            return this;
+        }
+
+        /// <summary>
+        /// Returns the stack trace of unhandled exceptions
+        /// when type assembly is in debug mode.
+        /// </summary>
+        public ConfigurationDsl ReturnErrorMessagesInDebugMode<T>()
+        {
+            _configuration.ReturnErrorMessage = typeof(T).Assembly.IsInDebugMode();
+            return this;
+        }
+
+        /// <summary>
+        /// Enables the diagnostics page.
+        /// </summary>
+        public ConfigurationDsl EnableDiagnostics()
+        {
+            _configuration.Diagnostics = true;
+            return this;
+        }
+
+        /// <summary>
+        /// Enables the diagnostics page when the
+        /// calling assembly is in debug mode.
+        /// </summary>
+        public ConfigurationDsl EnableDiagnosticsInDebugMode()
+        {
+            _configuration.Diagnostics = Assembly
+                .GetCallingAssembly().IsInDebugMode();
+            return this;
+        }
+
+        /// <summary>
+        /// Enables the diagnostics page when the 
+        /// type assembly is in debug mode.
+        /// </summary>
+        public ConfigurationDsl EnableDiagnosticsInDebugMode<T>()
+        {
+            _configuration.Diagnostics = typeof(T).Assembly.IsInDebugMode();
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the url of the diagnostics page.
+        /// </summary>
+        public ConfigurationDsl WithDiagnosticsAtUrl(string url)
+        {
+            _configuration.DiagnosticsUrl = url;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the download buffer size in bytes. The default is 1MB.
+        /// </summary>
+        public ConfigurationDsl WithDownloadBufferSizeOf(int length)
+        {
+            _configuration.DownloadBufferSize = length;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the status text returned by an unhandled exception.
+        /// </summary>
+        public ConfigurationDsl WithUnhandledExceptionStatusText(string statusText)
+        {
+            _configuration.UnhandledExceptionStatusText = statusText;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the default status code, the default is 204 (no content).
+        /// </summary>
+        public ConfigurationDsl WithDefaultStatusCode(HttpStatusCode statusCode)
+        {
+            _configuration.DefaultStatusCode = statusCode;
+            return this;
+        }
+
+        /// <summary>
+        /// Disables the default error handler.
+        /// </summary>
+        public ConfigurationDsl DisableDefaultErrorHandler()
+        {
+            _configuration.DefaultErrorHandlerEnabled = false;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the IoC container to use.
+        /// </summary>
+        public ConfigurationDsl UseContainer(IContainer container)
+        {
+            _configuration.Container = container;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the IoC container to use.
+        /// </summary>
+        public ConfigurationDsl UseContainer<T>() where T : IContainer, new()
+        {
+            _configuration.Container = new T();
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the initializer to use.
+        /// </summary>
+        public ConfigurationDsl WithInitializer<T>() where T : IInitializer
+        {
+            _configuration.Initializer.Set<T>();
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the initializer to use.
+        /// </summary>
+        public ConfigurationDsl WithInitializer<T>(T instance) where T : IInitializer
+        {
+            _configuration.Initializer.Set(instance);
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the route mapper to use.
+        /// </summary>
+        public ConfigurationDsl WithRouteMapper<T>() where T : IRouteMapper
+        {
+            _configuration.RouteMapper.Set<T>();
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the route mapper to use.
+        /// </summary>
+        public ConfigurationDsl WithRouteMapper<T>(T instance) where T : IRouteMapper
+        {
+            _configuration.RouteMapper.Set(instance);
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the inline constraint resolver to use.
+        /// </summary>
+        public ConfigurationDsl WithInlineConstraintResolver<T>() where T : IInlineConstraintResolver
+        {
+            _configuration.InlineConstraintResolver.Set<T>();
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the inline constraint resolver to use.
+        /// </summary>
+        public ConfigurationDsl WithInlineConstraintResolver<T>(T instance) where T : IInlineConstraintResolver
+        {
+            _configuration.InlineConstraintResolver.Set(instance);
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the inline constraint builder to use.
+        /// </summary>
+        public ConfigurationDsl WithInlineConstraintBuilder<T>() where T : IInlineConstraintBuilder
+        {
+            _configuration.InlineConstraintBuilder.Set<T>();
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the inline constraint builder to use.
+        /// </summary>
+        public ConfigurationDsl WithInlineConstraintBuilder<T>(T instance) where T : IInlineConstraintBuilder
+        {
+            _configuration.InlineConstraintBuilder.Set(instance);
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the type cache to use.
+        /// </summary>
+        public ConfigurationDsl WithTypeCache<T>() where T : ITypeCache
+        {
+            _configuration.TypeCache.Set<T>();
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the type cache to use.
+        /// </summary>
+        public ConfigurationDsl WithTypeCache<T>(T instance) where T : ITypeCache
+        {
+            _configuration.TypeCache.Set(instance);
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the action invoker to use.
+        /// </summary>
+        public ConfigurationDsl WithActionInvoker<T>() where T : IActionInvoker
+        {
+            _configuration.ActionInvoker.Set<T>();
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the action invoker to use.
+        /// </summary>
+        public ConfigurationDsl WithActionInvoker<T>(T instance) where T : IActionInvoker
+        {
+            _configuration.ActionInvoker.Set(instance);
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the behavior chain invoker to use.
+        /// </summary>
+        public ConfigurationDsl WithBehaviorChainInvoker<T>() where T : IBehaviorChainInvoker
+        {
+            _configuration.BehaviorChainInvoker.Set<T>();
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the behavior chain invoker to use.
+        /// </summary>
+        public ConfigurationDsl WithBehaviorChainInvoker<T>(T instance) where T : IBehaviorChainInvoker
+        {
+            _configuration.BehaviorChainInvoker.Set(instance);
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the last behavior in the chain.
+        /// </summary>
+        public ConfigurationDsl WithDefaultBehavior<T>() where T : IBehavior
+        {
+            _configuration.DefaultBehavior.Set<T>();
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the last behavior in the chain.
+        /// </summary>
+        public ConfigurationDsl WithDefaultBehavior<T>(T instance) where T : IBehavior
+        {
+            _configuration.DefaultBehavior.Set(instance);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds an http method.
+        /// </summary>
+        public ConfigurationDsl AddHttpMethod(string method, string actionRegex, 
+            bool allowRequestbody, bool allowResponsebody)
+        {
+            _configuration.SupportedHttpMethods.Add(new HttpMethod(actionRegex, 
+                method, allowRequestbody, allowResponsebody));
+            return this;
+        }
+
+        /// <summary>
+        /// Removes an http method.
+        /// </summary>
+        public ConfigurationDsl RemoveHttpMethod(params string[] methods)
+        {
+            methods.ForEach(method =>
+            {
+                var remove = _configuration.SupportedHttpMethods.FirstOrDefault(
+                    x => x.Method.EqualsIgnoreCase(method));
+                if (remove != null) _configuration.SupportedHttpMethods.Remove(remove);
+            });
+            return this;
+        }
+
+        /// <summary>
+        /// Removes an http method.
+        /// </summary>
+        public ConfigurationDsl RemoveHttpMethod(params HttpMethod[] methods)
+        {
+            methods.ForEach(method => _configuration.SupportedHttpMethods.Remove(method));
+            return this;
+        }
+
+        /// <summary>
+        /// Clears all default http methods.
+        /// </summary>
+        public ConfigurationDsl ClearHttpMethods()
+        {
+            _configuration.SupportedHttpMethods.Clear();
+            return this;
+        }
+
+        /// <summary>
+        /// Adds url aliases.
+        /// </summary>
+        public ConfigurationDsl WithUrlAlias(params Func<ActionMethod, Url, string>[] aliases)
+        {
+            _configuration.UrlAliases.AddRange(aliases);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a prefix to all urls.
+        /// </summary>
+        public ConfigurationDsl WithUrlPrefix(string prefix)
+        {
+            _configuration.UrlPrefix = prefix;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the handler filter.
+        /// </summary>
+        public ConfigurationDsl FilterHandlersBy(Func<Configuration, TypeDescriptor, bool> filter)
+        {
+            _configuration.HandlerFilter = filter;
+            return this;
+        }
+
+        /// <summary>
+        /// Only includes handlers under the namespace of the specified type.
+        /// </summary>
+        public ConfigurationDsl OnlyIncludeHandlersUnder<T>()
+        {
+            _configuration.HandlerFilter = (c, t) =>
+                t.Type.IsUnderNamespace<T>() &&
+                t.Name.IsMatch(c.HandlerNameFilterRegex);
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the regex used to identify handlers e.g. "Handler$".
+        /// </summary>
+        public ConfigurationDsl WithHandlerNameRegex(string regex)
+        {
+            _configuration.HandlerNameFilterRegex = regex;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the action filter.
+        /// </summary>
+        public ConfigurationDsl FilterActionsBy(Func<Configuration, MethodDescriptor, bool> filter)
+        {
+            _configuration.ActionFilter = filter;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the regex used to identify actions. The http method is 
+        /// pulled from the first capture group by default e.g. "^(Get|Post|...)".
+        /// </summary>
+        public ConfigurationDsl WithActionRegex(Func<Configuration, string> regex)
+        {
+            _configuration.ActionRegex = regex;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the regex used to parse the handler namespace. The namespace is 
+        /// pulled from the first capture group by default e.g. "MyApp\.Handlers\.(.*)".
+        /// </summary>
+        public ConfigurationDsl WithHandlerNamespaceRegex(string regex)
+        {
+            _configuration.HandlerNamespaceRegex = regex;
+            return this;
+        }
+
+        /// <summary>
+        /// Removes the types namespace from the url.
+        /// </summary>
+        public ConfigurationDsl ExcludeTypeNamespaceFromUrl<T>()
+        {
+            return ExcludeTypeNamespaceFromUrl(typeof(T));
+        }
+
+        /// <summary>
+        /// Removes the types namespace from the url.
+        /// </summary>
+        public ConfigurationDsl ExcludeTypeNamespaceFromUrl(Type type)
+        {
+            return ExcludeNamespaceFromUrl(type.Namespace);
+        }
+
+        /// <summary>
+        /// Removes the namespace from the begining of the url.
+        /// </summary>
+        public ConfigurationDsl ExcludeNamespaceFromUrl(string @namespace)
+        {
+            _configuration.HandlerNamespaceRegex = $"{@namespace.RegexEscape()}\\.?(.*)";
+            return this;
+        }
+
+        /// <summary>
+        /// Gets the portion of the action method name used for routing.
+        /// </summary>
+        public ConfigurationDsl GetActionMethodNameWith(Func<Configuration, ActionMethod, string> getName)
+        {
+            _configuration.GetActionMethodName = getName;
+            return this;
+        }
+
+        /// <summary>
+        /// Gets the http method from the action method name.
+        /// </summary>
+        public ConfigurationDsl GetHttpMethodWith(Func<Configuration, ActionMethod, string> getMethod)
+        {
+            _configuration.GetHttpMethod = getMethod;
+            return this;
+        }
+
+        /// <summary>
+        /// Configures the IoC container.
+        /// </summary>
+        public ConfigurationDsl ConfigureRegistry(Action<Registry> configure)
+        {
+            configure(_configuration.Registry);
+            return this;
+        }
+
+        /// <summary>
+        /// Configures action method sources.
+        /// </summary>
+        public ConfigurationDsl ConfigureActionMethodSources(Action<PluginDefinitions
+            <IActionMethodSource, ConfigurationContext>> configure)
+        {
+            configure(_configuration.ActionMethodSources);
+            return this;
+        }
+
+        /// <summary>
+        /// Configures action sources.
+        /// </summary>
+        public ConfigurationDsl ConfigureActionSources(Action<PluginDefinitions
+            <IActionSource, ConfigurationContext>> configure)
+        {
+            configure(_configuration.ActionSources);
+            return this;
+        }
+
+        /// <summary>
+        /// Configures action decorators.
+        /// </summary>
+        public ConfigurationDsl ConfigureActionDecorators(Action<PluginDefinitions
+            <IActionDecorator, ActionConfigurationContext>> configure)
+        {
+            configure(_configuration.ActionDecorators);
+            return this;
+        }
+
+        /// <summary>
+        /// Configures route conventions.
+        /// </summary>
+        public ConfigurationDsl ConfigureRouteConventions(Action<PluginDefinitions
+            <IRouteConvention, RouteConfigurationContext>> configure)
+        {
+            configure(_configuration.RouteConventions);
+            return this;
+        }
+
+        /// <summary>
+        /// Configures url conventions.
+        /// </summary>
+        public ConfigurationDsl ConfigureUrlConventions(Action<PluginDefinitions
+            <IUrlConvention, UrlConfigurationContext>> configure)
+        {
+            configure(_configuration.UrlConventions);
+            return this;
+        }
+
+        /// <summary>
+        /// Configures request readers.
+        /// </summary>
+        public ConfigurationDsl ConfigureRequestReaders(Action<PluginDefinitions
+            <IRequestReader, ActionConfigurationContext>> configure)
+        {
+            configure(_configuration.RequestReaders);
+            return this;
+        }
+
+        /// <summary>
+        /// Configures request binders.
+        /// </summary>
+        public ConfigurationDsl ConfigureRequestBinders(Action<PluginDefinitions
+            <IRequestBinder, ActionConfigurationContext>> configure)
+        {
+            configure(_configuration.RequestBinders);
+            return this;
+        }
+
+        /// <summary>
+        /// Configures value mappers.
+        /// </summary>
+        public ConfigurationDsl ConfigureValueMappers(Action<PluginDefinitions
+            <IValueMapper, ValueMapperConfigurationContext>> configure)
+        {
+            configure(_configuration.ValueMappers);
+            return this;
+        }
+
+        /// <summary>
+        /// Configures response writers.
+        /// </summary>
+        public ConfigurationDsl ConfigureResponseWriters(Action<PluginDefinitions
+            <IResponseWriter, ActionConfigurationContext>> configure)
+        {
+            configure(_configuration.ResponseWriters);
+            return this;
+        }
+
+        /// <summary>
+        /// Configures behaviors.
+        /// </summary>
+        public ConfigurationDsl ConfigureBehaviors(Action<PluginDefinitions
+            <IBehavior, ActionConfigurationContext>> configure)
+        {
+            configure(_configuration.Behaviors);
+            return this;
+        }
+
+        /// <summary>
+        /// Binds header values to action parameters.
+        /// </summary>
+        public ConfigurationDsl BindHeaders()
+        {
+            _configuration.HeadersBindingMode = BindingMode.Implicit;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds header values to action parameters by convention.
+        /// </summary>
+        public ConfigurationDsl BindHeadersByNamingConvention()
+        {
+            _configuration.HeadersBindingMode = BindingMode.Convention;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds header values to action parameters by attribute.
+        /// </summary>
+        public ConfigurationDsl BindHeadersByAttribute()
+        {
+            _configuration.HeadersBindingMode = BindingMode.Explicit;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds cookie values to action parameters.
+        /// </summary>
+        public ConfigurationDsl BindCookies()
+        {
+            _configuration.CookiesBindingMode = BindingMode.Implicit;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds cookie values to action parameters by convention.
+        /// </summary>
+        public ConfigurationDsl BindCookiesByNamingConvention()
+        {
+            _configuration.CookiesBindingMode = BindingMode.Convention;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds cookie values to action parameters by attribute.
+        /// </summary>
+        public ConfigurationDsl BindCookiesByByAttriubute()
+        {
+            _configuration.CookiesBindingMode = BindingMode.Explicit;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds request info values to action parameters.
+        /// </summary>
+        public ConfigurationDsl BindRequestInfo()
+        {
+            _configuration.RequestInfoBindingMode = BindingMode.Implicit;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds request info values to action parameters by convention.
+        /// </summary>
+        public ConfigurationDsl BindRequestInfoByAttribute()
+        {
+            _configuration.RequestInfoBindingMode = BindingMode.Explicit;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds container values to action parameters.
+        /// </summary>
+        public ConfigurationDsl BindContainer()
+        {
+            _configuration.ContinerBindingMode = BindingMode.Implicit;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds container values to action parameters by attribute.
+        /// </summary>
+        public ConfigurationDsl BindContainerByAttribute()
+        {
+            _configuration.ContinerBindingMode = BindingMode.Explicit;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds request parameters to the first level of 
+        /// properties of a complex action parameter type.
+        /// </summary>
+        public ConfigurationDsl BindComplexTypeProperties()
+        {
+            _configuration.BindComplexTypeProperties = true;
+            return this;
+        }
+
+        /// <summary>
+        /// Automatically constrain url parameters by type.
+        /// </summary>
+        public ConfigurationDsl AutomaticallyConstrainUrlParameterByType()
+        {
+            _configuration.AutomaticallyConstrainUrlParameterByType = true;
+            return this;
+        }
+    }
+}
