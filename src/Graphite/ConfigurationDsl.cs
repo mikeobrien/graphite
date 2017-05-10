@@ -104,6 +104,17 @@ namespace Graphite
         }
 
         /// <summary>
+        /// Enables the diagnostics page and returns 
+        /// the stack trace of unhandled exceptions
+        /// when type assembly is in debug mode.
+        /// </summary>
+        public ConfigurationDsl EnableDiagnosticsInDebugMode<T>()
+        {
+            _configuration.EnableDiagnostics = typeof(T).Assembly.IsInDebugMode();
+            return this;
+        }
+
+        /// <summary>
         /// Sets the url of the diagnostics page.
         /// </summary>
         public ConfigurationDsl WithDiagnosticsAtUrl(string url)
@@ -361,9 +372,18 @@ namespace Graphite
         /// Specifies the regex used to parse the handler namespace. The namespace is 
         /// pulled from the first capture group by default e.g. "MyApp\.Handlers\.(.*)".
         /// </summary>
-        public ConfigurationDsl ExcludeTypeNamespace<T>()
+        public ConfigurationDsl ExcludeTypeNamespaceFromUrl<T>()
         {
-            _configuration.HandlerNamespaceRegex = $"{typeof(T).Namespace}\\.?(.*)";
+            return ExcludeTypeNamespaceFromUrl(typeof(T));
+        }
+
+        /// <summary>
+        /// Specifies the regex used to parse the handler namespace. The namespace is 
+        /// pulled from the first capture group by default e.g. "MyApp\.Handlers\.(.*)".
+        /// </summary>
+        public ConfigurationDsl ExcludeTypeNamespaceFromUrl(Type type)
+        {
+            _configuration.HandlerNamespaceRegex = $"{type.Namespace}\\.?(.*)";
             return this;
         }
 
