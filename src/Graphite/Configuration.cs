@@ -67,7 +67,7 @@ namespace Graphite
             (c, t) => t.Name.IsMatch(c.HandlerNameFilterRegex);
 
         public Func<Configuration, string> ActionRegex { get; set; } =
-            c => $"^({c.SupportedHttpMethods.Select(m => m.ActionRegex).Join("|")})";
+            c => $"({c.SupportedHttpMethods.Select(m => m.ActionRegex).Join("|")})";
 
         public Func<Configuration, MethodDescriptor, bool> ActionFilter { get; set; } =
             (c, a) => a.Name.IsMatch(c.ActionRegex(c));
@@ -92,6 +92,13 @@ namespace Graphite
         public PluginDefinition<IInvokerBehavior> InvokerBehavior { get; } =
             PluginDefinition<IInvokerBehavior>.Create<InvokerBehavior>();
 
+        public PluginDefinitions<IRequestBinder, RequestBinderContext> RequestBinders { get; } =
+            PluginDefinitions<IRequestBinder, RequestBinderContext>.Create(x => x
+                .Append<ReaderBinder>(singleton: true)
+                .Append<UrlParameterBinder>(singleton: true)
+                .Append<QuerystringBinder>(singleton: true)
+                .Append<FormBinder>(singleton: true));
+
         public PluginDefinitions<IRequestReader, RequestReaderContext> RequestReaders { get; } =
             PluginDefinitions<IRequestReader, RequestReaderContext>.Create(x => x
                 .Append<StringReader>(singleton: true)
@@ -99,13 +106,6 @@ namespace Graphite
                 .Append<JsonReader>(singleton: true)
                 .Append<XmlReader>(singleton: true)
                 .Append<FormReader>(singleton: true));
-
-        public PluginDefinitions<IRequestBinder, RequestBinderContext> RequestBinders { get; } =
-            PluginDefinitions<IRequestBinder, RequestBinderContext>.Create(x => x
-                .Append<ReaderBinder>(singleton: true)
-                .Append<UrlParameterBinder>(singleton: true)
-                .Append<QuerystringBinder>(singleton: true)
-                .Append<FormBinder>(singleton: true));
 
         public PluginDefinitions<IValueMapper, ValueMapperContext> ValueMappers { get; } =
             PluginDefinitions<IValueMapper, ValueMapperContext>.Create(x => x
