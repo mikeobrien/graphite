@@ -109,6 +109,7 @@
     <Compile Include="Unit\Binding\SimpleTypeMapperTests.cs" />
     <Compile Include="Unit\Binding\UrlParameterBinderTests.cs" />
     <Compile Include="Unit\Binding\ValueMapperBaseTests.cs" />
+    <Compile Include="Unit\ConfigurationDslTests.cs" />
     <Compile Include="Unit\DefaultConfigurationTests.cs" />
     <Compile Include="Unit\DefaultErrorHandlerBehaviorTests.cs" />
     <Compile Include="Unit\DependencyInjection\StructureMapTests.cs" />
