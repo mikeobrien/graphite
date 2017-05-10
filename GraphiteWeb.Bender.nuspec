@@ -10,7 +10,7 @@
       <copyright />
       <language>en-US</language>
       <licenseUrl>https://github.com/mikeobrien/graphite/blob/master/LICENSE</licenseUrl>
-      <projectUrl>https://github.com/mikeobrien/graphite/</projectUrl>
+      <projectUrl>http://graphiteweb.io/</projectUrl>
       <owners>Mike O'Brien</owners>
       <summary>Integrates Bender with the Graphite web framework.</summary>
       <iconUrl>https://github.com/mikeobrien/graphite/raw/master/misc/logo128x128.png</iconUrl>
