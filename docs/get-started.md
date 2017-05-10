@@ -22,6 +22,8 @@ PM> Install-Package GraphiteWeb.StructureMap
 Next we will bootstrap Graphite by adding the following to the `Global.asax`:
 
 ```
+using Graphite.StructureMap;using System.Web.Http;using Graphite;
+
 namespace MyWebApp{    public class Global : HttpApplication    {        protected void Application_Start(object sender, EventArgs e)        {            var configuration = GlobalConfiguration.Configuration;            configuration                .InitializeGraphite(c => c                    .EnableDiagnosticsInDebugMode()                    .UseStructureMapContainer()                    .ExcludeTypeNamespace<Global>());            configuration.EnsureInitialized();        }    }}
 ```
 

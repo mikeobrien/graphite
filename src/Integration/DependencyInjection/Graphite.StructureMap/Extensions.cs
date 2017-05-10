@@ -21,16 +21,15 @@ namespace Graphite.StructureMap
         public static ConfigurationDsl UseStructureMapContainer(
             this ConfigurationDsl configuration,
             HttpConfiguration httpConfiguration,
-            Action<ConfigurationExpression> configure)
+            Action<ConfigurationExpression> configure = null)
         {
-            var container = new Container(configure);
+            var container = configure == null ? new Container() : new Container(configure);
             httpConfiguration.DependencyResolver = container;
             return configuration.UseContainer(container);
         }
 
         public static ConfigurationDsl UseStructureMapContainer<TRegistry>(
-            this ConfigurationDsl configuration,
-            Action<ConfigurationExpression> configure)
+            this ConfigurationDsl configuration)
             where TRegistry : global::StructureMap.Registry, new()
         {
             return configuration.UseStructureMapContainer(x => x.AddRegistry<TRegistry>());
@@ -38,9 +37,10 @@ namespace Graphite.StructureMap
 
         public static ConfigurationDsl UseStructureMapContainer(
             this ConfigurationDsl configuration,
-            Action<ConfigurationExpression> configure)
+            Action<ConfigurationExpression> configure = null)
         {
-            return configuration.UseContainer(new Container(configure));
+            return configuration.UseContainer(configure == null ? 
+                new Container() : new Container(configure));
         }
 
         public static ConfigurationDsl UseStructureMapContainer(this 
