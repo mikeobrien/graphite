@@ -37,7 +37,7 @@ Graphite can be found on nuget. Install the following packages:
 - Diagnostics out of the box.
 - Supports multiple querystring and form values with the same name.
 - Supports wildcard url parameters.
-- Currently supports only [StructureMap](http://structuremap.github.io/) but any IoC container can be plugged in.
+- Currently supports only [StructureMap](http://structuremap.github.io/) out of the box but any IoC container can be plugged in.
 - Currently supports [Json.NET](http://www.newtonsoft.com/json), [Bender](https://github.com/mikeobrien/Bender) and the FCL XML serializer but you can plug in any serializer.
 
 Props
