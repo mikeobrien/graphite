@@ -29,7 +29,7 @@ namespace Graphite.Diagnostics
             new ConfigurationDsl(configuration)
                 .IncludeTypeAssembly<DiagnosticsActionSource>()
                 .OnlyIncludeHandlersUnder<DiagnosticsActionSource>()
-                .ExcludeTypeNamespace<DiagnosticsActionSource>();
+                .ExcludeTypeNamespaceFromUrl<DiagnosticsActionSource>();
 
             var actionMethodSource = new DefaultActionMethodSource(configuration, _typeCache);
             var urlConvention = new LambdaUrlConvention((a, s) => _configuration
