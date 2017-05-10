@@ -1,107 +1,75 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Graphite</title>
-  <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
-  <link href="css/docs.css" rel="stylesheet" type="text/css">
-  <link href="img/favicon.png" rel="icon" type="image/png">
-</head>
-<body>
-    <div class="navbar-wrapper">
+---
+layout: site
+---
 
-        <nav class="navbar navbar-inverse navbar-static-top">
-          <div class="container">
-            <div class="navbar-header">
-              <img src="img/logo-small.png" />
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
-              <ul class="nav navbar-nav navbar-right">
-                <li><a href="get-started">Get Started</a></li>
-                <li><a href="documenation">Documentation</a></li>
-                <li><a href="https://github.com/mikeobrien/graphite">GitHub</a></li>
-                <li><a href="https://gitter.im/Graphite-Web-Framework/Discuss">Chat</a></li>
-              </ul>
-            </div>
-          </div>
-        </nav>
+<div>
 
+  <div class="row">
+    <div class="col-lg-12">
+    <p class="summary">Graphite is a simple, lightweight, convention based web framework built on Web Api.</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-4 blurb">
+      <div class="subheading-container">
+        <h2 class="subheading">Conventional</h2>
+      </div>
+      <p>Nearly every aspect of Graphite is driven by conventions, reducing ceremony.</p>
+    </div>
+    <div class="col-lg-4 blurb">
+      <div class="subheading-container">
+        <h2 class="subheading">Extensible</h2>
+      </div>
+      <p>Graphite is highy extensible, allowing you to customize and extend every aspect of the framework.</p>
+    </div>
+    <div class="col-lg-4 blurb">
+      <div class="subheading-container">
+        <h2 class="subheading">Flexible</h2>
+      </div>
+      <p>Graphite ships with some opionions, but is designed to support your opinions and work the way you want to work.</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-12 call-to-action-container">
+    <a class="call-to-action" href="get-started">Get Started</a>
+    </div>
+  </div>
+
+</div>
+
+<div class="feature-container">
+
+  <div class="row">
+    <div class="col-lg-4">
+        <ul>
+            <li>Can run side-by-side with existing Web Api controllers.
+            <li>IoC is baked in from the ground up.
+            <li>Heavy emphasis on testability.
+            <li>Heavy emphasis on flexibility and configurability. IoW maximizing extensibility and minimizing opinions so you can build your API how <b>you</b> want to.
+            <li>Lightweight and simple, <a href="https://www.brainyquote.com/quotes/quotes/a/antoinedes103610.html">out of the box functionality is purposely kept to a minimum</a>.
+        </ul>
+    </div>
+    <div class="col-lg-4">
+        <ul>
+            <li>Everything is async by default.
+            <li>POCO's, <a href="https://en.wikipedia.org/wiki/Composition_over_inheritance">no inheritance</a>.
+            <li>Conventional routing and urls out of the box.
+            <li>Conventionally override almost any part of the framework.
+            <li>Supports the handler approach (i.e. a single class with one action).
+            <li>Supports <a href="http://www.mkmurray.com/blog/2011/06/13/fubumvc-behavior-chains-the-bmvc-pattern">behavior chains</a> (AKA the <a href="http://codebetter.com/jeremymiller/2011/01/09/fubumvcs-internal-runtime-the-russian-doll-model-and-how-it-compares-to-asp-net-mvc-and-openrasta">Russian Doll Model</a>).
+        </ul>
+    </div>
+    <div class="col-lg-4">
+        <ul>
+            <li>Supports action sources which allow you to generate routes.
+            <li>Diagnostics out of the box.
+            <li>Supports multiple querystring and form values with the same name.
+            <li>Supports wildcard url parameters.
+            <li>Currently supports only <a href="http://structuremap.github.io/">StructureMap</a> but any IoC container can be plugged in.
+            <li>Currently supports <a href="http://www.newtonsoft.com/json">Json.NET</a>, <a href="https://github.com/mikeobrien/Bender">Bender</a> and the FCL XML serializer but you can plug in any serializer.
+        </ul>
     </div>
 
-    <div class="container">
-
-      <div class="row">
-        <div class="col-lg-12">
-        <p class="summary">Graphite is a simple, lightweight, convention based web framework built on Web Api.</p>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-lg-4 blurb">
-          <div class="subheading-container">
-            <h2 class="subheading">Conventions</h2>
-          </div>
-          <p>.</p>
-        </div>
-        <div class="col-lg-4 blurb">
-          <div class="subheading-container">
-            <h2 class="subheading">Extensibility</h2>
-          </div>
-          <p>Maximizing extensibility and minimizing opinions so you can build your API how you want to.</p>
-        </div>
-        <div class="col-lg-4 blurb">
-          <div class="subheading-container">
-            <h2 class="subheading">Flexible</h2>
-          </div>
-          <p>By enforcing strict guidelines, we ensure our plugins stay simple and work as expected.</p>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-lg-12 call-to-action-container">
-        <a class="call-to-action" href="getting-started">Get Started</a>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="container feature-container">
-
-      <div class="row">
-        <div class="col-lg-4">
-            <ul>
-                <li>Can run side-by-side with existing Web Api controllers.
-                <li>IoC is baked in from the ground up.
-                <li>Heavy emphasis on testability.
-                <li>Heavy emphasis on flexibility and configurability. IoW maximizing extensibility and minimizing opinions so you can build your API how <b>you</b> want to.
-                <li>Lightweight and simple, <a href="https://www.brainyquote.com/quotes/quotes/a/antoinedes103610.html">out of the box functionality is purposely kept to a minimum</a>.
-            </ul>
-        </div>
-        <div class="col-lg-4">
-            <ul>
-                <li>Everything is async by default.
-                <li>POCO's, <a href="https://en.wikipedia.org/wiki/Composition_over_inheritance">no inheritance</a>.
-                <li>Conventional routing and urls out of the box.
-                <li>Conventionally override almost any part of the framework.
-                <li>Supports the handler approach (i.e. a single class with one action).
-                <li>Supports <a href="http://www.mkmurray.com/blog/2011/06/13/fubumvc-behavior-chains-the-bmvc-pattern">behavior chains</a> (AKA the <a href="http://codebetter.com/jeremymiller/2011/01/09/fubumvcs-internal-runtime-the-russian-doll-model-and-how-it-compares-to-asp-net-mvc-and-openrasta">Russian Doll Model</a>).
-            </ul>
-        </div>
-        <div class="col-lg-4">
-            <ul>
-                <li>Supports action sources which allow you to generate routes.
-                <li>Diagnostics out of the box.
-                <li>Supports multiple querystring and form values with the same name.
-                <li>Supports wildcard url parameters.
-                <li>Currently supports only <a href="http://structuremap.github.io/">StructureMap</a> but any IoC container can be plugged in.
-                <li>Currently supports <a href="http://www.newtonsoft.com/json">Json.NET</a>, <a href="https://github.com/mikeobrien/Bender">Bender</a> and the FCL XML serializer but you can plug in any serializer.
-            </ul>
-        </div>
-      </div>
-
-    </div>
-
-    <script src="/js/jquery.js"></script>
-    <script src="/js/bootstrap.js"></script>
-    <script src="/js/docs.js"></script>
-</body>
-</html>
+</div>
