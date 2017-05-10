@@ -66,6 +66,11 @@ namespace Tests.Common
             return CreateFor(method.ToActionMethod());
         }
 
+        public static RequestGraph CreateFor(LambdaExpression lambda)
+        {
+            return new RequestGraph(lambda.ToActionMethod());
+        }
+
         public static RequestGraph CreateFor(ActionMethod actionMethod)
         {
             return new RequestGraph(actionMethod);
@@ -149,9 +154,9 @@ namespace Tests.Common
             return this;
         }
 
-        public RequestGraph Configure(Action<Configuration> config)
+        public RequestGraph Configure(Action<ConfigurationDsl> config)
         {
-            config(Configuration);
+            config(new ConfigurationDsl(Configuration));
             return this;
         }
 
