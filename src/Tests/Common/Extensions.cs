@@ -28,6 +28,14 @@ namespace Tests.Common
 
     public static class Extensions
     {
+        public static ActionMethod ToActionMethod(this LambdaExpression lambda)
+        {
+            var method = lambda.Body.As<MethodCallExpression>().Method;
+            var typeDescriptor = new TypeCache().GetTypeDescriptor(method.DeclaringType);
+            return new ActionMethod(typeDescriptor, typeDescriptor
+                .Methods.FirstOrDefault(x => x.MethodInfo == method));
+        }
+
         public static ActionMethod ToActionMethod<T>(this Expression<Func<T, object>> method)
         {
             return ToActionMethod<T>(method.GetMethodInfo());
