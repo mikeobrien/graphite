@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<!-- "Put your hand on a hot stove for a minute, and it seems like an hour. Sit with a pretty girl for an hour, and it seems like a minute. That's relativity." -->
+<html>
+<head>
+  <title>Graphite</title>
+  <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="css/docs.css" rel="stylesheet" type="text/css">
+  <link href="img/favicon.png" rel="icon" type="image/png">
+</head>
+<body>
+    <div class="navbar-wrapper">
+
+        <nav class="navbar navbar-inverse navbar-static-top">
+          <div class="container">
+            <div class="navbar-header">
+              <img src="img/logo-small.png" />
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+              <ul class="nav navbar-nav navbar-right">
+                <li><a href="get-started">Get Started</a></li>
+                <li><a href="documenation">Documentation</a></li>
+                <li><a href="https://github.com/mikeobrien/graphite">GitHub</a></li>
+                <li><a href="https://gitter.im/Graphite-Web-Framework/Discuss">Chat</a></li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+
+    </div>
+
+    <div class="container">
+
+      {{ content }}
+
+    </div>
+
+    <script src="/js/jquery.js"></script>
+    <script src="/js/bootstrap.js"></script>
+    <script src="/js/docs.js"></script>
+</body>
+</html>
