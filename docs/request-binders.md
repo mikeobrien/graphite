@@ -2,5 +2,4 @@
 layout: documentation
 ---
 
-### Bootstrap
-
+### Request Binders

@@ -1,6 +1,4 @@
 ---
 layout: documentation
 ---
-
-### Bootstrap
-
+### Default Conventions
