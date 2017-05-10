@@ -48,7 +48,7 @@ a {
 
 .summary {
     text-align: center;
-    padding: 100px 150px;
+    padding: 80px 150px 100px 150px;
     font-size: 32px;
     line-height: 42px;
     font-weight: 100;
@@ -73,7 +73,7 @@ a {
 
 .call-to-action-container {
     text-align: center;
-    margin-top: 80px;
+    margin-top: 100px;
 }
 
 .feature-container {
