@@ -5,9 +5,22 @@
 
 *...taking the friction out of Web Api.*
 
-## Overview
+Graphite is a simple, lightweight, convention based web framework built on Web Api. It is heavily inspired by the brilliant web framework FubuMVC.
 
-Graphite is a simple, lightweight, convention based web framework built on Web Api. It is heavily inspired by the brilliant web framework [FubuMVC](https://fubumvc.github.io/). 
+## Getting Started
+
+Getting started guide and documentation can be found [here](http://graphiteweb.io).
+
+
+## Install
+
+Graphite can be found on nuget. Install the following packages:
+
+    PM> Install-Package Microsoft.AspNet.WebApi.WebHost (If hosting with ASP.NET)
+    PM> Install-Package GraphiteWeb
+    PM> Install-Package GraphiteWeb.StructureMap
+
+## Features
 
 - Can run side-by-side with existing Web Api controllers.
 - IoC is baked in from the ground up.
@@ -26,21 +39,6 @@ Graphite is a simple, lightweight, convention based web framework built on Web A
 - Supports wildcard url parameters.
 - Currently supports only [StructureMap](http://structuremap.github.io/) but any IoC container can be plugged in.
 - Currently supports [Json.NET](http://www.newtonsoft.com/json), [Bender](https://github.com/mikeobrien/Bender) and the FCL XML serializer but you can plug in any serializer.
-
-Getting Started
-------------
-
-Getting started guide and documentation can be found [here](http://graphiteweb.io).
-
-
-Install
-------------
-
-Graphite can be found on nuget. Install the following packages:
-
-    PM> Install-Package Microsoft.AspNet.WebApi.WebHost (If hosting with ASP.NET)
-    PM> Install-Package GraphiteWeb
-    PM> Install-Package GraphiteWeb.StructureMap
 
 Props
 ------------
