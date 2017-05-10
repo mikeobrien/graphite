@@ -1,6 +1,6 @@
 ![Graphite](https://github.com/mikeobrien/graphite/raw/master/misc/header.png)
 
-[![Nuget](http://img.shields.io/nuget/v/GraphiteWeb.svg?style=flat)](http://www.nuget.org/packages/GraphiteWeb/) [![TeamCity Build Status](https://img.shields.io/teamcity/http/build.mikeobrien.net/s/Graphite.svg?style=flat)](http://build.mikeobrien.net/viewType.html?buildTypeId=Graphite&guest=1) [![Join the chat at https://gitter.im/Graphite-Web-Framework](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Graphite-Web-Framework?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Nuget](http://img.shields.io/nuget/v/GraphiteWeb.svg?style=flat)](http://www.nuget.org/packages/GraphiteWeb/) [![TeamCity Build Status](https://img.shields.io/teamcity/http/build.mikeobrien.net/s/Graphite.svg?style=flat)](http://build.mikeobrien.net/viewType.html?buildTypeId=Graphite&guest=1) [![Join the chat at https://gitter.im/Graphite-Web-Framework/Discuss](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Graphite-Web-Framework/Discuss?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
 *...taking the friction out of Web API.*
@@ -13,7 +13,7 @@
 Install
 ------------
 
-Graphite can be found on nuget:
+Graphite can be found on nuget. Install the following packages:
 
     PM> Install-Package Microsoft.AspNet.WebApi.WebHost (If hosting with ASP.NET)
     PM> Install-Package GraphiteWeb
@@ -23,9 +23,7 @@ Graphite can be found on nuget:
 Documentation
 ------------
 
-
-
-Documentation can be found [here](http://www.mikeobrien.net/graphite/).
+Documentation can be found [here](http://graphiteweb.io).
 
 Props
 ------------
