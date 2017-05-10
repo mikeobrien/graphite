@@ -20,7 +20,7 @@ namespace TestHarness
                 .InitializeGraphite(c => c
                     .EnableDiagnosticsInDebugMode()
                     .UseStructureMapContainer<Registry>(configuration)
-                    .ExcludeTypeNamespace<Global>()
+                    .ExcludeTypeNamespaceFromUrl<Global>()
                     .ConfigureBehaviors(b => b
                         .Append<Behavior1>()
                         .Append<Behavior2>()

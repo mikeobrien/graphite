@@ -263,6 +263,12 @@ namespace Tests.Common
                 return this;
             }
 
+            public CaseDsl Add<TArg>(Expression<Action<TArg>> expression)
+            {
+                AddCase(expression);
+                return this;
+            }
+
             public CaseDsl Add<TArg1, TArg2>
                 (Expression<Func<TArg1, object>> expression1,
                 Expression<Func<TArg2, object>> expression2)
