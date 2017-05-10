@@ -54,8 +54,8 @@
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.3\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="StructureMap, Version=4.4.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\StructureMap.4.4.5\lib\net45\StructureMap.dll</HintPath>
@@ -121,10 +121,6 @@
     <ProjectReference Include="..\Integration\Serializers\Graphite.Bender\Graphite.Bender.csproj">
       <Project>{73744e67-b5eb-427a-8a4d-9e6d07532ff9}</Project>
       <Name>Graphite.Bender</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Integration\Serializers\Graphite.Newtonsoft.Json\Graphite.Newtonsoft.Json.csproj">
-      <Project>{be193a75-3940-42ee-8ca9-2caffb0e04e3}</Project>
-      <Name>Graphite.Newtonsoft.Json</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

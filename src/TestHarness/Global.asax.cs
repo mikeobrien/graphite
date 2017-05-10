@@ -3,7 +3,6 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Routing;
 using Graphite;
-using Graphite.Newtonsoft.Json;
 using Graphite.StructureMap;
 
 namespace TestHarness
@@ -19,7 +18,6 @@ namespace TestHarness
 
             configuration
                 .InitializeGraphite(c => c
-                    .UseJsonNet()
                     .EnableDiagnosticsInDebugMode()
                     .UseStructureMapContainer<Registry>(configuration)
                     .ExcludeTypeNamespace<Global>()

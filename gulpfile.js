@@ -70,12 +70,6 @@ gulp.task('nuget-copy-bender', ['test'], function() {
         .pipe(gulp.dest('bender-package/lib'));
 });
 
-gulp.task('nuget-copy-jsonnet', ['test'], function() {
-    return gulp.src('src/Integration/Serializers/Graphite.Newtonsoft.Json/' + 
-            'bin/Release/Graphite.Newtonsoft.Json.{dll,pdb,xml}')
-        .pipe(gulp.dest('jsonnet-package/lib'));
-});
-
 gulp.task('nuget-pack-graphite', ['nuget-copy-graphite'], function() {
 
     return nuget.pack({
@@ -101,16 +95,8 @@ gulp.task('nuget-pack-bender', ['nuget-copy-bender'], function() {
     });
 });
 
-gulp.task('nuget-pack-jsonnet', ['nuget-copy-jsonnet'], function() {
-    return nuget.pack({
-        spec: 'GraphiteWeb.Newtonsoft.Json.nuspec',
-        basePath: 'jsonnet-package',
-        version: args.buildVersion
-    });
-});
-
 gulp.task('nuget-pack', ['nuget-pack-graphite', 'nuget-pack-structuremap', 
-    'nuget-pack-bender', 'nuget-pack-jsonnet']);
+    'nuget-pack-bender']);
 
 gulp.task('nuget-push', ['nuget-pack'], function() {
     return nuget.push('*.nupkg', { 

@@ -1,10 +1,11 @@
 ﻿using System.Threading.Tasks;
-using Bender.Collections;
+using Graphite.Extensions;
 using Graphite.Http;
-using Graphite.Readers;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
+using JsonReader = Graphite.Readers.JsonReader;
 
 namespace Tests.Unit.Readers
 {
@@ -36,7 +37,8 @@ namespace Tests.Unit.Readers
                 requestGraph.WithContentType(MimeTypes.ApplicationJson);
             }
 
-            new JsonReader().AppliesTo(requestGraph.GetRequestReaderContext())
+            new JsonReader(new JsonSerializerSettings())
+                .AppliesTo(requestGraph.GetRequestReaderContext())
                 .ShouldEqual(isJson);
         }
 
@@ -55,7 +57,8 @@ namespace Tests.Unit.Readers
                 requestGraph.WithRequestParameter("request");
             }
 
-            new JsonReader().AppliesTo(requestGraph.GetRequestReaderContext())
+            new JsonReader(new JsonSerializerSettings())
+                .AppliesTo(requestGraph.GetRequestReaderContext())
                 .ShouldEqual(hasRequest);
         }
 
@@ -69,11 +72,12 @@ namespace Tests.Unit.Readers
                     .WithContentType(MimeTypes.ApplicationJson)
                     .AddQuerystringParameter("param");
 
-            var result = await new JsonReader().Read(requestGraph.GetRequestBinderContext());
+            var result = await new JsonReader(new JsonSerializerSettings())
+                .Read(requestGraph.GetRequestReaderContext());
 
             result.ShouldNotBeNull();
             result.ShouldBeType<InputModel>();
-            result.As<InputModel>().Value.ShouldEqual("fark");
+            result.CastTo<InputModel>().Value.ShouldEqual("fark");
         }
     }
 }

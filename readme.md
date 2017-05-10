@@ -15,7 +15,7 @@ Graphite is a simple, lightweight, convention based web framework built on Web A
 - Heavy emphasis on testability.
 - Heavy emphasis on flexibility and configurability. IoW maximizing extensibility and minimizing opinions so you can build your API how **you** want to.
 - Lightweight and simple, [out of the box functionality is purposely kept to a minimum](https://www.brainyquote.com/quotes/quotes/a/antoinedes103610.html).
-- Everything is a POCO, [no inheritance](https://en.wikipedia.org/wiki/Composition_over_inheritance).
+- POCO's, [no inheritance](https://en.wikipedia.org/wiki/Composition_over_inheritance).
 - Conventional routing and urls out of the box.
 - Conventionally override almost any part of the framework.
 - Supports the handler approach (i.e. a single class with one action).
@@ -25,7 +25,7 @@ Graphite is a simple, lightweight, convention based web framework built on Web A
 - Supports multiple querystring and form values with the same name.
 - Supports wildcard url parameters.
 - Currently supports only [StructureMap](http://structuremap.github.io/) but any IoC container can be plugged in.
-- Currently supports [Json.NET](http://www.newtonsoft.com/json), [Bender](https://github.com/mikeobrien/Bender) and the FCL XML and JSON serializers but you can plug in any serializer.
+- Currently supports [Json.NET](http://www.newtonsoft.com/json), [Bender](https://github.com/mikeobrien/Bender) and the FCL XML serializer but you can plug in any serializer.
 
 Getting Started
 ------------
@@ -41,7 +41,6 @@ Graphite can be found on nuget. Install the following packages:
     PM> Install-Package Microsoft.AspNet.WebApi.WebHost (If hosting with ASP.NET)
     PM> Install-Package GraphiteWeb
     PM> Install-Package GraphiteWeb.StructureMap
-    PM> Install-Package GraphiteWeb.Newtonsoft.Json
 
 Props
 ------------

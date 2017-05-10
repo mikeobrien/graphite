@@ -1,8 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Graphite.Writers;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
+using JsonWriter = Graphite.Writers.JsonWriter;
 
 namespace Tests.Unit.Writers
 {
@@ -38,7 +39,8 @@ namespace Tests.Unit.Writers
                     .WithAccept(acceptType);
             var context = requestGraph.GetResponseWriterContext(null);
 
-            new JsonWriter().AppliesTo(context).ShouldEqual(applies);
+            new JsonWriter(new JsonSerializerSettings())
+                .AppliesTo(context).ShouldEqual(applies);
         }
 
         [Test]
@@ -52,7 +54,7 @@ namespace Tests.Unit.Writers
                 Value2 = "value2"
             });
 
-            var response = await new JsonWriter().Write(context);
+            var response = await new JsonWriter(new JsonSerializerSettings()).Write(context);
 
             var content = await response.Content.ReadAsStringAsync();
 

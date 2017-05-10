@@ -11,6 +11,7 @@ using Graphite.Readers;
 using Graphite.Reflection;
 using Graphite.Routing;
 using Graphite.Writers;
+using Newtonsoft.Json;
 
 namespace Graphite
 {
@@ -21,6 +22,16 @@ namespace Graphite
         public ConfigurationDsl(Configuration configuration)
         {
             _configuration = configuration;
+        }
+
+        /// <summary>
+        /// Allows you to configure Json.NET.
+        /// </summary>
+        public ConfigurationDsl ConfigureJsonNet(Action<JsonSerializerSettings> configure)
+        {
+            var settings = new JsonSerializerSettings();
+            configure?.Invoke(settings);
+            return ConfigureRegistry(x => x.Register(settings));
         }
 
         /// <summary>

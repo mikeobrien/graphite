@@ -1,17 +1,22 @@
 ﻿using System.Text;
-using Graphite.Extensions;
 using Graphite.Http;
+using Newtonsoft.Json;
 
 namespace Graphite.Writers
 {
     public class JsonWriter  : StringWriterBase
     {
-        public JsonWriter() : base(MimeTypes.ApplicationJson, Encoding.UTF8) { }
+        private readonly JsonSerializerSettings _settings;
+
+        public JsonWriter(JsonSerializerSettings settings) : 
+            base(MimeTypes.ApplicationJson, Encoding.UTF8)
+        {
+            _settings = settings;
+        }
 
         protected override string GetResponse(ResponseWriterContext context)
         {
-            return context.Response.SerializeJson(context
-                .RequestContext.Route.ResponseType.Type);
+            return JsonConvert.SerializeObject(context.Response, _settings);
         }
     }
 }

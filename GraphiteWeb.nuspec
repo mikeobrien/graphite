@@ -17,6 +17,7 @@
       <tags>web api rest</tags>
       <dependencies>
          <dependency id="Microsoft.AspNet.WebApi.Core" version="5.2.3" />
+    	 <dependency id="Newtonsoft.Json" version="6.0.4" />
       </dependencies>
    </metadata>
 </package>

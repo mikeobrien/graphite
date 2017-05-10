@@ -98,6 +98,7 @@
     <Compile Include="Readers\Extensions.cs" />
     <Compile Include="Readers\FormReader.cs" />
     <Compile Include="Readers\IRequestReader.cs" />
+    <Compile Include="Readers\JsonReader.cs" />
     <Compile Include="Readers\StreamReader.cs" />
     <Compile Include="Readers\StringReaderBase.cs" />
     <Compile Include="Readers\StringReader.cs" />
@@ -108,13 +109,12 @@
     <Compile Include="Routing\Extensions.cs" />
     <Compile Include="Writers\Extensions.cs" />
     <Compile Include="Writers\IResponseWriter.cs" />
-    <Compile Include="Readers\JsonReader.cs" />
+    <Compile Include="Writers\JsonWriter.cs" />
     <Compile Include="Writers\RedirectWriter.cs" />
     <Compile Include="Writers\StreamWriter.cs" />
     <Compile Include="Writers\StringWriter.cs" />
     <Compile Include="Writers\StringWriterBase.cs" />
     <Compile Include="Writers\XmlWriter.cs" />
-    <Compile Include="Writers\JsonWriter.cs" />
     <Compile Include="Actions\IBehavior.cs" />
     <Compile Include="DependencyInjection\Extensions.cs" />
     <Compile Include="Diagnostics\DiagnosticsActionSource.cs" />

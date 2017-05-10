@@ -40,8 +40,8 @@
     <Reference Include="IISExpressBootstrapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\IISExpressBootstrapper.1.2.0\lib\net45\IISExpressBootstrapper.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NSubstitute, Version=2.0.2.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
       <HintPath>..\packages\NSubstitute.2.0.2\lib\net45\NSubstitute.dll</HintPath>
@@ -130,7 +130,6 @@
     <Compile Include="Unit\Readers\StringReaderTests.cs" />
     <Compile Include="Unit\Readers\FormReaderTests.cs" />
     <Compile Include="Unit\Readers\JsonReaderTests.cs" />
-    <Compile Include="Unit\Readers\Newtonsoft.Json\JsonReaderTests.cs" />
     <Compile Include="Unit\Readers\XmlReaderTests.cs" />
     <Compile Include="Unit\Reflection\DescriptorTests.cs" />
     <Compile Include="Unit\Reflection\ExtensionTests.cs" />
@@ -143,7 +142,6 @@
     <Compile Include="Unit\Writers\StreamWriterTests.cs" />
     <Compile Include="Unit\Writers\StringWriterTests.cs" />
     <Compile Include="Unit\Writers\JsonWriterTests.cs" />
-    <Compile Include="Unit\Writers\Newtonsoft.Json\JsonWriterTests.cs" />
     <Compile Include="Unit\Writers\XmlWriterTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -159,17 +157,12 @@
       <Project>{73744e67-b5eb-427a-8a4d-9e6d07532ff9}</Project>
       <Name>Graphite.Bender</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Integration\Serializers\Graphite.Newtonsoft.Json\Graphite.Newtonsoft.Json.csproj">
-      <Project>{be193a75-3940-42ee-8ca9-2caffb0e04e3}</Project>
-      <Name>Graphite.Newtonsoft.Json</Name>
-    </ProjectReference>
     <ProjectReference Include="..\TestHarness\TestHarness.csproj">
       <Project>{ae3d3e1c-0a62-4da6-abf9-f92cbe31239d}</Project>
       <Name>TestHarness</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
