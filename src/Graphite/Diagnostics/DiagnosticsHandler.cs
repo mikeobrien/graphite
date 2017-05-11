@@ -210,6 +210,22 @@ namespace Graphite.Diagnostics
                             white-space: nowrap;
                         }}
 
+                        table.behaviors
+                        {{
+                            width: auto;
+                        }}
+
+                        .behaviors td
+                        {{
+                            padding-top: 0;
+                            padding-bottom: 0;
+                        }}
+
+                        .behaviors td.arrow
+                        {{
+                            text-align: center;
+                        }}
+
                         .green
                         {{
                             color: #90c564;
@@ -395,8 +411,8 @@ namespace Graphite.Diagnostics
                                                     <tr>
                                                         <td>Behaviors</td>
                                                         <td>{(!x.Behaviors.Any() ? "<span class=\"red\">None</span>" :
-                                                            x.Behaviors.Select(b => $@"<code>{b.FriendlyFullName.HtmlEncode()}</code>")
-                                                                .Join(" &rarr; "))}</td>
+                                                            $@"<table class=""behaviors"">{x.Behaviors.Select(b => $@"<tr><td><code>{b.FriendlyFullName
+                                                                .HtmlEncode()}</code></td></tr>").Join("<tr><td class=\"arrow\">&darr;</td></tr>")}</table>")}</td>
                                                     </tr>
                                                     <tr>
                                                         <td>Request Parameter</td>
