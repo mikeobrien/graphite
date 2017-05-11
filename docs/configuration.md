@@ -14,7 +14,9 @@ public class Global : HttpApplication
         var configuration = GlobalConfiguration.Configuration;
 
         configuration.InitializeGraphite(c => c
-            .EnableDiagnosticsInDebugMode()            .UseStructureMapContainer<Registry>(configuration)            .ExcludeTypeNamespaceFromUrl<Global>());
+            .EnableDiagnosticsInDebugMode()
+            .UseStructureMapContainer<Registry>(configuration)
+            .ExcludeTypeNamespaceFromUrl<Global>());
 
         configuration.EnsureInitialized();
     }
@@ -76,7 +78,9 @@ configuration.InitializeGraphite(c => c
 
 By default Graphite supports the following HTTP methods: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `OPTIONS`, `HEAD`, `TRACE` and `CONNECT`. When Graphite scans handler types for actions, it looks for methods matching the naming convention specified by the HTTP method. The default convention is the action method name starting with the pascal cased HTTP method (e.g. `^Get`, `^Post`, etc).
 
-- WithDownloadBufferSizfOf
+**In progress...**
+
+- WithDownloadBufferSizeOf
 - DisableMetrics
 - WithUnhandledExceptionStatusText
 - DisableDefaultErrorHandler
