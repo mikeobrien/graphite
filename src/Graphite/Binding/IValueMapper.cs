@@ -2,46 +2,41 @@ using System;
 using Graphite.Actions;
 using Graphite.Extensibility;
 using Graphite.Reflection;
+using Graphite.Routing;
 
 namespace Graphite.Binding
 {
     public class ValueMapperContext
     {
-        public ValueMapperContext(
-            Configuration configuration, RequestContext requestContext, 
-            ParameterDescriptor parameter, object[] values) :
-            this(configuration, requestContext, parameter?.ParameterType, values)
-        {
-            IsParameter = true;
-            Parameter = parameter;
-        }
+        private readonly ActionParameter _parameter;
 
         public ValueMapperContext(
             Configuration configuration, RequestContext requestContext,
-                PropertyDescriptor property, object[] values) : 
-            this(configuration, requestContext, property?.PropertyType, values)
+            ActionParameter parameter, object[] values)
         {
-            IsProperty = true;
-            Property = property;
-        }
-
-        private ValueMapperContext(Configuration configuration, RequestContext requestContext,
-            TypeDescriptor type, object[] values)
-        {
+            _parameter = parameter;
             Configuration = configuration;
             RequestContext = requestContext;
-            Type = type;
             Values = values;
         }
 
         public virtual Configuration Configuration { get; }
         public virtual RequestContext RequestContext { get; }
-        public virtual TypeDescriptor Type { get; }
-        public virtual bool IsParameter { get; }
-        public virtual ParameterDescriptor Parameter { get; }
-        public virtual bool IsProperty { get; }
-        public virtual PropertyDescriptor Property { get; }
+        public virtual string Name => _parameter.Name;
+        public virtual TypeDescriptor Type => _parameter.TypeDescriptor;
+        public virtual bool ForParameter => _parameter.IsParameter;
+        public virtual ParameterDescriptor Parameter => _parameter.ParameterDescriptor;
+        public virtual bool ForPropertyOfParameter => _parameter.IsPropertyOfParameter;
+        public virtual bool ForProperty => _parameter.IsProperty;
+        public virtual PropertyDescriptor Property => _parameter.PropertyDescriptor;
         public virtual object[] Values { get; }
+
+        public Attribute[] Attributes => _parameter.Attributes;
+        public bool HasAttribute<T>() where T : Attribute => _parameter.HasAttribute<T>();
+        public bool HasAnyAttribute<T1, T2>() where T1 : Attribute where T2 : Attribute =>
+            _parameter.HasAttributes<T1, T2>();
+        public T GetAttribute<T>() where T : Attribute => _parameter.GetAttribute<T>();
+        public T[] GetAttributes<T>() where T : Attribute => _parameter.GetAttributes<T>();
     }
 
     public interface IValueMapper : IConditional<ValueMapperContext>

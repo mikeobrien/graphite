@@ -7,9 +7,8 @@ namespace Graphite.Routing
     {
         public RouteDescriptor(
             string method, string url,
-            ParameterDescriptor[] urlParameters,
-            ParameterDescriptor[] wildcardParameters,
-            ParameterDescriptor[] querystringParameters,
+            UrlParameter[] urlParameters,
+            ActionParameter[] parameters,
             ParameterDescriptor requestParameter,
             TypeDescriptor responseType)
         {
@@ -17,8 +16,7 @@ namespace Graphite.Routing
             Method = method;
             Url = url;
             UrlParameters = urlParameters;
-            WildcardParameters = wildcardParameters;
-            QuerystringParameters = querystringParameters;
+            Parameters = parameters;
             RequestParameter = requestParameter;
             HasRequest = requestParameter != null;
             ResponseType = responseType;
@@ -28,9 +26,8 @@ namespace Graphite.Routing
         public virtual string Id { get; }
         public virtual string Method { get; }
         public virtual string Url { get; }
-        public virtual ParameterDescriptor[] UrlParameters { get; }
-        public virtual ParameterDescriptor[] WildcardParameters { get; }
-        public virtual ParameterDescriptor[] QuerystringParameters { get; }
+        public virtual UrlParameter[] UrlParameters { get; }
+        public virtual ActionParameter[] Parameters { get; }
         public virtual bool HasRequest { get; }
         public virtual bool HasResponse { get; }
         public virtual ParameterDescriptor RequestParameter { get; }

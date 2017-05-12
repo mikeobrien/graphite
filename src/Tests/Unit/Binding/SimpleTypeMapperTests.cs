@@ -5,6 +5,7 @@ using System.Linq;
 using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Reflection;
+using Graphite.Routing;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
@@ -40,7 +41,7 @@ namespace Tests.Unit.Binding
         public void Should_apply_to_simple_types(ParameterDescriptor parameter)
         {
             new SimpleTypeMapper().AppliesTo(new ValueMapperContext(
-                null, null, parameter, null)).ShouldBeTrue();
+                null, null, new ActionParameter(parameter), null)).ShouldBeTrue();
         }
 
         public class ComplexClass { }
@@ -56,7 +57,7 @@ namespace Tests.Unit.Binding
         public void Should_not_apply_to_complex_types(ParameterDescriptor parameter)
         {
             new SimpleTypeMapper().AppliesTo(new ValueMapperContext(
-                null, null, parameter, null)).ShouldBeFalse();
+                null, null, new ActionParameter(parameter), null)).ShouldBeFalse();
         }
 
         private static DateTime _datetime = DateTime.Parse(DateTime.MaxValue.ToString());
@@ -115,7 +116,7 @@ namespace Tests.Unit.Binding
         {
             var parameter = SimpleTypeParameters.FirstOrDefault(x => x.ParameterType.Type == type);
             var result = new SimpleTypeMapper().Map(new ValueMapperContext(
-                null, null, parameter, value.AsArray()));
+                null, null, new ActionParameter(parameter), value.AsArray()));
             result?.GetType().ShouldEqual(type.GetUnderlyingNullableType());
             result.ShouldEqual(expected);
         }
@@ -127,7 +128,8 @@ namespace Tests.Unit.Binding
             if (type == typeof(string)) return;
             var parameter = SimpleTypeParameters.FirstOrDefault(x => x.ParameterType.Type == type);
             var message = new SimpleTypeMapper().Should().Throw<BadRequestException>(x => x
-                .Map(new ValueMapperContext(null, null, parameter, "fark".AsArray()))).Message;
+                .Map(new ValueMapperContext(null, null, new ActionParameter(parameter), 
+                    "fark".AsArray()))).Message;
 
             message.ShouldContain("fark");
             message.ShouldContain(parameter.Name);
@@ -158,7 +160,7 @@ namespace Tests.Unit.Binding
             var parameter = SimpleTypeParameterArrays.FirstOrDefault(
                 x => x.ParameterType.ElementType.Type == type);
             var result = new SimpleTypeMapper().Map(new ValueMapperContext(
-                null, null, parameter, new[] { value, value }));
+                null, null, new ActionParameter(parameter), new[] { value, value }));
             result?.GetType().ShouldEqual(type.MakeArrayType());
             result.As<IEnumerable>().Cast<object>().ShouldOnlyContain(expected, expected);
         }
@@ -188,7 +190,7 @@ namespace Tests.Unit.Binding
             var parameter = SimpleTypeParameterLists.FirstOrDefault(
                 x => x.ParameterType.ElementType.Type == type);
             var result = new SimpleTypeMapper().Map(new ValueMapperContext(
-                null, null, parameter, new[] { value, value }));
+                null, null, new ActionParameter(parameter), new[] { value, value }));
             result?.GetType().ShouldEqual(typeof(List<>).MakeGenericType(type));
             result.As<IEnumerable>().Cast<object>().ShouldOnlyContain(expected, expected);
         }
@@ -218,7 +220,7 @@ namespace Tests.Unit.Binding
             var parameter = SimpleTypeParameterListInterface.FirstOrDefault(
                 x => x.ParameterType.ElementType.Type == type);
             var result = new SimpleTypeMapper().Map(new ValueMapperContext(
-                null, null, parameter, new[] { value, value }));
+                null, null, new ActionParameter(parameter), new[] { value, value }));
             result?.GetType().ShouldEqual(typeof(List<>).MakeGenericType(type));
             result.As<IEnumerable>().Cast<object>().ShouldOnlyContain(expected, expected);
         }

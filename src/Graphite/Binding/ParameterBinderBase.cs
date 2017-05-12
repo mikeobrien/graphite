@@ -1,35 +1,54 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Graphite.Reflection;
+using Graphite.Extensions;
+using Graphite.Routing;
 
 namespace Graphite.Binding
 {
     public abstract class ParameterBinderBase : IRequestBinder
     {
         private readonly IEnumerable<IValueMapper> _mappers;
-        private readonly Configuration _configuration;
 
-        protected ParameterBinderBase(IEnumerable<IValueMapper> mappers,
-            Configuration configuration)
+        protected ParameterBinderBase(IEnumerable<IValueMapper> mappers)
         {
             _mappers = mappers;
-            _configuration = configuration;
         }
 
         public abstract bool AppliesTo(RequestBinderContext context);
-        protected abstract ParameterDescriptor[] GetParameters(RequestBinderContext context);
-        protected abstract Task<ILookup<string, string>> GetValues(RequestBinderContext context);
+
+        protected abstract Task<ILookup<string, object>> GetValues(RequestBinderContext context);
+        protected abstract ActionParameter[] GetParameters(RequestBinderContext context);
+
+        protected virtual string MapParameterName(RequestBinderContext context, ActionParameter parameter)
+        {
+            return parameter.Name;
+        }
 
         public virtual async Task Bind(RequestBinderContext context)
         {
-            var parameters = await GetValues(context);
-            foreach (var parameter in GetParameters(context))
-            {
-                var values = parameters[parameter.Name].ToArray();
-                var result = _mappers.Map(values, parameter, context.RequestContext, _configuration);
-                if (result.Mapped) context.ActionArguments[parameter.Position] = result.Value;
-            }
+            var values = await GetValues(context);
+            var actionParameters = GetParameters(context)
+                .Where(x => x.IsParameter || x.IsPropertyOfParameter);
+
+            values.Where(x => x.Any())
+                .JoinIgnoreCase(actionParameters, x => x.Key, 
+                    x => MapParameterName(context, x), 
+                    (p, ap) => new
+                    {
+                        ActionParameter = ap,
+                        Values = p.ToArray()
+                    })
+                .ForEach(x =>
+                {
+                    var result = _mappers.Map(x.Values, x.ActionParameter,
+                        context.RequestContext, context.Configuration);
+
+                    if (!result.Mapped) return;
+
+                    x.ActionParameter.BindArgument(context.ActionArguments, result.Value);
+                });
         }
     }
 }

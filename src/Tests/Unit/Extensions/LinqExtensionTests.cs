@@ -17,7 +17,7 @@ namespace Tests.Unit.Extensions
                 { "key1", "value1" },
                 { "key1", "value2" },
                 { "key2", "value3" }
-            }.ToStringLookup();
+            }.ToLookup();
 
             lookup.Count.ShouldEqual(2);
 
@@ -33,7 +33,7 @@ namespace Tests.Unit.Extensions
                 { "key1", "value1" },
                 { "key1", "value2" },
                 { "key2", "value3" }
-            }.ToObjectLookup();
+            }.ToLookup();
 
             lookup.Count.ShouldEqual(2);
 

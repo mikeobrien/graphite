@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using Graphite.Actions;
 using Graphite.Binding;
@@ -138,6 +139,15 @@ namespace Graphite
         public ConfigurationDsl WithUnhandledExceptionStatusText(string statusText)
         {
             _configuration.UnhandledExceptionStatusText = statusText;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the default status code, the default is 204 (no content).
+        /// </summary>
+        public ConfigurationDsl WithDefaultStatusCode(HttpStatusCode statusCode)
+        {
+            _configuration.DefaultStatusCode = statusCode;
             return this;
         }
 
@@ -511,6 +521,88 @@ namespace Graphite
             <IBehavior, BehaviorContext>> configure)
         {
             configure(_configuration.Behaviors);
+            return this;
+        }
+
+        /// <summary>
+        /// Binds header values to action parameters.
+        /// </summary>
+        public ConfigurationDsl BindHeaders()
+        {
+            _configuration.HeadersBindingMode = BindingMode.Implicit;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds header values to action parameters by convention.
+        /// </summary>
+        public ConfigurationDsl BindHeadersByNamingConvention()
+        {
+            _configuration.HeadersBindingMode = BindingMode.Convention;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds header values to action parameters by attribute.
+        /// </summary>
+        public ConfigurationDsl BindHeadersByAttribute()
+        {
+            _configuration.HeadersBindingMode = BindingMode.Explicit;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds cookie values to action parameters.
+        /// </summary>
+        public ConfigurationDsl BindCookies()
+        {
+            _configuration.CookiesBindingMode = BindingMode.Implicit;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds cookie values to action parameters by convention.
+        /// </summary>
+        public ConfigurationDsl BindCookiesByNamingConvention()
+        {
+            _configuration.CookiesBindingMode = BindingMode.Convention;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds cookie values to action parameters by attribute.
+        /// </summary>
+        public ConfigurationDsl BindCookiesByByAttriubute()
+        {
+            _configuration.CookiesBindingMode = BindingMode.Explicit;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds request info values to action parameters.
+        /// </summary>
+        public ConfigurationDsl BindRequestInfo()
+        {
+            _configuration.RequestInfoBindingMode = BindingMode.Implicit;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds request info values to action parameters by convention.
+        /// </summary>
+        public ConfigurationDsl BindRequestInfoByAttribute()
+        {
+            _configuration.RequestInfoBindingMode = BindingMode.Explicit;
+            return this;
+        }
+
+        /// <summary>
+        /// Binds request parameters to the first level of 
+        /// properties of a complex action parameter type.
+        /// </summary>
+        public ConfigurationDsl BindComplexTypeProperties()
+        {
+            _configuration.BindComplexTypeProperties = true;
             return this;
         }
     }

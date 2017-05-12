@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -25,9 +28,9 @@ namespace Graphite.Extensions
             return method.EqualsIgnoreCase("DELETE");
         }
 
-        public static ILookup<string, string> ParseQueryString(this string querystring)
+        public static ILookup<string, object> ParseQueryString(this string querystring)
         {
-            return HttpUtility.ParseQueryString(querystring).ToStringLookup();
+            return HttpUtility.ParseQueryString(querystring).ToLookup();
         }
 
         public static T GetService<T>(this IDependencyResolver dependencyResolver)
@@ -103,6 +106,18 @@ namespace Graphite.Extensions
                 {
                     FileName = filename
                 };
+        }
+        
+        public static ILookup<string, object> ToLookup(this IEnumerable<CookieHeaderValue> cookies)
+        {
+            return cookies.SelectMany(c => c.Cookies.Select(x =>
+                new KeyValuePair<string, object>(x.Name, x.Value))).ToLookup();
+        }
+
+        public static ILookup<string, object> ToLookup(this HttpRequestHeaders headers)
+        {
+            return headers.SelectMany(h => h.Value.Select(x =>
+                new KeyValuePair<string, object>(h.Key, x))).ToLookup();
         }
     }
 }

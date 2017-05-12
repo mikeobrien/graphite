@@ -54,7 +54,7 @@ namespace Graphite
             actions.ForEach(x =>
             {
                 httpConfiguration.Routes.MapHttpRoute(x.Route.Id, x.Route.Url, null,
-                    handler: new ActionMessageHandler(x, _behaviorChainInvoker, 
+                    handler: new ActionMessageHandler(x, _behaviorChainInvoker,
                         _metrics, _configuration),
                     constraints: new
                     {

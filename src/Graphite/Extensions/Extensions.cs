@@ -32,6 +32,11 @@ namespace Graphite.Extensions
             return value as T;
         }
 
+        public static Lazy<TResult> ToLazy<TResult>(this Func<TResult> factory)
+        {
+            return new Lazy<TResult>(factory);
+        }
+
         public static Lazy<TResult> ToLazy<T, TResult>(this T source, 
             Func<T, TResult> factory)
         {

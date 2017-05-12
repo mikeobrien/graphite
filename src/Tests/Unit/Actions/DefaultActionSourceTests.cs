@@ -61,7 +61,7 @@ namespace Tests.Unit.Actions
                 GetDescriptors = x => new List<RouteDescriptor>
                 {
                     new RouteDescriptor(x.ActionMethod.Method.Name, 
-                        x.ActionMethod.FullName, null, null, null, null, null)
+                        x.ActionMethod.FullName, null, null, null, null)
                 }
             };
             _routeConvention2 = new TestRouteConvention2
@@ -230,16 +230,16 @@ namespace Tests.Unit.Actions
             _routeConvention1.GetDescriptors = x => new List<RouteDescriptor>
                 {
                     new RouteDescriptor(x.ActionMethod.Method.Name, 
-                        x.ActionMethod.FullName, null, null, null, null, null),
+                        x.ActionMethod.FullName, null, null, null, null),
                     new RouteDescriptor(x.ActionMethod.Method.Name, 
-                        "fark", null, null, null, null, null)
+                        "fark", null, null, null, null)
                 };
             _routeConvention2.GetDescriptors = x => new List<RouteDescriptor>
                 {
                     new RouteDescriptor(x.ActionMethod.Method.Name, 
-                        x.ActionMethod.FullName, null, null, null, null, null),
+                        x.ActionMethod.FullName, null, null, null, null),
                     new RouteDescriptor(x.ActionMethod.Method.Name, 
-                        "farker", null, null, null, null, null)
+                        "farker", null, null, null, null)
                 };
 
             var actions = _actionSource.GetActions(new ActionSourceContext(_configuration, null));

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -62,9 +63,12 @@ namespace Tests.Common
             return Get(relativeUrl, MimeTypes.TextHtml, x => new StreamReader(x).ReadToEnd());
         }
 
-        public static Result<TResponse> GetJson<TResponse>(string relativeUrl)
+        public static Result<TResponse> GetJson<TResponse>(string relativeUrl, 
+            Dictionary<string, string> cookies = null,
+            Dictionary<string, string> headers = null)
         {
-            return Get(relativeUrl, MimeTypes.ApplicationJson, x => Deserialize.Json<TResponse>(x));
+            return Get(relativeUrl, MimeTypes.ApplicationJson, x => 
+                Deserialize.Json<TResponse>(x), cookies, headers);
         }
 
         public static Result<TResponse> GetXml<TResponse>(string relativeUrl)
@@ -78,11 +82,16 @@ namespace Tests.Common
         }
 
         private static Result<TResponse> Get<TResponse>(string relativeUrl,
-            string accept, Func<Stream, TResponse> deserialize)
+            string accept, Func<Stream, TResponse> deserialize,
+            Dictionary<string, string> cookies = null,
+            Dictionary<string, string> headers = null)
         {
             var request = (HttpWebRequest)WebRequest.Create(BuildUrl(relativeUrl));
             request.Method = HttpMethod.Get.Method;
             request.Accept = accept;
+            if (cookies != null && cookies.Any())
+                request.Headers.Add("Cookie", cookies.Select(x => $"{x.Key}={x.Value}").Join("; "));
+            headers?.ForEach(x => request.Headers.Add(x.Key, x.Value));
             return Execute(request, deserialize);
         }
 
