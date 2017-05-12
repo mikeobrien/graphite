@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using NUnit.Framework;
 using Should;
 using TestHarness;
 using Tests.Common;
-using Handler = TestHarness.Handler;
 using WebClient = Tests.Common.WebClient;
 
 namespace Tests.Acceptance
@@ -15,15 +15,9 @@ namespace Tests.Acceptance
     public class PerformanceTests
     {
         [Test][Ignore("Manually run")]
-        public void PerformanceComparison()
+        public void Performance()
         {
-            var iterations = 100;
-
-            var graphite = new ConcurrentBag<long>();
-            var graphiteAsync = new ConcurrentBag<long>();
-            var webapi = new ConcurrentBag<long>();
-            var webapiAsync = new ConcurrentBag<long>();
-            var guid = Guid.NewGuid();
+            var guid = Guid.Parse("6e7335ea-5968-4cf5-84a2-0b8ef560a865");
             var url = $"performancetests/{{0}}/url1/{guid}/5?query1=query1&query2={guid}&query3=5";
             var urlAsync = $"performancetests/{{0}}/async/url1/{guid}/5?query1=query1&query2={guid}&query3=5";
             var graphiteUrl = string.Format(url, "graphite");
@@ -37,26 +31,25 @@ namespace Tests.Acceptance
                 Value3 = "value3"
             };
 
-            10.TimesParallel(() =>
-            {
-                Should_match_result(WebClient.PostJson<PerfInputModel, PerfOutputModel>(graphiteUrl, inputModel), guid);
-                Should_match_result(WebClient.PostJson<PerfInputModel, PerfOutputModel>(webapiUrl, inputModel), guid);
-                Should_match_result(WebClient.PostJson<PerfInputModel, PerfOutputModel>(graphiteAsyncUrl, inputModel), guid);
-                Should_match_result(WebClient.PostJson<PerfInputModel, PerfOutputModel>(webapiAsyncUrl, inputModel), guid);
-            });
+            Should_match_result(WebClient.PostJson<PerfInputModel, PerfOutputModel>(graphiteUrl, inputModel), guid);
+            Should_match_result(WebClient.PostJson<PerfInputModel, PerfOutputModel>(webapiUrl, inputModel), guid);
+            Should_match_result(WebClient.PostJson<PerfInputModel, PerfOutputModel>(graphiteAsyncUrl, inputModel), guid);
+            Should_match_result(WebClient.PostJson<PerfInputModel, PerfOutputModel>(webapiAsyncUrl, inputModel), guid);
 
-            iterations.TimesParallel(() =>
+            3.Times(() =>
             {
-                graphite.Add(graphiteUrl.ElapsedMilliseconds(x => WebClient.PostJson<PerfInputModel, PerfOutputModel>(x, inputModel)));
-                webapi.Add(webapiUrl.ElapsedMilliseconds(x => WebClient.PostJson<PerfInputModel, Handler.OutputModel>(x, inputModel)));
-                graphiteAsync.Add(graphiteUrl.ElapsedMilliseconds(x => WebClient.PostJson<PerfInputModel, PerfOutputModel>(x, inputModel)));
-                webapiAsync.Add(webapiUrl.ElapsedMilliseconds(x => WebClient.PostJson<PerfInputModel, Handler.OutputModel>(x, inputModel)));
-            });
+                Thread.Sleep(5000);
+                var comparison = PerformanceComparison.InMilliseconds(1000, 20, 40);
 
-            Console.WriteLine($"Graphite :      {graphite.Average()}ms");
-            Console.WriteLine($"Graphite Async: {graphiteAsync.Average()}ms");
-            Console.WriteLine($"Web Api:        {webapi.Average()}ms");
-            Console.WriteLine($"Web Api Async:  {webapiAsync.Average()}ms");
+                var graphite = comparison.AddCase("Graphite", () => WebClient.PostJson<PerfInputModel, PerfOutputModel>(graphiteUrl, inputModel));
+                var graphiteAsync = comparison.AddCase("Graphite Async", () => WebClient.PostJson<PerfInputModel, PerfOutputModel>(graphiteAsyncUrl, inputModel));
+                var webapi = comparison.AddCase("Web Api", () => WebClient.PostJson<PerfInputModel, PerfOutputModel>(webapiUrl, inputModel));
+                var webapiAsync = comparison.AddCase("Web Api Async", () => WebClient.PostJson<PerfInputModel, PerfOutputModel>(webapiAsyncUrl, inputModel));
+
+                comparison.Run();
+
+                File.AppendAllText(@"c:\temp\graphite.txt", $"{graphite.Average},{graphiteAsync.Average},{webapi.Average},{webapiAsync.Average}\r\n");
+            });
         }
 
         private void Should_match_result(WebClient.Result<PerfOutputModel> outputModel, Guid guid)

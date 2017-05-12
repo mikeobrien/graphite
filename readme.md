@@ -24,7 +24,6 @@ Graphite can be found on nuget. Install the following packages:
 
 - Can run side-by-side with existing Web Api controllers.
 - IoC is baked in from the ground up.
-- Everything is async by default.
 - Heavy emphasis on testability.
 - Heavy emphasis on flexibility and configurability. IoW maximizing extensibility and minimizing opinions so you can build your API how **you** want to.
 - Lightweight and simple, [out of the box functionality is purposely kept to a minimum](https://www.brainyquote.com/quotes/quotes/a/antoinedes103610.html).

@@ -1,42 +1,42 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Graphite.Extensions;
-using Graphite.Reflection;
+using Graphite.Routing;
 
 namespace Graphite.Binding
 {
     public class UrlParameterBinder : ParameterBinderBase
     {
-        public UrlParameterBinder(IEnumerable<IValueMapper> mappers,
-            Configuration configuration) : base(mappers, configuration) { }
+        public UrlParameterBinder(IEnumerable<IValueMapper> mappers) : base(mappers) { }
 
         public override bool AppliesTo(RequestBinderContext context)
         {
             return context.RequestContext.Route.UrlParameters.Any();
         }
 
-        protected override ParameterDescriptor[] GetParameters(RequestBinderContext context)
-        {
-            return context.RequestContext.Route.UrlParameters;
-        }
-
-        protected override Task<ILookup<string, string>> GetValues(RequestBinderContext context)
+        protected override Task<ILookup<string, object>> GetValues(RequestBinderContext context)
         {
             return context.RequestContext.UrlParameters.SelectMany(x => 
                 ExpandWildcardParameters(x, context.RequestContext.Route
-                    .WildcardParameters)).ToLookup().ToTaskResult();
+                    .UrlParameters)).ToLookup().ToTaskResult();
         }
 
-        private IEnumerable<KeyValuePair<string, string>> ExpandWildcardParameters
-            (KeyValuePair<string, string> value, ParameterDescriptor[] wildcardParameters)
+        private IEnumerable<KeyValuePair<string, object>> ExpandWildcardParameters
+            (KeyValuePair<string, object> value, UrlParameter[] parameters)
         {
-            var wildcard = wildcardParameters.FirstOrDefault(x => x.Name.EqualsIgnoreCase(value.Key));
-            return wildcard == null || !(wildcard.ParameterType.IsArray || 
-                    wildcard.ParameterType.IsGenericListCastable) 
-                ? new[] { value } 
-                : value.Value.Split('/').Select(x => new KeyValuePair<string, string>(value.Key, x));
+            var wildcard = parameters.FirstOrDefault(x => x.IsWildcard &&
+                x.Name.EqualsIgnoreCase(value.Key));
+            return wildcard == null || !(wildcard.TypeDescriptor.IsArray ||
+                    wildcard.TypeDescriptor.IsGenericListCastable)
+                ? new[] { value }
+                : value.Value.Split('/').ToKeyValuePairs(value.Key);
+        }
+
+        protected override ActionParameter[] GetParameters(RequestBinderContext context)
+        {
+            return context.RequestContext.Route.UrlParameters
+                .Concat(context.RequestContext.Route.Parameters).ToArray();
         }
     }
 }

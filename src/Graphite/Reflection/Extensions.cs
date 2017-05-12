@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using Graphite.Extensions;
 
@@ -27,6 +28,34 @@ namespace Graphite.Reflection
         public static TypeDescriptor GetTypeDescriptor<T>(this ITypeCache typeCache)
         {
             return typeCache.GetTypeDescriptor(typeof(T));
+        }
+
+        public static Func<object> CompileTryCreate(this Type type)
+        {
+            var constructor = type.GetParameterlessConstructor();
+            return Expression.Lambda<Func<object>>(constructor == null ?
+                (Expression)Expression.Constant(null) :
+                Expression.New(constructor)).Compile();
+        }
+
+        public static Func<object, object> CompileGetter(this PropertyInfo property)
+        {
+            var instance = Expression.Parameter(typeof(object));
+            return Expression.Lambda<Func<object, object>>(instance
+                    .Convert(property.DeclaringType)
+                    .PropertyAccess(property)
+                    .Convert<object>(),
+                instance).Compile();
+        }
+
+        public static Action<object, object> CompileSetter(this PropertyInfo property)
+        {
+            var instance = Expression.Parameter(typeof(object));
+            var value = Expression.Parameter(typeof(object));
+            return Expression.Lambda<Action<object, object>>(instance
+                    .Convert(property.DeclaringType)
+                    .PropertyAccess(property).Assign(value.Convert(property.PropertyType)),
+                instance, value).Compile();
         }
 
         public static bool IsInDebugMode(this Assembly assembly)
@@ -116,6 +145,16 @@ namespace Graphite.Reflection
             var compare = typeof(T);
             return type.Namespace == compare.Namespace || 
                 type.Namespace.StartsWith($"{compare.Namespace}.");
+        }
+
+        public static ConstructorInfo GetParameterlessConstructor(this Type type)
+        {
+            return type.GetConstructor(Type.EmptyTypes);
+        }
+
+        public static bool HasParameterlessConstructor(this Type type)
+        {
+            return type.GetParameterlessConstructor() != null;
         }
 
         public static bool HasAttribute<T>(this ParameterInfo parameter)

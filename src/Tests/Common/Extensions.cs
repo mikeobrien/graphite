@@ -75,22 +75,13 @@ namespace Tests.Common
             configuration.DependencyResolver = new EmptyResolver();
         }
 
-        public static long ElapsedTicks<T>(this T source, Action<T> action)
+        public static TimeSpan Elapsed(this Action action)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            action(source);
+            action();
             stopwatch.Stop();
-            return stopwatch.ElapsedTicks;
-        }
-
-        public static long ElapsedMilliseconds<T>(this T source, Action<T> action)
-        {
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            action(source);
-            stopwatch.Stop();
-            return stopwatch.ElapsedMilliseconds;
+            return stopwatch.Elapsed;
         }
 
         public static void Times(this int iterations, Action action)

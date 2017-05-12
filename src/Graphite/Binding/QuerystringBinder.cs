@@ -2,29 +2,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Graphite.Extensions;
-using Graphite.Reflection;
+using Graphite.Routing;
 
 namespace Graphite.Binding
 {
     public class QuerystringBinder : ParameterBinderBase
     {
-        public QuerystringBinder(IEnumerable<IValueMapper> mappers,
-            Configuration configuration) : base(mappers, configuration) { }
+        public QuerystringBinder(IEnumerable<IValueMapper> mappers) : base(mappers) { }
 
         public override bool AppliesTo(RequestBinderContext context)
         {
-            return context.RequestContext.Route.QuerystringParameters.Any();
+            return context.RequestContext.Route.Parameters.Any();
         }
 
-        protected override ParameterDescriptor[] GetParameters(RequestBinderContext context)
+        protected override ActionParameter[] GetParameters(RequestBinderContext context)
         {
-            return context.RequestContext.Route.QuerystringParameters;
+            return context.RequestContext.Route.Parameters;
         }
 
-        protected override Task<ILookup<string, string>> 
+        protected override Task<ILookup<string, object>> 
             GetValues(RequestBinderContext context)
         {
-            return context.RequestContext.QuerystringParameters.ToTaskResult();
+            return context.RequestContext.QuerystringParameters
+                .ToTaskResult<ILookup<string, object>>();
         }
     }
 }

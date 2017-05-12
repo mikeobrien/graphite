@@ -19,7 +19,7 @@ namespace Graphite.Writers
             var response = new HttpResponseMessage();
             var data = context.Response?.ToString();
             if (data != null)
-                response.Content = new StringContent(data,
+                response.Content = new AsyncStringContent(data,
                     Encoding.UTF8, data.ContainsIgnoreCase("</") ? 
                         MimeTypes.TextHtml : MimeTypes.TextPlain);
             return response.ToTaskResult();

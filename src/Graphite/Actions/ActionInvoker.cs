@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Graphite.Binding;
@@ -48,7 +47,7 @@ namespace Graphite.Actions
                     _configuration, _requestContext, response);
             }
 
-            return new HttpResponseMessage(HttpStatusCode.NoContent);
+            return _requestContext.RequestMessage.CreateResponse(_configuration.DefaultStatusCode);
         }
     }
 }

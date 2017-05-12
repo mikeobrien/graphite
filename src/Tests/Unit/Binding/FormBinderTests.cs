@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Graphite.Binding;
 using Graphite.Extensions;
@@ -30,12 +31,12 @@ namespace Tests.Unit.Binding
 
             if (hasParameters)
             {
-                requestGraph.AddQuerystringParameter("param1")
-                    .AddQuerystringParameter("param2");
+                requestGraph.AddParameter("param1")
+                    .AddParameter("param2");
             }
 
-            new FormBinder(requestGraph.ValueMappers,
-                requestGraph.Configuration).AppliesTo(requestGraph.GetRequestBinderContext())
+            new FormBinder(requestGraph.ValueMappers)
+                .AppliesTo(requestGraph.GetRequestBinderContext())
                 .ShouldEqual(hasParameters);
         }
 
@@ -46,8 +47,8 @@ namespace Tests.Unit.Binding
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                     .WithRequestData("param1=value1&param2=value2")
-                    .AddQuerystringParameter("param1")
-                    .AddQuerystringParameter("param2")
+                    .AddParameter("param1")
+                    .AddParameter("param2")
                     .WithContentType(MimeTypes.ApplicationFormUrlEncoded)
                     .AddValueMapper1(x => x.Values);
 
@@ -56,8 +57,8 @@ namespace Tests.Unit.Binding
                 requestGraph.WithRequestParameter("request");
             }
 
-            new FormBinder(requestGraph.ValueMappers,
-                requestGraph.Configuration).AppliesTo(requestGraph.GetRequestBinderContext())
+            new FormBinder(requestGraph.ValueMappers)
+                .AppliesTo(requestGraph.GetRequestBinderContext())
                 .ShouldEqual(!hasRequest);
         }
 
@@ -68,8 +69,8 @@ namespace Tests.Unit.Binding
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                     .WithRequestData("param1=value1&param2=value2")
-                    .AddQuerystringParameter("param1")
-                    .AddQuerystringParameter("param2")
+                    .AddParameter("param1")
+                    .AddParameter("param2")
                     .AddValueMapper1(x => x.Values);
 
             if (isFormUrlEncoded)
@@ -77,8 +78,8 @@ namespace Tests.Unit.Binding
                 requestGraph.WithContentType(MimeTypes.ApplicationFormUrlEncoded);
             }
 
-            new FormBinder(requestGraph.ValueMappers,
-                requestGraph.Configuration).AppliesTo(requestGraph.GetRequestBinderContext())
+            new FormBinder(requestGraph.ValueMappers)
+                .AppliesTo(requestGraph.GetRequestBinderContext())
                 .ShouldEqual(isFormUrlEncoded);
         }
 
@@ -88,12 +89,11 @@ namespace Tests.Unit.Binding
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                     .WithRequestData("param1=value1&param2=value2")
-                    .AddQuerystringParameter("param1")
-                    .AddQuerystringParameter("param2")
+                    .AddParameter("param1")
+                    .AddParameter("param2")
                     .AddValueMapper1(x => x.Values.First());
 
-            var binder = new FormBinder(requestGraph.ValueMappers, 
-                requestGraph.Configuration);
+            var binder = new FormBinder(requestGraph.ValueMappers);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
@@ -114,15 +114,14 @@ namespace Tests.Unit.Binding
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.MultiParams(null))
                     .WithRequestData("param1=value1&param1=value2")
-                    .AddQuerystringParameter("param1")
+                    .AddParameter("param1")
                     .AddValueMapper1(x => x.Values);
 
-            var binder = new FormBinder(requestGraph.ValueMappers,
-                requestGraph.Configuration);
+            var binder = new FormBinder(requestGraph.ValueMappers);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
-            requestGraph.ActionArguments[0].CastTo<string[]>()
+            requestGraph.ActionArguments[0].CastTo<object[]>()
                 .ShouldOnlyContain("value1", "value2");
         }
 
@@ -132,11 +131,10 @@ namespace Tests.Unit.Binding
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                     .WithRequestData("param1=value1")
-                    .AddQuerystringParameter("param1")
+                    .AddParameter("param1")
                     .AddValueMapper1(x => x.Values.First());
 
-            var binder = new FormBinder(requestGraph.ValueMappers,
-                requestGraph.Configuration);
+            var binder = new FormBinder(requestGraph.ValueMappers);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
@@ -149,13 +147,12 @@ namespace Tests.Unit.Binding
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                     .WithRequestData("param1=value1&param2=value2")
-                    .AddQuerystringParameter("param1")
-                    .AddQuerystringParameter("param2")
+                    .AddParameter("param1")
+                    .AddParameter("param2")
                     .AddValueMapper1(x => x.Values.First() + "mapper1")
                     .AddValueMapper2(x => x.Values.First() + "mapper2");
 
-            var binder = new FormBinder(requestGraph.ValueMappers,
-                requestGraph.Configuration);
+            var binder = new FormBinder(requestGraph.ValueMappers);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
@@ -174,13 +171,12 @@ namespace Tests.Unit.Binding
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                     .WithRequestData("param1=value1&param2=value2")
-                    .AddQuerystringParameter("param1")
-                    .AddQuerystringParameter("param2")
+                    .AddParameter("param1")
+                    .AddParameter("param2")
                     .AddValueMapper1(x => x.Values.First() + "mapper1", configAppliesTo: x => false)
                     .AddValueMapper2(x => x.Values.First() + "mapper2");
 
-            var binder = new FormBinder(requestGraph.ValueMappers,
-                requestGraph.Configuration);
+            var binder = new FormBinder(requestGraph.ValueMappers);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
@@ -199,13 +195,12 @@ namespace Tests.Unit.Binding
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                     .WithRequestData("param1=value1&param2=value2")
-                    .AddQuerystringParameter("param1")
-                    .AddQuerystringParameter("param2")
+                    .AddParameter("param1")
+                    .AddParameter("param2")
                     .AddValueMapper1(x => x.Values.First() + "mapper1", instanceAppliesTo: x => false)
                     .AddValueMapper2(x => x.Values.First() + "mapper2");
 
-            var binder = new FormBinder(requestGraph.ValueMappers,
-                requestGraph.Configuration);
+            var binder = new FormBinder(requestGraph.ValueMappers);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
@@ -224,11 +219,10 @@ namespace Tests.Unit.Binding
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                     .WithRequestData("param1=value1&param2=value2")
-                    .AddQuerystringParameter("param1")
-                    .AddQuerystringParameter("param2");
+                    .AddParameter("param1")
+                    .AddParameter("param2");
 
-            var binder = new FormBinder(requestGraph.ValueMappers,
-                requestGraph.Configuration);
+            var binder = new FormBinder(requestGraph.ValueMappers);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
@@ -241,11 +235,10 @@ namespace Tests.Unit.Binding
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                     .WithRequestData("")
-                    .AddQuerystringParameter("param1")
-                    .AddQuerystringParameter("param2");
+                    .AddParameter("param1")
+                    .AddParameter("param2");
 
-            var binder = new FormBinder(requestGraph.ValueMappers,
-                requestGraph.Configuration);
+            var binder = new FormBinder(requestGraph.ValueMappers);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 

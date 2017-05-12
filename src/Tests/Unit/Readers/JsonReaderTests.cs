@@ -30,7 +30,7 @@ namespace Tests.Unit.Readers
                 .CreateFor<Handler>(h => h.Post(null, null))
                     .WithRequestData("{}")
                     .WithRequestParameter("request")
-                    .AddQuerystringParameter("param");
+                    .AddParameter("param");
 
             if (isJson)
             {
@@ -50,7 +50,7 @@ namespace Tests.Unit.Readers
                 .CreateFor<Handler>(h => h.Post(null, null))
                     .WithRequestData("{}")
                     .WithContentType(MimeTypes.ApplicationJson)
-                    .AddQuerystringParameter("param");
+                    .AddParameter("param");
 
             if (hasRequest)
             {
@@ -70,7 +70,7 @@ namespace Tests.Unit.Readers
                     .WithRequestData("{\"Value\":\"fark\"}")
                     .WithRequestParameter("request")
                     .WithContentType(MimeTypes.ApplicationJson)
-                    .AddQuerystringParameter("param");
+                    .AddParameter("param");
 
             var result = await new JsonReader(new JsonSerializerSettings())
                 .Read(requestGraph.GetRequestReaderContext());

@@ -31,7 +31,7 @@ namespace Tests.Unit.Readers.Bender
                 .CreateFor<Handler>(h => h.Post(null, null))
                     .WithRequestData("{}")
                     .WithRequestParameter("request")
-                    .AddQuerystringParameter("param");
+                    .AddParameter("param");
 
             if (isJson)
             {
@@ -51,7 +51,7 @@ namespace Tests.Unit.Readers.Bender
                 .CreateFor<Handler>(h => h.Post(null, null))
                     .WithRequestData("{}")
                     .WithContentType(MimeTypes.ApplicationJson)
-                    .AddQuerystringParameter("param");
+                    .AddParameter("param");
 
             if (hasRequest)
             {
@@ -71,7 +71,7 @@ namespace Tests.Unit.Readers.Bender
                     .WithRequestData("{\"Value\":\"fark\"}")
                     .WithRequestParameter("request")
                     .WithContentType(MimeTypes.ApplicationJson)
-                    .AddQuerystringParameter("param");
+                    .AddParameter("param");
 
             var result = await new Graphite.Bender.JsonReader(new Options())
                 .Read(requestGraph.GetRequestBinderContext());

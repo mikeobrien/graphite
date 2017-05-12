@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Graphite.Reflection;
 
 namespace Graphite.Extensions
 {
@@ -120,15 +121,6 @@ namespace Graphite.Extensions
             );
         }
 
-        public static Expression New(this Type type)
-        {
-            var constructor = type.GetConstructors()
-                .FirstOrDefault(x => !x.GetParameters().Any());
-            if (constructor == null) throw new InvalidOperationException(
-                $"Type {type} must have a parameterless constructor.");
-            return Expression.New(constructor);
-        }
-
         public static ParameterExpression ToParameter(this Type type)
         {
             return Expression.Parameter(type);
@@ -137,6 +129,11 @@ namespace Graphite.Extensions
         public static ConstantExpression ToConstant(this object constant)
         {
             return Expression.Constant(constant);
+        }
+
+        public static UnaryExpression Convert<T>(this Expression expression)
+        {
+            return expression.Convert(typeof(T));
         }
 
         public static UnaryExpression Convert(this Expression expression, Type type)
@@ -207,6 +204,11 @@ namespace Graphite.Extensions
         public static Expression PropertyAccess(this Expression expression, string name)
         {
             return Expression.Property(expression, name);
+        }
+
+        public static Expression PropertyAccess(this Expression expression, PropertyInfo property)
+        {
+            return Expression.Property(expression, property);
         }
 
         public static Expression Assign(this Expression left, Expression right)

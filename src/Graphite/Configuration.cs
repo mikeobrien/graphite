@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using Graphite.Actions;
 using Graphite.Binding;
@@ -59,6 +60,7 @@ namespace Graphite
         public string DiagnosticsUrl { get; set; } = "_graphite";
         public bool EnableDiagnostics { get; set; }
         public bool EnableMetrics { get; set; } = true;
+        public HttpStatusCode DefaultStatusCode = HttpStatusCode.NoContent;
         public string UnhandledExceptionStatusText { get; set; } =
             "There was a problem processing your request.";
         public bool DefaultErrorHandlerEnabled { get; set; } = true;
@@ -95,12 +97,21 @@ namespace Graphite
         public PluginDefinition<IInvokerBehavior> InvokerBehavior { get; } =
             PluginDefinition<IInvokerBehavior>.Create<InvokerBehavior>();
 
+        public BindingMode HeadersBindingMode { get; set; } = BindingMode.None;
+        public BindingMode CookiesBindingMode { get; set; } = BindingMode.None;
+        public BindingMode RequestInfoBindingMode { get; set; } = BindingMode.None;
+        public bool BindComplexTypeProperties { get; set; }
+
         public PluginDefinitions<IRequestBinder, RequestBinderContext> RequestBinders { get; } =
             PluginDefinitions<IRequestBinder, RequestBinderContext>.Create(x => x
                 .Append<ReaderBinder>(singleton: true)
                 .Append<UrlParameterBinder>(singleton: true)
                 .Append<QuerystringBinder>(singleton: true)
-                .Append<FormBinder>(singleton: true));
+                .Append<FormBinder>(singleton: true)
+                .Append<HeaderBinder>(singleton: true)
+                .Append<CookieBinder>(singleton: true)
+                .Append<RequestInfoBinder>(singleton: true)
+            );
 
         public PluginDefinitions<IRequestReader, RequestReaderContext> RequestReaders { get; } =
             PluginDefinitions<IRequestReader, RequestReaderContext>.Create(x => x
@@ -117,6 +128,7 @@ namespace Graphite
         public PluginDefinitions<IResponseWriter, ResponseWriterContext> ResponseWriters { get; } =
             PluginDefinitions<IResponseWriter, ResponseWriterContext>.Create(x => x
                 .Append<RedirectWriter>(singleton: true)
+                .Append<HttpResponseMessageWriter>(singleton: true)
                 .Append<StringWriter>(singleton: true)
                 .Append<StreamWriter>(singleton: true)
                 .Append<JsonWriter>(singleton: true)

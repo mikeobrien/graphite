@@ -75,5 +75,19 @@ namespace Graphite.Extensions
             return find.Where(x => x.IsNotNullOrEmpty()).Any(y => 
                 value.Contains(y, StringComparison.OrdinalIgnoreCase));
         }
+
+        public static string[] Split(this object value, char separator)
+        {
+            return value?.ToString().Split(separator);
+        }
+
+        public static string Truncate(this string value, int length)
+        {
+            return value == null 
+                ? null 
+                : (value.Length <= length 
+                    ? "" 
+                    : value.Substring(0, value.Length - length));
+        }
     }
 }

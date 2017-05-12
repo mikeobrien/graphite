@@ -19,7 +19,7 @@ namespace Graphite.Actions
             _container = container;
         }
 
-        public virtual Task<HttpResponseMessage> Invoke(ActionDescriptor actionDescriptor, 
+        public virtual async Task<HttpResponseMessage> Invoke(ActionDescriptor actionDescriptor, 
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
             using (var container = _container.CreateScopedContainer())
@@ -29,10 +29,10 @@ namespace Graphite.Actions
                 var querystringParameters = QuerystringParameters.CreateFrom(request);
                 var requestContext = new RequestContext(actionDescriptor.Action,
                     actionDescriptor.Route, actionDescriptor.Behaviors, urlParameters,
-                    querystringParameters, request, request.GetConfiguration(), 
-                    cancellationToken);
+                    querystringParameters, request, request.GetConfiguration(),
+                    httpRequestContext, cancellationToken);
 
-                InitContainer(container, actionDescriptor, requestContext, request, 
+                InitContainer(container, actionDescriptor, requestContext, request,
                     httpRequestContext, cancellationToken);
 
                 IBehavior behaviorChain;
@@ -52,7 +52,7 @@ namespace Graphite.Actions
                 {
                     throw new GraphiteRuntimeInitializationException(exception, requestContext);
                 }
-                return behaviorChain.Invoke();
+                return await behaviorChain.Invoke();
             }
         }
 

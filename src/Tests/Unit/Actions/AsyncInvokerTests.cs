@@ -101,30 +101,23 @@ namespace Tests.Unit.Actions
         [Test]
         public void Should_invoke_method_faster_than_reflection()
         {
-            var iterations = 10000;
             var type = new TypeCache().GetTypeDescriptor(typeof(InvokerMethods));
-            var method = type.Methods.FirstOrDefault(x =>
-                x.Name == nameof(InvokerMethods.MethodWithReturnAndParameters));
-            
+            var method = type.Methods.First(x => x.Name == nameof(InvokerMethods.MethodWithReturnAndParameters));
             var invoke = method.GenerateAsyncInvoker(type);
             var instance = new InvokerMethods();
             var parameters = new object[] { "param1", "param2" };
 
-            var nativeElapsed = new List<long>();
-            var reflectionElapsed = new List<long>();
-            var expressionElapsed = new List<long>();
+            var comparison = PerformanceComparison.InTicks(10000);
 
-            iterations.Times(() =>
-            {
-                expressionElapsed.Add(instance.ElapsedTicks(x => invoke(x, parameters)));
-                reflectionElapsed.Add(method.ElapsedTicks(x => x.MethodInfo.Invoke(instance, parameters)));
-                nativeElapsed.Add(instance.ElapsedTicks(x => x.MethodWithReturnAndParameters(
-                    (string)parameters[0], (string)parameters[1])));
-            });
-            
-            Console.WriteLine($"Native:              {nativeElapsed.Average()}");
-            Console.WriteLine($"Compiled expression: {expressionElapsed.Average()}");
-            Console.WriteLine($"Reflection:          {reflectionElapsed.Average()}");
+            comparison.AddCase("Native", () => instance
+                    .MethodWithReturnAndParameters((string)parameters[0], (string)parameters[1]));
+
+            var compiledCase = comparison.AddCase("Compiled expression", () => invoke(instance, parameters));
+            var reflectionCase = comparison.AddCase("Reflection", () => method.MethodInfo.Invoke(instance, parameters));
+
+            comparison.Run();
+
+            compiledCase.Average.ShouldBeLessThan(reflectionCase.Average);
         }
     }
 }

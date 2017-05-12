@@ -17,19 +17,20 @@ using Graphite.Binding;
 using Graphite.DependencyInjection;
 using Graphite.Routing;
 using Graphite.Extensions;
+using Graphite.Http;
 using Graphite.Readers;
 using Graphite.Reflection;
 using Graphite.StructureMap;
 using Graphite.Writers;
 using Tests.Common.Fakes;
+using HttpMethod = System.Net.Http.HttpMethod;
 
 namespace Tests.Common
 {
     public class RequestGraph
     {
-        private readonly List<ParameterDescriptor> _querystringParameters = new List<ParameterDescriptor>();
-        private readonly List<ParameterDescriptor> _urlParameters = new List<ParameterDescriptor>();
-        private readonly List<ParameterDescriptor> _wildcardParameters = new List<ParameterDescriptor>();
+        private readonly List<ActionParameter> _parameters = new List<ActionParameter>();
+        private readonly List<UrlParameter> _urlParameters = new List<UrlParameter>();
         private string _urlTemplate;
 
         public RequestGraph(ActionMethod actionMethod)
@@ -91,15 +92,15 @@ namespace Tests.Common
         public string AttachmentFilename { get; set; }
         public string Accept { get; set; }
         public byte[] RequestData { get; set; }
+        public Dictionary<string, object> RequestProperties { get; } = new Dictionary<string, object>();
+        public Dictionary<string, string> Cookies { get; } = new Dictionary<string, string>();
+        public Dictionary<string, string> Headers { get; } = new Dictionary<string, string>();
 
         public string Url { get; set; }
 
         public string UrlTemplate
         {
-            get
-            {
-                return _urlTemplate;
-            }
+            get { return _urlTemplate; }
             set
             {
                 _urlTemplate = value;
@@ -111,10 +112,7 @@ namespace Tests.Common
                         IsWildcard = x.Groups[1].Value.StartsWith("*")
                     }).ToList();
 
-                _urlParameters.AddRange(parameters.Select(x => x.Parameter));
-                _wildcardParameters.AddRange(parameters
-                    .Where(x => x.IsWildcard)
-                    .Select(x => x.Parameter));
+                _urlParameters.AddRange(parameters.Select(x => new UrlParameter(x.Parameter, x.IsWildcard)));
             }
         }
 
@@ -160,23 +158,30 @@ namespace Tests.Common
             return this;
         }
 
+        public RequestGraph AddRequestProperty(string name, object value)
+        {
+            RequestProperties[name] = value;
+            return this;
+        }
+
         public RouteDescriptor GetRouteDescriptor()
         {
             return new RouteDescriptor(HttpMethod, Url, _urlParameters.ToArray(),
-                _wildcardParameters.ToArray(), _querystringParameters.ToArray(), 
-                RequestParameter, ResponseType);
+                _parameters.ToArray(), RequestParameter, ResponseType);
         }
 
         public RequestContext GetRequestContext()
         {
             var requestMessage = GetHttpRequestMessage();
-            var querystringParameters = requestMessage.GetQueryNameValuePairs()
-                .ToLookup(x => x.Key, x => x.Value);
             var requestContext = requestMessage.GetRequestContext();
+            var querystringParameters = new QuerystringParameters(
+                    requestMessage.GetQueryNameValuePairs()
+                .ToLookup(x => x.Key, x => (object)x.Value));
+            var urlParameters = new UrlParameters(requestContext.RouteData
+                .Values.ToDictionary(x => x.Key, x => x.Value));
             return new RequestContext(ActionMethod, GetRouteDescriptor(), GetBehaviors(),
-                requestContext.RouteData.Values.ToDictionary(x => x.Key, x => (string)x.Value), 
-                querystringParameters, requestMessage, 
-                HttpConfiguration, CancellationToken);
+                urlParameters, querystringParameters, requestMessage, HttpConfiguration, 
+                GetHttpRequestContext(requestMessage), CancellationToken);
         }
 
         public ActionDescriptor GetActionDescriptor()
@@ -199,6 +204,10 @@ namespace Tests.Common
                     {
                         FileName = AttachmentFilename
                     };
+            RequestProperties.ForEach(x => message.Properties[x.Key] = x.Value);
+            if (Cookies.Any()) message.Headers.Add("Cookie", 
+                Cookies.Select(x => $"{x.Key}={x.Value}").Join("; "));
+            Headers.ForEach(x => message.Headers.Add(x.Key, x.Value));
             return message;
         }
 
@@ -216,15 +225,34 @@ namespace Tests.Common
             return this;
         }
 
-        public RequestGraph AddUrlParameter(string name)
+        public RequestGraph AddUrlParameter(string name, bool wildcard = false)
         {
-            _urlParameters.Add(GetParameter(name));
+            _urlParameters.Add(new UrlParameter(GetParameter(name), wildcard));
             return this;
         }
 
-        public RequestGraph AddQuerystringParameter(string name)
+        public RequestGraph AddCookie(string name, string value)
         {
-            _querystringParameters.Add(GetParameter(name));
+            Cookies[name] = value;
+            return this;
+        }
+
+        public RequestGraph AddHeader(string name, string value)
+        {
+            Headers[name] = value;
+            return this;
+        }
+
+        public RequestGraph AddAllActionParameters()
+        {
+            _parameters.AddRange(ActionMethod.Method.Parameters
+                .Select(x => new ActionParameter(x)));
+            return this;
+        }
+
+        public RequestGraph AddParameter(string name)
+        {
+            _parameters.Add(new ActionParameter(GetParameter(name)));
             return this;
         }
 
@@ -247,16 +275,10 @@ namespace Tests.Common
 
         /* ---------------- Parameter Mappers --------------- */
 
-        public ValueMapperContext GetParameterMapperContext(ParameterDescriptor parameter, 
+        public ValueMapperContext GetParameterMapperContext(ActionParameter parameter, 
             Type destinationType, object[] value)
         {
             return new ValueMapperContext(Configuration, GetRequestContext(), parameter, value);
-        }
-
-        public ValueMapperContext GetPropertyMapperContext(PropertyDescriptor property, 
-            Type destinationType, object[] value)
-        {
-            return new ValueMapperContext(Configuration, GetRequestContext(), property, value);
         }
 
         public List<IValueMapper> ValueMappers { get; } = new List<IValueMapper>();

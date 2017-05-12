@@ -1,7 +1,10 @@
 ﻿using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Web.Http;
 using Bender.Extensions;
+using Graphite.Binding;
 using Graphite.Readers;
 using Graphite.Routing;
 using Graphite.Writers;
@@ -32,6 +35,7 @@ namespace TestHarness
             public int Query2 { get; set; }
             public string[] MultiQuery1 { get; set; }
             public int[] MultiQuery2 { get; set; }
+            public int? NullableQuery { get; set; }
             public string Form1 { get; set; }
             public int Form2 { get; set; }
             public string[] MultiForm1 { get; set; }
@@ -76,6 +80,14 @@ namespace TestHarness
             {
                 MultiQuery1 = query1,
                 MultiQuery2 = query2
+            };
+        }
+
+        public OutputModel GetWithNullableQueryParams(int? query)
+        {
+            return new OutputModel
+            {
+                NullableQuery = query
             };
         }
 
@@ -286,6 +298,53 @@ namespace TestHarness
             return redirect ? new RedirectModel(RedirectType
                     .MovedPermanently, "http://www.google.com") : 
                 new RedirectModel { Value = "value" };
+        }
+
+        public class BindingOutputModel
+        {
+            public string Param { get; set; }
+            public string ParamByName { get; set; }
+            public string ParamByAttribute { get; set; }
+            public bool ParamByType { get; set; }
+        }
+
+        public BindingOutputModel GetWithCookies(string param, string cookie1, 
+            [FromCookies("cookie2")] string someCookie)
+        {
+            return new BindingOutputModel
+            {
+                Param = param,
+                ParamByName = cookie1,
+                ParamByAttribute = someCookie
+            };
+        }
+
+        public BindingOutputModel GetWithHeaders(string param, string header1,
+            [FromHeaders("header2")] string someHeader)
+        {
+            return new BindingOutputModel
+            {
+                Param = param,
+                ParamByName = header1,
+                ParamByAttribute = someHeader
+            };
+        }
+
+        public BindingOutputModel GetWithRequestInfo(string param, string remoteAddress,
+            [FromRequestInfo("serverProtocol")] string someInfo, HttpRequestMessage requestMessage)
+        {
+            return new BindingOutputModel
+            {
+                Param = param,
+                ParamByName = remoteAddress,
+                ParamByAttribute = someInfo,
+                ParamByType = requestMessage != null
+            };
+        }
+
+        public HttpResponseMessage GetWithResponseMessage()
+        {
+            return new HttpResponseMessage(HttpStatusCode.PaymentRequired);
         }
     }
 }

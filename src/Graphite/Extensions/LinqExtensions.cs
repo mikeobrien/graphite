@@ -58,14 +58,10 @@ namespace Graphite.Extensions
             return source.Concat(new List<T> { item });
         }
 
-        public static ILookup<string, object> ToObjectLookup(this NameValueCollection source)
+        public static ILookup<string, object> ToLookup(this NameValueCollection source,
+            Func<string, string> getKey = null)
         {
-            return source.ToLookup<object>();
-        }
-
-        public static ILookup<string, string> ToStringLookup(this NameValueCollection source)
-        {
-            return source.ToLookup<string>();
+            return source.ToLookup<object>(getKey);
         }
 
         public static ILookup<TKey, TValue> ToLookup<TKey, TValue>(
@@ -74,11 +70,33 @@ namespace Graphite.Extensions
             return source.ToLookup(x => x.Key, x => x.Value);
         }
 
-        private static ILookup<string, T> ToLookup<T>(this NameValueCollection source)
+        private static ILookup<string, T> ToLookup<T>(this NameValueCollection source, 
+            Func<string, string> getKey = null)
         {
             return source.AllKeys.SelectMany(key => source.GetValues(key)
                 .Select(value => new KeyValuePair<string, T>(key, (T)(object)value)))
-                .ToLookup(x => x.Key, x => x.Value);
+                .ToLookup(x => getKey?.Invoke(x.Key) ?? x.Key, x => x.Value);
+        }
+
+        public static IEnumerable<KeyValuePair<TKey, object>> ToKeyValuePairs<TKey>(
+            this IEnumerable<object> source, TKey key)
+        {
+            return source.Select(x => new KeyValuePair<TKey, object>(key, x));
+        }
+
+        public static IEnumerable<KeyValuePair<TKey, TValue>> ToKeyValuePairs<TSource, TKey, TValue>(
+            this IEnumerable<TSource> source, Func<TSource, TKey> key, Func<TSource, TValue> value)
+        {
+            return source.Select(x => new KeyValuePair<TKey, TValue>(key(x), value(x)));
+        }
+
+        public static IEnumerable<TResult> JoinIgnoreCase<TOuter, TInner, TResult>(
+            this IEnumerable<TOuter> outer, IEnumerable<TInner> inner, 
+            Func<TOuter, string> outerKeySelector, Func<TInner, string> innerKeySelector,
+            Func<TOuter, TInner, TResult> resultSelector)
+        {
+            return outer.Join(inner, outerKeySelector, innerKeySelector, 
+                resultSelector, StringComparer.OrdinalIgnoreCase);
         }
     }
 }

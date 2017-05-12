@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
 using Graphite.Extensions;
@@ -29,7 +31,7 @@ namespace Graphite.Writers
             var response = new HttpResponseMessage();
             var data = GetResponse(context);
             if (data != null)
-                response.Content = new StringContent(data, _encoding, _mimeType);
+                response.Content = new AsyncStringContent(data, _encoding, _mimeType);
             return response.ToTaskResult();
         }
     }

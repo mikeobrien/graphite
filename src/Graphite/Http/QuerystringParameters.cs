@@ -5,11 +5,11 @@ using System.Net.Http;
 
 namespace Graphite.Http
 {
-    public class QuerystringParameters : ILookup<string, string>
+    public class QuerystringParameters : ILookup<string, object>
     {
-        private readonly ILookup<string, string> _source;
+        private readonly ILookup<string, object> _source;
 
-        public QuerystringParameters(ILookup<string, string> source)
+        public QuerystringParameters(ILookup<string, object> source)
         {
             _source = source;
         }
@@ -17,11 +17,11 @@ namespace Graphite.Http
         public static QuerystringParameters CreateFrom(HttpRequestMessage message)
         {
             return new QuerystringParameters(message.GetQueryNameValuePairs()?
-                .ToLookup(x => x.Key, x => x.Value));
+                .ToLookup(x => x.Key, x => (object)x.Value));
         }
 
         public int Count => _source.Count;
-        public IEnumerable<string> this[string key] => _source[key];
+        public IEnumerable<object> this[string key] => _source[key];
 
         public bool Contains(string key)
         {
@@ -33,7 +33,7 @@ namespace Graphite.Http
             return GetEnumerator();
         }
 
-        public IEnumerator<IGrouping<string, string>> GetEnumerator()
+        public IEnumerator<IGrouping<string, object>> GetEnumerator()
         {
             return _source.GetEnumerator();
         }

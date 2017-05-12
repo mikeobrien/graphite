@@ -55,12 +55,13 @@ namespace Tests.Unit
         {
             var container = new Container();
 
-            GlobalConfiguration.Configuration.InitializeGraphite(config => config
-                .UseContainer(container)
-                .FilterHandlersBy((c, t) => false)
-                .ConfigureActionDecorators(x => x.Append<TestActionDecorator>())
-                .ConfigureRegistry(x => x
-                    .Register<RequestContext>(new TestRequestContext()))
+            GlobalConfiguration.Configuration.InitializeGraphite(config => 
+                config
+                    .UseContainer(container)
+                    .FilterHandlersBy((c, t) => false)
+                    .ConfigureActionDecorators(x => x.Append<TestActionDecorator>())
+                    .ConfigureRegistry(x => x
+                        .Register<RequestContext>(new TestRequestContext()))
             );
             
             Should_be_configured_with_graphite_defaults(container);
@@ -73,14 +74,15 @@ namespace Tests.Unit
 
             GlobalConfiguration.Configure(httpConfig =>
             {
-                httpConfig.InitializeGraphite(config => config
-                    .IncludeTypeAssembly<GraphiteBootstrapTests>()
-                    .UseContainer(container)
-                    .FilterHandlersBy((c, t) => false)
-                    .ConfigureActionDecorators(x => x.Append<TestActionDecorator>())
-                    .ConfigureRegistry(x => x
-                        .Register<RequestContext>(new TestRequestContext()))
-                );
+                httpConfig.InitializeGraphite(config => {
+                    config
+                        .IncludeTypeAssembly<GraphiteBootstrapTests>()
+                        .UseContainer(container)
+                        .FilterHandlersBy((c, t) => false)
+                        .ConfigureActionDecorators(x => x.Append<TestActionDecorator>())
+                        .ConfigureRegistry(x => x
+                            .Register<RequestContext>(new TestRequestContext()));
+                });
             });
             
             Should_be_configured_with_graphite_defaults(container);
@@ -120,23 +122,27 @@ namespace Tests.Unit
             requestReaders[4].ShouldBeType<FormReader>();
 
             var requestBinders = container.GetInstances<IRequestBinder>().ToList();
-            requestBinders.Count.ShouldEqual(4);
+            requestBinders.Count.ShouldEqual(7);
             requestBinders[0].ShouldBeType<ReaderBinder>();
             requestBinders[1].ShouldBeType<UrlParameterBinder>();
             requestBinders[2].ShouldBeType<QuerystringBinder>();
             requestBinders[3].ShouldBeType<FormBinder>();
+            requestBinders[4].ShouldBeType<HeaderBinder>();
+            requestBinders[5].ShouldBeType<CookieBinder>();
+            requestBinders[6].ShouldBeType<RequestInfoBinder>();
 
             var valueMappers = container.GetInstances<IValueMapper>().ToList();
             valueMappers.Count.ShouldEqual(1);
             valueMappers[0].ShouldBeType<SimpleTypeMapper>();
 
             var responseWriters = container.GetInstances<IResponseWriter>().ToList();
-            responseWriters.Count.ShouldEqual(5);
+            responseWriters.Count.ShouldEqual(6);
             responseWriters[0].ShouldBeType<RedirectWriter>();
-            responseWriters[1].ShouldBeType<StringWriter>();
-            responseWriters[2].ShouldBeType<StreamWriter>();
-            responseWriters[3].ShouldBeType<JsonWriter>();
-            responseWriters[4].ShouldBeType<XmlWriter>();
+            responseWriters[1].ShouldBeType<HttpResponseMessageWriter>();
+            responseWriters[2].ShouldBeType<StringWriter>();
+            responseWriters[3].ShouldBeType<StreamWriter>();
+            responseWriters[4].ShouldBeType<JsonWriter>();
+            responseWriters[5].ShouldBeType<XmlWriter>();
 
             container.GetInstance<IContainer>().ShouldBeType<TrackingContainer>();
             container.GetInstance<Configuration>().ShouldEqual(configuration);

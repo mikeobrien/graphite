@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -44,6 +45,17 @@ namespace Tests.Acceptance
             result.Data.Url2.ShouldEqual(5);
             result.Data.Query1.ShouldEqual("query1");
             result.Data.Query2.ShouldEqual(6);
+        }
+
+        [TestCase("", null)]
+        [TestCase("?query=7", 7)]
+        public void Should_handle_nullable_querystring_value(string querystring, int? value)
+        {
+            var result = WebClient.GetJson<Handler.OutputModel>(
+                $"WithNullableQueryParams{querystring}");
+
+            result.Status.ShouldEqual(HttpStatusCode.OK);
+            result.Data.NullableQuery.ShouldEqual(value);
         }
 
         [Test]
@@ -314,7 +326,61 @@ namespace Tests.Acceptance
 
             result.Status.ShouldEqual(HttpStatusCode.OK);
             result.Data.Value.ShouldEqual("value");
+        }
 
+        [Test]
+        public void Should_bind_cookies()
+        {
+            var result = WebClient.GetJson<Handler.BindingOutputModel>("WithCookies",
+                new Dictionary<string, string>
+                {
+                    { "cookie1", "value1" },
+                    { "cookie2", "value2" }
+                });
+
+            result.Status.ShouldEqual(HttpStatusCode.OK);
+
+            result.Data.Param.ShouldBeNull();
+            result.Data.ParamByName.ShouldEqual("value1");
+            result.Data.ParamByAttribute.ShouldEqual("value2");
+        }
+
+        [Test]
+        public void Should_bind_headers()
+        {
+            var result = WebClient.GetJson<Handler.BindingOutputModel>("WithHeaders",
+                headers: new Dictionary<string, string>
+                {
+                    { "header1", "value1" },
+                    { "header2", "value2" }
+                });
+
+            result.Status.ShouldEqual(HttpStatusCode.OK);
+
+            result.Data.Param.ShouldBeNull();
+            result.Data.ParamByName.ShouldEqual("value1");
+            result.Data.ParamByAttribute.ShouldEqual("value2");
+        }
+
+        [Test]
+        public void Should_bind_request_info()
+        {
+            var result = WebClient.GetJson<Handler.BindingOutputModel>("WithRequestInfo");
+
+            result.Status.ShouldEqual(HttpStatusCode.OK);
+
+            result.Data.Param.ShouldBeNull();
+            result.Data.ParamByName.ShouldEqual("::1");
+            result.Data.ParamByAttribute.ShouldEqual("HTTP/1.1");
+            result.Data.ParamByType.ShouldBeTrue();
+        }
+
+        [Test]
+        public void Should_write_http_response_message()
+        {
+            var result = WebClient.GetJson<Handler.BindingOutputModel>("WithResponseMessage");
+
+            result.Status.ShouldEqual(HttpStatusCode.PaymentRequired);
         }
     }
 }

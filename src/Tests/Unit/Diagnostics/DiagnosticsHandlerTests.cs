@@ -43,8 +43,10 @@ namespace Tests.Unit.Diagnostics
                 new ActionDescriptor(
                     Type<Handler>.Expression(x => x.Get(null, 0, DateTime.MaxValue)).ToActionMethod(), 
                     new RouteDescriptor("GET", "some/url", 
-                        parameters.Where(x => x.Name == "urlParam").ToArray(), null,
-                        parameters.Where(x => x.Name == "queryParam").ToArray(), 
+                        parameters.Where(x => x.Name == "urlParam")
+                            .Select(x => new UrlParameter(x, false)).ToArray(), 
+                        parameters.Where(x => x.Name == "queryParam")
+                            .Select(x => new ActionParameter(x)).ToArray(), 
                         parameters.First(x => x.Name == "request"),
                         new TypeCache().GetTypeDescriptor(typeof(OutputModel))),
                     new TypeDescriptor[] {})

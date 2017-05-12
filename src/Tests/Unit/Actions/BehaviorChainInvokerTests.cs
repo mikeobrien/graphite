@@ -73,7 +73,7 @@ namespace Tests.Unit.Actions
             _requestGraph.Configuration.Behaviors.Append<RegistrationLoggingBehavior>();
             _requestGraph.Url = "http://fark.com/urlparamvalue?queryparam=queryvalue";
             _requestGraph.UrlTemplate = "{urlParam}";
-            _requestGraph.AddQuerystringParameter("queryParam");
+            _requestGraph.AddParameter("queryParam");
 
             var log = new Logger();
             _requestGraph.UnderlyingContainer.Configure(x =>
