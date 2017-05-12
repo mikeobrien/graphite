@@ -138,12 +138,12 @@ namespace TestHarness
             };
         }
 
-        public string PostString(string request)
+        public string PostString([FromBody] string request)
         {
             return request;
         }
 
-        public OutputModel PostWithQueryParams([FromUri]string query1, int query2)
+        public OutputModel PostWithQueryParams(string query1, int query2)
         {
             return new OutputModel
             {
@@ -152,7 +152,7 @@ namespace TestHarness
             };
         }
 
-        public OutputModel PostWithMultiQueryParams([FromUri]string[] query1, int[] query2)
+        public OutputModel PostWithMultiQueryParams(string[] query1, int[] query2)
         {
             return new OutputModel
             {

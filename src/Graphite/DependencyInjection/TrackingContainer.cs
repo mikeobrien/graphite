@@ -3,22 +3,31 @@ using System.Collections.Generic;
 
 namespace Graphite.DependencyInjection
 {
-    public class TrackingContainer : IContainer
+    public interface ITrackingContainer
+    {
+        Registry ParentRegistry { get; }
+        Registry Registry { get; }
+    }
+
+    public class TrackingContainer : IContainer, ITrackingContainer
     {
         private readonly IContainer _container;
 
         public TrackingContainer(IContainer container)
         {
             _container = container;
+            ParentRegistry = new Registry();
             Registry = new Registry();
         }
 
         public TrackingContainer(IContainer container, Registry registry)
         {
             _container = container;
-            Registry = new Registry(registry);
+            ParentRegistry = new Registry(registry);
+            Registry = new Registry();
         }
 
+        public Registry ParentRegistry { get; }
         public Registry Registry { get; }
 
         public void Register(Type plugin, Type concrete, bool singleton)

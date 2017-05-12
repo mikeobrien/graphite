@@ -33,10 +33,19 @@ namespace Graphite.Routing
                     $"action {action.HandlerType.Type.FullName}.{action.Method.Name}.")
                 .Trim().ToUpper();
 
-            var requestParameter = _configuration.SupportedHttpMethods
-                    .Any(x => x.AllowRequestBody && x.Method == httpMethod) ? 
-                action.Method.Parameters.Take(1).FirstOrDefault(x => 
-                    !x.HasAttribute<FromUriAttribute>()) : null;
+            var requestParameter = !_configuration.SupportedHttpMethods
+                    .Any(x => x.AllowRequestBody && x.Method == httpMethod) ? null :
+                action.Method.Parameters.Take(1)
+                    .Select(x => new
+                    {
+                        Type = x,
+                        FromUri = x.HasAttribute<FromUriAttribute>(),
+                        FromBody = x.HasAttribute<FromBodyAttribute>(),
+                        x.ParameterType.IsSimpleTypeOrHasSimpleElementType,
+                        x.ParameterType.IsComplexTypeOrHasComplexElementType
+                    })
+                    .FirstOrDefault(x => (x.IsSimpleTypeOrHasSimpleElementType && x.FromBody) ||
+                                         (x.IsComplexTypeOrHasComplexElementType && !x.FromUri))?.Type;
 
             var parameters = action.Method.Parameters.Where(x => x != requestParameter).ToList();
 

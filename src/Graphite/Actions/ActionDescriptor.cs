@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Graphite.DependencyInjection;
 using Graphite.Routing;
 using Graphite.Extensions;
 using Graphite.Reflection;
@@ -13,11 +13,13 @@ namespace Graphite.Actions
             Action = action;
             Route = route;
             Behaviors = behaviors ?? new TypeDescriptor[] {};
+            Registry = new Registry();
         }
 
         public virtual ActionMethod Action { get; }
         public virtual RouteDescriptor Route { get; }
         public virtual TypeDescriptor[] Behaviors { get; }
+        public virtual Registry Registry { get; }
 
         public override int GetHashCode()
         {

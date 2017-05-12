@@ -5,6 +5,7 @@ using System.Web.Http;
 using System.Web.Http.Routing;
 using Graphite.Actions;
 using Graphite.DependencyInjection;
+using Graphite.Extensions;
 using Graphite.Monitoring;
 using Graphite.Routing;
 
@@ -17,16 +18,19 @@ namespace Graphite
         private readonly IContainer _container;
         private readonly Configuration _configuration;
         private readonly Metrics _metrics;
+        private readonly IEnumerable<IActionDecorator> _actionDecorators;
 
         public Initializer(IEnumerable<IActionSource> actionSources, 
             IBehaviorChainInvoker behaviorChainInvoker, IContainer container,
-            Configuration configuration, Metrics metrics)
+            Configuration configuration, Metrics metrics,
+            IEnumerable<IActionDecorator> actionDecorators)
         {
             _actionSources = actionSources;
             _behaviorChainInvoker = behaviorChainInvoker;
             _container = container;
             _configuration = configuration;
             _metrics = metrics;
+            _actionDecorators = actionDecorators;
         }
 
         public void Initialize(HttpConfiguration httpConfiguration)
@@ -39,6 +43,10 @@ namespace Graphite
                 .Where(x => x.Count() > 1).ToList();
 
             if (duplicates.Any()) throw new DuplicateRouteException(duplicates);
+
+            actions.ForEach(a => _actionDecorators
+                .ThatApplyTo(a, httpConfiguration, _configuration)
+                .ForEach(d => d.Decorate(a, httpConfiguration, _configuration)));
 
             _container.Register(httpConfiguration);
             _container.Register(new RuntimeConfiguration(actions));

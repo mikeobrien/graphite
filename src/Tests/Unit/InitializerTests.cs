@@ -14,6 +14,7 @@ using NSubstitute;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
+using Tests.Common.Fakes;
 
 namespace Tests.Unit
 {
@@ -22,6 +23,7 @@ namespace Tests.Unit
     {
         private HttpRouteCollection _routes;
         private List<IActionSource> _actionSources;
+        private List<IActionDecorator> _actionDecorators;
         private Configuration _configuration;
         private IContainer _container;
         private IBehaviorChainInvoker _invoker;
@@ -33,12 +35,13 @@ namespace Tests.Unit
         {
             _routes = new HttpRouteCollection();
             _actionSources = new List<IActionSource>();
+            _actionDecorators = new List<IActionDecorator>();
             _invoker = Substitute.For<IBehaviorChainInvoker>();
             _container = new Container();
             _configuration = new Configuration();
             _httpConfiguration = new HttpConfiguration(_routes);
             _initializer = new Initializer(_actionSources, _invoker, 
-                _container, _configuration, new Metrics());
+                _container, _configuration, new Metrics(), _actionDecorators);
         }
 
         public class Handler
@@ -112,6 +115,48 @@ namespace Tests.Unit
             _container.GetInstance<RuntimeConfiguration>().Actions.Count().ShouldEqual(2);
         }
 
+        public class SomeType { }
+
+        [TestCase(false, false, false)]
+        [TestCase(true, false, false)]
+        [TestCase(false, true, false)]
+        [TestCase(true, true, true)]
+        public void Should_run_action_decorators_that_apply(bool configAppliesTo, bool runtimeAppliesTo, bool ran)
+        {
+            var action = AddRoute(AddActionSource(), "fark");
+            var instance = new SomeType();
+            var decorator = new TestActionDecorator
+            {
+                AppliesToFunc = x => runtimeAppliesTo,
+                DecorateFunc = x => x.ActionDescriptor.Registry.Register(instance)
+            };
+            _configuration.ActionDecorators.Append<TestActionDecorator>(x => configAppliesTo);
+            _actionDecorators.Add(decorator);
+
+            _initializer.Initialize(_httpConfiguration);
+
+            action.Registry.Any(x => x.PluginType == typeof(SomeType)).ShouldEqual(ran);
+
+            decorator.AppliesToCalled.ShouldEqual(configAppliesTo);
+            decorator.DecorateCalled.ShouldEqual(configAppliesTo && runtimeAppliesTo);
+
+            if (configAppliesTo)
+            {
+                decorator.AppliesToContext.ActionDescriptor.ShouldEqual(action);
+                decorator.AppliesToContext.Configuration.ShouldEqual(_configuration);
+                decorator.AppliesToContext.HttpConfiguration.ShouldEqual(_httpConfiguration);
+            }
+            else decorator.AppliesToContext.ShouldBeNull();
+
+            if (configAppliesTo && runtimeAppliesTo)
+            {
+                decorator.AppliesToContext.ActionDescriptor.ShouldEqual(action);
+                decorator.AppliesToContext.Configuration.ShouldEqual(_configuration);
+                decorator.AppliesToContext.HttpConfiguration.ShouldEqual(_httpConfiguration);
+            }
+            else decorator.DecorateContext.ShouldBeNull();
+        }
+
         private List<ActionDescriptor> AddActionSource(bool appliesTo = true)
         {
             var actions = new List<ActionDescriptor>();
@@ -122,10 +167,12 @@ namespace Tests.Unit
             return actions;
         }
 
-        private void AddRoute(List<ActionDescriptor> actions, string route)
+        private ActionDescriptor AddRoute(List<ActionDescriptor> actions, string route)
         {
-            actions.Add(new ActionDescriptor(Type<Handler>.Expression(x => x.Get()).ToActionMethod(),
-                new RouteDescriptor("GET", route, null, null, null, null, null)));
+            var descriptor = new ActionDescriptor(Type<Handler>.Expression(x => x.Get()).ToActionMethod(),
+                new RouteDescriptor("GET", route, null, null, null, null, null));
+            actions.Add(descriptor);
+            return descriptor;
         }
     }
 }

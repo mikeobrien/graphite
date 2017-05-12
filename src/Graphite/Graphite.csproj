@@ -67,6 +67,7 @@
     <Compile Include="Actions\RequestContext.cs" />
     <Compile Include="Binding\BadRequestException.cs" />
     <Compile Include="DependencyInjection\TrackingContainer.cs" />
+    <Compile Include="Actions\IActionDecorator.cs" />
     <Compile Include="Monitoring\Metrics.cs" />
     <Compile Include="DefaultErrorHandlerBehavior.cs" />
     <Compile Include="Binding\MapResult.cs" />

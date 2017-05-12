@@ -86,7 +86,7 @@ namespace Graphite.Reflection
         public static string GetFriendlyName(this Assembly assembly)
         {
             var name = assembly.GetName();
-            return $"{name.Name}, Version={name.Version}";
+            return $"{name.Name} {name.Version}";
         }
 
         public static bool IsSystemAssembly(this Assembly assembly)

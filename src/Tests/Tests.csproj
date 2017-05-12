@@ -76,6 +76,7 @@
   <ItemGroup>
     <Compile Include="Acceptance\PerformanceTests.cs" />
     <Compile Include="Acceptance\RequestTests.cs" />
+    <Compile Include="Common\Fakes\TestActionDescriptor.cs" />
     <Compile Include="Common\Fakes\TestBehaviors.cs" />
     <Compile Include="Common\Fakes\TestRequestContext.cs" />
     <Compile Include="Common\Fakes\TestValueMapper.cs" />

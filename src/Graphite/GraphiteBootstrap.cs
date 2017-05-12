@@ -41,6 +41,7 @@ namespace Graphite
                 container.Register(configuration);
                 container.RegisterPlugins(configuration.ActionMethodSources);
                 container.RegisterPlugins(configuration.ActionSources);
+                container.RegisterPlugins(configuration.ActionDecorators);
                 container.RegisterPlugins(configuration.RouteConventions);
                 container.RegisterPlugins(configuration.UrlConventions);
                 container.RegisterPlugin(configuration.TypeCache);
@@ -52,14 +53,7 @@ namespace Graphite
                 container.RegisterPlugins(configuration.RequestReaders);
                 container.RegisterPlugins(configuration.ValueMappers);
                 container.RegisterPlugins(configuration.ResponseWriters);
-
-                configuration.Registry.ForEach(x =>
-                {
-                    if (x.PluginType == null) return;
-                    if (x.IsInstance) container.Register(x.PluginType, x.Instance);
-                    else if (x.ConcreteType != null)
-                        container.Register(x.PluginType, x.ConcreteType, x.Singleton);
-                });
+                container.IncludeRegistry(configuration.Registry);
 
                 container.GetInstance<IInitializer>().Initialize(httpConfiguration);
 

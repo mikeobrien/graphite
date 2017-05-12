@@ -111,6 +111,14 @@ namespace Tests.Common
         }
 
         public static object[][] CreateWithExpression<T1, T2, T3, T4>(
+            Action<CaseDsl<Expression<Action<T1>>, T2, T3, T4>> config)
+        {
+            var cases = new List<object[]>();
+            config(new CaseDsl<Expression<Action<T1>>, T2, T3, T4>(cases));
+            return cases.ToArray();
+        }
+
+        public static object[][] CreateWithExpression<T1, T2, T3, T4>(
             Action<CaseDsl<Expression<Func<T1, object>>, T2, T3, T4>> config)
         {
             var cases = new List<object[]>();

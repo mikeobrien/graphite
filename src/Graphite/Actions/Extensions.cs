@@ -11,27 +11,25 @@ namespace Graphite.Actions
 {
     public static class Extensions
     {
-        public static List<ActionDescriptor> GetActions(this IActionSource actionSource,
-            Configuration configuration, HttpConfiguration httpConfiguration)
-        {
-            return actionSource.GetActions(new ActionSourceContext(configuration, httpConfiguration));
-        }
-
-        public static List<Type> ThatApplyTo(this PluginDefinitions
-            <IBehavior, BehaviorContext> behaviors, ActionSourceContext context,
-            ActionMethod actionMethod, RouteDescriptor routeDescriptor)
-        {
-            return behaviors.ThatApplyTo(new BehaviorContext(context.Configuration, context
-                .HttpConfiguration, actionMethod, routeDescriptor))
-                .Select(x => x.Type).ToList();
-        }
-
         public static IEnumerable<IActionMethodSource> ThatApplyTo(
             this IEnumerable<IActionMethodSource> methodSources,
             ActionSourceContext actionSourceContext, Configuration configuration)
         {
             return configuration.ActionMethodSources.ThatApplyTo(methodSources, 
                 new ActionMethodSourceContext(configuration, actionSourceContext.HttpConfiguration));
+        }
+
+        public static IEnumerable<ActionMethod> GetActionMethods(this
+            IActionMethodSource actionMethodSource, ActionSourceContext context)
+        {
+            return actionMethodSource.GetActionMethods(new 
+                ActionMethodSourceContext(context.Configuration, context.HttpConfiguration));
+        }
+
+        public static List<ActionDescriptor> GetActions(this IActionSource actionSource,
+            Configuration configuration, HttpConfiguration httpConfiguration)
+        {
+            return actionSource.GetActions(new ActionSourceContext(configuration, httpConfiguration));
         }
 
         public static IEnumerable<IActionSource> ThatApplyTo(
@@ -42,11 +40,30 @@ namespace Graphite.Actions
                 new ActionSourceContext(configuration, httpConfiguration));
         }
 
-        public static IEnumerable<ActionMethod> GetActionMethods(this
-            IActionMethodSource actionMethodSource, ActionSourceContext context)
+        public static IEnumerable<IActionDecorator> ThatApplyTo(
+            this IEnumerable<IActionDecorator> actionDecorators,
+            ActionDescriptor actionDescriptor, HttpConfiguration httpConfiguration, 
+            Configuration configuration)
         {
-            return actionMethodSource.GetActionMethods(new 
-                ActionMethodSourceContext(context.Configuration, context.HttpConfiguration));
+            return configuration.ActionDecorators.ThatApplyTo(actionDecorators,
+                new ActionDecoratorContext(configuration, httpConfiguration, actionDescriptor));
+        }
+
+        public static void Decorate(this IActionDecorator actionSource,
+            ActionDescriptor actionDescriptor, HttpConfiguration httpConfiguration,
+            Configuration configuration)
+        {
+            actionSource.Decorate(new ActionDecoratorContext(configuration, 
+                httpConfiguration, actionDescriptor));
+        }
+
+        public static List<Type> ThatApplyTo(this PluginDefinitions
+            <IBehavior, BehaviorContext> behaviors, ActionSourceContext context,
+            ActionMethod actionMethod, RouteDescriptor routeDescriptor)
+        {
+            return behaviors.ThatApplyTo(new BehaviorContext(context.Configuration, context
+                .HttpConfiguration, actionMethod, routeDescriptor))
+                .Select(x => x.Type).ToList();
         }
 
         public static Task Bind(this IRequestBinder binder, 

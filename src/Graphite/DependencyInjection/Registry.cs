@@ -41,7 +41,13 @@ namespace Graphite.DependencyInjection
             _registrations = new List<Registration>(registry);
         }
 
-        public Registry Register(Type plugin, Type concrete, bool singleton)
+        public Registry Register<TPlugin, TConcrete>(bool singleton = false) 
+            where TPlugin : class where TConcrete : TPlugin
+        {
+            return Register(typeof(TPlugin), typeof(TConcrete), singleton);
+        }
+
+        public Registry Register(Type plugin, Type concrete, bool singleton = false)
         {
             _registrations.Add(new Registration(plugin, concrete, singleton));
             return this;
@@ -53,7 +59,7 @@ namespace Graphite.DependencyInjection
             return this;
         }
 
-        public Registry Register<TPlugin>(Type concrete, bool singleton) where TPlugin : class
+        public Registry Register<TPlugin>(Type concrete, bool singleton = false) where TPlugin : class
         {
             return Register(typeof(TPlugin), concrete, singleton);
         }

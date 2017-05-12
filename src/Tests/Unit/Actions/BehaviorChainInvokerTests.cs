@@ -48,7 +48,8 @@ namespace Tests.Unit.Actions
                 HttpRequestContext httpRequestContext,
                 RequestCancellation requestCancellation,
                 UrlParameters urlParameters,
-                QuerystringParameters querystringParameters)
+                QuerystringParameters querystringParameters,
+                SomeType someInstance)
             {
                 InnerBehavior = innerBehavior;
                 logger.Write(request);
@@ -59,12 +60,16 @@ namespace Tests.Unit.Actions
                 logger.Write(requestCancellation);
                 logger.Write(urlParameters);
                 logger.Write(querystringParameters);
+                logger.Write(someInstance);
             }
         }
+
+        public class SomeType { }
 
         [Test]
         public async Task Should_register_request_objects_in_scoped_container()
         {
+            var someInstance = new SomeType();
             _requestGraph.Configuration.Behaviors.Append<RegistrationLoggingBehavior>();
             _requestGraph.Url = "http://fark.com/urlparamvalue?queryparam=queryvalue";
             _requestGraph.UrlTemplate = "{urlParam}";
@@ -80,6 +85,8 @@ namespace Tests.Unit.Actions
             var requestMessage = _requestGraph.GetHttpRequestMessage();
             var actionDescriptor = _requestGraph.GetActionDescriptor();
 
+            actionDescriptor.Registry.Register(someInstance);
+
             await _invoker.Invoke(actionDescriptor,
                 requestMessage, _requestGraph.CancellationToken);
 
@@ -87,6 +94,7 @@ namespace Tests.Unit.Actions
             log.ShouldContain(_requestGraph.ActionMethod);
             log.ShouldContain(actionDescriptor.Route);
             log.ShouldContain(requestMessage.GetRequestContext());
+            log.ShouldContain(someInstance);
 
             var urlParameters = log.OfType<UrlParameters>().FirstOrDefault();
             urlParameters.ShouldNotBeNull();

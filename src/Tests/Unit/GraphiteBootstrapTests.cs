@@ -58,6 +58,7 @@ namespace Tests.Unit
             GlobalConfiguration.Configuration.InitializeGraphite(config => config
                 .UseContainer(container)
                 .FilterHandlersBy((c, t) => false)
+                .ConfigureActionDecorators(x => x.Append<TestActionDecorator>())
                 .ConfigureRegistry(x => x
                     .Register<RequestContext>(new TestRequestContext()))
             );
@@ -76,6 +77,7 @@ namespace Tests.Unit
                     .IncludeTypeAssembly<GraphiteBootstrapTests>()
                     .UseContainer(container)
                     .FilterHandlersBy((c, t) => false)
+                    .ConfigureActionDecorators(x => x.Append<TestActionDecorator>())
                     .ConfigureRegistry(x => x
                         .Register<RequestContext>(new TestRequestContext()))
                 );
@@ -93,12 +95,16 @@ namespace Tests.Unit
 
             var actionMethodSources = container.GetInstances<IActionMethodSource>().ToList();
             actionMethodSources.Count.ShouldEqual(1);
-            actionMethodSources.ShouldContain(x => x is DefaultActionMethodSource);
+            actionMethodSources[0].ShouldBeType<DefaultActionMethodSource>();
 
             var actionSources = container.GetInstances<IActionSource>().ToList();
             actionSources.Count.ShouldEqual(2);
             actionSources[0].ShouldBeType<DiagnosticsActionSource>();
-            actionSources.ShouldContain(x => x is DefaultActionSource);
+            actionSources[1].ShouldBeType<DefaultActionSource>();
+
+            var actionDecorators = container.GetInstances<IActionDecorator>().ToList();
+            actionDecorators.Count.ShouldEqual(1);
+            actionDecorators[0].ShouldBeType<TestActionDecorator>();
 
             var urlConventions = container.GetInstances<IUrlConvention>().ToList();
             urlConventions.Count.ShouldEqual(2);

@@ -32,7 +32,7 @@ namespace Graphite.Actions
                     querystringParameters, request, request.GetConfiguration(), 
                     cancellationToken);
 
-                InitContainer(container, requestContext, request, 
+                InitContainer(container, actionDescriptor, requestContext, request, 
                     httpRequestContext, cancellationToken);
 
                 IBehavior behaviorChain;
@@ -56,10 +56,12 @@ namespace Graphite.Actions
             }
         }
 
-        public virtual void InitContainer(IContainer container, RequestContext requestContext,
-            HttpRequestMessage request, HttpRequestContext httpRequestContext, 
+        public virtual void InitContainer(IContainer container, ActionDescriptor actionDescriptor, 
+            RequestContext requestContext, HttpRequestMessage request, HttpRequestContext httpRequestContext, 
             CancellationToken cancellationToken)
         {
+            container.Register(container);
+            container.IncludeRegistry(actionDescriptor.Registry);
             container.Register(request);
             container.Register(requestContext);
             container.Register(requestContext.Action);

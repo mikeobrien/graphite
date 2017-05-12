@@ -3,6 +3,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Routing;
 using Graphite;
+using Graphite.Actions;
 using Graphite.StructureMap;
 
 namespace TestHarness
@@ -21,6 +22,7 @@ namespace TestHarness
                     .EnableDiagnosticsInDebugMode()
                     .UseStructureMapContainer<Registry>(configuration)
                     .ExcludeTypeNamespaceFromUrl<Global>()
+                    .ConfigureActionDecorators(d => d.Append<TestActionDecorator>())
                     .ConfigureBehaviors(b => b
                         .Append<Behavior1>()
                         .Append<Behavior2>()
@@ -36,4 +38,20 @@ namespace TestHarness
             configuration.EnsureInitialized();
         }
     }
+
+    public class TestActionDecorator : IActionDecorator
+    {
+        public bool AppliesTo(ActionDecoratorContext context)
+        {
+            return context.ActionDescriptor.Route.Method == "GET";
+        }
+
+        public void Decorate(ActionDecoratorContext context)
+        {
+            context.ActionDescriptor.Registry.Register<IDependency, Dependency>();
+        }
+    }
+
+    public interface IDependency { }
+    public class Dependency : IDependency { }
 }

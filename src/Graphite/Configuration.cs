@@ -37,6 +37,9 @@ namespace Graphite
                 .Append<DiagnosticsActionSource>()
                 .Append<DefaultActionSource>());
 
+        public PluginDefinitions<IActionDecorator, ActionDecoratorContext> ActionDecorators { get; } =
+            PluginDefinitions<IActionDecorator, ActionDecoratorContext>.Create();
+
         public PluginDefinitions<IRouteConvention, RouteContext> RouteConventions { get; } =
             PluginDefinitions<IRouteConvention, RouteContext>.Create(x => x
                 .Append<DefaultRouteConvention>());

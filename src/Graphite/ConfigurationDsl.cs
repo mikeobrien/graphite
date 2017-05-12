@@ -435,6 +435,16 @@ namespace Graphite
         }
 
         /// <summary>
+        /// Configures action decorators.
+        /// </summary>
+        public ConfigurationDsl ConfigureActionDecorators(Action<PluginDefinitions
+            <IActionDecorator, ActionDecoratorContext>> configure)
+        {
+            configure(_configuration.ActionDecorators);
+            return this;
+        }
+
+        /// <summary>
         /// Configures route conventions.
         /// </summary>
         public ConfigurationDsl ConfigureRouteConventions(Action<PluginDefinitions

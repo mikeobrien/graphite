@@ -52,6 +52,12 @@ namespace Graphite.Reflection
         public string FriendlyFullName => _friendlyFullName.Value;
         public bool IsBclType { get; }
         public bool IsSimpleType => _isSimpleType.Value;
+        public bool HasSimpleElementType => ElementType?.IsSimpleType ?? false;
+        public bool IsSimpleTypeOrHasSimpleElementType => IsSimpleType || HasSimpleElementType;
+        public bool IsComplexType => !_isSimpleType.Value;
+        public bool HasComplexElementType => ElementType?.IsComplexType ?? false;
+        public bool IsComplexTypeOrHasComplexElementType => (!HasElement && IsComplexType) || 
+            (HasElement && HasComplexElementType);
         public MethodDescriptor[] Methods => _methods.Value;
         public PropertyDescriptor[] Properties => _properties.Value;
         public bool IsNullable => _isNullable.Value;
@@ -60,6 +66,7 @@ namespace Graphite.Reflection
         public TypeDescriptor ArrayElementType => _arrayElementType.Value;
         public bool IsGenericListCastable => GenericListCastableElementType != null;
         public TypeDescriptor GenericListCastableElementType => _genericListCastableType.Value;
+        public bool HasElement => IsArray || IsGenericListCastable;
         public TypeDescriptor ElementType => ArrayElementType ?? GenericListCastableElementType;
         public bool IsTask { get; }
         public bool IsTaskWithResult { get; }
