@@ -35,8 +35,7 @@ namespace Tests.Unit.Binding
                     .WithUrlTemplate(urlTemplate)
                     .AddValueMapper1(x => x.Values.First());
 
-            var binder = new UrlParameterBinder(requestGraph.ValueMappers,
-                requestGraph.Configuration);
+            var binder = new UrlParameterBinder(requestGraph.ValueMappers);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
@@ -70,8 +69,7 @@ namespace Tests.Unit.Binding
                     .WithUrlTemplate("{param1}/segment/{*param2}")
                     .AddValueMapper(new SimpleTypeMapper());
 
-            var binder = new UrlParameterBinder(requestGraph.ValueMappers,
-                requestGraph.Configuration);
+            var binder = new UrlParameterBinder(requestGraph.ValueMappers);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
@@ -91,8 +89,7 @@ namespace Tests.Unit.Binding
                     .AddValueMapper1(x => x.Values.First() + "mapper1")
                     .AddValueMapper2(x => x.Values.First() + "mapper2");
 
-            var binder = new UrlParameterBinder(requestGraph.ValueMappers,
-                requestGraph.Configuration);
+            var binder = new UrlParameterBinder(requestGraph.ValueMappers);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
@@ -115,8 +112,7 @@ namespace Tests.Unit.Binding
                     .AddValueMapper1(x => x.Values.First() + "mapper1", configAppliesTo: x => false)
                     .AddValueMapper2(x => x.Values.First() + "mapper2");
 
-            var binder = new UrlParameterBinder(requestGraph.ValueMappers,
-                requestGraph.Configuration);
+            var binder = new UrlParameterBinder(requestGraph.ValueMappers);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
@@ -139,8 +135,7 @@ namespace Tests.Unit.Binding
                     .AddValueMapper1(x => x.Values.First() + "mapper1", instanceAppliesTo: x => false)
                     .AddValueMapper2(x => x.Values.First() + "mapper2");
 
-            var binder = new UrlParameterBinder(requestGraph.ValueMappers,
-                requestGraph.Configuration);
+            var binder = new UrlParameterBinder(requestGraph.ValueMappers);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
@@ -161,8 +156,7 @@ namespace Tests.Unit.Binding
                     .WithUrl("http://fark.com/value1/segment/value2")
                     .WithUrlTemplate("{param1}/segment/{param2}");
 
-            var binder = new UrlParameterBinder(requestGraph.ValueMappers,
-                requestGraph.Configuration);
+            var binder = new UrlParameterBinder(requestGraph.ValueMappers);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
@@ -177,8 +171,7 @@ namespace Tests.Unit.Binding
                     .AddUrlParameter("param1")
                     .AddUrlParameter("param2");
 
-            var binder = new UrlParameterBinder(requestGraph.ValueMappers,
-                requestGraph.Configuration);
+            var binder = new UrlParameterBinder(requestGraph.ValueMappers);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 

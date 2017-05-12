@@ -170,7 +170,7 @@ namespace Tests.Unit
         private ActionDescriptor AddRoute(List<ActionDescriptor> actions, string route)
         {
             var descriptor = new ActionDescriptor(Type<Handler>.Expression(x => x.Get()).ToActionMethod(),
-                new RouteDescriptor("GET", route, null, null, null, null, null));
+                new RouteDescriptor("GET", route, null, null, null, null));
             actions.Add(descriptor);
             return descriptor;
         }

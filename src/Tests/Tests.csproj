@@ -60,6 +60,8 @@
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
     </Reference>
@@ -87,6 +89,7 @@
     <Compile Include="Common\Fakes\TestUrlConvention.cs" />
     <Compile Include="Common\Fakes\TestResponseWriter.cs" />
     <Compile Include="Common\Logger.cs" />
+    <Compile Include="Common\PerformanceComparison.cs" />
     <Compile Include="Common\RequestGraph.cs" />
     <Compile Include="Common\TestCaseSource.cs" />
     <Compile Include="Common\WebClient.cs" />
@@ -104,7 +107,9 @@
     <Compile Include="Unit\Actions\InvokerBehaviorTests.cs" />
     <Compile Include="Unit\Binding\ExtensionsTests.cs" />
     <Compile Include="Unit\Binding\FormBinderTests.cs" />
-    <Compile Include="Unit\Binding\PropertyBinderTests.cs" />
+    <Compile Include="Unit\Binding\CookieBinderTests.cs" />
+    <Compile Include="Unit\Binding\RequestInfoBinderTests.cs" />
+    <Compile Include="Unit\Binding\HeaderBinderTests.cs" />
     <Compile Include="Unit\Binding\QuerystringBinderTests.cs" />
     <Compile Include="Unit\Binding\ReaderBinderTests.cs" />
     <Compile Include="Unit\Binding\SimpleTypeMapperTests.cs" />

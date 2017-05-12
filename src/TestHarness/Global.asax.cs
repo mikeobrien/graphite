@@ -4,9 +4,7 @@ using System.Web.Http;
 using System.Web.Routing;
 using Graphite;
 using Graphite.Actions;
-using Graphite.Bender;
 using Graphite.StructureMap;
-using Newtonsoft.Json.Serialization;
 
 namespace TestHarness
 {
@@ -17,6 +15,7 @@ namespace TestHarness
             RouteTable.Routes.RouteExistingFiles = true;
 
             var configuration = GlobalConfiguration.Configuration;
+
             configuration.MapHttpAttributeRoutes();
 
             configuration
@@ -28,6 +27,9 @@ namespace TestHarness
                     .UseStructureMapContainer<Registry>(configuration)
                     .ExcludeTypeNamespaceFromUrl<Global>()
                     .ConfigureActionDecorators(d => d.Append<TestActionDecorator>())
+                    .BindCookies()
+                    .BindRequestInfo()
+                    .BindHeaders()
                     .ConfigureBehaviors(b => b
                         .Append<Behavior1>()
                         .Append<Behavior2>()

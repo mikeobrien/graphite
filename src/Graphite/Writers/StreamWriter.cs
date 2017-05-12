@@ -64,7 +64,7 @@ namespace Graphite.Writers
             
             if (stream != null)
             {
-                response.Content = new StreamContent(stream, bufferSize);
+                response.Content = new AsyncStreamContent(stream, bufferSize);
                 if (streamInfo != null)
                 {
                     if (streamInfo.ContentType.IsNotNullOrEmpty())

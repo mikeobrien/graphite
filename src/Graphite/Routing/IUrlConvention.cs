@@ -10,11 +10,10 @@ namespace Graphite.Routing
         public UrlContext(Configuration configuration, 
             HttpConfiguration httpConfiguration,
             ActionMethod actionMethod, string httpMethod, 
-            string[] urlSegments, ParameterDescriptor[] urlParameters,
-            ParameterDescriptor[] wildcardParameters,
-            ParameterDescriptor[] querystringParameters,
+            string[] urlSegments, UrlParameter[] urlParameters,
+            ActionParameter[] parameters,
             ParameterDescriptor requestParameter, 
-            TypeDescriptor responseBodyType)
+            TypeDescriptor responseType)
         {
             Configuration = configuration;
             HttpConfiguration = httpConfiguration;
@@ -22,10 +21,9 @@ namespace Graphite.Routing
             HttpMethod = httpMethod;
             UrlSegments = urlSegments;
             UrlParameters = urlParameters;
-            WildcardParameters = wildcardParameters;
-            QuerystringParameters = querystringParameters;
+            Parameters = parameters;
             RequestParameter = requestParameter;
-            ResponseBodyType = responseBodyType;
+            ResponseType = responseType;
         }
 
         public virtual Configuration Configuration { get; }
@@ -33,11 +31,10 @@ namespace Graphite.Routing
         public virtual ActionMethod ActionMethod { get; }
         public virtual string HttpMethod { get; }
         public virtual string[] UrlSegments { get; }
-        public virtual ParameterDescriptor[] UrlParameters { get; }
-        public virtual ParameterDescriptor[] WildcardParameters { get; }
-        public virtual ParameterDescriptor[] QuerystringParameters { get; }
+        public virtual UrlParameter[] UrlParameters { get; }
+        public virtual ActionParameter[] Parameters { get; }
         public virtual ParameterDescriptor RequestParameter { get; }
-        public virtual TypeDescriptor ResponseBodyType { get; }
+        public virtual TypeDescriptor ResponseType { get; }
     }
 
     public interface IUrlConvention : IConditional<UrlContext>

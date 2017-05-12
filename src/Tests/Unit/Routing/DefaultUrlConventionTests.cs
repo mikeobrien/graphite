@@ -23,7 +23,7 @@ namespace Tests.Unit.Routing
             var urls = new DefaultUrlConvention()
                 .GetUrls(new UrlContext(null, null, actionMethod,
                     null, new[] { "some", "url" },
-                    null, null, null, null, null));
+                    null, null, null, null));
 
             urls.ShouldOnlyContain("url1", "url2");
         }
@@ -35,7 +35,7 @@ namespace Tests.Unit.Routing
             var urls = new DefaultUrlConvention()
                 .GetUrls(new UrlContext(null, null, actionMethod,
                     null, new []  { "some", "url" }, 
-                    null, null, null, null, null));
+                    null, null, null, null));
 
             urls.ShouldOnlyContain("some/url");
         }

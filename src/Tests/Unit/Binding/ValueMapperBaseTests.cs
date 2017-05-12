@@ -5,6 +5,7 @@ using System.Reflection;
 using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Reflection;
+using Graphite.Routing;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
@@ -48,7 +49,7 @@ namespace Tests.Unit.Binding
         public void Should_map_source_to_value()
         {
             var result = new TestValueMapper().Map(new ValueMapperContext(null,
-                 null, Properties[nameof(Model.Value)], new object[] { "1,2,3" }));
+                 null, new ActionParameter(Properties[nameof(Model.Value)]), new object[] { "1,2,3" }));
             result.ShouldBeType<int>();
             result.CastTo<int>().ShouldEqual(1);
         }
@@ -57,7 +58,7 @@ namespace Tests.Unit.Binding
         public void Should_map_source_to_array()
         {
             var result = new TestValueMapper().Map(new ValueMapperContext(null,
-                 null, Properties[nameof(Model.Array)], new object[] { "1,2,3" }));
+                 null, new ActionParameter(Properties[nameof(Model.Array)]), new object[] { "1,2,3" }));
             result.ShouldBeType<int[]>();
             result.CastTo<int[]>().ShouldOnlyContain(1, 2, 3);
         }
@@ -66,7 +67,7 @@ namespace Tests.Unit.Binding
         public void Should_map_source_to_list()
         {
             var result = new TestValueMapper().Map(new ValueMapperContext(null,
-                 null, Properties[nameof(Model.List)], new object[] { "1,2,3" }));
+                 null, new ActionParameter(Properties[nameof(Model.List)]), new object[] { "1,2,3" }));
             result.ShouldBeType<List<int>>();
             result.CastTo<List<int>>().ShouldOnlyContain(1, 2, 3);
         }
@@ -74,44 +75,23 @@ namespace Tests.Unit.Binding
         [Test]
         public void Should_set_properties_faster_than_reflection()
         {
-            var iterations = 10000;
             var mapper = new TestValueMapper();
             var mapperContext = new ValueMapperContext(null, null,
-                Properties[nameof(Model.Value)], new object[] {"1,2,3"});
+                new ActionParameter(Properties[nameof(Model.Value)]), new object[] {"1,2,3"});
             var method = typeof(TestValueMapper)
                 .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                 .First(x => x.Name == nameof(TestValueMapper.Map) && x.IsGenericMethod)
                 .MakeGenericMethod(mapperContext.Type.Type);
 
-            var nativeElapsed = new List<long>();
-            var reflectionElapsed = new List<long>();
-            var expressionElapsed = new List<long>();
+            var comparison = PerformanceComparison.InTicks(10000);
 
-            Action run = () =>
-            {
-                expressionElapsed.Add(mapper.ElapsedTicks(x => x.Map(mapperContext)));
-                reflectionElapsed.Add(method.ElapsedTicks(x =>
-                {
-                    x.Invoke(mapper, new object[] { mapperContext });
+            comparison.AddCase("Native", () => mapper.Map<int>(mapperContext));
+            var compiledCase = comparison.AddCase("Compiled expression", () => mapper.Map(mapperContext));
+            var reflectionCase = comparison.AddCase("Reflection", () => method.Invoke(mapper, new object[] { mapperContext }));
 
-                }));
-                nativeElapsed.Add(mapper.ElapsedTicks(x =>
-                {
-                    x.Map<int>(mapperContext);
-                }));
-            };
+            comparison.Run();
 
-            100.Times(run); // Warmup
-
-            nativeElapsed.Clear();
-            reflectionElapsed.Clear();
-            expressionElapsed.Clear();
-
-            iterations.Times(run);
-
-            Console.WriteLine($"Native:              {nativeElapsed.Average()}");
-            Console.WriteLine($"Compiled expression: {expressionElapsed.Average()}");
-            Console.WriteLine($"Reflection:          {reflectionElapsed.Average()}");
+            compiledCase.Average.ShouldBeLessThan(reflectionCase.Average);
         }
     }
 }

@@ -24,6 +24,104 @@ namespace Tests.Unit.Reflection
     [TestFixture]
     public class ExtensionTests
     {
+        public class EmptyCtor { }
+        public class NoEmptyCtor { public NoEmptyCtor(string fark) { } }
+
+        [TestCase(typeof(EmptyCtor), true)]
+        [TestCase(typeof(NoEmptyCtor), false)]
+        public void Should_compile_try_create_function(Type type, bool canCreate)
+        {
+            var result = type.CompileTryCreate()();
+
+            if (canCreate) result.ShouldNotBeNull();
+            else result.ShouldBeNull();
+        }
+
+        [Test]
+        public void Should_be_faster_than_activator_create_object()
+        {
+            var comparison = PerformanceComparison.InTicks(10000);
+            var type = typeof(EmptyCtor);
+            var create = type.CompileTryCreate();
+
+            comparison.AddCase("Native", () => new EmptyCtor());
+            var expressionCase = comparison.AddCase("Compiled expression", () => create());
+            var reflectionCase = comparison.AddCase("Reflection", () => Activator.CreateInstance(type));
+
+            comparison.Run();
+
+            expressionCase.Average.ShouldBeLessThan(reflectionCase.Average);
+        }
+
+        public class TypeWithProperty
+        {
+            public string Value { get; set; }
+        }
+
+        [Test]
+        public void Should_set_property_value()
+        {
+            var instance = new TypeWithProperty();
+
+            typeof(TypeWithProperty).GetProperty(nameof(TypeWithProperty.Value))
+                .CompileSetter()(instance, "fark");
+
+            instance.Value.ShouldEqual("fark");
+        }
+
+        [Test]
+        public void Should_be_faster_than_reflection_setting_property_value()
+        {
+            var comparison = PerformanceComparison.InTicks(10000);
+            var instance = new TypeWithProperty();
+            var propertyInfo = typeof(TypeWithProperty).GetProperty(
+                nameof(TypeWithProperty.Value));
+            var setter = propertyInfo.CompileSetter();
+
+            comparison.AddCase("Native", () => instance.Value = "fark");
+            var expressionCase = comparison.AddCase("Compiled expression", () => setter(instance, "fark"));
+            var reflectionCase = comparison.AddCase("Reflection", () => propertyInfo.SetValue(instance, "fark"));
+
+            comparison.Run();
+
+            expressionCase.Average.ShouldBeLessThan(reflectionCase.Average);
+        }
+
+        [Test]
+        public void Should_get_property_value()
+        {
+            var instance = new TypeWithProperty
+            {
+                Value = "fark"
+            };
+
+            typeof(TypeWithProperty).GetProperty(nameof(TypeWithProperty.Value))
+                .CompileGetter()(instance)
+                .ShouldEqual("fark");
+        }
+
+        [Test]
+        public void Should_be_faster_than_reflection_getting_property_value()
+        {
+            var comparison = PerformanceComparison.InTicks(10000);
+            var instance = new TypeWithProperty
+            {
+                Value = "fark"
+            };
+            var propertyInfo = typeof(TypeWithProperty).GetProperty(
+                nameof(TypeWithProperty.Value));
+            var getter = propertyInfo.CompileGetter();
+            object value = null;
+            
+            comparison.AddCase("Native", () => value = instance.Value);
+            var expressionCase = comparison.AddCase("Compiled expression", () => getter(instance));
+            var reflectionCase = comparison.AddCase("Reflection", () => propertyInfo.GetValue(instance));
+
+            comparison.Run();
+
+            expressionCase.Average.ShouldBeLessThan(reflectionCase.Average);
+        }
+
         [TestCase(typeof(Dictionary<string, KeyValuePair<int, string>>), "Dictionary")]
         [TestCase(typeof(string), "String")]
         [TestCase(typeof(int?), "Nullable")]

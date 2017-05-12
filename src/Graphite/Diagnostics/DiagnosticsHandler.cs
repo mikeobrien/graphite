@@ -446,15 +446,15 @@ namespace Graphite.Diagnostics
                                                 .ParameterType.FriendlyFullName.HtmlEncode()}</code>")}</td>
                                     </tr>
                                     <tr>
-                                        <td>Querystring Parameters</td>
-                                        <td>{(!x.Route.QuerystringParameters.Any() ? "<span class=\"red\">None</span>" :
-                                            x.Route.QuerystringParameters.Select(p => $@"<code class=""red"">{p.Name}</code>:<code>{p.ParameterType
+                                        <td>Url Parameters</td>
+                                        <td>{(!x.Route.UrlParameters.Any() ? "<span class=\"red\">None</span>" :
+                                            x.Route.UrlParameters.Select(p => $@"<code class=""red"">{p.Name}</code>:<code>{p.TypeDescriptor
                                             .FriendlyFullName.HtmlEncode()}</code>").Join(", "))}</td>
                                     </tr>
                                     <tr>
-                                        <td>Url Parameters</td>
-                                        <td>{(!x.Route.UrlParameters.Any() ? "<span class=\"red\">None</span>" :
-                                            x.Route.UrlParameters.Select(p => $@"<code class=""red"">{p.Name}</code>:<code>{p.ParameterType
+                                        <td>Parameters</td>
+                                        <td>{(!x.Route.Parameters.Any() ? "<span class=\"red\">None</span>" :
+                                            x.Route.Parameters.Select(p => $@"<code class=""red"">{p.Name}</code>:<code>{p.TypeDescriptor
                                             .FriendlyFullName.HtmlEncode()}</code>").Join(", "))}</td>
                                     </tr>
                                     <tr>

@@ -31,7 +31,7 @@ namespace Tests.Unit.Readers.Bender
                 .CreateFor<Handler>(h => h.Post(null, null))
                     .WithRequestData("<InputModel/>")
                     .WithRequestParameter("request")
-                    .AddQuerystringParameter("param");
+                    .AddParameter("param");
 
             if (isXml)
             {
@@ -51,7 +51,7 @@ namespace Tests.Unit.Readers.Bender
                 .CreateFor<Handler>(h => h.Post(null, null))
                     .WithRequestData("{}")
                     .WithContentType(MimeTypes.ApplicationXml)
-                    .AddQuerystringParameter("param");
+                    .AddParameter("param");
 
             if (hasRequest)
             {
@@ -71,7 +71,7 @@ namespace Tests.Unit.Readers.Bender
                     .WithRequestData("<InputModel><Value>fark</Value></InputModel>")
                     .WithRequestParameter("request")
                     .WithContentType(MimeTypes.ApplicationXml)
-                    .AddQuerystringParameter("param");
+                    .AddParameter("param");
 
             var result = await new Graphite.Bender.XmlReader(new Options())
                 .Read(requestGraph.GetRequestBinderContext());

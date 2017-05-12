@@ -172,9 +172,11 @@ namespace Tests.Unit.Actions
         }
 
         [Test]
-        public async Task Should_return_empty_response_if_no_writers_apply()
+        public async Task Should_return_empty_response_if_no_writers_apply(
+            [Values(null, HttpStatusCode.OK)] HttpStatusCode? statusCode)
         {
             var requestGraph = RequestGraph.CreateFor<IHandler>(x => x.Response());
+            if (statusCode.HasValue) requestGraph.Configuration.DefaultStatusCode = statusCode.Value;
             var invoker = new ActionInvoker(requestGraph.GetRequestContext(), 
                 requestGraph.RequestBinders, requestGraph.ResponseWriters, 
                 requestGraph.Configuration);
@@ -184,7 +186,7 @@ namespace Tests.Unit.Actions
 
             var response = await invoker.Invoke(handler);
 
-            response.StatusCode.ShouldEqual(HttpStatusCode.NoContent);
+            response.StatusCode.ShouldEqual(requestGraph.Configuration.DefaultStatusCode);
         }
     }
 }

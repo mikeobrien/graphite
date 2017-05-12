@@ -3,30 +3,28 @@ using System.Linq;
 using System.Threading.Tasks;
 using Graphite.Extensions;
 using Graphite.Http;
-using Graphite.Reflection;
+using Graphite.Routing;
 
 namespace Graphite.Binding
 {
     public class FormBinder : ParameterBinderBase
     {
-        public FormBinder(IEnumerable<IValueMapper> mappers,
-            Configuration configuration) : base(mappers, configuration) { }
+        public FormBinder(IEnumerable<IValueMapper> mappers) : base(mappers) { }
 
         public override bool AppliesTo(RequestBinderContext context)
         {
             return !context.RequestContext.Route.HasRequest && 
-                context.RequestContext.Route.QuerystringParameters.Any() &&
+                context.RequestContext.Route.Parameters.Any() &&
                 context.RequestContext.RequestMessage.ContentTypeIs(
                     MimeTypes.ApplicationFormUrlEncoded);
         }
 
-        protected override ParameterDescriptor[] 
-            GetParameters(RequestBinderContext context)
+        protected override ActionParameter[] GetParameters(RequestBinderContext context)
         {
-            return context.RequestContext.Route.QuerystringParameters;
+            return context.RequestContext.Route.Parameters;
         }
 
-        protected override async Task<ILookup<string, string>> 
+        protected override async Task<ILookup<string, object>> 
             GetValues(RequestBinderContext context)
         {
             var data = await context.RequestContext

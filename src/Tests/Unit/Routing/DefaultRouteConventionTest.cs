@@ -36,8 +36,7 @@ namespace Tests.Unit.Routing
         public class Handler
         {
             public Response Post_UrlParam1_Segment_UrlParam2(Request request,
-                string urlParam1, Guid? urlParam2, string querystringParam1,
-                Guid? querystringParam2)
+                string urlParam1, Guid? urlParam2, string param1, Guid? param2)
             {
                 return null;
             }
@@ -63,9 +62,9 @@ namespace Tests.Unit.Routing
             descriptor.UrlParameters.ShouldContain(x => x.Name == "urlParam1");
             descriptor.UrlParameters.ShouldContain(x => x.Name == "urlParam2");
 
-            descriptor.QuerystringParameters.Length.ShouldEqual(2);
-            descriptor.QuerystringParameters.ShouldContain(x => x.Name == "querystringParam1");
-            descriptor.QuerystringParameters.ShouldContain(x => x.Name == "querystringParam2");
+            descriptor.Parameters.Length.ShouldEqual(2);
+            descriptor.Parameters.ShouldContain(x => x.Name == "param1");
+            descriptor.Parameters.ShouldContain(x => x.Name == "param2");
 
             descriptor.HasRequest.ShouldBeTrue();
             descriptor.RequestParameter.ParameterType.Type.ShouldEqual<Request>();
@@ -204,14 +203,31 @@ namespace Tests.Unit.Routing
             descriptor.RequestParameter.ShouldBeNull();
         }
 
+        public class ParametersModel
+        {
+            public string Param { get; set; }
+            public string Param2 { get; }
+            public ParametersModel Model { get; set; }
+        }
+
         public class ParametersHandler
         {
             public void Get() { }
             public void Get_() { }
             public void Get(string param) { }
+            public void Get(ParametersModel model) { }
             public void Get_(string param) { }
             public void Get_Param(string param) { }
+            public void Get_Param(ParametersModel model) { }
             public void Post(string param) { }
+            public void Post_UrlParam(string urlParam) { }
+            public void Post_UrlParam(string[] urlParam) { }
+            public void Post_UrlParam_FromBody([FromBody] string urlParam) { }
+            public void Post_UrlParam_FromBody([FromBody] string[] urlParam) { }
+            public void Post_UrlParam(Request urlParam) { }
+            public void Post_UrlParam(Request[] urlParam) { }
+            public void Post_UrlParam_FromUri([FromUri] Request urlParam) { }
+            public void Post_UrlParam_FromUri([FromUri] Request[] urlParam) { }
             public void Post_Param(string param) { }
             public void Post_Param(string[] param) { }
             public void Post_Param_FromBody([FromBody] string param) { }
@@ -220,69 +236,66 @@ namespace Tests.Unit.Routing
             public void Post_Param(Request[] param) { }
             public void Post_Param_FromUri([FromUri] Request param) { }
             public void Post_Param_FromUri([FromUri] Request[] param) { }
-            public void Post_Querystring(string param) { }
-            public void Post_Querystring(string[] param) { }
-            public void Post_Querystring_FromBody([FromBody] string param) { }
-            public void Post_Querystring_FromBody([FromBody] string[] param) { }
-            public void Post_Querystring(Request param) { }
-            public void Post_Querystring(Request[] param) { }
-            public void Post_Querystring_FromUri([FromUri] Request param) { }
-            public void Post_Querystring_FromUri([FromUri] Request[] param) { }
             public void Post(Request param) { }
-            public void Get_UrlParam(string urlParam, string querystringParam) { }
+            public void Get_UrlParam(string urlParam, string param) { }
             public void Get_Segment_Param_Segment(string param) { }
-            public void Get_Segment_UrlParam_Segment(string urlParam, string querystringParam) { }
+            public void Get_Segment_UrlParam_Segment(string urlParam, string param) { }
             public void Get_param(string param) { }
-            public void Get__UrlParam_(string urlParam, string querystringParam) { }
+            public void Get__UrlParam_(string urlParam, string param) { }
             public void Get_UrlParam1_UrlParam2(string urlParam1, string urlParam2, 
-                string querystringParam1, string querystringParam2) { }
+                string param1, string param2) { }
             public void Get_Segment_UrlParam1_Segment_UrlParam2_Segment(string urlParam1, string urlParam2,
-                string querystringParam1, string querystringParam2) { }
+                string param1, string param2) { }
         }
 
         public static object[][] ParameterCases = TestCaseSource
-            .CreateWithExpression<ParametersHandler, string, string, string>(x => x
-                .Add(h => h.Get(), null, null, null)
-                .Add(h => h.Get_(), null, null, null)
-                .Add(h => h.Get(null), null, null, "param")
-                .Add(h => h.Get_(null), null, null, "param")
-                .Add(h => h.Get_Param(null), null, "param", null)
-                .Add(h => h.Post((string)null), null, null, "param")
-                .Add(h => h.Post_Param((string)null), null, "param", null)
-                .Add(h => h.Post_Param((string[])null), null, "param", null)
-                .Add(h => h.Post_Param_FromBody((string)null), "param", null, null)
-                .Add(h => h.Post_Param_FromBody((string[])null), "param", null, null)
-                .Add(h => h.Post_Param((Request)null), "param", null, null)
-                .Add(h => h.Post_Param((Request[])null), "param", null, null)
-                .Add(h => h.Post_Param_FromUri((Request)null), null, "param", null)
-                .Add(h => h.Post_Param_FromUri((Request[])null), null, "param", null)
-                .Add(h => h.Post_Querystring((string)null), null, null, "param")
-                .Add(h => h.Post_Querystring((string[])null), null, null, "param")
-                .Add(h => h.Post_Querystring_FromBody((string)null), "param", null, null)
-                .Add(h => h.Post_Querystring_FromBody((string[])null), "param", null, null)
-                .Add(h => h.Post_Querystring((Request)null), "param", null, null)
-                .Add(h => h.Post_Querystring((Request[])null), "param", null, null)
-                .Add(h => h.Post_Querystring_FromUri((Request)null), null, null, "param")
-                .Add(h => h.Post_Querystring_FromUri((Request[])null), null, null, "param")
-                .Add(h => h.Post((Request)null), "param", null, null)
-                .Add(h => h.Get_UrlParam(null, null), null, "urlParam", "querystringParam")
-                .Add(h => h.Get_Segment_Param_Segment(null), null, "param", null)
-                .Add(h => h.Get_Segment_UrlParam_Segment(null, null), null, "urlParam", "querystringParam")
-                .Add(h => h.Get_param(null), null, "param", null)
-                .Add(h => h.Get__UrlParam_(null, null), null, "urlParam", "querystringParam")
+            .CreateWithExpression<ParametersHandler, string, string, string, bool>(x => x
+                .Add(h => h.Get(), null, null, null, false)
+                .Add(h => h.Get_(), null, null, null, false)
+                .Add(h => h.Get((string)null), null, null, "param", false)
+                .Add(h => h.Get((ParametersModel)null), null, null, "model", false)
+                .Add(h => h.Get((ParametersModel)null), null, null, "model,param", true)
+                .Add(h => h.Get_(null), null, null, "param", false)
+                .Add(h => h.Get_Param((string)null), null, "param", null, false)
+                .Add(h => h.Get_Param((ParametersModel)null), null, null, "model", false)
+                .Add(h => h.Get_Param((ParametersModel)null), null, "param", "model", true)
+                .Add(h => h.Post((string)null), null, null, "param", false)
+                .Add(h => h.Post_UrlParam((string)null), null, "urlParam", null, false)
+                .Add(h => h.Post_UrlParam((string[])null), null, "urlParam", null, false)
+                .Add(h => h.Post_UrlParam_FromBody((string)null), "urlParam", null, null, false)
+                .Add(h => h.Post_UrlParam_FromBody((string[])null), "urlParam", null, null, false)
+                .Add(h => h.Post_UrlParam((Request)null), "urlParam", null, null, false)
+                .Add(h => h.Post_UrlParam((Request[])null), "urlParam", null, null, false)
+                .Add(h => h.Post_UrlParam_FromUri((Request)null), null, "urlParam", null, false)
+                .Add(h => h.Post_UrlParam_FromUri((Request[])null), null, "urlParam", null, false)
+                .Add(h => h.Post_Param((string)null), null, "param", null, false)
+                .Add(h => h.Post_Param((string[])null), null, "param", null, false)
+                .Add(h => h.Post_Param_FromBody((string)null), "param", null, null, false)
+                .Add(h => h.Post_Param_FromBody((string[])null), "param", null, null, false)
+                .Add(h => h.Post_Param((Request)null), "param", null, null, false)
+                .Add(h => h.Post_Param((Request[])null), "param", null, null, false)
+                .Add(h => h.Post_Param_FromUri((Request)null), null, "param", null, false)
+                .Add(h => h.Post_Param_FromUri((Request[])null), null, "param", null, false)
+                .Add(h => h.Post((Request)null), "param", null, null, false)
+                .Add(h => h.Get_UrlParam(null, null), null, "urlParam", "param", false)
+                .Add(h => h.Get_Segment_Param_Segment(null), null, "param", null, false)
+                .Add(h => h.Get_Segment_UrlParam_Segment(null, null), null, "urlParam", "param", false)
+                .Add(h => h.Get_param(null), null, "param", null, false)
+                .Add(h => h.Get__UrlParam_(null, null), null, "urlParam", "param", false)
                 .Add(h => h.Get_UrlParam1_UrlParam2(null, null, null, null), null, "urlParam1,urlParam2", 
-                    "querystringParam1,querystringParam2")
+                    "param1,param2", false)
                 .Add(h => h.Get_Segment_UrlParam1_Segment_UrlParam2_Segment(null, null, null, null),
-                    null, "urlParam1,urlParam2", "querystringParam1,querystringParam2"));
+                    null, "urlParam1,urlParam2", "param1,param2", false));
 
         [TestCaseSource(nameof(ParameterCases))]
         public void Should_get_parameters(Expression<Action<ParametersHandler>> action, 
-            string requestParam, string urlParams, string querystringParams)
+            string requestParam, string urlParams, string @params, bool bindComplexProperties)
         {
+            _configuration.BindComplexTypeProperties = bindComplexProperties;
             var descriptors = _routeConvention.GetRouteDescriptors(
                 new RouteContext(null, null, action.ToActionMethod()));
             var urlParameterNames = urlParams?.Split(',') ?? new string[] {};
-            var querystringParameterNames = querystringParams?.Split(',') ?? new string[] { };
+            var parameterNames = @params?.Split(',') ?? new string[] { };
 
             descriptors.Count.ShouldEqual(1);
             var descriptor = descriptors.First();
@@ -290,20 +303,20 @@ namespace Tests.Unit.Routing
             if (requestParam == null) descriptor.RequestParameter.ShouldBeNull();
             else descriptor.RequestParameter.Name.ShouldEqual(requestParam);
 
-            var parameters = descriptor.UrlParameters;
-            parameters.Length.ShouldEqual(urlParameterNames.Length);
+            var urlParameters = descriptor.UrlParameters;
+            urlParameters.Length.ShouldEqual(urlParameterNames.Length);
 
             foreach (var name in urlParameterNames)
             {
-                parameters.ShouldContain(x => x.Name == name);
+                urlParameters.ShouldContain(x => x.Name.EqualsIgnoreCase(name));
             }
 
-            parameters = descriptor.QuerystringParameters;
-            parameters.Length.ShouldEqual(querystringParameterNames.Length);
+            var parameters = descriptor.Parameters;
+            parameters.Length.ShouldEqual(parameterNames.Length);
 
-            foreach (var name in querystringParameterNames)
+            foreach (var name in parameterNames)
             {
-                parameters.ShouldContain(x => x.Name == name);
+                parameters.ShouldContain(x => x.Name.EqualsIgnoreCase(name));
             }
         }
 
@@ -311,10 +324,14 @@ namespace Tests.Unit.Routing
         {
             public void GetNoWildcard_Values(string[] values) { }
             public void GetParams_Value1_Values(string value1, params string[] values) { }
-            public void GetWildcardAttributeArray_Value1_Values(string value1, [Wildcard] string[] values) { }
-            public void GetWildcardAttributeSingleValue_Value1_Values(string value1, [Wildcard] string values) { }
-            public void GetWildcardAttributeNotLast_Value1_Values([Wildcard] string[] values, string value1) { }
-            public void GetWildcardAttributeMultiple_Values1_Values2([Wildcard] string[] values1, [Wildcard] string[] values2) { }
+            public void GetWildcardAttributeArray_Value1_Values(
+                string value1, [Wildcard] string[] values) { }
+            public void GetWildcardAttributeSingleValue_Value1_Values(
+                string value1, [Wildcard] string values) { }
+            public void GetWildcardAttributeNotLast_Value1_Values(
+                [Wildcard] string[] values, string value1) { }
+            public void GetWildcardAttributeMultiple_Values1_Values2(
+                [Wildcard] string[] values1, [Wildcard] string[] values2) { }
         }
 
         public static object[][] WildcardParameterCases = TestCaseSource
@@ -332,7 +349,7 @@ namespace Tests.Unit.Routing
                 new RouteContext(null, null, action.ToActionMethod())).FirstOrDefault();
 
             routeDescriptor.Url.Split('/').ShouldContain($"{{{(wildcard ? "*" : "")}values}}");
-            routeDescriptor.WildcardParameters.Any(x => x.Name == "values").ShouldEqual(wildcard);
+            routeDescriptor.UrlParameters.Any(x => x.IsWildcard && x.Name == "values").ShouldEqual(wildcard);
         }
 
         [Test]
@@ -385,7 +402,7 @@ namespace Tests.Unit.Routing
             public void Get_Segment() { }
             public void Get_Segment1_Segment2() { }
             public void Get_Segment1_UrlParameter_Segment2(
-                string urlParameter, string querystringParameter) { }
+                string urlParameter, string parameter) { }
             public void Get_Segment1_UrlParameter1_Segment2_UrlParameter2(
                 string urlParameter1, string urlParameter2) { }
         }
@@ -448,9 +465,9 @@ namespace Tests.Unit.Routing
             urlConvention.AppliesToContext.HttpMethod.ShouldEqual("GET");
             urlConvention.AppliesToContext.UrlSegments.ToArray().ShouldEqual(expectedSegments);
             urlConvention.AppliesToContext.UrlParameters.ShouldBeEmpty();
-            urlConvention.AppliesToContext.QuerystringParameters.ShouldBeEmpty();
+            urlConvention.AppliesToContext.Parameters.ShouldBeEmpty();
             urlConvention.AppliesToContext.RequestParameter.ShouldEqual(null);
-            urlConvention.AppliesToContext.ResponseBodyType.ShouldEqual(null);
+            urlConvention.AppliesToContext.ResponseType.ShouldEqual(null);
 
             urlConvention.GetUrlsCalled.ShouldBeTrue();
             urlConvention.GetUrlsContext.HttpConfiguration.ShouldEqual(httpConfiguration);
@@ -458,9 +475,9 @@ namespace Tests.Unit.Routing
             urlConvention.GetUrlsContext.HttpMethod.ShouldEqual("GET");
             urlConvention.GetUrlsContext.UrlSegments.ToArray().ShouldEqual(expectedSegments);
             urlConvention.GetUrlsContext.UrlParameters.ShouldBeEmpty();
-            urlConvention.GetUrlsContext.QuerystringParameters.ShouldBeEmpty();
+            urlConvention.GetUrlsContext.Parameters.ShouldBeEmpty();
             urlConvention.GetUrlsContext.RequestParameter.ShouldEqual(null);
-            urlConvention.GetUrlsContext.ResponseBodyType.ShouldEqual(null);
+            urlConvention.GetUrlsContext.ResponseType.ShouldEqual(null);
         }
 
         [Test]

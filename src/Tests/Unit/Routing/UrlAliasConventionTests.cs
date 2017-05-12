@@ -23,7 +23,7 @@ namespace Tests.Unit.Routing
             var actionMethod = Type<AliasHandler>.Method(x => x.Get()).ToActionMethod<AliasHandler>();
             var urls = new AliasUrlConvention(new Configuration())
                 .GetUrls(new UrlContext(null, null, actionMethod,
-                    null, null, null, null, null, null, null));
+                    null, null, null, null, null, null));
 
             urls.ShouldOnlyContain("url1", "url2");
         }
@@ -42,7 +42,7 @@ namespace Tests.Unit.Routing
                 })
                 .GetUrls(new UrlContext(null, null, actionMethod,
                     null, new []  { "some", "url" }, 
-                    null, null, null, null, null));
+                    null, null, null, null));
 
             urls.ShouldOnlyContain("Post/url1/some/url", "Post/url2/some/url");
         }
