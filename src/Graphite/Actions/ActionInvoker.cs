@@ -48,7 +48,7 @@ namespace Graphite.Actions
                     _configuration, _requestContext, response);
             }
 
-            return new HttpResponseMessage(HttpStatusCode.NoContent);
+            return new HttpResponseMessage(_configuration.DefaultStatusCode);
         }
     }
 }

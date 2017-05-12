@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using Graphite.Actions;
 using Graphite.Binding;
@@ -59,6 +60,7 @@ namespace Graphite
         public string DiagnosticsUrl { get; set; } = "_graphite";
         public bool EnableDiagnostics { get; set; }
         public bool EnableMetrics { get; set; } = true;
+        public HttpStatusCode DefaultStatusCode = HttpStatusCode.NoContent;
         public string UnhandledExceptionStatusText { get; set; } =
             "There was a problem processing your request.";
         public bool DefaultErrorHandlerEnabled { get; set; } = true;

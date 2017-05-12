@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using Graphite.Actions;
 using Graphite.Binding;
@@ -138,6 +139,15 @@ namespace Graphite
         public ConfigurationDsl WithUnhandledExceptionStatusText(string statusText)
         {
             _configuration.UnhandledExceptionStatusText = statusText;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the default status code, the default is 204 (no content).
+        /// </summary>
+        public ConfigurationDsl WithDefaultStatusCode(HttpStatusCode statusCode)
+        {
+            _configuration.DefaultStatusCode = statusCode;
             return this;
         }
 
