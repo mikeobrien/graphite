@@ -4,7 +4,9 @@ using System.Web.Http;
 using System.Web.Routing;
 using Graphite;
 using Graphite.Actions;
+using Graphite.Bender;
 using Graphite.StructureMap;
+using Newtonsoft.Json.Serialization;
 
 namespace TestHarness
 {
@@ -20,6 +22,9 @@ namespace TestHarness
             configuration
                 .InitializeGraphite(c => c
                     .EnableDiagnosticsInDebugMode()
+                    //.UseBender(x => x.UseCamelCaseNaming())
+                    //.ConfigureJsonNet(x => x.ContractResolver = 
+                    //    new CamelCasePropertyNamesContractResolver())
                     .UseStructureMapContainer<Registry>(configuration)
                     .ExcludeTypeNamespaceFromUrl<Global>()
                     .ConfigureActionDecorators(d => d.Append<TestActionDecorator>())

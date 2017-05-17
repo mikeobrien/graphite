@@ -244,6 +244,21 @@ namespace Graphite.Diagnostics
                     color: #e3524f;
                 }
 
+                .purple
+                {
+                    color: #b842ff;
+                }
+
+                .dark-blue
+                {
+                    color: #4272ff;
+                }
+
+                .pink
+                {
+                    color: #ef3cc7;
+                }
+
                 .grey
                 {
                     color: #888888;
@@ -372,6 +387,19 @@ namespace Graphite.Diagnostics
                 </table>";
         }
 
+        private string GetMethodClass(string method)
+        {
+            switch (method)
+            {
+                case "GET": return "dark-blue";
+                case "POST": return "green";
+                case "PUT": return "pink";
+                case "PATCH": return "purple";
+                case "DELETE": return "red";
+                default: return "";
+            }
+        }
+
         private string RenderActions()
         {
             return $@"
@@ -395,7 +423,7 @@ namespace Graphite.Diagnostics
                     {_runtimeConfiguration.Actions.OrderBy(x => x.Route.Url).Select(x => $@"
                     <tbody>
                         <tr onclick=""toggleVisibility(this)"">
-                            <td><code>{x.Route.Method}</code></td>
+                            <td><code><span class=""{GetMethodClass(x.Route.Method)}"">{x.Route.Method}</span></code></td>
                             <td><code>/{new Regex(@"(\{\w*\})").Replace(x.Route.Url.HtmlEncode(), "<span class=\"url-parameter\">$1</span>")}</code></td>
                             <td>&rarr;</td>
                             <td><code>{x.Action.FullName}</code></td>
