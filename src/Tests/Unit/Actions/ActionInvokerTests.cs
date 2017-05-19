@@ -32,16 +32,16 @@ namespace Tests.Unit.Actions
 
         public static object[][] ActionTestCases = TestCaseSource
             .Create<ActionMethod>(x => x
-                .Add(Type<IHandler>.Expression(h => h.NoParamsOrResponse()).ToActionMethod())
-                .Add(Type<IHandler>.Expression(h => h.NoParamsOrResponseAsync()).ToActionMethod())
-                .Add(Type<IHandler>.Expression(h => h.Params(null)).ToActionMethod())
-                .Add(Type<IHandler>.Expression(h => h.Params(null, null)).ToActionMethod())
-                .Add(Type<IHandler>.Expression(h => h.ParamsAsync(null)).ToActionMethod())
-                .Add(Type<IHandler>.Expression(h => h.ParamsAsync(null, null)).ToActionMethod())
-                .Add(Type<IHandler>.Expression(h => h.Response()).ToActionMethod())
-                .Add(Type<IHandler>.Expression(h => h.ResponseAsync()).ToActionMethod())
-                .Add(Type<IHandler>.Expression(h => h.ParamsAndResponse(null)).ToActionMethod())
-                .Add(Type<IHandler>.Expression(h => h.ParamsAndResponseAsync(null)).ToActionMethod()));
+                .Add(ActionMethod.From<IHandler>(h => h.NoParamsOrResponse()))
+                .Add(ActionMethod.From<IHandler>(h => h.NoParamsOrResponseAsync()))
+                .Add(ActionMethod.From<IHandler>(h => h.Params(null)))
+                .Add(ActionMethod.From<IHandler>(h => h.Params(null, null)))
+                .Add(ActionMethod.From<IHandler>(h => h.ParamsAsync(null)))
+                .Add(ActionMethod.From<IHandler>(h => h.ParamsAsync(null, null)))
+                .Add(ActionMethod.From<IHandler>(h => h.Response()))
+                .Add(ActionMethod.From<IHandler>(h => h.ResponseAsync()))
+                .Add(ActionMethod.From<IHandler>(h => h.ParamsAndResponse(null)))
+                .Add(ActionMethod.From<IHandler>(h => h.ParamsAndResponseAsync(null))));
 
         [TestCaseSource(nameof(ActionTestCases))]
         public async Task Should_call_action(ActionMethod actionMethod)
@@ -64,7 +64,7 @@ namespace Tests.Unit.Actions
 
             var response = await invoker.Invoke(handler);
 
-            var expectedArguments = actionMethod.Method.Parameters.Select(p =>
+            var expectedArguments = actionMethod.MethodDescriptor.Parameters.Select(p =>
                 $"value{p.Position}-{p.Position}").Cast<object>().ToArray();
 
             await actionMethod.Invoke(handler.Received(1), expectedArguments);
@@ -80,7 +80,7 @@ namespace Tests.Unit.Actions
 
         private static Task SetArguments(RequestBinderContext context, Action<object[], ParameterDescriptor> set)
         {
-            context.RequestContext.Action.Method.Parameters.ForEach(pi => set(context.ActionArguments, pi));
+            context.RequestContext.Action.MethodDescriptor.Parameters.ForEach(pi => set(context.ActionArguments, pi));
             return Task.CompletedTask;
         }
 

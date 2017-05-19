@@ -80,13 +80,13 @@ namespace Graphite
         public string HandlerNamespaceRegex { get; set; } = "(.*)";
 
         public Func<Configuration, ActionMethod, string> GetHandlerNamespace { get; set; } =
-            (c, a) => a.HandlerType.Type.Namespace.MatchGroups(c.HandlerNamespaceRegex).FirstOrDefault();
+            (c, a) => a.HandlerTypeDescriptor.Type.Namespace.MatchGroups(c.HandlerNamespaceRegex).FirstOrDefault();
 
         public Func<Configuration, ActionMethod, string> GetActionMethodName { get; set; } =
-            (c, a) => a.Method.Name.Remove(c.ActionRegex(c));
+            (c, a) => a.MethodDescriptor.Name.Remove(c.ActionRegex(c));
 
         public Func<Configuration, ActionMethod, string> GetHttpMethod { get; set; } = (c, a) =>
-            a.Method.Name.MatchGroups(c.ActionRegex(c)).FirstOrDefault();
+            a.MethodDescriptor.Name.MatchGroups(c.ActionRegex(c)).FirstOrDefault();
 
         public PluginDefinition<IBehaviorChainInvoker> BehaviorChainInvoker { get; } =
             PluginDefinition<IBehaviorChainInvoker>.Create<BehaviorChainInvoker>();

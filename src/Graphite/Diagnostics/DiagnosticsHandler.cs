@@ -427,7 +427,7 @@ namespace Graphite.Diagnostics
                             <td><code>/{new Regex(@"(\{\w*\})").Replace(x.Route.Url.HtmlEncode(), "<span class=\"url-parameter\">$1</span>")}</code></td>
                             <td>&rarr;</td>
                             <td><code>{x.Action.FullName}</code></td>
-                            <td width=""100%""><code>{x.Action.Method.DeclaringType.Type.Assembly.GetFriendlyName().HtmlEncode()}</code></td>
+                            <td width=""100%""><code>{x.Action.MethodDescriptor.DeclaringType.Type.Assembly.GetFriendlyName().HtmlEncode()}</code></td>
                             <td><code>{_metrics.GetAverageRequestTime(x)}</code></td>
                         </tr>
                         <tr style=""display: none"">

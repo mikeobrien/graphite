@@ -3,17 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Bender.Extensions;
-using Graphite.Actions;
 using Graphite.Extensibility;
 using Graphite.Extensions;
-using Graphite.Reflection;
 using Tests.Common.Fakes;
 
 namespace Tests.Common
@@ -28,31 +25,6 @@ namespace Tests.Common
 
     public static class Extensions
     {
-        public static ActionMethod ToActionMethod(this LambdaExpression lambda)
-        {
-            var method = lambda.Body.As<MethodCallExpression>().Method;
-            var typeDescriptor = new TypeCache().GetTypeDescriptor(method.DeclaringType);
-            return new ActionMethod(typeDescriptor, typeDescriptor
-                .Methods.FirstOrDefault(x => x.MethodInfo == method));
-        }
-
-        public static ActionMethod ToActionMethod<T>(this Expression<Func<T, object>> method)
-        {
-            return ToActionMethod<T>(method.GetMethodInfo());
-        }
-
-        public static ActionMethod ToActionMethod<T>(this Expression<Action<T>> method)
-        {
-            return ToActionMethod<T>(method.GetMethodInfo());
-        }
-
-        public static ActionMethod ToActionMethod<T>(this MethodInfo method)
-        {
-            var typeDescriptor = new TypeCache().GetTypeDescriptor(typeof(T));
-            return new ActionMethod(typeDescriptor, typeDescriptor
-                .Methods.FirstOrDefault(x => x.MethodInfo == method));
-        }
-
         public static void Add<TKey, TValue>(
             this List<KeyValuePair<TKey, TValue>> source, 
             TKey key, TValue value)

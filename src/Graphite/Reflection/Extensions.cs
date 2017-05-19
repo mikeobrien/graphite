@@ -112,6 +112,17 @@ namespace Graphite.Reflection
                 .Select(x => x.GetFriendlyTypeName(includeNamespace)).Join(", ")}>" : "");
         }
 
+        public static string GetFriendlyParameterName(this ParameterInfo parameter, bool includeNamespace = false)
+        {
+            return $"{parameter.ParameterType.GetFriendlyTypeName(includeNamespace)} {parameter.Name}";
+        }
+
+        public static string GetFriendlyPropertyName(this PropertyInfo property, bool includeNamespace = false)
+        {
+            return $"{property.PropertyType.GetFriendlyTypeName(includeNamespace)} {property.Name} " +
+                   $"{{ {(property.CanRead ? "get; " : "")}{(property.CanWrite ? "set; " : "")}}}";
+        }
+
         public static string GetFriendlyName(this Assembly assembly)
         {
             var name = assembly.GetName();

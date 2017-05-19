@@ -82,14 +82,14 @@ namespace Tests.Unit.Actions
 
         private void Should_contain_action_method<T>(string methodName)
         {
-            _actionMethods.ShouldContain(x => x.HandlerType.Type == typeof(T) &&
-                x.Method.MethodInfo == typeof(T).GetMethod(methodName));
+            _actionMethods.ShouldContain(x => x.HandlerTypeDescriptor.Type == typeof(T) &&
+                x.MethodDescriptor.MethodInfo == typeof(T).GetMethod(methodName));
         }
 
         private void Should_not_contain_action_method<T>(string methodName)
         {
-            _actionMethods.ShouldNotContain(x => x.HandlerType.Type == typeof(T) &&
-                x.Method.MethodInfo == typeof(T).GetMethod(methodName));
+            _actionMethods.ShouldNotContain(x => x.HandlerTypeDescriptor.Type == typeof(T) &&
+                x.MethodDescriptor.MethodInfo == typeof(T).GetMethod(methodName));
         }
     }
 }

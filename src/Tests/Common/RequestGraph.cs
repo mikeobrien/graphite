@@ -37,11 +37,11 @@ namespace Tests.Common
         {
             Configuration = new Configuration();
             ActionMethod = actionMethod;
-            ResponseType = !actionMethod.Method.HasResult ? 
-                null : actionMethod.Method.ReturnType;
+            ResponseType = !actionMethod.MethodDescriptor.HasResult ? 
+                null : actionMethod.MethodDescriptor.ReturnType;
             CancellationToken = new CancellationToken();
             HttpConfiguration = new HttpConfiguration();
-            ActionArguments = new object[actionMethod.Method.Parameters.Length];
+            ActionArguments = new object[actionMethod.MethodDescriptor.Parameters.Length];
             HttpMethod = "GET";
             Url = "http://fark.com";
             _urlTemplate = "";
@@ -59,17 +59,17 @@ namespace Tests.Common
 
         public static RequestGraph CreateFor<T>(Expression<Action<T>> method)
         {
-            return CreateFor(method.ToActionMethod());
+            return CreateFor(ActionMethod.From(method));
         }
 
         public static RequestGraph CreateFor<T>(Expression<Func<T, object>> method)
         {
-            return CreateFor(method.ToActionMethod());
+            return CreateFor(ActionMethod.From(method));
         }
 
         public static RequestGraph CreateFor(LambdaExpression lambda)
         {
-            return new RequestGraph(lambda.ToActionMethod());
+            return CreateFor(ActionMethod.From(lambda));
         }
 
         public static RequestGraph CreateFor(ActionMethod actionMethod)
@@ -245,7 +245,7 @@ namespace Tests.Common
 
         public RequestGraph AddAllActionParameters()
         {
-            _parameters.AddRange(ActionMethod.Method.Parameters
+            _parameters.AddRange(ActionMethod.MethodDescriptor.Parameters
                 .Select(x => new ActionParameter(x)));
             return this;
         }
@@ -258,10 +258,10 @@ namespace Tests.Common
 
         private ParameterDescriptor GetParameter(string name)
         {
-            var parameter = ActionMethod.Method.Parameters.FirstOrDefault(
+            var parameter = ActionMethod.MethodDescriptor.Parameters.FirstOrDefault(
                 x => x.Name == name);
             if (parameter == null) throw new Exception($"Could not find parameter {name} " +
-                $@"should be {ActionMethod.Method.Parameters.Select(x => 
+                $@"should be {ActionMethod.MethodDescriptor.Parameters.Select(x => 
                     x.Name).Join(", ")}.");
             return parameter;
         }

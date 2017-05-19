@@ -75,7 +75,22 @@ namespace Graphite.Reflection
 
         public object TryCreate()
         {
-            return _tryCreate.Value(); 
+            return _tryCreate.Value();
+        }
+
+        public override int GetHashCode()
+        {
+            return this.GetHashCode(Type);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return GetHashCode() == obj?.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return FriendlyFullName;
         }
     }
 }

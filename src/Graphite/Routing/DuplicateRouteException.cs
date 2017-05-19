@@ -16,8 +16,8 @@ namespace Graphite.Routing
         {
             return "The following actions are resulting in the same url: \r\n" +
                 duplicates.Select(x => $"\t{x.Key}: \r\n" +
-                    x.Select(a => $"\t\t{a.Action.HandlerType.Type.FullName}" +
-                        $".{a.Action.Method.Name}\r\n").Join()).Join();
+                    x.Select(a => $"\t\t{a.Action.HandlerTypeDescriptor.Type.FullName}" +
+                        $".{a.Action.MethodDescriptor.Name}\r\n").Join()).Join();
         }
     }
 }

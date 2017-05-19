@@ -27,7 +27,7 @@ namespace Graphite.Actions
 
         public virtual async Task<HttpResponseMessage> Invoke(object handler)
         {
-            var actionArguments = new object[_requestContext.Action.Method.Parameters.Length];
+            var actionArguments = new object[_requestContext.Action.MethodDescriptor.Parameters.Length];
 
             if (actionArguments.Any())
             {

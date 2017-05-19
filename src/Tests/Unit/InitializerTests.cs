@@ -166,10 +166,10 @@ namespace Tests.Unit
             _actionSources.Add(actionSource);
             return actions;
         }
-
+        
         private ActionDescriptor AddRoute(List<ActionDescriptor> actions, string route)
         {
-            var descriptor = new ActionDescriptor(Type<Handler>.Expression(x => x.Get()).ToActionMethod(),
+            var descriptor = new ActionDescriptor(ActionMethod.From<Handler>(x => x.Get()),
                 new RouteDescriptor("GET", route, null, null, null, null));
             actions.Add(descriptor);
             return descriptor;

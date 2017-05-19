@@ -54,7 +54,7 @@ namespace Graphite.Routing
 
             if (urlParameters.Count(x => x.IsWildcard) > 1)
                 throw new InvalidOperationException("Multiple wildcard parameters found on " +
-                    $"action {action.HandlerType.FriendlyFullName}.{action.Method.FriendlyName}.");
+                    $"action {action.HandlerTypeDescriptor.FriendlyFullName}.{action.MethodDescriptor.FriendlyName}.");
 
             var parameters = actionParameters.Where(p => !urlParameters.Contains(p)).ToArray();
 
@@ -62,7 +62,7 @@ namespace Graphite.Routing
                 .Split('.').Where(x => x.IsNotNullOrWhiteSpace())
                 .Concat(methodSegments.Select(x => x.Segment)).ToArray();
 
-            var responseBody = !action.Method.HasResult ? null : action.Method.ReturnType;
+            var responseBody = !action.MethodDescriptor.HasResult ? null : action.MethodDescriptor.ReturnType;
 
             var urlContext = new UrlContext(_configuration, context.HttpConfiguration, 
                 action, httpMethod, urlSegments, urlParameters, 
@@ -78,18 +78,18 @@ namespace Graphite.Routing
         {
             return _configuration.GetHttpMethod(_configuration, action)
                 .AssertNotEmptyOrWhitespace("Http method not found on " +
-                    $"action {action.HandlerType.Type.FullName}.{action.Method.Name}.")
+                    $"action {action.HandlerTypeDescriptor.Type.FullName}.{action.MethodDescriptor.Name}.")
                 .Trim().ToUpper();
         }
 
         private List<ActionParameter> GetActionParameters(ActionMethod action, 
             ParameterDescriptor requestParameter)
         {
-            var actionParameters = action.Method.Parameters.Where(x => x != requestParameter)
+            var actionParameters = action.MethodDescriptor.Parameters.Where(x => x != requestParameter)
                 .Select(x => new ActionParameter(x)).ToList();
 
             if (_configuration.BindComplexTypeProperties)
-                actionParameters.AddRange(action.Method.Parameters
+                actionParameters.AddRange(action.MethodDescriptor.Parameters
                     .Where(x => x.ParameterType.IsComplexType)
                     .SelectMany(param => param.ParameterType.Properties
                         .Where(x => x.PropertyInfo.CanWrite && x.PropertyType.IsSimpleType)
@@ -102,7 +102,7 @@ namespace Graphite.Routing
         {
             return !_configuration.SupportedHttpMethods
                     .Any(x => x.AllowRequestBody && x.Method == httpMethod) ? null :
-                action.Method.Parameters.Take(1)
+                action.MethodDescriptor.Parameters.Take(1)
                     .Select(x => new
                     {
                         Type = x,

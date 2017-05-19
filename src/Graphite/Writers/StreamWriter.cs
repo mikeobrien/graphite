@@ -58,7 +58,7 @@ namespace Graphite.Writers
         {
             var response = new HttpResponseMessage();
             var streamInfo = context.Response.As<IStreamInfo>() ?? context
-                .RequestContext.Action.Method.GetAttribute<OutputStreamAttribute>();
+                .RequestContext.Action.MethodDescriptor.GetAttribute<OutputStreamAttribute>();
             var stream = context.Response.As<OutputStream>()?.Stream ?? context.Response as Stream;
             var bufferSize = streamInfo?.BufferSize ?? _configuration.DownloadBufferSize;
             

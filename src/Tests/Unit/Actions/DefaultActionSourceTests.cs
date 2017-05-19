@@ -60,7 +60,7 @@ namespace Tests.Unit.Actions
             {
                 GetDescriptors = x => new List<RouteDescriptor>
                 {
-                    new RouteDescriptor(x.ActionMethod.Method.Name, 
+                    new RouteDescriptor(x.ActionMethod.MethodDescriptor.Name, 
                         x.ActionMethod.FullName, null, null, null, null)
                 }
             };
@@ -137,10 +137,10 @@ namespace Tests.Unit.Actions
         {
             var actionSourceContext = new ActionSourceContext(_configuration, new HttpConfiguration());
             _configuration.RouteConventions.Append<TestRouteConvention1>(
-                x => x.ActionMethod.HandlerType.Type == typeof(Handler1));
+                x => x.ActionMethod.HandlerTypeDescriptor.Type == typeof(Handler1));
             _configuration.RouteConventions.Append<TestRouteConvention2>(
-                x => x.ActionMethod.HandlerType.Type == typeof(Handler2) &&
-                    x.ActionMethod.Method.Name == nameof(Handler2.Post));
+                x => x.ActionMethod.HandlerTypeDescriptor.Type == typeof(Handler2) &&
+                    x.ActionMethod.MethodDescriptor.Name == nameof(Handler2.Post));
 
             var actions = _actionSource.GetActions(actionSourceContext);
 
@@ -148,17 +148,17 @@ namespace Tests.Unit.Actions
 
             var action = actions.FirstOrDefault(x => x.Action == _handler1Get);
             action.ShouldNotBeNull();
-            action.Route.Method.ShouldEqual(_handler1Get.Method.Name);
+            action.Route.Method.ShouldEqual(_handler1Get.MethodDescriptor.Name);
             action.Route.Url.ShouldEqual(_handler1Get.FullName);
 
             action = actions.FirstOrDefault(x => x.Action == _handler1Post);
             action.ShouldNotBeNull();
-            action.Route.Method.ShouldEqual(_handler1Post.Method.Name);
+            action.Route.Method.ShouldEqual(_handler1Post.MethodDescriptor.Name);
             action.Route.Url.ShouldEqual(_handler1Post.FullName);
 
             action = actions.FirstOrDefault(x => x.Action == _handler2Post);
             action.ShouldNotBeNull();
-            action.Route.Method.ShouldEqual(_handler2Post.Method.Name);
+            action.Route.Method.ShouldEqual(_handler2Post.MethodDescriptor.Name);
             action.Route.Url.ShouldEqual(_handler2Post.FullName);
 
             _routeConvention1.AppliesToCalled.ShouldBeTrue();
@@ -183,10 +183,10 @@ namespace Tests.Unit.Actions
         {
             var actionSourceContext = new ActionSourceContext(_configuration, new HttpConfiguration());
             _routeConvention1.AppliesToPredicate = x => x.ActionMethod
-                .HandlerType.Type == typeof(Handler1);
+                .HandlerTypeDescriptor.Type == typeof(Handler1);
             _routeConvention2.AppliesToPredicate = x => x.ActionMethod
-                    .HandlerType.Type == typeof(Handler2) && 
-                x.ActionMethod.Method.Name == nameof(Handler2.Post);
+                    .HandlerTypeDescriptor.Type == typeof(Handler2) && 
+                x.ActionMethod.MethodDescriptor.Name == nameof(Handler2.Post);
 
             var actions = _actionSource.GetActions(actionSourceContext);
 
@@ -194,17 +194,17 @@ namespace Tests.Unit.Actions
 
             var action = actions.FirstOrDefault(x => x.Action == _handler1Get);
             action.ShouldNotBeNull();
-            action.Route.Method.ShouldEqual(_handler1Get.Method.Name);
+            action.Route.Method.ShouldEqual(_handler1Get.MethodDescriptor.Name);
             action.Route.Url.ShouldEqual(_handler1Get.FullName);
 
             action = actions.FirstOrDefault(x => x.Action == _handler1Post);
             action.ShouldNotBeNull();
-            action.Route.Method.ShouldEqual(_handler1Post.Method.Name);
+            action.Route.Method.ShouldEqual(_handler1Post.MethodDescriptor.Name);
             action.Route.Url.ShouldEqual(_handler1Post.FullName);
 
             action = actions.FirstOrDefault(x => x.Action == _handler2Post);
             action.ShouldNotBeNull();
-            action.Route.Method.ShouldEqual(_handler2Post.Method.Name);
+            action.Route.Method.ShouldEqual(_handler2Post.MethodDescriptor.Name);
             action.Route.Url.ShouldEqual(_handler2Post.FullName);
 
             _routeConvention1.AppliesToCalled.ShouldBeTrue();
@@ -229,16 +229,16 @@ namespace Tests.Unit.Actions
         {
             _routeConvention1.GetDescriptors = x => new List<RouteDescriptor>
                 {
-                    new RouteDescriptor(x.ActionMethod.Method.Name, 
+                    new RouteDescriptor(x.ActionMethod.MethodDescriptor.Name, 
                         x.ActionMethod.FullName, null, null, null, null),
-                    new RouteDescriptor(x.ActionMethod.Method.Name, 
+                    new RouteDescriptor(x.ActionMethod.MethodDescriptor.Name, 
                         "fark", null, null, null, null)
                 };
             _routeConvention2.GetDescriptors = x => new List<RouteDescriptor>
                 {
-                    new RouteDescriptor(x.ActionMethod.Method.Name, 
+                    new RouteDescriptor(x.ActionMethod.MethodDescriptor.Name, 
                         x.ActionMethod.FullName, null, null, null, null),
-                    new RouteDescriptor(x.ActionMethod.Method.Name, 
+                    new RouteDescriptor(x.ActionMethod.MethodDescriptor.Name, 
                         "farker", null, null, null, null)
                 };
 
@@ -276,7 +276,7 @@ namespace Tests.Unit.Actions
         public void Should_only_configure_matching_behaviors_on_action()
         {
             _configuration.Behaviors.Append<TestBehavior1>(x => x.ActionMethod
-                .Method.Name == nameof(Handler1.Get));
+                .MethodDescriptor.Name == nameof(Handler1.Get));
 
             _configuration.Behaviors.Append<TestBehavior2>();
 

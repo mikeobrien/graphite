@@ -24,7 +24,7 @@ namespace Graphite.Routing
 
         public virtual string[] GetUrls(UrlContext context)
         {
-            var urls = context.ActionMethod.Method
+            var urls = context.ActionMethod.MethodDescriptor
                 .GetAttribute<UrlAttribute>()?.Urls
                 .Where(x => x.IsNotNullOrWhiteSpace())
                 .Select(x => x.Trim('/')).ToArray();

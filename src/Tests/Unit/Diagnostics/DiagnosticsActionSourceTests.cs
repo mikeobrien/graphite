@@ -39,8 +39,8 @@ namespace Tests.Unit.Diagnostics
             var action = actions.First();
 
             action.Route.Url.ShouldEqual(configuration.DiagnosticsUrl);
-            action.Action.HandlerType.Type.ShouldEqual(diagnosticsHandler);
-            action.Action.Method.MethodInfo.ShouldEqual(diagnosticsHandler
+            action.Action.HandlerTypeDescriptor.Type.ShouldEqual(diagnosticsHandler);
+            action.Action.MethodDescriptor.MethodInfo.ShouldEqual(diagnosticsHandler
                 .GetMethod(nameof(DiagnosticsHandler.Get)));
         }
     }

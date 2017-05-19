@@ -11,7 +11,6 @@ using Graphite.Routing;
 using Graphite.StructureMap;
 using NUnit.Framework;
 using Should;
-using Tests.Common;
 using Tests.Common.Fakes;
 
 namespace Tests.Unit.Diagnostics
@@ -41,7 +40,7 @@ namespace Tests.Unit.Diagnostics
             var actionDescriptors = new List<ActionDescriptor>
             {
                 new ActionDescriptor(
-                    Type<Handler>.Expression(x => x.Get(null, 0, DateTime.MaxValue)).ToActionMethod(), 
+                    ActionMethod.From<Handler>(x => x.Get(null, 0, DateTime.MaxValue)), 
                     new RouteDescriptor("GET", "some/url", 
                         parameters.Where(x => x.Name == "urlParam")
                             .Select(x => new UrlParameter(x, false)).ToArray(), 

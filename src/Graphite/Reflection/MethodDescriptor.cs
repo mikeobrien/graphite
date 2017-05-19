@@ -34,5 +34,20 @@ namespace Graphite.Reflection
         public ParameterDescriptor[] Parameters => _parameters.Value;
         public bool HasResult => _hasResult.Value;
         public TypeDescriptor ReturnType => _returnType.Value;
+
+        public override int GetHashCode()
+        {
+            return this.GetHashCode(MethodInfo);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return GetHashCode() == obj?.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return FriendlyName;
+        }
     }
 }

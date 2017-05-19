@@ -27,7 +27,7 @@ namespace Graphite.Actions
 
         public virtual Task<HttpResponseMessage> Invoke()
         {
-            var handler = _container.GetInstance(_requestContext.Action.HandlerType.Type);
+            var handler = _container.GetInstance(_requestContext.Action.HandlerTypeDescriptor.Type);
             return _actionInvoker.Invoke(handler);
         }
     }

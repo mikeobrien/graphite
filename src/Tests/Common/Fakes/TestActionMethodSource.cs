@@ -17,7 +17,7 @@ namespace Tests.Common.Fakes
 
         public ActionMethod Add<T>(Expression<Func<T, object>> method)
         {
-            var actionMethod = method.ToActionMethod();
+            var actionMethod = ActionMethod.From(method);
             _actionMethods.Add(actionMethod);
             return actionMethod;
         }

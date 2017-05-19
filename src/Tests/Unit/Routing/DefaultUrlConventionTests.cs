@@ -1,7 +1,7 @@
-﻿using Graphite.Routing;
+﻿using Graphite.Actions;
+using Graphite.Routing;
 using NUnit.Framework;
 using Tests.Common;
-using Graphite.Extensions;
 
 namespace Tests.Unit.Routing
 {
@@ -19,7 +19,7 @@ namespace Tests.Unit.Routing
         [Test]
         public void Should_return_overriden_urls()
         {
-            var actionMethod = Type<Handler>.Method(x => x.Override()).ToActionMethod<Handler>();
+            var actionMethod = ActionMethod.From<Handler>(x => x.Override());
             var urls = new DefaultUrlConvention()
                 .GetUrls(new UrlContext(null, null, actionMethod,
                     null, new[] { "some", "url" },
@@ -31,7 +31,7 @@ namespace Tests.Unit.Routing
         [Test]
         public void Should_return_default_url_when_override_not_specified()
         {
-            var actionMethod = Type<Handler>.Expression(x => x.NoOverride()).ToActionMethod();
+            var actionMethod = ActionMethod.From<Handler>(x => x.NoOverride());
             var urls = new DefaultUrlConvention()
                 .GetUrls(new UrlContext(null, null, actionMethod,
                     null, new []  { "some", "url" }, 

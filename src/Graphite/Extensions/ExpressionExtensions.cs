@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Graphite.Reflection;
 
 namespace Graphite.Extensions
 {
@@ -34,14 +33,14 @@ namespace Graphite.Extensions
         public static MethodCallExpression Call(Expression instance,
             Expression<Func<T, object>> method, params Expression[] parameters)
         {
-            return System.Linq.Expressions.Expression.Call(instance, Method(method), parameters);
+            return Expression.Call(instance, Method(method), parameters);
         }
 
         public static MethodCallExpression Call(Expression instance,
             Expression<Func<T, object>> method, Type typeArg1, 
             params Expression[] parameters)
         {
-            return System.Linq.Expressions.Expression.Call(instance, method.GetMethodInfo(typeArg1), parameters);
+            return Expression.Call(instance, method.GetMethodInfo(typeArg1), parameters);
         }
 
         public static MethodInfo Method(Expression<Func<T, object>> expression)
@@ -54,16 +53,6 @@ namespace Graphite.Extensions
             return (expression.UnwrapConvert() as MethodCallExpression)?.Method;
         }
 
-        public static Expression<Func<T, object>> Expression(Expression<Func<T, object>> expression)
-        {
-            return expression;
-        }
-
-        public static Expression<Action<T>> Expression(Expression<Action<T>> expression)
-        {
-            return expression;
-        }
-
         public static PropertyInfo Property(Expression<Func<T, object>> property)
         {
             return (property.UnwrapConvert() as MemberExpression)?.Member as PropertyInfo;
@@ -71,7 +60,7 @@ namespace Graphite.Extensions
 
         public static ParameterExpression Parameter(string name = "")
         {
-            return System.Linq.Expressions.Expression.Parameter(typeof(T), name);
+            return Expression.Parameter(typeof(T), name);
         }
     }
 

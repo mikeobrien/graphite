@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Graphite;
+using Graphite.Actions;
 using Graphite.Extensions;
 using Graphite.Routing;
 using Tests.Common;
@@ -46,8 +47,8 @@ namespace Tests.Unit.Routing
         public void Should_get_route_descriptor_for_action()
         {
             var descriptors = _routeConvention.GetRouteDescriptors(new RouteContext(
-                null, null, Type<Handler>.Expression(x => x.Post_UrlParam1_Segment_UrlParam2(
-                    null, null, null, null, null)).ToActionMethod()));
+                null, null, ActionMethod.From<Handler>(x => x.Post_UrlParam1_Segment_UrlParam2(
+                    null, null, null, null, null))));
 
             descriptors.Count.ShouldEqual(1);
 
@@ -110,7 +111,7 @@ namespace Tests.Unit.Routing
         public void Should_get_all_common_http_verbs(Expression<Action<VerbHandler>> action)
         {
             var descriptors = _routeConvention.GetRouteDescriptors(
-                new RouteContext(null, null, action.ToActionMethod()));
+                new RouteContext(null, null, ActionMethod.From(action)));
 
             descriptors.Count.ShouldEqual(1);
             descriptors.First().Method.ShouldEqual(action.GetMethodInfo()
@@ -121,8 +122,8 @@ namespace Tests.Unit.Routing
         public void Should_fail_to_get_unsupported_verb()
         {
             _routeConvention.Should().Throw<InvalidOperationException>(
-                x => x.GetRouteDescriptors(new RouteContext(null, null, Type<VerbHandler>
-                .Expression(h => h.NotASupportedVerb()).ToActionMethod())))
+                x => x.GetRouteDescriptors(new RouteContext(null, null, ActionMethod.From<VerbHandler>
+                (h => h.NotASupportedVerb()))))
                 .Message.ShouldContainAll(typeof(VerbHandler).FullName, 
                     nameof(VerbHandler.NotASupportedVerb));
         }
@@ -157,7 +158,7 @@ namespace Tests.Unit.Routing
             Expression<Action<RequestHandler>> action)
         {
             var descriptors = _routeConvention.GetRouteDescriptors(
-                new RouteContext(null, null, action.ToActionMethod()));
+                new RouteContext(null, null, ActionMethod.From(action)));
 
             descriptors.Count.ShouldEqual(1);
             var descriptor = descriptors.First();
@@ -176,7 +177,7 @@ namespace Tests.Unit.Routing
             Expression<Action<RequestHandler>> action)
         {
             var descriptors = _routeConvention.GetRouteDescriptors(
-                new RouteContext(null, null, action.ToActionMethod()));
+                new RouteContext(null, null, ActionMethod.From(action)));
 
             descriptors.Count.ShouldEqual(1);
             var descriptor = descriptors.First();
@@ -195,7 +196,7 @@ namespace Tests.Unit.Routing
             Expression<Action<RequestHandler>> action)
         {
             var descriptors = _routeConvention.GetRouteDescriptors(
-                new RouteContext(null, null, action.ToActionMethod()));
+                new RouteContext(null, null, ActionMethod.From(action)));
 
             descriptors.Count.ShouldEqual(1);
             var descriptor = descriptors.First();
@@ -293,7 +294,7 @@ namespace Tests.Unit.Routing
         {
             _configuration.BindComplexTypeProperties = bindComplexProperties;
             var descriptors = _routeConvention.GetRouteDescriptors(
-                new RouteContext(null, null, action.ToActionMethod()));
+                new RouteContext(null, null, ActionMethod.From(action)));
             var urlParameterNames = urlParams?.Split(',') ?? new string[] {};
             var parameterNames = @params?.Split(',') ?? new string[] { };
 
@@ -346,7 +347,7 @@ namespace Tests.Unit.Routing
         public void Should_make_param_wild_card(Expression<Action<WildcardHandler>> action, bool wildcard)
         {
             var routeDescriptor =_routeConvention.GetRouteDescriptors(
-                new RouteContext(null, null, action.ToActionMethod())).FirstOrDefault();
+                new RouteContext(null, null, ActionMethod.From(action))).FirstOrDefault();
 
             routeDescriptor.Url.Split('/').ShouldContain($"{{{(wildcard ? "*" : "")}values}}");
             routeDescriptor.UrlParameters.Any(x => x.IsWildcard && x.Name == "values").ShouldEqual(wildcard);
@@ -355,15 +356,14 @@ namespace Tests.Unit.Routing
         [Test]
         public void Should_fail_if_multiple_wildcards_specified()
         {
-            var action =Type<WildcardHandler>.Method(t => t
-                .GetWildcardAttributeMultiple_Values1_Values2(null, null))
-                    .ToActionMethod<WildcardHandler>();
+            var action = ActionMethod.From<WildcardHandler>(t => t
+                .GetWildcardAttributeMultiple_Values1_Values2(null, null));
 
             var message = _routeConvention.Should().Throw<InvalidOperationException>(x => x
                 .GetRouteDescriptors(
                     new RouteContext(null, null, action))).Message;
 
-            message.ShouldContain(action.Method.FriendlyName);
+            message.ShouldContain(action.MethodDescriptor.FriendlyName);
         }
 
         public class ResponseHandler
@@ -385,7 +385,7 @@ namespace Tests.Unit.Routing
         public void Should_get_response_if_exists(Expression<Action<ResponseHandler>> action, bool hasResponse)
         {
             var descriptors = _routeConvention.GetRouteDescriptors(
-                new RouteContext(null, null, action.ToActionMethod()));
+                new RouteContext(null, null, ActionMethod.From(action)));
 
             descriptors.Count.ShouldEqual(1);
             var descriptor = descriptors.First();
@@ -421,7 +421,7 @@ namespace Tests.Unit.Routing
         public void Should_build_url(Expression<Action<UrlHandler>> action, string url)
         {
             var descriptors = _routeConvention.GetRouteDescriptors(
-                new RouteContext(null, null, action.ToActionMethod()));
+                new RouteContext(null, null, ActionMethod.From(action)));
 
             descriptors.Count.ShouldEqual(1);
             var descriptor = descriptors.First();
@@ -438,13 +438,12 @@ namespace Tests.Unit.Routing
         public void Should_use_url_conventions_that_apply()
         {
             var httpConfiguration = new HttpConfiguration();
-            var actionMethod = Type<UrlConventionHandler>
-                .Expression(x => x.Get_Segment()).ToActionMethod();
+            var actionMethod = ActionMethod.From<UrlConventionHandler>(x => x.Get_Segment());
             var urlConvention = new TestUrlConvention
             {
                 AppliesToFunc = c => true,
                 GetUrlsFunc = c => new[] {"fark", "farker"}.Select(y => $@"{y}/{c.ActionMethod
-                    .Method.Name}/{c.UrlSegments.Join("/")}").ToArray()
+                    .MethodDescriptor.Name}/{c.UrlSegments.Join("/")}").ToArray()
             };
             _urlConventions.Add(urlConvention);
                 
@@ -491,7 +490,7 @@ namespace Tests.Unit.Routing
             _urlConventions.Add(urlConvention);
 
             var descriptors = _routeConvention.GetRouteDescriptors(new RouteContext(null, null, 
-                Type<UrlConventionHandler>.Expression(x => x.Get_Segment()).ToActionMethod()));
+                ActionMethod.From<UrlConventionHandler>(x => x.Get_Segment())));
 
             descriptors.Count.ShouldEqual(1);
 
@@ -510,7 +509,7 @@ namespace Tests.Unit.Routing
             _configuration.UrlConventions.Append<TestUrlConvention>(x => false);
 
             var descriptors = _routeConvention.GetRouteDescriptors(new RouteContext(null, null,
-                Type<UrlConventionHandler>.Expression(x => x.Get_Segment()).ToActionMethod()));
+                ActionMethod.From<UrlConventionHandler>(x => x.Get_Segment())));
 
             descriptors.Count.ShouldEqual(1);
 

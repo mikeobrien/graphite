@@ -1,4 +1,5 @@
 ﻿using Graphite;
+using Graphite.Actions;
 using Graphite.Routing;
 using NUnit.Framework;
 using Tests.Common;
@@ -20,7 +21,7 @@ namespace Tests.Unit.Routing
         [Test]
         public void Should_return_attribute_url_aliases()
         {
-            var actionMethod = Type<AliasHandler>.Method(x => x.Get()).ToActionMethod<AliasHandler>();
+            var actionMethod = ActionMethod.From<AliasHandler>(x => x.Get());
             var urls = new AliasUrlConvention(new Configuration())
                 .GetUrls(new UrlContext(null, null, actionMethod,
                     null, null, null, null, null, null));
@@ -31,13 +32,13 @@ namespace Tests.Unit.Routing
         [Test]
         public void Should_return_conventional_url_aliases()
         {
-            var actionMethod = Type<AliasHandler>.Expression(x => x.Post()).ToActionMethod();
+            var actionMethod = ActionMethod.From<AliasHandler>(x => x.Post());
             var urls = new AliasUrlConvention(new Configuration
                 {
                     UrlAliases =
                     {
-                        (a, s) => $"{a.Method.Name}/url1/{s.Join("/")}",
-                        (a, s) => $"{a.Method.Name}/url2/{s.Join("/")}"
+                        (a, s) => $"{a.MethodDescriptor.Name}/url1/{s.Join("/")}",
+                        (a, s) => $"{a.MethodDescriptor.Name}/url2/{s.Join("/")}"
                     }
                 })
                 .GetUrls(new UrlContext(null, null, actionMethod,

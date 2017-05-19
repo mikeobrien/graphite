@@ -1,5 +1,6 @@
 ﻿using System;
 using Graphite.Reflection;
+using Graphite.Extensions;
 
 namespace Graphite.Routing
 {
@@ -58,17 +59,20 @@ namespace Graphite.Routing
         public T GetAttribute<T>() where T : Attribute => _descriptor.GetAttribute<T>();
         public T[] GetAttributes<T>() where T : Attribute => _descriptor.GetAttributes<T>();
 
-        public override bool Equals(object obj)
-        {
-            var actionParameter = obj as ActionParameter;
-            return actionParameter != null && (IsParameter 
-                ? ParameterDescriptor.Equals(actionParameter.ParameterDescriptor) 
-                : PropertyDescriptor.Equals(actionParameter.PropertyDescriptor));
-        }
-
         public override int GetHashCode()
         {
-            return IsParameter ? ParameterDescriptor.GetHashCode() : PropertyDescriptor.GetHashCode();
+            return this.GetHashCode(IsParameter ? ParameterDescriptor : 
+                (DescriptorBase)PropertyDescriptor);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return GetHashCode() == obj?.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 }
