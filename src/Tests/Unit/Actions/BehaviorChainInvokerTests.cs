@@ -3,7 +3,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http.Controllers;
+using Graphite;
 using Graphite.Actions;
+using Graphite.Behaviors;
 using Graphite.Extensions;
 using Graphite.Http;
 using Graphite.Routing;
@@ -27,14 +29,16 @@ namespace Tests.Unit.Actions
         private TestInvokerBehavior _invokerBehavior;
         private HttpResponseMessage _responseMessage;
         private BehaviorChainInvoker _invoker;
+        private Configuration _configuration;
 
         [SetUp]
         public void Setup()
         {
+            _configuration = new Configuration();
             _requestGraph = RequestGraph.CreateFor<Handler>(x => x.Get(null, null));
             _responseMessage = new HttpResponseMessage();
             _invokerBehavior = new TestInvokerBehavior(_responseMessage);
-            _invoker = new BehaviorChainInvoker(_requestGraph.Container);
+            _invoker = new BehaviorChainInvoker(_requestGraph.Container, _configuration);
         }
 
         public class RegistrationLoggingBehavior : TestBehavior
@@ -78,7 +82,7 @@ namespace Tests.Unit.Actions
             var log = new Logger();
             _requestGraph.UnderlyingContainer.Configure(x =>
             {
-                x.For<IInvokerBehavior>().Use(_invokerBehavior);
+                x.For<IBehavior>().Use(_invokerBehavior);
                 x.For<Logger>().Use(log);
             });
 
@@ -155,7 +159,7 @@ namespace Tests.Unit.Actions
             var log = new Logger();
             _requestGraph.UnderlyingContainer.Configure(x =>
             {
-                x.For<IInvokerBehavior>().Use(_invokerBehavior);
+                x.For<IBehavior>().Use(_invokerBehavior);
                 x.For<Disposable>().Use<Disposable>();
                 x.For<Logger>().Use(log);
             });
@@ -170,7 +174,7 @@ namespace Tests.Unit.Actions
         [Test]
         public async Task Should_invoke_with_empty_behavior_chain()
         {
-            _requestGraph.UnderlyingContainer.Configure(x => x.For<IInvokerBehavior>().Use(_invokerBehavior));
+            _requestGraph.UnderlyingContainer.Configure(x => x.For<IBehavior>().Use(_invokerBehavior));
 
             var response = await _invoker.Invoke(_requestGraph.GetActionDescriptor(),
                 _requestGraph.GetHttpRequestMessage(),
@@ -216,7 +220,7 @@ namespace Tests.Unit.Actions
             var log = new Logger();
             _requestGraph.UnderlyingContainer.Configure(x =>
             {
-                x.For<IInvokerBehavior>().Use(_invokerBehavior);
+                x.For<IBehavior>().Use(_invokerBehavior);
                 x.For<Logger>().Use(log);
             });
 
@@ -251,7 +255,7 @@ namespace Tests.Unit.Actions
             var log = new Logger();
             _requestGraph.UnderlyingContainer.Configure(x =>
             {
-                x.For<IInvokerBehavior>().Use(_invokerBehavior);
+                x.For<IBehavior>().Use(_invokerBehavior);
                 x.For<Logger>().Use(log);
             });
 
@@ -266,7 +270,7 @@ namespace Tests.Unit.Actions
 
         public class BehaviorException : Exception { }
 
-        public class InitFailureBehavior : BehaviorBase, IInvokerBehavior
+        public class InitFailureBehavior : BehaviorBase
         {
             public InitFailureBehavior()
             {
@@ -282,7 +286,7 @@ namespace Tests.Unit.Actions
         [Test]
         public async Task Should_wrap_invoker_behavior_with_runtime_init_exception_during_behavior_chain_construction()
         {
-            _requestGraph.UnderlyingContainer.Configure(x => x.For<IInvokerBehavior>().Use<InitFailureBehavior>());
+            _requestGraph.UnderlyingContainer.Configure(x => x.For<IBehavior>().Use<InitFailureBehavior>());
 
             var exception = await _invoker.Should()
                 .Throw<GraphiteRuntimeInitializationException>(x =>
@@ -296,7 +300,7 @@ namespace Tests.Unit.Actions
                 BehaviorException>();
         }
 
-        public class FailureBehavior : BehaviorBase, IInvokerBehavior
+        public class FailureBehavior : BehaviorBase
         {
             public override Task<HttpResponseMessage> Invoke()
             {
@@ -307,7 +311,7 @@ namespace Tests.Unit.Actions
         [Test]
         public async Task Should_not_wrap_invoker_behavior_with_runtime_init_exception_on_invoke()
         {
-            _requestGraph.UnderlyingContainer.Configure(x => x.For<IInvokerBehavior>().Use<FailureBehavior>());
+            _requestGraph.UnderlyingContainer.Configure(x => x.For<IBehavior>().Use<FailureBehavior>());
             _requestGraph.Configuration.DefaultErrorHandlerEnabled = false;
 
             await _invoker.Should().Throw<BehaviorException>(x =>
@@ -319,7 +323,7 @@ namespace Tests.Unit.Actions
         [Test]
         public async Task Should_wrap_behavior_with_runtime_init_exception_during_behavior_chain_construction()
         {
-            _requestGraph.UnderlyingContainer.Configure(x => x.For<IInvokerBehavior>().Use<TestInvokerBehavior>());
+            _requestGraph.UnderlyingContainer.Configure(x => x.For<IBehavior>().Use<TestInvokerBehavior>());
             _requestGraph.Configuration.Behaviors.Append<InitFailureBehavior>();
 
             var exception = await _invoker.Should().Throw<GraphiteRuntimeInitializationException>(x =>
@@ -336,7 +340,7 @@ namespace Tests.Unit.Actions
         [Test]
         public async Task Should_not_wrap_behavior_with_runtime_init_exception_on_invoke()
         {
-            _requestGraph.UnderlyingContainer.Configure(x => x.For<IInvokerBehavior>().Use<TestInvokerBehavior>());
+            _requestGraph.UnderlyingContainer.Configure(x => x.For<IBehavior>().Use<TestInvokerBehavior>());
             _requestGraph.Configuration.DefaultErrorHandlerEnabled = false;
             _requestGraph.Configuration.Behaviors.Append<FailureBehavior>();
 

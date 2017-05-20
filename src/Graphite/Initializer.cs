@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Routing;
 using Graphite.Actions;
+using Graphite.Behaviors;
 using Graphite.DependencyInjection;
 using Graphite.Extensions;
 using Graphite.Monitoring;

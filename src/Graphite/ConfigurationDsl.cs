@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using Graphite.Actions;
+using Graphite.Behaviors;
 using Graphite.Binding;
 using Graphite.DependencyInjection;
 using Graphite.Extensibility;
@@ -251,20 +252,20 @@ namespace Graphite
         }
 
         /// <summary>
-        /// Specifies the invoker behavior to use.
+        /// Specifies the last behavior in the chain.
         /// </summary>
-        public ConfigurationDsl WithInvokerBehavior<T>() where T : IInvokerBehavior
+        public ConfigurationDsl WithDefaultBehavior<T>() where T : IBehavior
         {
-            _configuration.InvokerBehavior.Set<T>();
+            _configuration.DefaultBehavior.Set<T>();
             return this;
         }
 
         /// <summary>
-        /// Specifies the invoker behavior to use.
+        /// Specifies the last behavior in the chain.
         /// </summary>
-        public ConfigurationDsl WithInvokerBehavior<T>(T instance) where T : IInvokerBehavior
+        public ConfigurationDsl WithDefaultBehavior<T>(T instance) where T : IBehavior
         {
-            _configuration.InvokerBehavior.Set(instance);
+            _configuration.DefaultBehavior.Set(instance);
             return this;
         }
 

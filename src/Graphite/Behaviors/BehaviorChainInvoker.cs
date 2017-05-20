@@ -4,19 +4,22 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http.Controllers;
+using Graphite.Actions;
 using Graphite.DependencyInjection;
 using Graphite.Http;
 using Graphite.Reflection;
 
-namespace Graphite.Actions
+namespace Graphite.Behaviors
 {
     public class BehaviorChainInvoker : IBehaviorChainInvoker
     {
         private readonly IContainer _container;
+        private readonly Configuration _configuration;
 
-        public BehaviorChainInvoker(IContainer container)
+        public BehaviorChainInvoker(IContainer container, Configuration configuration)
         {
             _container = container;
+            _configuration = configuration;
         }
 
         public virtual async Task<HttpResponseMessage> Invoke(ActionDescriptor actionDescriptor, 
@@ -39,8 +42,7 @@ namespace Graphite.Actions
                 try
                 {
                     behaviorChain = actionDescriptor.Behaviors.AsEnumerable().Reverse()
-                        .Aggregate<TypeDescriptor, IBehavior>(
-                            container.GetInstance<IInvokerBehavior>(),
+                        .Aggregate(container.GetInstance<IBehavior>(_configuration.DefaultBehavior.Type),
                             (chain, type) =>
                             {
                                 var behavior = container.GetInstance<IBehavior>(

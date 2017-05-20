@@ -13,6 +13,7 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Routing;
 using Graphite;
 using Graphite.Actions;
+using Graphite.Behaviors;
 using Graphite.Binding;
 using Graphite.DependencyInjection;
 using Graphite.Routing;

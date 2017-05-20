@@ -343,7 +343,7 @@ namespace Graphite.Diagnostics
                     {RenderPlugins("Url Convention", _configuration.UrlConventions)}
                     {RenderPlugin("Behavior Chain Invoker", _configuration.BehaviorChainInvoker)}
                     {RenderPlugins("Behavior", _configuration.Behaviors)}
-                    {RenderPlugin("Invoker Behavior", _configuration.InvokerBehavior)}
+                    {RenderPlugin("Invoker Behavior", _configuration.DefaultBehavior)}
                     {RenderPlugin("Action Invoker", _configuration.ActionInvoker)}
                     {RenderPlugins("Request Binder", _configuration.RequestBinders)}
                     {RenderPlugins("Request Reader", _configuration.RequestReaders)}

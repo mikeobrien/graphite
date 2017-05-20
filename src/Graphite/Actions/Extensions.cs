@@ -56,21 +56,5 @@ namespace Graphite.Actions
             actionSource.Decorate(new ActionDecoratorContext(configuration, 
                 httpConfiguration, actionDescriptor));
         }
-
-        public static List<Type> ThatApplyTo(this PluginDefinitions
-            <IBehavior, BehaviorContext> behaviors, ActionSourceContext context,
-            ActionMethod actionMethod, RouteDescriptor routeDescriptor)
-        {
-            return behaviors.ThatApplyTo(new BehaviorContext(context.Configuration, context
-                .HttpConfiguration, actionMethod, routeDescriptor))
-                .Select(x => x.Type).ToList();
-        }
-
-        public static Task Bind(this IRequestBinder binder, 
-            Configuration configuration, RequestContext context, 
-            object[] actionArguments)
-        {
-            return binder.Bind(new RequestBinderContext(configuration, context, actionArguments));
-        }
     }
 }

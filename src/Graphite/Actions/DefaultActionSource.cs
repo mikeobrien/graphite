@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Graphite.Behaviors;
 using Graphite.Reflection;
 using Graphite.Routing;
 

@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Graphite;
 using Graphite.Actions;
+using Graphite.Behaviors;
 using Graphite.Binding;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;

@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Web.Http;
 using Graphite;
 using Graphite.Actions;
+using Graphite.Behaviors;
 using Graphite.Binding;
 using Graphite.DependencyInjection;
 using Graphite.Diagnostics;
@@ -150,7 +151,7 @@ namespace Tests.Unit
             container.GetInstance<ITypeCache>().ShouldBeType<TypeCache>();
             container.GetInstance<IInitializer>().ShouldBeType<Initializer>();
             container.GetInstance<IBehaviorChainInvoker>().ShouldBeType<BehaviorChainInvoker>();
-            container.GetInstance<IInvokerBehavior>().ShouldBeType<InvokerBehavior>();
+            container.GetInstance<InvokerBehavior>().ShouldBeType<InvokerBehavior>();
             container.GetInstance<IActionInvoker>().ShouldBeType<ActionInvoker>();
         }
 

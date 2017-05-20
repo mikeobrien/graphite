@@ -47,7 +47,7 @@ namespace Graphite
                 container.RegisterPlugin(configuration.TypeCache);
                 container.RegisterPlugin(configuration.Initializer);
                 container.RegisterPlugin(configuration.BehaviorChainInvoker);
-                container.RegisterPlugin(configuration.InvokerBehavior);
+                container.Register(configuration.DefaultBehavior.Type);
                 container.RegisterPlugin(configuration.ActionInvoker);
                 container.RegisterPlugins(configuration.RequestBinders);
                 container.RegisterPlugins(configuration.RequestReaders);

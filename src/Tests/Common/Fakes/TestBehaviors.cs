@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Graphite.Actions;
+using Graphite.Behaviors;
 using Graphite.Extensions;
 
 namespace Tests.Common.Fakes
@@ -35,7 +36,7 @@ namespace Tests.Common.Fakes
         }
     }
 
-    public class TestInvokerBehavior : BehaviorBase, IInvokerBehavior
+    public class TestInvokerBehavior : BehaviorBase
     {
         private readonly HttpResponseMessage _response;
 

@@ -5,6 +5,7 @@ using System.Web.Http;
 using System.Web.Http.Routing;
 using Graphite;
 using Graphite.Actions;
+using Graphite.Behaviors;
 using Graphite.DependencyInjection;
 using Graphite.Extensions;
 using Graphite.Monitoring;

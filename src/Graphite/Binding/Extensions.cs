@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Graphite.Actions;
 using Graphite.Extensibility;
 using Graphite.Extensions;
@@ -65,6 +66,13 @@ namespace Graphite.Binding
                     "must be a property or parameter property.");
 
             parameter.PropertyDescriptor.SetValue(instance, value);
+        }
+
+        public static Task Bind(this IRequestBinder binder,
+            Configuration configuration, RequestContext context,
+            object[] actionArguments)
+        {
+            return binder.Bind(new RequestBinderContext(configuration, context, actionArguments));
         }
     }
 }

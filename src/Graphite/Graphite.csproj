@@ -54,14 +54,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\ActionInvoker.cs" />
-    <Compile Include="Actions\BehaviorChainInvoker.cs" />
+    <Compile Include="Behaviors\BehaviorChainInvoker.cs" />
     <Compile Include="Actions\ActionMethod.cs" />
-    <Compile Include="Actions\BehaviorBase.cs" />
+    <Compile Include="Behaviors\BehaviorBase.cs" />
     <Compile Include="Actions\DefaultActionSource.cs" />
     <Compile Include="Actions\Extensions.cs" />
     <Compile Include="Actions\GraphiteRuntimeInitializationException.cs" />
     <Compile Include="Actions\IActionInvoker.cs" />
-    <Compile Include="Actions\IBehaviorChainInvoker.cs" />
+    <Compile Include="Behaviors\Extensions.cs" />
+    <Compile Include="Behaviors\IBehaviorChainInvoker.cs" />
     <Compile Include="Actions\IActionMethodSource.cs" />
     <Compile Include="Actions\IActionSource.cs" />
     <Compile Include="Actions\InvokerBehavior.cs" />
@@ -131,7 +132,7 @@
     <Compile Include="Writers\StringWriter.cs" />
     <Compile Include="Writers\StringWriterBase.cs" />
     <Compile Include="Writers\XmlWriter.cs" />
-    <Compile Include="Actions\IBehavior.cs" />
+    <Compile Include="Behaviors\IBehavior.cs" />
     <Compile Include="DependencyInjection\Extensions.cs" />
     <Compile Include="Diagnostics\DiagnosticsActionSource.cs" />
     <Compile Include="Routing\DuplicateRouteException.cs" />

@@ -1,12 +1,11 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
+using Graphite.Behaviors;
 using Graphite.DependencyInjection;
 
 namespace Graphite.Actions
 {
-    public interface IInvokerBehavior : IBehavior { }
-
-    public class InvokerBehavior : IInvokerBehavior
+    public class InvokerBehavior : IBehavior
     {
         private readonly IContainer _container;
         private readonly RequestContext _requestContext;

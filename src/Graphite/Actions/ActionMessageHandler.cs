@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Graphite.Behaviors;
 using Graphite.Monitoring;
 
 namespace Graphite.Actions

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using Graphite.Actions;
+using Graphite.Behaviors;
 using Graphite.Binding;
 using Graphite.DependencyInjection;
 using Graphite.Diagnostics;
@@ -94,8 +95,8 @@ namespace Graphite
         public PluginDefinition<IActionInvoker> ActionInvoker { get; } =
             PluginDefinition<IActionInvoker>.Create<ActionInvoker>();
 
-        public PluginDefinition<IInvokerBehavior> InvokerBehavior { get; } =
-            PluginDefinition<IInvokerBehavior>.Create<InvokerBehavior>();
+        public PluginDefinition<IBehavior> DefaultBehavior { get; } =
+            PluginDefinition<IBehavior>.Create<InvokerBehavior>();
 
         public BindingMode HeadersBindingMode { get; set; } = BindingMode.None;
         public BindingMode CookiesBindingMode { get; set; } = BindingMode.None;
