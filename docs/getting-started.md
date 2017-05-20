@@ -4,7 +4,7 @@ layout: documentation
 
 ### Getting Started
 
-You can either start out with a new empty web project or with an existing one as Graphite can coexist with your existing Web Api controllers.
+You can either start out with a new empty web project or with an existing one as Graphite can coexist with your existing Web Api controllers. Graphite only supports .NET 4.6.2 or later.
 
 If you are hosting with ASP.NET, install the following package if it is not already installed:
 
@@ -49,7 +49,7 @@ Handlers are simply POCO's with a name that ends with `Handler` and one or more 
 namespace MyWebApp.Api{    public class TimeModel    {        public DateTime Time { get; set; }    }    public class TimeHandler    {        public TimeModel GetTime_TimeZone_Id(string id)        {            return new TimeModel            {                Time = TimeZoneInfo.ConvertTime(DateTime.Now,                    TimeZoneInfo.FindSystemTimeZoneById(id))            };        }    }}
 ```
 
-The url for the action is determined by the conventions you specify in the configuration but we'll discuss the default conventions here. The http verb is determined by the action method name prefix. The url for this action is built as follows:
+The url for the action is determined by the conventions you specify in the configuration but we'll discuss the default conventions here. The http verb is determined by the action method name prefix, which in this case is `Get`. The url for this action is built as follows:
 
 1. The handler namespace split by `.`.
 2. The method name minus the verb prefix, split by `_`. Segments that match the name of an action parameter are considered url parameters.
