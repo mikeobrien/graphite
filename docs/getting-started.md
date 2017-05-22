@@ -36,14 +36,9 @@ configuration    .InitializeGraphite(c => c        .ConfigureRequestReaders(r 
         ...);
 ```
 
-Next we'll write our first handler and action. Graphite handlers are analogous to Web Api controllers. Graphite uses the term "handler" as opposed to "controller" to encourage one verb per handler vs one resource per controller. This is simply a naming difference so you can group all your resource verbs into one handler if you want. You can even change the naming convention to look for classes ending with `Controller`: 
+Next we'll write our first handler and action. Graphite handlers are analogous to Web Api controllers. Although Graphite uses the term "handler" as opposed to "controller" to encourage one verb per handler vs one resource per controller. This is simply a naming difference so you can group all your resource verbs into one handler if you want. 
 
-```csharp
-configuration    .InitializeGraphite(c => c        .WithHandlerNameRegex("Controller$")
-        ...);
-```
-
-Handlers are simply POCO's with a name that ends with `Handler` and one or more actions with a name that begins with an HTTP verb (e.g. `Get`, `Post`, `Patch`, `Put`, `Delete`, etc.) By default actions are passed and return POCO models and/or simple types (i.e. no `IHttpActionResult`). For example, a handler with an action that returns the current time in a particular timezone:
+Handlers are simply POCO's with a name that ends with `Handler` and one or more actions with a name that begins with an HTTP verb (e.g. `Get`, `Post`, `Patch`, `Put`, `Delete`, etc.) By default actions are passed and return POCO models and/or simple types. For example, a handler with an action that returns the current time in a particular timezone:
 
 ```csharp
 namespace MyWebApp.Api{    public class TimeModel    {        public DateTime Time { get; set; }    }    public class TimeHandler    {        public TimeModel GetTime_TimeZone_Id(string id)        {            return new TimeModel            {                Time = TimeZoneInfo.ConvertTime(DateTime.Now,                    TimeZoneInfo.FindSystemTimeZoneById(id))            };        }    }}
@@ -63,13 +58,19 @@ These are concatenated, so the verb and url for this action would be `GET /MyWeb
 
 We really don't want `MyWebApp` in our url so thats why we used the `.ExcludeTypeNamespaceFromUrl<Global>()` configuration option above. This will exclude the namespace of the `Global` class, `MyWebApp`, from the url, producing `/Api/Time/TimeZone/{id}` instead.
 
+**NOTE:** Since Graphite does not include the handler name in the url, it is possible that the url could match a physical path under the website. By default IIS will not route existing directories and files so if the url does match, your route will likely just return a `403`. To allow route urls to match physical paths, add the following to the `Global.asax`:
+
+```csharp
+RouteTable.Routes.RouteExistingFiles = true;
+```
+
 Conventions do a lot of magic and it can be difficult, especially at first, to know what they are doing. This is why Graphite ships with diagnostics out of the box. There you can see all your configuration and actions. By default the diagnostics url is `/_graphite`, simply start your web project and browse to that url. You can see our time action below:
 
 ![Diagnostics](img/getting-started/diagnostics1.png)
 
 Now lets see how you can pass querystring values and send data. 
 
-First lets pass the time zone id as a querystring value. All that needs to be done is to remove `_Id` from the action method name. Now that the parameter name no longer matches a url segment, it is considered to be a querystring value.
+First lets pass the time zone id as a querystring parameter. All that needs to be done is to remove `_Id` from the action method name. Now that the parameter name no longer matches a url segment, it is considered to be an action parameter. Action parameters can be bound to querystring parameters or other request values like cookies and headers (although by default only querystring parameters are bound to action parameters, others need to be enabled in the configuration before they will be bound).
 
 ```csharp
 public class TimeHandler

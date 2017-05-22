@@ -21,6 +21,13 @@ namespace Graphite.Extensibility
             else container.Register<TPlugin>(pluginDefinition.Type, pluginDefinition.Singleton);
         }
 
+        public static TPlugin GetInstance<TPlugin>(this PluginDefinition<TPlugin> pluginDefinition,
+            IContainer container) where TPlugin : class
+        {
+            return (TPlugin)(pluginDefinition.HasInstance ? pluginDefinition.Instance : 
+                container.GetInstance(pluginDefinition.Type));
+        }
+
         public static IEnumerable<TPlugin> ThatApplyTo<TPlugin, TContext>(
             this PluginDefinitions<TPlugin, TContext> definitions,
             IEnumerable<TPlugin> plugins, TContext context)

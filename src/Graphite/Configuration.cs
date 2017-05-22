@@ -53,6 +53,7 @@ namespace Graphite
 
         public List<Func<ActionMethod, string[], string>> UrlAliases { get; } =
             new List<Func<ActionMethod, string[], string>>();
+        public string UrlPrefix { get; set; }
 
         public List<HttpMethod> SupportedHttpMethods { get; } = new List<HttpMethod> {
             HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Patch, HttpMethod.Delete,

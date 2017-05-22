@@ -13,7 +13,7 @@ namespace Graphite.Extensions
                 if (map.ContainsKey(x)) return map[x];
                 var result = func(x);
                 map.TryAdd(x, result);
-                return result;
+                return result; 
             };
         }
 

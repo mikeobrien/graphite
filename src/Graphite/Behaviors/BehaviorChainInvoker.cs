@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Web.Http.Controllers;
 using Graphite.Actions;
 using Graphite.DependencyInjection;
+using Graphite.Extensibility;
 using Graphite.Http;
 using Graphite.Reflection;
 
@@ -42,7 +43,7 @@ namespace Graphite.Behaviors
                 try
                 {
                     behaviorChain = actionDescriptor.Behaviors.AsEnumerable().Reverse()
-                        .Aggregate(container.GetInstance<IBehavior>(_configuration.DefaultBehavior.Type),
+                        .Aggregate(_configuration.DefaultBehavior.GetInstance(container),
                             (chain, type) =>
                             {
                                 var behavior = container.GetInstance<IBehavior>(

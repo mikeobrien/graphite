@@ -1,4 +1,5 @@
-﻿using Graphite.Actions;
+﻿using Graphite;
+using Graphite.Actions;
 using Graphite.Routing;
 using NUnit.Framework;
 using Tests.Common;
@@ -21,7 +22,7 @@ namespace Tests.Unit.Routing
         {
             var actionMethod = ActionMethod.From<Handler>(x => x.Override());
             var urls = new DefaultUrlConvention()
-                .GetUrls(new UrlContext(null, null, actionMethod,
+                .GetUrls(new UrlContext(new Configuration(), null, actionMethod,
                     null, new[] { "some", "url" },
                     null, null, null, null));
 
@@ -33,11 +34,31 @@ namespace Tests.Unit.Routing
         {
             var actionMethod = ActionMethod.From<Handler>(x => x.NoOverride());
             var urls = new DefaultUrlConvention()
-                .GetUrls(new UrlContext(null, null, actionMethod,
+                .GetUrls(new UrlContext(new Configuration(), null, actionMethod,
                     null, new []  { "some", "url" }, 
                     null, null, null, null));
 
             urls.ShouldOnlyContain("some/url");
+        }
+
+        [TestCase(null, "some/url")]
+        [TestCase("", "some/url")]
+        [TestCase("/", "some/url")]
+        [TestCase("///", "some/url")]
+        [TestCase("/fark/", "fark/some/url")]
+        [TestCase("fark/farker", "fark/farker/some/url")]
+        public void Should_add_url_prefix(string prefix, string expected)
+        {
+            var actionMethod = ActionMethod.From<Handler>(x => x.NoOverride());
+            var urls = new DefaultUrlConvention()
+                .GetUrls(new UrlContext(new Configuration
+                    {
+                        UrlPrefix = prefix
+                }, null, actionMethod,
+                    null, new[] { "some", "url" },
+                    null, null, null, null));
+
+            urls.ShouldOnlyContain(expected);
         }
     }
 }

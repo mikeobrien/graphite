@@ -322,6 +322,15 @@ namespace Graphite
         }
 
         /// <summary>
+        /// Adds a prefix to all urls.
+        /// </summary>
+        public ConfigurationDsl WithUrlPrefix(string prefix)
+        {
+            _configuration.UrlPrefix = prefix;
+            return this;
+        }
+
+        /// <summary>
         /// Specifies the handler filter.
         /// </summary>
         public ConfigurationDsl FilterHandlersBy(Func<Configuration, TypeDescriptor, bool> filter)

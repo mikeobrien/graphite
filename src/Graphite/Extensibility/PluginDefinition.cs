@@ -22,12 +22,14 @@ namespace Graphite.Extensibility
         {
             Type = typeof(TConcrete);
             Singleton = singleton;
+            Instance = default(T);
         }
 
         public void Set<TConcrete>(TConcrete instance) where TConcrete : T
         {
             Type = typeof(TConcrete);
             Instance = instance;
+            Singleton = false;
         }
 
         public T Instance { get; private set; }

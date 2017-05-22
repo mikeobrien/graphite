@@ -28,7 +28,9 @@ namespace Graphite.Routing
                 .GetAttribute<UrlAttribute>()?.Urls
                 .Where(x => x.IsNotNullOrWhiteSpace())
                 .Select(x => x.Trim('/')).ToArray();
-            return urls ?? new[] { context.UrlSegments.Join("/") };
+            var prefix = context.Configuration.UrlPrefix?.Trim('/');
+            return urls ?? new[] { (prefix.IsNullOrEmpty() ? context.UrlSegments : 
+                prefix.AsList().Concat(context.UrlSegments)).Join("/") };
         }
     }
 }
