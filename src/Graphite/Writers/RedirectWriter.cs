@@ -90,7 +90,7 @@ namespace Graphite.Writers
             {
                 Headers =
                 {
-                    Location = new Uri(redirect.RidirectUrl)
+                    Location = new Uri(redirect.RidirectUrl, UriKind.RelativeOrAbsolute)
                 },
                 StatusCode = (HttpStatusCode)redirect.Ridirect
             }.ToTaskResult();
