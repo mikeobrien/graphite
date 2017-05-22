@@ -77,7 +77,7 @@
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Extensions\IOExtensions.cs" />
     <Compile Include="Monitoring\Metrics.cs" />
-    <Compile Include="DefaultErrorHandlerBehavior.cs" />
+    <Compile Include="Behaviors\DefaultErrorHandlerBehavior.cs" />
     <Compile Include="Binding\MapResult.cs" />
     <Compile Include="Binding\ParameterBinderBase.cs" />
     <Compile Include="Binding\FormBinder.cs" />

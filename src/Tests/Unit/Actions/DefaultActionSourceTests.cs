@@ -3,6 +3,7 @@ using System.Linq;
 using System.Web.Http;
 using Graphite;
 using Graphite.Actions;
+using Graphite.Behaviors;
 using Graphite.Reflection;
 using Graphite.Routing;
 using NUnit.Framework;

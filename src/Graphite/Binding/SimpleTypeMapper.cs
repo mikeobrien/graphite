@@ -29,7 +29,7 @@ namespace Graphite.Binding
             catch (FormatException exception)
             {
                 throw new BadRequestException($@"Parameter {context.Parameter.Name} value {context.Values
-                    .Select(x => $"'{x}'").Join(",")} is not formatted correctly.", exception);
+                    .Select(x => $"'{x}'").Join(",")} is not formatted correctly. {exception.Message}", exception);
             }
         }
     }

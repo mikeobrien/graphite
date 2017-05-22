@@ -2,11 +2,9 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Graphite.Actions;
-using Graphite.Behaviors;
 using Graphite.Binding;
 
-namespace Graphite
+namespace Graphite.Behaviors
 {
     public class DefaultErrorHandlerBehavior : BehaviorBase
     {
