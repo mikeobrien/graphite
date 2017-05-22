@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Graphite.Reflection;
 
 namespace Graphite.Extensions
 {
@@ -41,6 +42,11 @@ namespace Graphite.Extensions
             Func<T, TResult> factory)
         {
             return new Lazy<TResult>(() => factory(source));
+        }
+
+        public static TypeDescriptor ToTypeDescriptor(this Type type, ITypeCache typeCache = null)
+        {
+            return (typeCache ?? new TypeCache()).GetTypeDescriptor(type);
         }
     }
 }

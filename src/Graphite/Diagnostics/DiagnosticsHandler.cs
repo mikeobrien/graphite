@@ -435,9 +435,9 @@ namespace Graphite.Diagnostics
                                 <table>
                                     <tr>
                                         <td>Behaviors</td>
-                                        <td>{(!x.Behaviors.Any() ? "<span class=\"red\">None</span>" :
-                                            $@"<table class=""behaviors"">{x.Behaviors.Select(b => $@"<tr><td><code>{b.FriendlyFullName
-                                                .HtmlEncode()}</code></td></tr>").Join("<tr><td class=\"arrow\">&darr;</td></tr>")}</table>")}</td>
+                                        <td><table class=""behaviors"">{x.Behaviors.Append(_configuration.DefaultBehavior.Type.ToTypeDescriptor(_typeCache))
+                                            .Select(b => $@"<tr><td><code>{b.FriendlyFullName.HtmlEncode()}</code></td></tr>")
+                                            .Join("<tr><td class=\"arrow\">&darr;</td></tr>")}</table></td>
                                     </tr>
                                     <tr>
                                         <td>Request Parameter</td>

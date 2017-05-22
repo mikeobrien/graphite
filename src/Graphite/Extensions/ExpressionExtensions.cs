@@ -115,6 +115,23 @@ namespace Graphite.Extensions
             return Expression.Parameter(type);
         }
 
+        public static BinaryExpression Coalesce(this Expression left, Expression right)
+        {
+            return Expression.Coalesce(left, right);
+        }
+
+        public static DefaultExpression ToDefault(this Type type,
+            params Expression[] parameters)
+        {
+            return Expression.Default(type);
+        }
+
+        public static NewExpression ToNew(this ConstructorInfo constructor,
+            params Expression[] parameters)
+        {
+            return Expression.New(constructor, parameters);
+        }
+
         public static ConstantExpression ToConstant(this object constant)
         {
             return Expression.Constant(constant);
