@@ -86,8 +86,10 @@ namespace Tests.Unit.Writers
                 .GetResponseWriterContext(new NotRedirectable())).ShouldBeFalse();
         }
 
-        [Test]
-        public async Task Should_redirect()
+        [TestCase("fark", "fark")]
+        [TestCase("/fark", "/fark")]
+        [TestCase("http://fark", "http://fark/")]
+        public async Task Should_redirect(string url, string expected)
         {
             var requestGraph = RequestGraph.CreateFor<Handler>(x => x.Redirect());
 
@@ -95,11 +97,11 @@ namespace Tests.Unit.Writers
                 .GetResponseWriterContext(new Redirect
                 {
                     Type = RedirectType.Found,
-                    Url = "http://fark"
+                    Url = url
                 }));
 
             result.StatusCode.ShouldEqual(HttpStatusCode.Found);
-            result.Headers.Location.ToString().ShouldEqual("http://fark/");
+            result.Headers.Location.ToString().ShouldEqual(expected);
         }
 
         [Test]
