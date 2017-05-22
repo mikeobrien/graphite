@@ -7,6 +7,11 @@ namespace Graphite.Extensions
 {
     public static class StringExtensions
     {
+        public static string RegexEscape(this string source)
+        {
+            return Regex.Escape(source);
+        }
+
         public static bool EqualsIgnoreCase(this string source, string compare)
         {
             return source.Equals(compare, StringComparison.OrdinalIgnoreCase);

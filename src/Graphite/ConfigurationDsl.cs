@@ -389,8 +389,7 @@ namespace Graphite
         }
 
         /// <summary>
-        /// Specifies the regex used to parse the handler namespace. The namespace is 
-        /// pulled from the first capture group by default e.g. "MyApp\.Handlers\.(.*)".
+        /// Removes the types namespace from the url.
         /// </summary>
         public ConfigurationDsl ExcludeTypeNamespaceFromUrl<T>()
         {
@@ -398,12 +397,19 @@ namespace Graphite
         }
 
         /// <summary>
-        /// Specifies the regex used to parse the handler namespace. The namespace is 
-        /// pulled from the first capture group by default e.g. "MyApp\.Handlers\.(.*)".
+        /// Removes the types namespace from the url.
         /// </summary>
         public ConfigurationDsl ExcludeTypeNamespaceFromUrl(Type type)
         {
-            _configuration.HandlerNamespaceRegex = $"{type.Namespace}\\.?(.*)";
+            return ExcludeNamespaceFromUrl(type.Namespace);
+        }
+
+        /// <summary>
+        /// Removes the namespace from the begining of the url.
+        /// </summary>
+        public ConfigurationDsl ExcludeNamespaceFromUrl(string @namespace)
+        {
+            _configuration.HandlerNamespaceRegex = $"{@namespace.RegexEscape()}\\.?(.*)";
             return this;
         }
 
