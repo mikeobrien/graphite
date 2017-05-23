@@ -43,9 +43,6 @@ namespace Graphite.Binding
                 { typeof(HttpRequestContext), x => x.HttpRequestContext }
             };
 
-        private static readonly ILookup<string, object> EmptyLookup = 
-            new Dictionary<string, object>().ToLookup();
-
         public RequestInfoBinder(IEnumerable<IValueMapper> mappers) : base(mappers) { }
 
         public override bool AppliesTo(RequestBinderContext context)
@@ -96,8 +93,8 @@ namespace Graphite.Binding
 
             if (request.Properties.ContainsKey(HttpContextKey))
             {
-                return (request.Properties[HttpContextKey].As<HttpContextBase>()?.Request?
-                    .ServerVariables.ToLookup(NormalizeServerVariableKey) ?? EmptyLookup).ToTaskResult();
+                return request.Properties[HttpContextKey].As<HttpContextBase>()?.Request?
+                    .ServerVariables.ToLookup(NormalizeServerVariableKey).ToTaskResult();
             }
             if (request.Properties.ContainsKey(RemoteEndpointMessageProperty.Name))
             {
@@ -109,7 +106,7 @@ namespace Graphite.Binding
                     { "RemotePort", endpoint.Port }
                 }.ToLookup().ToTaskResult();
             }
-            return EmptyLookup.ToTaskResult();
+            return ((ILookup<string, object>)null).ToTaskResult();
         }
 
         private static string NormalizeServerVariableKey(string key)

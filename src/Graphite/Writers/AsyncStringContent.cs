@@ -12,18 +12,16 @@ namespace Graphite.Writers
     {
         private readonly string _data;
         private readonly Encoding _encoding;
-        private readonly string _mimeType;
 
         public AsyncStringContent(string data, Encoding encoding, string mimeType)
         {
             _data = data;
             _encoding = encoding;
-            _mimeType = mimeType;
+            Headers.ContentType = new MediaTypeHeaderValue(mimeType);
         }
 
         protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)
         {
-            Headers.ContentType = new MediaTypeHeaderValue(_mimeType);
             return stream.WriteAsync(_data, _encoding);
         }
 

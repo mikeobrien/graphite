@@ -106,6 +106,8 @@
     <Compile Include="Unit\Actions\ActionInvokerTests.cs" />
     <Compile Include="Unit\Actions\InvokerBehaviorTests.cs" />
     <Compile Include="Unit\Binding\ExtensionsTests.cs" />
+    <Compile Include="Unit\Binding\XmlBinderTests.cs" />
+    <Compile Include="Unit\Binding\JsonBinderTests.cs" />
     <Compile Include="Unit\Binding\FormBinderTests.cs" />
     <Compile Include="Unit\Binding\CookieBinderTests.cs" />
     <Compile Include="Unit\Binding\RequestInfoBinderTests.cs" />

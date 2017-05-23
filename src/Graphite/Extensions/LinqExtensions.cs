@@ -67,7 +67,7 @@ namespace Graphite.Extensions
         public static ILookup<TKey, TValue> ToLookup<TKey, TValue>(
             this IEnumerable<KeyValuePair<TKey, TValue>> source)
         {
-            return source.ToLookup(x => x.Key, x => x.Value);
+            return source?.ToLookup(x => x.Key, x => x.Value);
         }
 
         private static ILookup<string, T> ToLookup<T>(this NameValueCollection source, 

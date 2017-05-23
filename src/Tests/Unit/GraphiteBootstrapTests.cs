@@ -123,14 +123,16 @@ namespace Tests.Unit
             requestReaders[4].ShouldBeType<FormReader>();
 
             var requestBinders = container.GetInstances<IRequestBinder>().ToList();
-            requestBinders.Count.ShouldEqual(7);
+            requestBinders.Count.ShouldEqual(9);
             requestBinders[0].ShouldBeType<ReaderBinder>();
             requestBinders[1].ShouldBeType<UrlParameterBinder>();
             requestBinders[2].ShouldBeType<QuerystringBinder>();
             requestBinders[3].ShouldBeType<FormBinder>();
-            requestBinders[4].ShouldBeType<HeaderBinder>();
-            requestBinders[5].ShouldBeType<CookieBinder>();
-            requestBinders[6].ShouldBeType<RequestInfoBinder>();
+            requestBinders[4].ShouldBeType<JsonBinder>();
+            requestBinders[5].ShouldBeType<XmlBinder>();
+            requestBinders[6].ShouldBeType<HeaderBinder>();
+            requestBinders[7].ShouldBeType<CookieBinder>();
+            requestBinders[8].ShouldBeType<RequestInfoBinder>();
 
             var valueMappers = container.GetInstances<IValueMapper>().ToList();
             valueMappers.Count.ShouldEqual(1);

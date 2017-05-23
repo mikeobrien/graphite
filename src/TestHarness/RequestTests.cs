@@ -150,6 +150,14 @@ namespace TestHarness
             };
         }
 
+        public OutputModel PostToParameters(string value)
+        {
+            return new OutputModel
+            {
+                Value = value
+            };
+        }
+
         public string PostString([FromBody] string request)
         {
             return request;

@@ -29,6 +29,8 @@ namespace Graphite.Binding
         public virtual async Task Bind(RequestBinderContext context)
         {
             var values = await GetValues(context);
+            if (values == null || !values.Any()) return;
+
             var actionParameters = GetParameters(context)
                 .Where(x => x.IsParameter || x.IsPropertyOfParameter);
 

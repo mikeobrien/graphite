@@ -73,6 +73,8 @@
     <Compile Include="Actions\RequestContext.cs" />
     <Compile Include="Binding\BadRequestException.cs" />
     <Compile Include="Binding\BindingMode.cs" />
+    <Compile Include="Binding\XmlBinder.cs" />
+    <Compile Include="Binding\JsonBinder.cs" />
     <Compile Include="Binding\RequestInfoBinder.cs" />
     <Compile Include="Binding\HeaderBinder.cs" />
     <Compile Include="Binding\CookieBinder.cs" />

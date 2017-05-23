@@ -110,6 +110,8 @@ namespace Graphite
                 .Append<UrlParameterBinder>(singleton: true)
                 .Append<QuerystringBinder>(singleton: true)
                 .Append<FormBinder>(singleton: true)
+                .Append<JsonBinder>(singleton: true)
+                .Append<XmlBinder>(singleton: true)
                 .Append<HeaderBinder>(singleton: true)
                 .Append<CookieBinder>(singleton: true)
                 .Append<RequestInfoBinder>(singleton: true)

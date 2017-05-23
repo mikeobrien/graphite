@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using Graphite.Http;
 using NUnit.Framework;
 using Should;
 using TestHarness;
@@ -29,6 +30,7 @@ namespace Tests.Acceptance
             var result = WebClient.GetJson<Handler.OutputModel>("WithResponse");
 
             result.Status.ShouldEqual(HttpStatusCode.OK);
+            result.ContentType.ShouldEqual(MimeTypes.ApplicationJson);
             result.Data.Value.ShouldEqual("fark");
         }
 
@@ -96,6 +98,7 @@ namespace Tests.Acceptance
             var result = WebClient.GetXml<Handler.OutputModel>("WithResponse");
 
             result.Status.ShouldEqual(HttpStatusCode.OK);
+            result.ContentType.ShouldEqual(MimeTypes.ApplicationXml);
             result.Data.Value.ShouldEqual("fark");
         }
 
@@ -126,11 +129,34 @@ namespace Tests.Acceptance
                 new Handler.InputModel { Value = "fark" });
 
             result.Status.ShouldEqual(HttpStatusCode.OK);
+            result.ContentType.ShouldEqual(MimeTypes.ApplicationJson);
             result.Data.Value.ShouldEqual("fark");
             result.Data.Url1.ShouldEqual("url1");
             result.Data.Url2.ShouldEqual(5);
             result.Data.Query1.ShouldEqual("query1");
             result.Data.Query2.ShouldEqual(6);
+        }
+
+        [Test]
+        public void Should_post_json_to_action_parameters()
+        {
+            var result = WebClient.PostJson<Handler.InputModel, Handler.OutputModel>("ToParameters",
+                new Handler.InputModel { Value = "fark" });
+
+            result.Status.ShouldEqual(HttpStatusCode.OK);
+            result.ContentType.ShouldEqual(MimeTypes.ApplicationJson);
+            result.Data.Value.ShouldEqual("fark");
+        }
+
+        [Test]
+        public void Should_post_xml_to_action_parameters()
+        {
+            var result = WebClient.PostXml<Handler.InputModel, Handler.OutputModel>("ToParameters",
+                new Handler.InputModel { Value = "fark" });
+
+            result.Status.ShouldEqual(HttpStatusCode.OK);
+            result.ContentType.ShouldEqual(MimeTypes.ApplicationXml);
+            result.Data.Value.ShouldEqual("fark");
         }
 
         [Test]
@@ -140,6 +166,7 @@ namespace Tests.Acceptance
                 new Handler.InputModel { Value = "fark" });
 
             result.Status.ShouldEqual(HttpStatusCode.OK);
+            result.ContentType.ShouldEqual(MimeTypes.ApplicationXml);
             result.Data.Value.ShouldEqual("fark");
         }
 
@@ -149,6 +176,7 @@ namespace Tests.Acceptance
             var result = WebClient.PostString("String", "fark");
 
             result.Status.ShouldEqual(HttpStatusCode.OK);
+            result.ContentType.ShouldEqual(MimeTypes.TextPlain);
             result.Data.ShouldEqual("fark");
         }
 
