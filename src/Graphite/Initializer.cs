@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
@@ -38,7 +39,9 @@ namespace Graphite
         {
             var actions = _actionSources
                 .ThatApplyTo(httpConfiguration, _configuration)
-                .SelectMany(x => x.GetActions(_configuration, httpConfiguration)).ToList();
+                .SelectMany(x => x.GetActions(_configuration, httpConfiguration))
+                .OrderBy(x => x.Route.Url, StringComparer.OrdinalIgnoreCase)
+                .ToList();
 
             var duplicates = actions.GroupBy(x => x.Route.Id)
                 .Where(x => x.Count() > 1).ToList();

@@ -78,6 +78,18 @@ namespace Tests.Unit
         }
 
         [Test]
+        public void Should_sort_url_parameters_below_segments()
+        {
+            AddRoute(AddActionSource(), "fark/{param}");
+            AddRoute(AddActionSource(), "fark/segment");
+            AddRoute(AddActionSource(), "fark");
+
+            _initializer.Initialize(_httpConfiguration);
+
+            _routes.Select(x => x.RouteTemplate).ShouldOnlyContain("fark", "fark/segment", "fark/{param}");
+        }
+
+        [Test]
         public void Should_not_add_routes_for_action_sources_that_do_not_apply()
         {
             AddRoute(AddActionSource(false), "fark1");

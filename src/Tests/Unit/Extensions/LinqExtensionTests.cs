@@ -1,4 +1,6 @@
-﻿using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Specialized;
+using System.Linq;
 using Graphite.Extensions;
 using NUnit.Framework;
 using Should;
