@@ -420,7 +420,7 @@ namespace Graphite.Diagnostics
                             <th nowrap>Average Time</th>
                         </tr>
                     </thead>
-                    {_runtimeConfiguration.Actions.OrderBy(x => x.Route.Url).Select(x => $@"
+                    {_runtimeConfiguration.Actions.Select(x => $@"
                     <tbody>
                         <tr onclick=""toggleVisibility(this)"">
                             <td><code><span class=""{GetMethodClass(x.Route.Method)}"">{x.Route.Method}</span></code></td>
