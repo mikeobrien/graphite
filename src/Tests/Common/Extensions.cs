@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
@@ -157,6 +158,18 @@ namespace Tests.Common
             {
                 Content = new StringContent(content, Encoding.UTF8, contentType)
             };
+        }
+
+        public static bool IsRedirect(this HttpStatusCode status)
+        {
+            return status == HttpStatusCode.MultipleChoices ||
+                   status == HttpStatusCode.MovedPermanently || status == HttpStatusCode.Found ||
+                   status == HttpStatusCode.SeeOther || status == HttpStatusCode.TemporaryRedirect; ;
+        }
+
+        public static TValue TryGet<TKey, TValue>(this IDictionary<TKey, TValue> source, TKey key)
+        {
+            return source.ContainsKey(key) ? source[key] : default(TValue);
         }
     }
 }

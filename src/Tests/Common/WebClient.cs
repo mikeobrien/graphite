@@ -28,6 +28,8 @@ namespace Tests.Common
                         StringComparer.OrdinalIgnoreCase);
                 Filename = response.Headers["content-disposition"]?
                     .GetHeaderValues()["filename"].FirstOrDefault();
+                WasRedirected = Status.IsRedirect();
+                RedirectUrl = Headers.TryGet("location");
             }
 
             public Result(HttpWebResponse response, string error) : this(response)
@@ -40,6 +42,8 @@ namespace Tests.Common
             public string StatusText { get; }
             public string ContentType { get; }
             public string Filename { get; }
+            public bool WasRedirected { get; }
+            public string RedirectUrl { get; }
             public Dictionary<string, string> Headers { get; }
             public Dictionary<string, string> Cookies { get; }
         }
@@ -216,6 +220,7 @@ namespace Tests.Common
         private static Result<TResponse> Execute<TResponse>(HttpWebRequest request, 
             Func<Stream, TResponse> deserialize)
         {
+            request.AllowAutoRedirect = false;
             //Console.WriteLine($"{request.Method}:{request.RequestUri}");
             using (var response = GetResponse(request))
             {

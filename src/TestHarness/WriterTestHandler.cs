@@ -1,4 +1,5 @@
 using System.IO;
+using System.Net;
 using System.Text;
 using Graphite.Writers;
 
@@ -67,40 +68,38 @@ namespace TestHarness.Writer
 
         public Redirect GetRedirect()
         {
-            return new Redirect
-            {
-                Type = RedirectType.Found,
-                Url = "http://www.google.com"
-            };
+            return Redirect.To("http://www.google.com", RedirectType.Found);
         }
 
         public class RedirectModel : IRedirectable
         {
-            private readonly RedirectType _type;
+            private readonly HttpStatusCode? _status;
             private readonly string _url;
 
-            public RedirectModel()
-            {
-                _type = RedirectType.None;
-            }
+            public RedirectModel() { }
 
-            public RedirectModel(RedirectType type, string url)
+            public RedirectModel(HttpStatusCode? status, string url)
             {
-                _type = type;
+                _status = status;
                 _url = url;
             }
 
-            RedirectType IRedirectable.Ridirect => _type;
-            string IRedirectable.RidirectUrl => _url;
+            HttpStatusCode? IRedirectable.RedirectStatus => _status;
+            string IRedirectable.RedirectUrl => _url;
 
             public string Value { get; set; }
         }
 
         public RedirectModel GetRedirectModel(bool redirect)
         {
-            return redirect ? new RedirectModel(RedirectType
+            return redirect ? new RedirectModel(HttpStatusCode
                     .MovedPermanently, "http://www.google.com") :
                 new RedirectModel { Value = "value" };
+        }
+
+        public Redirect GetNoRedirectWithStatus()
+        {
+            return Redirect.None(HttpStatusCode.NotFound);
         }
     }
 }

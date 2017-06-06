@@ -9,7 +9,6 @@ namespace Graphite.Writers
 {
     public enum RedirectType
     {
-        None = 0,
         /// <summary>
         /// 301 This response code means that URI of requested resource 
         /// has been changed. Probably, new URI would be given in the response.
@@ -60,17 +59,58 @@ namespace Graphite.Writers
 
     public interface IRedirectable
     {
-        RedirectType Ridirect { get; }
-        string RidirectUrl { get; }
+        HttpStatusCode? RedirectStatus { get; }
+        string RedirectUrl { get; }
     }
 
     public class Redirect : IRedirectable
     {
-        public string Url { get; set; }
-        public RedirectType Type { get; set; } = RedirectType.MovedPermanently;
+        public Redirect(HttpStatusCode? status)
+        {
+            Status = status;
+        }
 
-        string IRedirectable.RidirectUrl => Url;
-        RedirectType IRedirectable.Ridirect => Type;
+        public Redirect(string url, HttpStatusCode? status)
+        {
+            Status = status;
+            Url = url;
+        }
+
+        public HttpStatusCode? Status { get; }
+        public string Url { get; }
+
+        HttpStatusCode? IRedirectable.RedirectStatus => Status;
+        string IRedirectable.RedirectUrl => Url;
+
+        public static Redirect To(string url, RedirectType type)
+        {
+            return new Redirect(url, (HttpStatusCode)type);
+        }
+
+        /// <summary>
+        /// 301 This response code means that URI of requested resource 
+        /// has been changed. Probably, new URI would be given in the response.
+        /// </summary>
+        public static Redirect PermanentlyTo(string url)
+        {
+            return new Redirect(url, HttpStatusCode.MovedPermanently);
+        }
+
+        /// <summary>
+        /// 302 This response code means that URI of requested resource has 
+        /// been changed temporarily. New changes in the URI might be made 
+        /// in the future. Therefore, this same URI should be used by the 
+        /// client in future requests.
+        /// </summary>
+        public static Redirect TemporarilyTo(string url)
+        {
+            return new Redirect(url, HttpStatusCode.Found);
+        }
+
+        public static Redirect None(HttpStatusCode? status = null)
+        {
+            return new Redirect(status);
+        }
     }
     
     public class RedirectWriter : IResponseWriter
@@ -90,14 +130,16 @@ namespace Graphite.Writers
             var responseType = _routeDescriptor.ResponseType?.Type;
             if (!typeof(IRedirectable).IsAssignableFrom(responseType)) return false;
             var redirect = context.Response.As<IRedirectable>();
-            return redirect.Ridirect != RedirectType.None && redirect.RidirectUrl.IsNotNullOrEmpty();
+            return redirect.RedirectStatus.HasValue;
         }
 
         public Task<HttpResponseMessage> Write(ResponseWriterContext context)
         {
             var redirect = context.Response.As<IRedirectable>();
-            _responseMessage.StatusCode = (HttpStatusCode) redirect.Ridirect;
-            _responseMessage.Headers.Location = new Uri(redirect.RidirectUrl, UriKind.RelativeOrAbsolute);
+            if (redirect.RedirectStatus.HasValue)
+                _responseMessage.StatusCode = redirect.RedirectStatus.Value;
+            if (redirect.RedirectUrl.IsNotNullOrEmpty())
+                _responseMessage.Headers.Location = new Uri(redirect.RedirectUrl, UriKind.RelativeOrAbsolute);
             return _responseMessage.ToTaskResult();
         }
     }

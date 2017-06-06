@@ -12,22 +12,19 @@ namespace Tests.Unit.Writers
     {
         public class RedirectModel : IRedirectable
         {
-            private readonly RedirectType _type;
+            private readonly HttpStatusCode? _status;
             private readonly string _url;
 
-            public RedirectModel()
-            {
-                _type = RedirectType.None;
-            }
+            public RedirectModel() { }
 
-            public RedirectModel(RedirectType type, string url)
+            public RedirectModel(HttpStatusCode? status, string url)
             {
-                _type = type;
+                _status = status;
                 _url = url;
             }
 
-            RedirectType IRedirectable.Ridirect => _type;
-            string IRedirectable.RidirectUrl => _url;
+            HttpStatusCode? IRedirectable.RedirectStatus => _status;
+            string IRedirectable.RedirectUrl => _url;
 
             public string Value { get; set; }
         }
@@ -51,28 +48,28 @@ namespace Tests.Unit.Writers
             }
         }
 
-        [TestCase(RedirectType.Found, null, false)]
-        [TestCase(RedirectType.Found, "", false)]
-        [TestCase(RedirectType.None, "http://fark", false)]
-        [TestCase(RedirectType.Found, "http://fark", true)]
+        [TestCase(HttpStatusCode.Found, null, true)]
+        [TestCase(HttpStatusCode.Found, "", true)]
+        [TestCase(null, "http://fark", false)]
+        [TestCase(HttpStatusCode.Found, "http://fark", true)]
         public void Should_only_apply_to_actions_with_a_redirect(
-            RedirectType type, string url, bool applies)
+            HttpStatusCode? status, string url, bool applies)
         {
             var requestGraph = RequestGraph.CreateFor<Handler>(x => x.Redirect());
             CreateRedirectWriter(requestGraph).AppliesTo(requestGraph
-                .GetResponseWriterContext(new Redirect { Type = type, Url = url })).ShouldEqual(applies);
+                .GetResponseWriterContext(new Redirect(url, status))).ShouldEqual(applies);
         }
 
-        [TestCase(RedirectType.Found, null, false)]
-        [TestCase(RedirectType.Found, "", false)]
-        [TestCase(RedirectType.None, "http://fark", false)]
-        [TestCase(RedirectType.Found, "http://fark", true)]
+        [TestCase(HttpStatusCode.Found, null, true)]
+        [TestCase(HttpStatusCode.Found, "", true)]
+        [TestCase(null, "http://fark", false)]
+        [TestCase(HttpStatusCode.Found, "http://fark", true)]
         public void Should_only_apply_to_action_models_with_a_redirect(
-            RedirectType type, string url, bool applies)
+            HttpStatusCode? status, string url, bool applies)
         {
             var requestGraph = RequestGraph.CreateFor<Handler>(x => x.RedirectModel());
             CreateRedirectWriter(requestGraph).AppliesTo(requestGraph
-                .GetResponseWriterContext(new RedirectModel(type, url))).ShouldEqual(applies);
+                .GetResponseWriterContext(new RedirectModel(status, url))).ShouldEqual(applies);
         }
 
         [Test]
@@ -83,22 +80,19 @@ namespace Tests.Unit.Writers
                 .GetResponseWriterContext(new NotRedirectable())).ShouldBeFalse();
         }
 
-        [TestCase("fark", "fark")]
-        [TestCase("/fark", "/fark")]
-        [TestCase("http://fark", "http://fark/")]
-        public async Task Should_redirect(string url, string expected)
+        [TestCase(HttpStatusCode.Found, "fark", "fark")]
+        [TestCase(HttpStatusCode.Found, "/fark", "/fark")]
+        [TestCase(HttpStatusCode.Found, "http://fark", "http://fark/")]
+        [TestCase(HttpStatusCode.NotFound, null, null)]
+        public async Task Should_redirect(HttpStatusCode? status, string url, string expected)
         {
             var requestGraph = RequestGraph.CreateFor<Handler>(x => x.Redirect());
 
             var result = await CreateRedirectWriter(requestGraph).Write(requestGraph
-                .GetResponseWriterContext(new Redirect
-                {
-                    Type = RedirectType.Found,
-                    Url = url
-                }));
+                .GetResponseWriterContext(new Redirect(url, status)));
 
-            result.StatusCode.ShouldEqual(HttpStatusCode.Found);
-            result.Headers.Location.ToString().ShouldEqual(expected);
+            result.StatusCode.ShouldEqual(status ?? HttpStatusCode.NoContent);
+            (result.Headers.Location?.ToString()).ShouldEqual(expected);
         }
 
         [Test]
@@ -107,7 +101,7 @@ namespace Tests.Unit.Writers
             var requestGraph = RequestGraph.CreateFor<Handler>(x => x.Redirect());
 
             var result = await CreateRedirectWriter(requestGraph).Write(requestGraph
-                .GetResponseWriterContext(new RedirectModel(RedirectType.Found, "http://fark")));
+                .GetResponseWriterContext(new RedirectModel(HttpStatusCode.Found, "http://fark")));
 
             result.StatusCode.ShouldEqual(HttpStatusCode.Found);
             result.Headers.Location.ToString().ShouldEqual("http://fark/");

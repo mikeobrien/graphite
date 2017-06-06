@@ -64,9 +64,10 @@ namespace Tests.Acceptance
             "RedirectModel?redirect=true")] string url)
         {
             var result = WebClient.GetString(BaseUrl + url);
-
-            result.Status.ShouldEqual(HttpStatusCode.OK);
-            result.Data.ShouldContain("google");
+            
+            result.WasRedirected.ShouldBeTrue();
+            result.RedirectUrl.ShouldEqual("http://www.google.com/");
+            result.Data.ShouldBeNull();
         }
 
         [Test]
@@ -74,9 +75,21 @@ namespace Tests.Acceptance
         {
             var result = WebClient.GetJson<WriterTestHandler.RedirectModel>(
                 $"{BaseUrl}RedirectModel?redirect=false");
-
-            result.Status.ShouldEqual(HttpStatusCode.OK);
+            
+            result.WasRedirected.ShouldBeFalse();
+            result.RedirectUrl.ShouldBeNull();
             result.Data.Value.ShouldEqual("value");
+        }
+
+        [Test]
+        public void Should_not_redirect_and_set_Status_when_status_specified()
+        {
+            var result = WebClient.GetJson<WriterTestHandler.RedirectModel>(
+                $"{BaseUrl}NoRedirectWithStatus");
+
+            result.Status.ShouldEqual(HttpStatusCode.NotFound);
+            result.RedirectUrl.ShouldBeNull();
+            result.Data.ShouldBeNull();
         }
     }
 }
