@@ -43,5 +43,15 @@ namespace Tests.Unit.Extensions
                 "Fark200 Farker2··\r\n" +
                 "Fark300 Farker3  ");
         }
+
+        [TestCase(null, null)]
+        [TestCase("", "")]
+        [TestCase("f", "F")]
+        [TestCase("fark", "Fark")]
+        [TestCase("FARK", "Fark")]
+        public void Should_initial_cap(string source, string expected)
+        {
+            source.InitialCap().ShouldEqual(expected);
+        }
     }
 }

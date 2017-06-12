@@ -34,8 +34,7 @@ namespace Graphite.Routing
         {
             var aliases = new List<string>();
 
-            var attriubteAliases = context.ActionMethod.MethodDescriptor
-                .GetAttribute<UrlAliasAttribute>();
+            var attriubteAliases = context.ActionMethod.GetAttribute<UrlAliasAttribute>();
             if (attriubteAliases != null) aliases.AddRange(attriubteAliases.Urls);
 
             aliases.AddRange(_configuration.UrlAliases.Select(x => 

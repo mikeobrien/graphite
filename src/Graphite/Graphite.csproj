@@ -88,6 +88,7 @@
     <Compile Include="Actions\IActionDecorator.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Extensions\IOExtensions.cs" />
+    <Compile Include="Http\HttpMethods.cs" />
     <Compile Include="Routing\IRouteMapper.cs" />
     <Compile Include="Monitoring\Metrics.cs" />
     <Compile Include="Behaviors\DefaultErrorHandlerBehavior.cs" />

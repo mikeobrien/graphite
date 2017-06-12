@@ -65,7 +65,7 @@ namespace Graphite.Writers
         public Task<HttpResponseMessage> Write(ResponseWriterContext context)
         {
             var outputInfo = context.Response.As<TOutputInfo>() ?? 
-                _actionMethod.MethodDescriptor.GetAttribute<TAttribute>();
+                _actionMethod.GetAttribute<TAttribute>();
             var data = context.Response.As<OutputBody<T>>()?.Data ?? context.Response as T;
 
             if (data != null)

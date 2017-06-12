@@ -15,6 +15,12 @@ namespace Graphite.Extensions
             return Regex.Escape(source);
         }
 
+        public static string InitialCap(this string source)
+        {
+            return source.IsNotNullOrEmpty() ? (source.Substring(0, 1).ToUpper() + 
+                (source.Length > 1 ? source.Substring(1).ToLower() : "")) : source;
+        }
+
         public static bool EqualsIgnoreCase(this string source, string compare)
         {
             return source.Equals(compare, StringComparison.OrdinalIgnoreCase);

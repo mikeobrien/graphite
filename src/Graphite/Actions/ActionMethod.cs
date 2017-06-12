@@ -18,9 +18,31 @@ namespace Graphite.Actions
         }
 
         public virtual string FullName { get; }
+        public virtual string Name => MethodDescriptor.Name;
         public virtual TypeDescriptor HandlerTypeDescriptor { get; }
         public virtual MethodDescriptor MethodDescriptor { get; }
         public virtual Func<object, object[], Task<object>> Invoke { get; }
+        public Attribute[] Attributes => MethodDescriptor.Attributes;
+
+        public bool HasAttribute<T>() where T : Attribute
+        {
+            return MethodDescriptor.HasAttribute<T>();
+        }
+
+        public bool HasAttributes<T1, T2>() where T1 : Attribute where T2 : Attribute
+        {
+            return MethodDescriptor.HasAttributes<T1, T2>();
+        }
+
+        public T GetAttribute<T>() where T : Attribute
+        {
+            return MethodDescriptor.GetAttribute<T>();
+        }
+
+        public T[] GetAttributes<T>() where T : Attribute
+        {
+            return MethodDescriptor.GetAttributes<T>();
+        }
 
         public override int GetHashCode()
         {

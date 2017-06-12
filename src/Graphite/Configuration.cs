@@ -76,7 +76,7 @@ namespace Graphite
             new List<Func<ActionMethod, Url, string>>();
         public string UrlPrefix { get; set; }
 
-        public List<HttpMethod> SupportedHttpMethods { get; } = new List<HttpMethod> {
+        public HttpMethods SupportedHttpMethods { get; } = new HttpMethods {
             HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Patch, HttpMethod.Delete,
             HttpMethod.Options, HttpMethod.Head, HttpMethod.Trace, HttpMethod.Connect };
 
@@ -110,8 +110,9 @@ namespace Graphite
         public Func<Configuration, ActionMethod, string> GetActionMethodName { get; set; } =
             (c, a) => a.MethodDescriptor.Name.Remove(c.ActionRegex(c));
 
-        public Func<Configuration, ActionMethod, string> GetHttpMethod { get; set; } = (c, a) =>
-            a.MethodDescriptor.Name.MatchGroups(c.ActionRegex(c)).FirstOrDefault();
+        public Func<Configuration, ActionMethod, string> GetHttpMethod { get; set; } = 
+            (c, a) => c.SupportedHttpMethods.MethodMatchesAny(a.MethodDescriptor
+                .Name.MatchGroups(c.ActionRegex(c)))?.Method;
 
         public PluginDefinition<IUnhandledExceptionHandler> UnhandledExceptionHandler { get; } =
             PluginDefinition<IUnhandledExceptionHandler>

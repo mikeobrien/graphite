@@ -376,45 +376,11 @@ namespace Graphite
         }
 
         /// <summary>
-        /// Adds an http method.
+        /// Configure http methods.
         /// </summary>
-        public ConfigurationDsl AddHttpMethod(string method, string actionRegex, 
-            bool allowRequestbody, bool allowResponsebody)
+        public ConfigurationDsl ConfigureHttpMethods(Action<HttpMethods> configure)
         {
-            _configuration.SupportedHttpMethods.Add(new HttpMethod(actionRegex, 
-                method, allowRequestbody, allowResponsebody));
-            return this;
-        }
-
-        /// <summary>
-        /// Removes an http method.
-        /// </summary>
-        public ConfigurationDsl RemoveHttpMethod(params string[] methods)
-        {
-            methods.ForEach(method =>
-            {
-                var remove = _configuration.SupportedHttpMethods.FirstOrDefault(
-                    x => x.Method.EqualsIgnoreCase(method));
-                if (remove != null) _configuration.SupportedHttpMethods.Remove(remove);
-            });
-            return this;
-        }
-
-        /// <summary>
-        /// Removes an http method.
-        /// </summary>
-        public ConfigurationDsl RemoveHttpMethod(params HttpMethod[] methods)
-        {
-            methods.ForEach(method => _configuration.SupportedHttpMethods.Remove(method));
-            return this;
-        }
-
-        /// <summary>
-        /// Clears all default http methods.
-        /// </summary>
-        public ConfigurationDsl ClearHttpMethods()
-        {
-            _configuration.SupportedHttpMethods.Clear();
+            configure(_configuration.SupportedHttpMethods);
             return this;
         }
 
