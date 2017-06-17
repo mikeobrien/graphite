@@ -61,6 +61,12 @@
     <Compile Include="Actions\ActionInvoker.cs" />
     <Compile Include="Actions\IUnhandledExceptionHandler.cs" />
     <Compile Include="Actions\UnhandledExceptionHandler.cs" />
+    <Compile Include="Authentication\AuthenticationBehavior.cs" />
+    <Compile Include="Authentication\AuthenticatorBase.cs" />
+    <Compile Include="Authentication\BasicAuthenticatorBase.cs" />
+    <Compile Include="Authentication\BearerTokenAuthenticatorBase.cs" />
+    <Compile Include="Authentication\Extensions.cs" />
+    <Compile Include="Authentication\IAuthenticator.cs" />
     <Compile Include="Behaviors\BehaviorChainInvoker.cs" />
     <Compile Include="Actions\ActionMethod.cs" />
     <Compile Include="Behaviors\BehaviorBase.cs" />
@@ -88,6 +94,7 @@
     <Compile Include="Actions\IActionDecorator.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Extensions\IOExtensions.cs" />
+    <Compile Include="GraphiteException.cs" />
     <Compile Include="Http\HttpMethods.cs" />
     <Compile Include="Routing\IRouteMapper.cs" />
     <Compile Include="Monitoring\Metrics.cs" />

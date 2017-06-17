@@ -6,6 +6,7 @@ using System.Web.Http;
 using System.Web.Routing;
 using Graphite;
 using Graphite.Actions;
+using Graphite.Authentication;
 using Graphite.Behaviors;
 using Graphite.StructureMap;
 
@@ -34,8 +35,12 @@ namespace TestHarness
                     .BindRequestInfo()
                     .BindHeaders()
                     .BindContainer()
+                    .ConfigureAuthenticators(x => x
+                        .Append<TestBearerTokenAuthenticator>()
+                        .Append<TestBasicAuthenticator>(a => a.ActionMethod.Name.EndsWith("BasicSecure")))
                     .ConfigureBehaviors(b => b
-                        .Append<Behavior1>()
+                        .Append<AuthenticationBehavior>(a => a.ActionMethod.Name.EndsWith("Secure"))
+                        .Append<Behavior2>()
                         .Append<Behavior2>()));
 
             configuration.EnsureInitialized();

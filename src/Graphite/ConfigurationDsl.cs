@@ -4,6 +4,7 @@ using System.Net;
 using System.Reflection;
 using System.Web.Http.Routing;
 using Graphite.Actions;
+using Graphite.Authentication;
 using Graphite.Behaviors;
 using Graphite.Binding;
 using Graphite.DependencyInjection;
@@ -609,6 +610,34 @@ namespace Graphite
             <IBehavior, ActionConfigurationContext>> configure)
         {
             configure(_configuration.Behaviors);
+            return this;
+        }
+
+        /// <summary>
+        /// Configures authenticators.
+        /// </summary>
+        public ConfigurationDsl ConfigureAuthenticators(Action<PluginDefinitions
+            <IAuthenticator, ActionConfigurationContext>> configure)
+        {
+            configure(_configuration.Authenticators);
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the default authentication realm.
+        /// </summary>
+        public ConfigurationDsl WithDefaultAuthenticationRealm(string realm)
+        {
+            _configuration.DefaultAuthenticationRealm = realm;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the default unauthorized status message.
+        /// </summary>
+        public ConfigurationDsl WithDefaultUnauthorizedStatusMessage(string statusMessage)
+        {
+            _configuration.DefaultUnauthorizedStatusMessage = statusMessage;
             return this;
         }
 

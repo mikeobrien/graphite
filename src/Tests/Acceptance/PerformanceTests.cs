@@ -6,7 +6,6 @@ using NUnit.Framework;
 using Should;
 using TestHarness;
 using Tests.Common;
-using WebClient = Tests.Common.WebClient;
 
 namespace Tests.Acceptance
 {
@@ -30,20 +29,20 @@ namespace Tests.Acceptance
                 Value3 = "value3"
             };
 
-            Should_match_result(WebClient.PostJson<PerfInputModel, PerfOutputModel>(graphiteUrl, inputModel), guid);
-            Should_match_result(WebClient.PostJson<PerfInputModel, PerfOutputModel>(webapiUrl, inputModel), guid);
-            Should_match_result(WebClient.PostJson<PerfInputModel, PerfOutputModel>(graphiteAsyncUrl, inputModel), guid);
-            Should_match_result(WebClient.PostJson<PerfInputModel, PerfOutputModel>(webapiAsyncUrl, inputModel), guid);
+            Should_match_result(Http.PostJson<PerfInputModel, PerfOutputModel>(graphiteUrl, inputModel), guid);
+            Should_match_result(Http.PostJson<PerfInputModel, PerfOutputModel>(webapiUrl, inputModel), guid);
+            Should_match_result(Http.PostJson<PerfInputModel, PerfOutputModel>(graphiteAsyncUrl, inputModel), guid);
+            Should_match_result(Http.PostJson<PerfInputModel, PerfOutputModel>(webapiAsyncUrl, inputModel), guid);
 
             3.Times(() =>
             {
                 Thread.Sleep(5000);
                 var comparison = PerformanceComparison.InMilliseconds(100, 20, 40);
 
-                var graphite = comparison.AddCase("Graphite", () => WebClient.PostJson<PerfInputModel, PerfOutputModel>(graphiteUrl, inputModel));
-                var graphiteAsync = comparison.AddCase("Graphite Async", () => WebClient.PostJson<PerfInputModel, PerfOutputModel>(graphiteAsyncUrl, inputModel));
-                var webapi = comparison.AddCase("Web Api", () => WebClient.PostJson<PerfInputModel, PerfOutputModel>(webapiUrl, inputModel));
-                var webapiAsync = comparison.AddCase("Web Api Async", () => WebClient.PostJson<PerfInputModel, PerfOutputModel>(webapiAsyncUrl, inputModel));
+                var graphite = comparison.AddCase("Graphite", () => Http.PostJson<PerfInputModel, PerfOutputModel>(graphiteUrl, inputModel));
+                var graphiteAsync = comparison.AddCase("Graphite Async", () => Http.PostJson<PerfInputModel, PerfOutputModel>(graphiteAsyncUrl, inputModel));
+                var webapi = comparison.AddCase("Web Api", () => Http.PostJson<PerfInputModel, PerfOutputModel>(webapiUrl, inputModel));
+                var webapiAsync = comparison.AddCase("Web Api Async", () => Http.PostJson<PerfInputModel, PerfOutputModel>(webapiAsyncUrl, inputModel));
 
                 comparison.Run();
 
@@ -51,7 +50,7 @@ namespace Tests.Acceptance
             });
         }
 
-        private void Should_match_result(WebClient.Result<PerfOutputModel> outputModel, Guid guid)
+        private void Should_match_result(Http.Result<PerfOutputModel> outputModel, Guid guid)
         {
             outputModel.Status.ShouldEqual(HttpStatusCode.OK);
             outputModel.Data.ShouldNotBeNull();

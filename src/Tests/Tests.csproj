@@ -76,6 +76,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Acceptance\AuthenticationTests.cs" />
     <Compile Include="Acceptance\ActionTests.cs" />
     <Compile Include="Acceptance\BindingTests.cs" />
     <Compile Include="Acceptance\PerformanceTests.cs" />
@@ -96,7 +97,7 @@
     <Compile Include="Common\PerformanceComparison.cs" />
     <Compile Include="Common\RequestGraph.cs" />
     <Compile Include="Common\TestCaseSource.cs" />
-    <Compile Include="Common\WebClient.cs" />
+    <Compile Include="Common\Http.cs" />
     <Compile Include="Common\Fakes\EmptyResolver.cs" />
     <Compile Include="Common\Extensions.cs" />
     <Compile Include="Common\FluentAssertions.cs" />
@@ -110,6 +111,10 @@
     <Compile Include="Unit\Actions\ActionInvokerTests.cs" />
     <Compile Include="Unit\Actions\InvokerBehaviorTests.cs" />
     <Compile Include="Unit\Actions\UnhandledExceptionHandlerTests.cs" />
+    <Compile Include="Unit\Authentication\ExtensionTests.cs" />
+    <Compile Include="Unit\Authentication\BasicAuthenticatorBaseTests.cs" />
+    <Compile Include="Unit\Authentication\AuthenticationBehaviorTests.cs" />
+    <Compile Include="Unit\Authentication\TestAuthenticators.cs" />
     <Compile Include="Unit\Binding\ExtensionsTests.cs" />
     <Compile Include="Unit\Binding\ParameterBinderTests.cs" />
     <Compile Include="Unit\Binding\ContainerBinderTests.cs" />

@@ -5,6 +5,7 @@ using System.Net;
 using System.Reflection;
 using System.Web.Http.Routing;
 using Graphite.Actions;
+using Graphite.Authentication;
 using Graphite.Behaviors;
 using Graphite.Binding;
 using Graphite.DependencyInjection;
@@ -129,6 +130,12 @@ namespace Graphite
         public PluginDefinition<IBehavior> DefaultBehavior { get; } =
             PluginDefinition<IBehavior>
                 .Create<InvokerBehavior>();
+
+        public PluginDefinitions<IAuthenticator, ActionConfigurationContext> Authenticators { get; } =
+            PluginDefinitions<IAuthenticator, ActionConfigurationContext>.Create();
+
+        public string DefaultAuthenticationRealm { get; set; }
+        public string DefaultUnauthorizedStatusMessage { get; set; }
 
         public BindingMode HeadersBindingMode { get; set; } = BindingMode.None;
         public BindingMode CookiesBindingMode { get; set; } = BindingMode.None;

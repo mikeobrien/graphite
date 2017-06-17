@@ -2,7 +2,7 @@ using System;
 
 namespace Graphite
 {
-    public class GraphiteInitializationException : Exception
+    public class GraphiteInitializationException : GraphiteException
     {
         public GraphiteInitializationException(Exception exception) : 
             base("Graphite failed to initialize.", exception) { }

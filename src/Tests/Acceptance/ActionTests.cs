@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using NUnit.Framework;
 using Should;
-using WebClient = Tests.Common.WebClient;
+using Tests.Common;
 
 namespace Tests.Acceptance
 {
@@ -13,7 +13,7 @@ namespace Tests.Acceptance
         [Test]
         public void Should_modify_cookies()
         {
-            var result = WebClient.Get($"{BaseUrl}UpdateCookies");
+            var result = Http.Get($"{BaseUrl}UpdateCookies");
 
             result.Status.ShouldEqual(HttpStatusCode.NoContent);
             result.Cookies["fark"].ShouldEqual("farker");
@@ -22,16 +22,16 @@ namespace Tests.Acceptance
         [Test]
         public void Should_modify_headers()
         {
-            var result = WebClient.Get($"{BaseUrl}UpdateHeaders");
+            var result = Http.Get($"{BaseUrl}UpdateHeaders");
 
             result.Status.ShouldEqual(HttpStatusCode.NoContent);
-            result.Headers["fark"].ShouldEqual("farker");
+            result.Headers.GetValues("fark").ShouldContain("farker");
         }
 
         [Test]
         public void Should_write_http_response_message()
         {
-            var result = WebClient.Get($"{BaseUrl}WithResponseMessage");
+            var result = Http.Get($"{BaseUrl}WithResponseMessage");
 
             result.Status.ShouldEqual(HttpStatusCode.PaymentRequired);
         }

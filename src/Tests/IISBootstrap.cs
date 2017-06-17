@@ -12,7 +12,7 @@ namespace Tests
         [OneTimeSetUp]
         public void StartIIS()
         {
-            _host = new IISExpressHost("TestHarness", WebClient.Port);
+            _host = new IISExpressHost("TestHarness", Http.Port);
         }
 
         [OneTimeTearDown]

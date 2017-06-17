@@ -121,11 +121,9 @@ namespace Tests.Common
 
         public static void WriteAllText(this Stream stream, string text)
         {
-            using (var writer = new StreamWriter(stream))
-            {
-                writer.Write(text);
-                writer.Flush();
-            }
+            var writer = new StreamWriter(stream);
+            writer.Write(text);
+            writer.Flush();
         }
 
         public static ILookup<string, string> GetHeaderValues(this string value)

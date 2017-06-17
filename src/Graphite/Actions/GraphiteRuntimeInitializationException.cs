@@ -4,7 +4,7 @@ using Graphite.DependencyInjection;
 
 namespace Graphite.Actions
 {
-    public class GraphiteRuntimeInitializationException : Exception
+    public class GraphiteRuntimeInitializationException : GraphiteException
     {
         public GraphiteRuntimeInitializationException(Exception exception,
             HttpRequestMessage requestMessage, ActionMethod actionMethod, IContainer container) :

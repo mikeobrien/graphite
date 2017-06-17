@@ -5,7 +5,7 @@ using Graphite.Http;
 using NUnit.Framework;
 using Should;
 using TestHarness.Reader;
-using WebClient = Tests.Common.WebClient;
+using Tests.Common;
 
 namespace Tests.Acceptance
 {
@@ -17,7 +17,7 @@ namespace Tests.Acceptance
         [Test]
         public void Should_post_xml()
         {
-            var result = WebClient.PostXml<ReaderTestHandler.XmlModel, 
+            var result = Http.PostXml<ReaderTestHandler.XmlModel, 
                     ReaderTestHandler.XmlModel>($"{BaseUrl}Xml",
                 new ReaderTestHandler.XmlModel { Value = "fark" });
 
@@ -30,7 +30,7 @@ namespace Tests.Acceptance
         [TestCase("Stream2", "application/video", "weddingsinger.mp4", 4)]
         public void Should_post_stream(string url, string mimetype, string filename, int? length)
         {
-            var result = WebClient.PostStream<ReaderTestHandler.OutputInfoModel>(BaseUrl + url,
+            var result = Http.PostStream<ReaderTestHandler.OutputInfoModel>(BaseUrl + url,
                 new MemoryStream(Encoding.UTF8.GetBytes("fark")),
                 "application/video", "weddingsinger.mp4");
 
@@ -45,7 +45,7 @@ namespace Tests.Acceptance
         [TestCase("String2", "application/video", "weddingsinger.mp4", 4)]
         public void Should_post_string(string url, string mimetype, string filename, int? length)
         {
-            var result = WebClient.PostStream<ReaderTestHandler.OutputInfoModel>(BaseUrl + url,
+            var result = Http.PostStream<ReaderTestHandler.OutputInfoModel>(BaseUrl + url,
                 new MemoryStream(Encoding.UTF8.GetBytes("fark")),
                 "application/video", "weddingsinger.mp4");
 
@@ -60,7 +60,7 @@ namespace Tests.Acceptance
         [TestCase("Bytes2", "application/video", "weddingsinger.mp4", 4)]
         public void Should_post_bytes(string url, string mimetype, string filename, int? length)
         {
-            var result = WebClient.PostStream<ReaderTestHandler.OutputInfoModel>(BaseUrl + url,
+            var result = Http.PostStream<ReaderTestHandler.OutputInfoModel>(BaseUrl + url,
                 new MemoryStream(Encoding.UTF8.GetBytes("fark")),
                 "application/video", "weddingsinger.mp4");
 

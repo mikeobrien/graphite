@@ -4,7 +4,6 @@ using NUnit.Framework;
 using Should;
 using TestHarness.Writer;
 using Tests.Common;
-using WebClient = Tests.Common.WebClient;
 
 namespace Tests.Acceptance
 {
@@ -16,7 +15,7 @@ namespace Tests.Acceptance
         [Test]
         public void Should_get_xml()
         {
-            var result = WebClient.GetXml<WriterTestHandler.XmlModel>($"{BaseUrl}Xml");
+            var result = Http.GetXml<WriterTestHandler.XmlModel>($"{BaseUrl}Xml");
 
             result.Status.ShouldEqual(HttpStatusCode.OK);
             result.ContentType.ShouldEqual(MimeTypes.ApplicationXml);
@@ -26,7 +25,7 @@ namespace Tests.Acceptance
         [Test]
         public void Should_get_string([Values("String1", "String2")] string url)
         {
-            var result = WebClient.GetStream(BaseUrl + url, data =>
+            var result = Http.GetStream(BaseUrl + url, data =>
             {
                 data.ReadAllText().ShouldEqual("fark");
             });
@@ -38,7 +37,7 @@ namespace Tests.Acceptance
         [Test]
         public void Should_get_stream([Values("Stream1", "Stream2")] string url)
         {
-            var result = WebClient.GetStream(BaseUrl + url, data =>
+            var result = Http.GetStream(BaseUrl + url, data =>
             {
                 data.ReadAllText().ShouldEqual("fark");
             });
@@ -50,7 +49,7 @@ namespace Tests.Acceptance
         [Test]
         public void Should_get_bytes([Values("Bytes1", "Bytes2")] string url)
         {
-            var result = WebClient.GetStream(BaseUrl + url, data =>
+            var result = Http.GetStream(BaseUrl + url, data =>
             {
                 data.ReadAllText().ShouldEqual("fark");
             });
@@ -63,7 +62,7 @@ namespace Tests.Acceptance
         public void Should_redirect([Values("Redirect",
             "RedirectModel?redirect=true")] string url)
         {
-            var result = WebClient.GetString(BaseUrl + url);
+            var result = Http.GetString(BaseUrl + url);
             
             result.WasRedirected.ShouldBeTrue();
             result.RedirectUrl.ShouldEqual("http://www.google.com/");
@@ -73,7 +72,7 @@ namespace Tests.Acceptance
         [Test]
         public void Should_not_redirect_from_model_when_no_redirect_specified()
         {
-            var result = WebClient.GetJson<WriterTestHandler.RedirectModel>(
+            var result = Http.GetJson<WriterTestHandler.RedirectModel>(
                 $"{BaseUrl}RedirectModel?redirect=false");
             
             result.WasRedirected.ShouldBeFalse();
@@ -84,7 +83,7 @@ namespace Tests.Acceptance
         [Test]
         public void Should_not_redirect_and_set_Status_when_status_specified()
         {
-            var result = WebClient.GetJson<WriterTestHandler.RedirectModel>(
+            var result = Http.GetJson<WriterTestHandler.RedirectModel>(
                 $"{BaseUrl}NoRedirectWithStatus");
 
             result.Status.ShouldEqual(HttpStatusCode.NotFound);
