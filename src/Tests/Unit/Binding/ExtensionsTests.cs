@@ -51,7 +51,27 @@ namespace Tests.Unit.Binding
         }
 
         [Test]
-        public void Should_return_original_parameter_value_if_mapper_not_found()
+        public void Should_map_parameter_with_default_mapper_if_configured_and_no_mappers_apply()
+        {
+            var mappers = new List<IValueMapper>
+            {
+                new TestValueMapper1 { MapFunc = c => $"{c.Values.First()}1" },
+                new TestValueMapper2 { MapFunc = c => $"{c.Values.First()}2" }
+            };
+            var configuration = new Configuration();
+
+            configuration.ValueMappers.Append<TestValueMapper1>(x => false);
+            configuration.ValueMappers.Append<TestValueMapper2>(x => false, true);
+
+            var result = mappers.Map(null, null, null, new object[] { "value" },
+                new ConfigurationContext(configuration, null));
+
+            result.Mapped.ShouldBeTrue();
+            result.Value.ShouldEqual("value2");
+        }
+
+        [Test]
+        public void Should_not_map_if_mapper_not_found()
         {
             var mappers = new List<IValueMapper>
             {
@@ -82,21 +102,6 @@ namespace Tests.Unit.Binding
 
             result.Mapped.ShouldBeTrue();
             result.Value.ShouldEqual("value2");
-        }
-
-        [Test]
-        public void Should_return_original_property_value_if_mapper_not_found()
-        {
-            var mappers = new List<IValueMapper>
-            {
-                new TestValueMapper { MapFunc = c => $"{c.Values.First()}1", AppliesToFunc = c => false }
-            };
-
-            var result = mappers.Map(null, null, null, new object[] { "value" },
-                new ConfigurationContext(new Configuration(), null));
-
-            result.Mapped.ShouldBeFalse();
-            result.Value.ShouldBeNull();
         }
 
         public class ArgumentHandler

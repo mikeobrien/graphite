@@ -56,7 +56,7 @@ namespace Graphite.Actions
 
             if (_routeDescriptor.HasResponse)
             {
-                var writer = _writers.ThatApplyTo(response, _actionConfigurationContext);
+                var writer = _writers.ThatAppliesTo(response, _actionConfigurationContext);
                 if (writer != null) return await writer.Write(response);
             }
 

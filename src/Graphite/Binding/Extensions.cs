@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Graphite.Actions;
 using Graphite.Extensibility;
@@ -19,18 +18,6 @@ namespace Graphite.Binding
                 actionConfigurationContext, new RequestBinderContext(actionArguments));
         }
 
-        public static IValueMapper ThatApplyTo(
-            this IEnumerable<IValueMapper> mappers, 
-            ActionMethod actionMethod, RouteDescriptor route,
-            ActionParameter parameter, object[] values, 
-            ConfigurationContext configurationContext)
-        {
-            return configurationContext.Configuration.ValueMappers.ThatApplyTo(mappers, 
-                new ValueMapperConfigurationContext(configurationContext, actionMethod, 
-                route, parameter, values), new ValueMapperContext(parameter, values))
-                .FirstOrDefault();
-        }
-
         public static MapResult Map(this IEnumerable<IValueMapper> mappers,
             ActionMethod actionMethod, RouteDescriptor route,
             ActionParameter parameter, object[] values, 
@@ -40,7 +27,7 @@ namespace Graphite.Binding
             var mapperConfigurationcontext = new ValueMapperConfigurationContext(
                 configurationContext, actionMethod, route, parameter, values);
             var mapper = configurationContext.Configuration.ValueMappers
-                .ThatApplyTo(mappers, mapperConfigurationcontext, mapperContext).FirstOrDefault();
+                .ThatAppliesToOrDefault(mappers, mapperConfigurationcontext, mapperContext);
             return mapper == null ? MapResult.NotMapped() : MapResult.WasMapped(mapper.Map(mapperContext));
         }
 

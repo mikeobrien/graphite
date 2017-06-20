@@ -11,6 +11,7 @@ using NSubstitute;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
+using Tests.Common.Fakes;
 
 namespace Tests.Unit.Actions
 {
@@ -146,13 +147,37 @@ namespace Tests.Unit.Actions
         }
 
         [Test]
-        public async Task Should_call_handler_with_first_writer_that_applies()
+        public async Task Should_use_first_writer_that_applies()
         {
             var requestGraph = RequestGraph.CreateFor<IHandler>(x => x.Response());
 
             requestGraph.AddResponseWriter1(x => $"{x.Response}1".CreateTextResponse()
                 .ToTaskResult(), instanceAppliesTo: x => false);
             requestGraph.AddResponseWriter2(x => $"{x.Response}2".CreateTextResponse().ToTaskResult());
+
+            var invoker = CreateInvoker(requestGraph);
+            var handler = Substitute.For<IHandler>();
+
+            handler.Response().ReturnsForAnyArgs(x => "response");
+
+            var response = await invoker.Invoke(handler);
+
+            response.StatusCode.ShouldEqual(HttpStatusCode.OK);
+            var responseText = await response.Content.ReadAsStringAsync();
+            responseText.ShouldEqual("response2");
+        }
+
+        [Test]
+        public async Task Should_use_default_writer_if_set_and_no_writers_apply()
+        {
+            var requestGraph = RequestGraph.CreateFor<IHandler>(x => x.Response());
+
+            requestGraph.Configuration.ResponseWriters.DefaultIs<TestResponseWriter2>();
+
+            requestGraph.AddResponseWriter1(x => $"{x.Response}1".CreateTextResponse()
+                .ToTaskResult(), instanceAppliesTo: x => false);
+            requestGraph.AddResponseWriter2(x => $"{x.Response}2".CreateTextResponse()
+                .ToTaskResult(), instanceAppliesTo: x => false);
 
             var invoker = CreateInvoker(requestGraph);
             var handler = Substitute.For<IHandler>();

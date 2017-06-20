@@ -32,7 +32,7 @@ namespace Graphite.Binding
         public virtual async Task Bind(RequestBinderContext context)
         {
             var position = _routeDescriptor.RequestParameter.Position;
-            var reader = _readers.ThatApply(_actionConfigurationContext);
+            var reader = _readers.ThatApplies(_actionConfigurationContext);
             if (reader != null) context.ActionArguments[position] = await reader.Read(context);
         }
     }

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Graphite.Actions;
@@ -9,13 +8,13 @@ namespace Graphite.Writers
 {
     public static class Extensions
     {
-        public static IResponseWriter ThatApplyTo(
+        public static IResponseWriter ThatAppliesTo(
             this IEnumerable<IResponseWriter> writers, object response,
             ActionConfigurationContext actionConfigurationContext)
         {
-            return actionConfigurationContext.Configuration.ResponseWriters.ThatApplyTo(writers,
-                actionConfigurationContext, new ResponseWriterContext(response))
-                .FirstOrDefault();
+            return actionConfigurationContext.Configuration.ResponseWriters
+                .ThatAppliesToOrDefault(writers, actionConfigurationContext, 
+                    new ResponseWriterContext(response));
         }
 
         public static Task<HttpResponseMessage> Write(this IResponseWriter writer, object response)

@@ -7,19 +7,27 @@ namespace Graphite.Extensibility
 {
     public class PluginDefinitions<TPlugin, TContext> : IEnumerable<PluginDefinition<TPlugin, TContext>> 
     {
-        private readonly List<PluginDefinition<TPlugin, TContext>> _definitions;
-        private readonly bool _singleton;
+        public class State
+        {
+            public List<PluginDefinition<TPlugin, TContext>> Definitions;
+            public bool Singleton;
+            public Type Default;
+        }
+
+        private readonly State _state;
 
         public PluginDefinitions(bool singleton)
         {
-            _singleton = singleton;
-            _definitions = new List<PluginDefinition<TPlugin, TContext>>();
+            _state = new State
+            {
+                Definitions = new List<PluginDefinition<TPlugin, TContext>>(),
+                Singleton = singleton
+            };
         }
 
-        private PluginDefinitions(List<PluginDefinition<TPlugin, TContext>> definitions, bool singleton)
+        private PluginDefinitions(State state)
         {
-            _definitions = definitions;
-            _singleton = singleton;
+            _state = state;
         }
 
         public static PluginDefinitions<TPlugin, TContext> Create(
@@ -32,9 +40,9 @@ namespace Graphite.Extensibility
 
         public IEnumerable<PluginDefinition<TPlugin, TContext>> ThatApplyTo(TContext context)
         {
-            return _definitions
+            return _state.Definitions
                 .Where(x => x.AppliesTo?.Invoke(context) ?? true)
-                .OrderBy(x => _definitions.IndexOf(x)).ToList();
+                .OrderBy(x => _state.Definitions.IndexOf(x)).ToList();
         }
 
         public int Order(object instance)
@@ -54,11 +62,24 @@ namespace Graphite.Extensibility
 
         public int Order(PluginDefinition<TPlugin, TContext> definition)
         {
-            var order = _definitions.IndexOf(definition);
+            var order = _state.Definitions.IndexOf(definition);
             return order >= 0 ? order : short.MaxValue;
         }
 
+        public PluginDefinitions<TPlugin, TContext> DefaultIs<TConcrete>() 
+            where TConcrete : TPlugin
+        {
+            _state.Default = typeof(TConcrete);
+            return this;
+        }
+
+        public bool IsDefault(Type concreteType) 
+        {
+            return concreteType != null && _state.Default == concreteType;
+        }
+
         public PluginDefinition<TPlugin, TContext> Get<TConcrete>()
+            where TConcrete : TPlugin
         {
             return Get(typeof(TConcrete));
         }
@@ -70,12 +91,12 @@ namespace Graphite.Extensibility
 
         public PluginDefinition<TPlugin, TContext> Get(Type type)
         {
-            return _definitions.FirstOrDefault(x => x.Type == type);
+            return _state.Definitions.FirstOrDefault(x => x.Type == type);
         }
 
         public PluginDefinitions<TPlugin, TContext> Clear()
         {
-            _definitions.Clear();
+            _state.Definitions.Clear();
             return this;
         }
 
@@ -86,20 +107,20 @@ namespace Graphite.Extensibility
 
         public bool Exists(Type type)
         {
-            return _definitions.Any(x => x.Type == type);
+            return _state.Definitions.Any(x => x.Type == type);
         }
 
         public PluginDefinitions<TPlugin, TContext> Remove<TConcrete>() where TConcrete : TPlugin
         {
             var definition = Get<TConcrete>();
-            if (definition != null) _definitions.Remove(definition);
+            if (definition != null) _state.Definitions.Remove(definition);
             return this;
         }
 
         public ReplaceDsl<TReplace> Replace<TReplace>()
             where TReplace : TPlugin
         {
-            return new ReplaceDsl<TReplace>(this, _singleton);
+            return new ReplaceDsl<TReplace>(this, _state.Singleton);
         }
 
         public class ReplaceDsl<TReplace> where TReplace : TPlugin
@@ -114,63 +135,66 @@ namespace Graphite.Extensibility
             }
 
             public PluginDefinitions<TPlugin, TContext> With<TReplacement>(
-                Func<TContext, bool> predicate = null)
+                Func<TContext, bool> predicate = null, bool @default = false)
                 where TReplacement : TPlugin
             {
                 return With<TReplacement>(PluginDefinition<TPlugin, TContext>
-                    .Create<TReplacement>(predicate, _singleton));
+                    .Create<TReplacement>(predicate, _singleton), @default);
             }
 
             public PluginDefinitions<TPlugin, TContext> With<TReplacement>(
-                TReplacement instance, Func<TContext, bool> predicate = null, bool dispose = false)
+                TReplacement instance, Func<TContext, bool> predicate = null, 
+                bool dispose = false, bool @default = false)
                 where TReplacement : TPlugin
             {
                 return With<TReplacement>(PluginDefinition<TPlugin, TContext>
-                    .Create(instance, predicate, dispose));
+                    .Create(instance, predicate, dispose), @default);
             }
 
             public PluginDefinitions<TPlugin, TContext> With<TReplacement>(
-                PluginDefinition<TPlugin, TContext> plugin)
+                PluginDefinition<TPlugin, TContext> plugin, bool @default = false)
                 where TReplacement : TPlugin
             {
                 _plugins.Append<TReplacement>(plugin).After<TReplace>();
                 _plugins.Remove<TReplace>();
+                if (@default) _plugins.DefaultIs<TReplace>();
                 return _plugins;
             }
         }
 
         public AppendDsl<TAppend> Append<TAppend>(
-            Func<TContext, bool> predicate = null)
+            Func<TContext, bool> predicate = null, bool @default = false)
             where TAppend : TPlugin
         {
             return Append<TAppend>(PluginDefinition<TPlugin, TContext>
-                .Create<TAppend>(predicate, _singleton));
+                .Create<TAppend>(predicate, _state.Singleton), @default);
         }
 
         public AppendDsl<TAppend> Append<TAppend>(
-        TAppend instance, Func<TContext, bool> predicate = null, bool dispose = false)
+        TAppend instance, Func<TContext, bool> predicate = null, 
+        bool dispose = false, bool @default = false)
             where TAppend : TPlugin
         {
             return Append<TAppend>(PluginDefinition<TPlugin, TContext>
-                .Create(instance, predicate, dispose));
+                .Create(instance, predicate, dispose), @default);
         }
 
         public AppendDsl<TAppend> Append<TAppend>(
-            PluginDefinition<TPlugin, TContext> plugin)
+            PluginDefinition<TPlugin, TContext> plugin, bool @default = false)
             where TAppend : TPlugin
         {
             Remove<TAppend>();
-            _definitions.Add(plugin);
-            return new AppendDsl<TAppend>(_definitions, plugin, _singleton);
+            _state.Definitions.Add(plugin);
+            if (@default) DefaultIs<TAppend>();
+            return new AppendDsl<TAppend>(plugin, _state);
         }
 
         public class AppendDsl<TAppend> : PluginDefinitions<TPlugin, TContext> where TAppend : TPlugin
         {
             private readonly PluginDefinition<TPlugin, TContext> _plugin;
 
-            public AppendDsl(
-                List<PluginDefinition<TPlugin, TContext>> definitions,
-                PluginDefinition<TPlugin, TContext> plugin, bool singleton) : base(definitions, singleton)
+            public AppendDsl(PluginDefinition<TPlugin, TContext> plugin, 
+                State state) : base(state)
             {
                 _plugin = plugin;
             }
@@ -180,45 +204,46 @@ namespace Graphite.Extensibility
             {
                 if (!Exists<TFind>()) return this;
                 var order = Order<TFind>() + 1;
-                if (order >= _definitions.Count) return this;
+                if (order >= _state.Definitions.Count) return this;
                 Remove<TAppend>();
-                _definitions.Insert(order, _plugin);
+                _state.Definitions.Insert(order, _plugin);
                 return this;
             }
         }
 
         public PrependDsl<TPrepend> Prepend<TPrepend>(
-            Func<TContext, bool> predicate = null) 
+            Func<TContext, bool> predicate = null, bool @default = false) 
             where TPrepend : TPlugin
         {
             return Prepend<TPrepend>(PluginDefinition<TPlugin, TContext>
-                    .Create<TPrepend>(predicate, _singleton));
+                .Create<TPrepend>(predicate, _state.Singleton), @default);
         }
 
         public PrependDsl<TPrepend> Prepend<TPrepend>(
-            TPrepend instance, Func<TContext, bool> predicate = null, bool dispose = false) 
+            TPrepend instance, Func<TContext, bool> predicate = null, 
+            bool dispose = false, bool @default = false) 
             where TPrepend : TPlugin
         {
             return Prepend<TPrepend>(PluginDefinition<TPlugin, TContext>
-                .Create(instance, predicate, dispose));
+                .Create(instance, predicate, dispose), @default);
         }
 
         public PrependDsl<TPrepend> Prepend<TPrepend>(
-            PluginDefinition<TPlugin, TContext> plugin)
+            PluginDefinition<TPlugin, TContext> plugin, bool @default = false)
             where TPrepend : TPlugin
         {
             Remove<TPrepend>();
-            _definitions.Insert(0, plugin);
-            return new PrependDsl<TPrepend>(_definitions, plugin, _singleton);
+            _state.Definitions.Insert(0, plugin);
+            if (@default) DefaultIs<TPrepend>();
+            return new PrependDsl<TPrepend>(plugin, _state);
         }
 
         public class PrependDsl<TPrepend> : PluginDefinitions<TPlugin, TContext> where TPrepend : TPlugin
         {
             private readonly PluginDefinition<TPlugin, TContext> _plugin;
 
-            public PrependDsl(
-                List<PluginDefinition<TPlugin, TContext>> definitions,
-                PluginDefinition<TPlugin, TContext> plugin, bool singleton) : base(definitions, singleton)
+            public PrependDsl(PluginDefinition<TPlugin, TContext> plugin, 
+                State state) : base(state)
             {
                 _plugin = plugin;
             }
@@ -228,7 +253,7 @@ namespace Graphite.Extensibility
             {
                 Remove<TPrepend>();
                 if (!Exists<TFind>()) return Append<TPrepend>(_plugin);
-                _definitions.Insert(Order<TFind>(), _plugin);
+                _state.Definitions.Insert(Order<TFind>(), _plugin);
                 return this;
             }
         }
@@ -240,7 +265,7 @@ namespace Graphite.Extensibility
 
         public IEnumerator<PluginDefinition<TPlugin, TContext>> GetEnumerator()
         {
-            return _definitions.GetEnumerator();
+            return _state.Definitions.GetEnumerator();
         }
     }
 }

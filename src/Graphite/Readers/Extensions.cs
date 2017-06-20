@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Graphite.Actions;
 using Graphite.Binding;
@@ -9,13 +8,13 @@ namespace Graphite.Readers
 {
     public static class Extensions
     {
-        public static IRequestReader ThatApply(
+        public static IRequestReader ThatApplies(
             this IEnumerable<IRequestReader> readers,
             ActionConfigurationContext actionConfigurationContext)
         {
             return actionConfigurationContext.Configuration
-                    .RequestReaders.ThatApplyTo(readers,
-                actionConfigurationContext).FirstOrDefault();
+                .RequestReaders.ThatAppliesToOrDefault(readers,
+                    actionConfigurationContext);
         }
 
         public static Task<object> Read(this IRequestReader reader, 

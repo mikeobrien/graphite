@@ -5,6 +5,7 @@ using Graphite.Extensions;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
+using Tests.Common.Fakes;
 
 namespace Tests.Unit.Binding
 {
@@ -93,7 +94,33 @@ namespace Tests.Unit.Binding
         }
 
         [Test]
-        public async Task Should_not_bind_if_no_reader_found()
+        public async Task Should_bind_default_reader_if_configured_and_no_reader_applies()
+        {
+            var requestGraph = RequestGraph
+                .CreateFor<Handler>(h => h.Get(null))
+                .WithRequestParameter("request")
+                .AddRequestReader1(() => "reader1".ToTaskResult<object>(),
+                    instanceAppliesTo: () => false)
+                .AddRequestReader2(() => "reader2".ToTaskResult<object>(),
+                    instanceAppliesTo: () => false)
+                .AddValueMapper1(x => x.Values.First());
+            requestGraph.Configuration.RequestReaders.DefaultIs<TestRequestReader2>();
+
+            var binder = CreateBinder(requestGraph);
+
+            await binder.Bind(requestGraph.GetRequestBinderContext());
+
+            requestGraph.ActionArguments.ShouldOnlyContain("reader2");
+
+            requestGraph.RequestReader1.AppliesCalled.ShouldBeTrue();
+            requestGraph.RequestReader1.ReadCalled.ShouldBeFalse();
+
+            requestGraph.RequestReader2.AppliesCalled.ShouldBeTrue();
+            requestGraph.RequestReader2.ReadCalled.ShouldBeTrue();
+        }
+
+        [Test]
+        public async Task Should_not_bind_if_no_reader_applies()
         {
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Get(null))

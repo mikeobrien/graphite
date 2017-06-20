@@ -105,18 +105,18 @@ namespace Tests.Common
 
         public static void AddRange<T>(this List<T> source, params T[] items)
         {
-            source.AddRange((IEnumerable<T>)items);
+            source.AddRange(items);
         }
 
         public static void Append<TPlugin, TContext>(this
             PluginDefinitions<TPlugin, TContext> definitions, Type type,
-            Func<TContext, bool> predicate = null)
+            Func<TContext, bool> predicate = null, bool @default = false)
         {
             typeof(PluginDefinitions<TPlugin, TContext>)
                 .GetMethods().FirstOrDefault(x => x.Name == nameof(
                     PluginDefinitions<TPlugin, TContext>.Append))
                 .MakeGenericMethod(type)
-                .Invoke(definitions, new object[] { predicate });
+                .Invoke(definitions, new object[] { predicate, @default });
         }
 
         public static void WriteAllText(this Stream stream, string text)
@@ -162,7 +162,7 @@ namespace Tests.Common
         {
             return status == HttpStatusCode.MultipleChoices ||
                    status == HttpStatusCode.MovedPermanently || status == HttpStatusCode.Found ||
-                   status == HttpStatusCode.SeeOther || status == HttpStatusCode.TemporaryRedirect; ;
+                   status == HttpStatusCode.SeeOther || status == HttpStatusCode.TemporaryRedirect;
         }
 
         public static TValue TryGet<TKey, TValue>(this IDictionary<TKey, TValue> source, TKey key)
