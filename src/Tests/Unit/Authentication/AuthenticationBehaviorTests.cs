@@ -181,5 +181,20 @@ namespace Tests.Unit.Authentication
                     $"realm=\"{realm ?? authenticator.Realm}\"" : null);
             }
         }
+
+        public class TestBearerTokenAuthenticator : BearerTokenAuthenticatorBase
+        {
+            private readonly string _token;
+
+            public TestBearerTokenAuthenticator(string token)
+            {
+                _token = token;
+            }
+
+            public override bool Authenticate(string credentials)
+            {
+                return credentials == _token;
+            }
+        }
     }
 }

@@ -150,12 +150,13 @@ namespace Graphite.Reflection
             return method.DeclaringType.IsBclType();
         }
 
-        public static bool IsUnderNamespace<T>(this Type type)
+        public static bool IsUnderNamespace<T>(this Type type, string relativeNamespace = null)
         {
-            if (type.Namespace == null) return false;
-            var compare = typeof(T);
-            return type.Namespace == compare.Namespace || 
-                type.Namespace.StartsWith($"{compare.Namespace}.");
+            var compareType = typeof(T);
+            if (type.Namespace.IsNullOrEmpty() || compareType.Namespace.IsNullOrEmpty()) return false;
+            var compare = compareType.Namespace + (relativeNamespace.IsNotNullOrEmpty() 
+                ? $".{relativeNamespace.Trim('.')}" : "");
+            return type.Namespace == compare || type.Namespace.StartsWith($"{compare}.");
         }
 
         public static ConstructorInfo GetParameterlessConstructor(this Type type)

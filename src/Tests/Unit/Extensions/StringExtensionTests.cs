@@ -53,5 +53,22 @@ namespace Tests.Unit.Extensions
         {
             source.InitialCap().ShouldEqual(expected);
         }
+
+        [TestCase(null, "")]
+        [TestCase("", "")]
+        [TestCase("fark", "ZmFyaw==")]
+        public void Should_encode_base64(string text, string expected)
+        {
+            text.ToBase64().ShouldEqual(expected);
+        }
+
+        [TestCase(null, "")]
+        [TestCase("", "")]
+        [TestCase("farker", "")]
+        [TestCase("ZmFyaw==", "fark")]
+        public void Should_decode_base64(string base64, string expected)
+        {
+            base64.FromBase64().ShouldEqual(expected);
+        }
     }
 }

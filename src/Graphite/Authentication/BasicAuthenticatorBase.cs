@@ -16,7 +16,9 @@ namespace Graphite.Authentication
         public sealed override bool Authenticate(string credentials)
         {
             if (credentials.IsNullOrEmpty()) return false;
-            var parts = credentials.Split(new[] { ':' }, 2);
+            var decoded = credentials.FromBase64();
+            if (decoded.IsNullOrEmpty()) return false;
+            var parts = decoded.Split(new[] { ':' }, 2);
             return parts.Length == 2 && Authenticate(parts[0], parts[1]);
         }
     }

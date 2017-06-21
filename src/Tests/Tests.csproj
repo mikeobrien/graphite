@@ -114,7 +114,6 @@
     <Compile Include="Unit\Authentication\ExtensionTests.cs" />
     <Compile Include="Unit\Authentication\BasicAuthenticatorBaseTests.cs" />
     <Compile Include="Unit\Authentication\AuthenticationBehaviorTests.cs" />
-    <Compile Include="Unit\Authentication\TestAuthenticators.cs" />
     <Compile Include="Unit\Binding\ExtensionsTests.cs" />
     <Compile Include="Unit\Binding\ParameterBinderTests.cs" />
     <Compile Include="Unit\Binding\ContainerBinderTests.cs" />

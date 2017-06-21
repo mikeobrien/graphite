@@ -20,7 +20,7 @@ namespace Graphite.Authentication
             this HttpRequestHeaders headers, string username, string password)
         {
             return headers.SetAuthorizationHeader(BasicAuthenticatorBase
-                .BasicScheme, $"{username}:{password}");
+                .BasicScheme, $"{username}:{password}".ToBase64());
         }
 
         public static HttpRequestMessage SetBearerTokenAuthorizationHeader(

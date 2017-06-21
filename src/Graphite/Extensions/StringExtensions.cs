@@ -115,5 +115,26 @@ namespace Graphite.Extensions
             return columns.Concat(data).Select((x, r) => x.Select((y, i) => 
                 y.PadRight(columnWidths[i], r % 2 == 0 ? '·' : ' ')).Join(" ")).Join("\r\n");
         }
+
+        public static string ToBase64(this string text, Encoding encoding = null)
+        {
+            return text.IsNullOrEmpty() ? "" : Convert.ToBase64String(
+                (encoding ?? Encoding.UTF8).GetBytes(text));
+        }
+
+        public static string FromBase64(this string base64, Encoding encoding = null)
+        {
+            if (base64.IsNullOrEmpty()) return "";
+            byte[] bytes;
+            try
+            {
+                bytes = Convert.FromBase64String(base64);
+            }
+            catch
+            {
+                return "";
+            }
+            return (encoding ?? Encoding.UTF8).GetString(bytes);
+        }
     }
 }
