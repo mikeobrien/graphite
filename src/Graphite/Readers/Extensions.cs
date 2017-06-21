@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Graphite.Actions;
 using Graphite.Binding;
@@ -14,7 +15,7 @@ namespace Graphite.Readers
         {
             return actionConfigurationContext.Configuration
                 .RequestReaders.ThatAppliesToOrDefault(readers,
-                    actionConfigurationContext);
+                    actionConfigurationContext).FirstOrDefault();
         }
 
         public static Task<object> Read(this IRequestReader reader, 

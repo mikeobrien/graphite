@@ -15,7 +15,7 @@ namespace Graphite.Bender
 
         public JsonWriter(Options options, RouteDescriptor routeDescriptor,
             HttpRequestMessage requestMessage, HttpResponseMessage responseMessage) : 
-            base(requestMessage, responseMessage, MimeTypes.ApplicationJson, Encoding.UTF8)
+            base(requestMessage, responseMessage, Encoding.UTF8, MimeTypes.ApplicationJson)
         {
             _options = options;
             _routeDescriptor = routeDescriptor;

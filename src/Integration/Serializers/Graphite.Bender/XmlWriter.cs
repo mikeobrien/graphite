@@ -15,7 +15,7 @@ namespace Graphite.Bender
 
         public XmlWriter(Options options, RouteDescriptor routeDescriptor,
             HttpRequestMessage requestMessage, HttpResponseMessage responseMessage) : 
-            base(requestMessage, responseMessage, MimeTypes.ApplicationXml, Encoding.UTF8)
+            base(requestMessage, responseMessage, Encoding.UTF8, MimeTypes.ApplicationXml)
         {
             _options = options;
             _routeDescriptor = routeDescriptor;

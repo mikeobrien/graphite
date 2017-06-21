@@ -24,7 +24,7 @@ namespace Graphite.Readers
             _requestMessage = requestMessage;
         }
 
-        public virtual bool Applies()
+        public bool Applies()
         {
             var requestType = _routeDescriptor.RequestParameter?.ParameterType.Type;
             return requestType == typeof(T) || requestType == typeof(TWrapper);

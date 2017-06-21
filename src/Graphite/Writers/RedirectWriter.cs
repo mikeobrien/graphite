@@ -113,7 +113,7 @@ namespace Graphite.Writers
         }
     }
     
-    public class RedirectWriter : IResponseWriter
+    public class RedirectWriter : ResponseWriterBase
     {
         private readonly RouteDescriptor _routeDescriptor;
         private readonly HttpResponseMessage _responseMessage;
@@ -125,7 +125,7 @@ namespace Graphite.Writers
             _responseMessage = responseMessage;
         }
 
-        public virtual bool AppliesTo(ResponseWriterContext context)
+        public override bool AppliesTo(ResponseWriterContext context)
         {
             var responseType = _routeDescriptor.ResponseType?.Type;
             if (!typeof(IRedirectable).IsAssignableFrom(responseType)) return false;
@@ -133,7 +133,7 @@ namespace Graphite.Writers
             return redirect.RedirectStatus.HasValue;
         }
 
-        public Task<HttpResponseMessage> Write(ResponseWriterContext context)
+        public override Task<HttpResponseMessage> Write(ResponseWriterContext context)
         {
             var redirect = context.Response.As<IRedirectable>();
             if (redirect.RedirectStatus.HasValue)

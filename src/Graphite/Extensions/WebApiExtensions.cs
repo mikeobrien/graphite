@@ -8,6 +8,30 @@ using System.Web.Http.Dependencies;
 
 namespace Graphite.Extensions
 {
+    public enum MatchType
+    {
+        None = 0,
+        Full = 1,
+        Partial = 2,
+        Any = 3
+    }
+
+    public class AcceptTypeMatch
+    {
+        public AcceptTypeMatch(MatchType matchType, string contentType, string acceptType, double quality)
+        {
+            MatchType = matchType;
+            ContentType = contentType;
+            AcceptType = acceptType;
+            Quality = quality;
+        }
+
+        public MatchType MatchType { get; }
+        public string ContentType { get; set; }
+        public string AcceptType { get; }
+        public double Quality { get; set; }
+    }
+
     public static class WebApiExtensions
     {
         public static bool IsPost(this string method)
@@ -40,21 +64,45 @@ namespace Graphite.Extensions
             return (T)dependencyResolver.GetService(type);
         }
 
-        public static bool AcceptsMimeType(this HttpRequestMessage request, params string[] mimeTypes)
+        public static double GetWeight(this AcceptTypeMatch match)
         {
-            return request.Headers.Accept?.Any(x => mimeTypes
-                .Any(m => m.MatchesAcceptMimeType(x.MediaType))) ?? false;
+            return match.Quality - ((int)match.MatchType - 1).Max(0) * .0001;
         }
 
-        public static bool MatchesAcceptMimeType(this string mimeType, string acceptMimeType)
+        public static AcceptTypeMatch GetFirstMatchingAcceptTypeOrDefault(
+            this HttpRequestMessage request, params string[] mimeTypes)
         {
-            if (mimeType.IsNullOrEmpty() || acceptMimeType.IsNullOrEmpty()) return false;
+            return request.GetMatchingAcceptTypes(mimeTypes).FirstOrDefault();
+        }
+
+        public static List<AcceptTypeMatch> GetMatchingAcceptTypes(this HttpRequestMessage request, 
+            params string[] mimeTypes)
+        {
+            return request.Headers.Accept?
+                .SelectMany(x => mimeTypes.Select(m => new
+                {
+                    AcceptType = x.MediaType,
+                    ContentType = m,
+                    Match = m.MatchesAcceptType(x.MediaType),
+                    Quality = x.Quality ?? 1
+                }))
+                .Where(x => x.Match != MatchType.None)
+                .OrderByDescending(x => x.Quality)
+                .ThenBy(x => x.Match)
+                .Select(x => new AcceptTypeMatch(x.Match, x.ContentType, x.AcceptType, x.Quality)).ToList();
+        }
+
+        public static MatchType MatchesAcceptType(this string mimeType, string acceptMimeType)
+        {
+            if (mimeType.IsNullOrEmpty() || acceptMimeType.IsNullOrEmpty()) return MatchType.None;
+            if (acceptMimeType == "*/*") return MatchType.Any;
             if (acceptMimeType.EndsWith("/*"))
             {
-                return acceptMimeType == "*/*" || mimeType.StartsWithIgnoreCase(
-                    acceptMimeType.Substring(0, acceptMimeType.Length - 1));
+                return mimeType.StartsWithIgnoreCase(acceptMimeType
+                        .Substring(0, acceptMimeType.Length - 1)) 
+                    ? MatchType.Partial : MatchType.None;
             }
-            return mimeType.EqualsIgnoreCase(acceptMimeType);
+            return mimeType.EqualsIgnoreCase(acceptMimeType) ? MatchType.Full : MatchType.None;
         }
 
         public static bool ContentTypeIs(this HttpRequestMessage request, params string[] mimeTypes)

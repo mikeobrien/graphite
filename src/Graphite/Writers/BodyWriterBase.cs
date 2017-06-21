@@ -34,7 +34,7 @@ namespace Graphite.Writers
         public T Data { get; set; }
     }
 
-    public abstract class BodyWriterBase<T, TWrapper, TAttribute, TOutputInfo> : IResponseWriter
+    public abstract class BodyWriterBase<T, TWrapper, TAttribute, TOutputInfo> : ResponseWriterBase
         where TWrapper : OutputBody<T>, new() 
         where TAttribute : Attribute, TOutputInfo
         where TOutputInfo : class, IOutputInfo
@@ -53,7 +53,7 @@ namespace Graphite.Writers
             _actionMethod = actionMethod;
         }
 
-        public virtual bool AppliesTo(ResponseWriterContext context)
+        public override bool AppliesTo(ResponseWriterContext context)
         {
             var responseType = _routeDescriptor.ResponseType?.Type;
             return responseType == typeof(TWrapper) || responseType == typeof(T);
@@ -62,7 +62,7 @@ namespace Graphite.Writers
         protected abstract HttpContent GetContent(T data, TOutputInfo outputInfo);
         protected abstract string GetContentType(T data);
 
-        public Task<HttpResponseMessage> Write(ResponseWriterContext context)
+        public override Task<HttpResponseMessage> Write(ResponseWriterContext context)
         {
             var outputInfo = context.Response.As<TOutputInfo>() ?? 
                 _actionMethod.GetAttribute<TAttribute>();

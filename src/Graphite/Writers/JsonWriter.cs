@@ -12,8 +12,8 @@ namespace Graphite.Writers
         public JsonWriter(JsonSerializerSettings settings, 
             HttpRequestMessage requestMessage,
             HttpResponseMessage responseMessage) : 
-            base(requestMessage, responseMessage, 
-                MimeTypes.ApplicationJson, Encoding.UTF8)
+            base(requestMessage, responseMessage, Encoding.UTF8, 
+                MimeTypes.ApplicationJson)
         {
             _settings = settings;
         }

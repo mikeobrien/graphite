@@ -16,6 +16,21 @@ namespace Graphite.Writers
 
     public interface IResponseWriter : IConditional<ResponseWriterContext>
     {
+        bool IsWeighted { get; }
+        double Weight { get; }
         Task<HttpResponseMessage> Write(ResponseWriterContext context);
+    }
+
+    public abstract class ResponseWriterBase : IResponseWriter
+    {
+        public virtual bool IsWeighted => false;
+        public virtual double Weight => 0;
+
+        public virtual bool AppliesTo(ResponseWriterContext context)
+        {
+            return true;
+        }
+
+        public abstract Task<HttpResponseMessage> Write(ResponseWriterContext context);
     }
 }

@@ -8,8 +8,8 @@ namespace Graphite.Actions
         public ActionConfigurationContext(ConfigurationContext configurationContext,
             ActionMethod actionMethodMethod, RouteDescriptor routeDescriptorDescriptor)
         {
-            Configuration = configurationContext.Configuration;
-            HttpConfiguration = configurationContext.HttpConfiguration;
+            Configuration = configurationContext?.Configuration;
+            HttpConfiguration = configurationContext?.HttpConfiguration;
             ActionMethod = actionMethodMethod;
             RouteDescriptor = routeDescriptorDescriptor;
         }
@@ -17,10 +17,10 @@ namespace Graphite.Actions
         public ActionConfigurationContext(ConfigurationContext configurationContext, 
             ActionDescriptor actionDescriptor)
         {
-            Configuration = configurationContext.Configuration;
-            HttpConfiguration = configurationContext.HttpConfiguration;
-            ActionMethod = actionDescriptor.Action;
-            RouteDescriptor = actionDescriptor.Route;
+            Configuration = configurationContext?.Configuration;
+            HttpConfiguration = configurationContext?.HttpConfiguration;
+            ActionMethod = actionDescriptor?.Action;
+            RouteDescriptor = actionDescriptor?.Route;
         }
 
         public Configuration Configuration { get; }

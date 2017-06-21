@@ -17,12 +17,16 @@ namespace Tests.Common.Fakes
         public bool AppliesToCalled { get; set; }
         public bool WriteCalled { get; set; }
 
+        public bool IsWeighted { get; set; }
+        public double Weight { get; set; }
+
         public bool AppliesTo(ResponseWriterContext context)
         {
             AppliesToCalled = true;
             AppliesToContext = context;
             return AppliesToFunc?.Invoke(context) ?? true;
         }
+
 
         public Task<HttpResponseMessage> Write(ResponseWriterContext context)
         {

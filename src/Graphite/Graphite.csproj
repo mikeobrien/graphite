@@ -94,6 +94,7 @@
     <Compile Include="Actions\IActionDecorator.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Extensions\IOExtensions.cs" />
+    <Compile Include="Extensions\NumericExtensions.cs" />
     <Compile Include="GraphiteException.cs" />
     <Compile Include="Http\HttpMethods.cs" />
     <Compile Include="Routing\IRouteMapper.cs" />

@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
@@ -6,37 +7,40 @@ using Graphite.Extensions;
 
 namespace Graphite.Writers
 {
-    public abstract class StringWriterBase : IResponseWriter
+    public abstract class StringWriterBase : ResponseWriterBase
     {
-        private readonly HttpRequestMessage _requestMessage;
         private readonly HttpResponseMessage _responseMessage;
-        private readonly string _mimeType;
+        private readonly Lazy<AcceptTypeMatch> _acceptType;
         private readonly Encoding _encoding;
 
         protected StringWriterBase(HttpRequestMessage requestMessage, 
-            HttpResponseMessage responseMessage, string mimeType, Encoding encoding)
+            HttpResponseMessage responseMessage, Encoding encoding, params string[] mimeTypes)
         {
-            _requestMessage = requestMessage;
             _responseMessage = responseMessage;
-            _mimeType = mimeType;
+            _acceptType = requestMessage.ToLazy(x => x
+                .GetFirstMatchingAcceptTypeOrDefault(mimeTypes));
             _encoding = encoding;
         }
 
         protected abstract string GetResponse(ResponseWriterContext context);
 
-        public virtual bool AppliesTo(ResponseWriterContext context)
+        public override bool IsWeighted => true;
+        public override double Weight => _acceptType.Value?.GetWeight() ?? 0;
+
+        public override bool AppliesTo(ResponseWriterContext context)
         {
-            return _requestMessage.AcceptsMimeType(_mimeType);
+            return _acceptType.Value != null;
         }
 
-        public Task<HttpResponseMessage> Write(ResponseWriterContext context)
+        public override Task<HttpResponseMessage> Write(ResponseWriterContext context)
         {
             var data = GetResponse(context);
             if (data != null)
             {
                 _responseMessage.Content = new AsyncStringContent(data, _encoding);
-                if (_mimeType.IsNotNullOrEmpty())
-                    _responseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue(_mimeType);
+                if (_acceptType.Value != null)
+                    _responseMessage.Content.Headers.ContentType = new 
+                        MediaTypeHeaderValue(_acceptType.Value.ContentType);
             }
             return _responseMessage.ToTaskResult();
         }

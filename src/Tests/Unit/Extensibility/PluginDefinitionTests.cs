@@ -76,7 +76,7 @@ namespace Tests.Unit.Extensibility
                 .Append<PluginWithContext2>(x => x.SomeValue > 5)
                 .Append(instance3);
             var context = new SomePluginContext { SomeValue = 5 };
-            var definition = _definitionsWithContext.ThatAppliesToOrDefault(new List<IPluginWithContext>
+            var definition = _definitionsWithContext.FirstThatAppliesToOrDefault(new List<IPluginWithContext>
             {
                 new PluginWithContext1(),
                 new PluginWithContext2(),
@@ -97,7 +97,7 @@ namespace Tests.Unit.Extensibility
                 .Append<PluginWithContext1>(x => x.SomeValue > 6)
                 .Append<PluginWithContext2>(x => x.SomeValue > 5);
             var context = new SomePluginContext { SomeValue = 4 };
-            var definition = _definitionsWithContext.ThatAppliesToOrDefault(new List<IPluginWithContext>
+            var definition = _definitionsWithContext.FirstThatAppliesToOrDefault(new List<IPluginWithContext>
             {
                 new PluginWithContext1(),
                 new PluginWithContext2()
@@ -113,7 +113,7 @@ namespace Tests.Unit.Extensibility
                 .Append<PluginWithContext1>(x => x.SomeValue > 6)
                 .Append<PluginWithContext2>(x => x.SomeValue > 5, true);
             var context = new SomePluginContext { SomeValue = 4 };
-            var definition = _definitionsWithContext.ThatAppliesToOrDefault(new List<IPluginWithContext>
+            var definition = _definitionsWithContext.FirstThatAppliesToOrDefault(new List<IPluginWithContext>
             {
                 new PluginWithContext1(),
                 new PluginWithContext2()
@@ -133,7 +133,7 @@ namespace Tests.Unit.Extensibility
                 .Append<PluginWithoutContext2>(x => x.SomeValue > 5)
                 .Append(instance3);
             var context = new SomePluginContext { SomeValue = 4 };
-            var definition = _definitionsWithoutContext.ThatAppliesToOrDefault(new List<IPluginWithoutContext>
+            var definition = _definitionsWithoutContext.FirstThatAppliesToOrDefault(new List<IPluginWithoutContext>
             {
                 new PluginWithoutContext1(),
                 new PluginWithoutContext2(),
@@ -153,7 +153,7 @@ namespace Tests.Unit.Extensibility
             _definitionsWithoutContext
                 .Append<PluginWithoutContext1>(x => false)
                 .Append<PluginWithoutContext2>(x => false);
-            var definition = _definitionsWithoutContext.ThatAppliesToOrDefault(new List<IPluginWithoutContext>
+            var definition = _definitionsWithoutContext.FirstThatAppliesToOrDefault(new List<IPluginWithoutContext>
             {
                 new PluginWithoutContext1(),
                 new PluginWithoutContext2()
@@ -168,7 +168,7 @@ namespace Tests.Unit.Extensibility
             _definitionsWithoutContext
                 .Append<PluginWithoutContext1>(x => false)
                 .Append<PluginWithoutContext2>(x => false, true);
-            var definition = _definitionsWithoutContext.ThatAppliesToOrDefault(new List<IPluginWithoutContext>
+            var definition = _definitionsWithoutContext.FirstThatAppliesToOrDefault(new List<IPluginWithoutContext>
             {
                 new PluginWithoutContext1(),
                 new PluginWithoutContext2()

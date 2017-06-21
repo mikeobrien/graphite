@@ -148,6 +148,7 @@
     <Compile Include="Unit\InitializerTests.cs" />
     <Compile Include="Unit\Readers\Bender\JsonReaderTests.cs" />
     <Compile Include="Unit\Readers\Bender\XmlReaderTests.cs" />
+    <Compile Include="Unit\Writers\ExtensionTests.cs" />
     <Compile Include="Unit\Readers\StreamReaderTests.cs" />
     <Compile Include="Unit\Readers\ByteReaderTests.cs" />
     <Compile Include="Unit\Readers\StringReaderTests.cs" />
@@ -167,6 +168,7 @@
     <Compile Include="Unit\Writers\RedirectWriterTests.cs" />
     <Compile Include="Unit\Writers\ByteWriterTests.cs" />
     <Compile Include="Unit\Writers\StreamWriterTests.cs" />
+    <Compile Include="Unit\Writers\StringWriterBaseTests.cs" />
     <Compile Include="Unit\Writers\StringWriterTests.cs" />
     <Compile Include="Unit\Writers\JsonWriterTests.cs" />
     <Compile Include="Unit\Writers\XmlWriterTests.cs" />

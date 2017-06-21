@@ -18,7 +18,7 @@ namespace Graphite.Readers
 
         protected abstract object GetRequest(string data);
 
-        public virtual bool Applies()
+        public bool Applies()
         {
             return _requestMessage.ContentTypeIs(_mimeTypes);
         }

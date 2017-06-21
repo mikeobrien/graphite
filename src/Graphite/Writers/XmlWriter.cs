@@ -12,7 +12,7 @@ namespace Graphite.Writers
 
         public XmlWriter(RouteDescriptor routeDescriptor, 
             HttpRequestMessage requestMessage, HttpResponseMessage responseMessage) : 
-            base(requestMessage, responseMessage, MimeTypes.ApplicationXml, Encoding.UTF8)
+            base(requestMessage, responseMessage, Encoding.UTF8, MimeTypes.ApplicationXml)
         {
             _routeDescriptor = routeDescriptor;
         }

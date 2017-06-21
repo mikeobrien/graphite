@@ -27,7 +27,7 @@ namespace Graphite.Binding
             var mapperConfigurationcontext = new ValueMapperConfigurationContext(
                 configurationContext, actionMethod, route, parameter, values);
             var mapper = configurationContext.Configuration.ValueMappers
-                .ThatAppliesToOrDefault(mappers, mapperConfigurationcontext, mapperContext);
+                .FirstThatAppliesToOrDefault(mappers, mapperConfigurationcontext, mapperContext);
             return mapper == null ? MapResult.NotMapped() : MapResult.WasMapped(mapper.Map(mapperContext));
         }
 

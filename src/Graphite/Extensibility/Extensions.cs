@@ -46,26 +46,45 @@ namespace Graphite.Extensibility
             return definitions.ThatApplyTo(plugins, configContext, x => x.AppliesTo(pluginContext));
         }
 
-        public static TPlugin ThatAppliesToOrDefault<TPlugin, TConfigContext>(
+        public static TPlugin FirstThatAppliesToOrDefault<TPlugin, TConfigContext>(
             this PluginDefinitions<TPlugin, TConfigContext> definitions,
             IEnumerable<TPlugin> plugins, TConfigContext configContext)
             where TPlugin : class, IConditional
         {
-            return definitions.ThatApplyTo(plugins, configContext,
-                    x => x.Applies()).FirstOrDefault() ??
-                definitions.GetInstanceDefinitions(plugins)
-                    .FirstOrDefault(x => x.IsDefault)?.Instance;
+            return definitions.ThatAppliesToOrDefault(plugins, configContext).FirstOrDefault();
         }
 
-        public static TPlugin ThatAppliesToOrDefault<TPlugin, TConfigContext, TPluginContext>(
+        public static IEnumerable<TPlugin> ThatAppliesToOrDefault<TPlugin, TConfigContext>(
+            this PluginDefinitions<TPlugin, TConfigContext> definitions,
+            IEnumerable<TPlugin> plugins, TConfigContext configContext)
+            where TPlugin : class, IConditional
+        {
+            var thatApply = definitions.ThatApplyTo(plugins, configContext,
+                x => x.Applies()).ToList();
+            return thatApply.Any() ? thatApply : 
+                definitions.GetInstanceDefinitions(plugins)
+                    .Where(x => x.IsDefault).Select(x => x.Instance);
+        }
+
+        public static TPlugin FirstThatAppliesToOrDefault<TPlugin, TConfigContext, TPluginContext>(
             this PluginDefinitions<TPlugin, TConfigContext> definitions,
             IEnumerable<TPlugin> plugins, TConfigContext configContext, TPluginContext pluginContext)
             where TPlugin : class, IConditional<TPluginContext>
         {
-            return definitions.ThatApplyTo(plugins, configContext, 
-                x => x.AppliesTo(pluginContext)).FirstOrDefault() ??
-                   definitions.GetInstanceDefinitions(plugins)
-                    .FirstOrDefault(x => x.IsDefault)?.Instance;
+            return definitions.ThatAppliesToOrDefault(plugins, 
+                configContext, pluginContext).FirstOrDefault();
+        }
+
+        public static IEnumerable<TPlugin> ThatAppliesToOrDefault<TPlugin, TConfigContext, TPluginContext>(
+            this PluginDefinitions<TPlugin, TConfigContext> definitions,
+            IEnumerable<TPlugin> plugins, TConfigContext configContext, TPluginContext pluginContext)
+            where TPlugin : class, IConditional<TPluginContext>
+        {
+            var thatApply = definitions.ThatApplyTo(plugins, configContext,
+                x => x.AppliesTo(pluginContext)).ToList();
+            return thatApply.Any() ? thatApply :
+                definitions.GetInstanceDefinitions(plugins)
+                    .Where(x => x.IsDefault).Select(x => x.Instance);
         }
 
         private static IEnumerable<TPlugin> ThatApplyTo<TPlugin, TConfigContext>(
