@@ -6,7 +6,7 @@ using NUnit.Framework;
 using Should;
 using Tests.Common;
 using Tests.Unit.Reflection.ParentNamespace;
-using Tests.Unit.Reflection.ParentNamespace.ChildNamespace;
+using Tests.Unit.Reflection.ParentNamespace.ChildNamespace1;
 
 namespace Tests.Unit.Reflection
 {
@@ -15,7 +15,11 @@ namespace Tests.Unit.Reflection
     {
         public class MarkerClass { }
         public class InNamespaceClass { }
-        namespace ChildNamespace
+        namespace ChildNamespace1
+        {
+            public class UnderNamespaceClass { }
+        }
+        namespace ChildNamespace2
         {
             public class UnderNamespaceClass { }
         }
@@ -190,7 +194,14 @@ namespace Tests.Unit.Reflection
         [TestCase(typeof(UnderNamespaceClass), true)]
         public void Should_indicate_if_type_is_under_namespace(Type type, bool under)
         {
-            type.IsUnderNamespace<MarkerClass>();
+            type.IsUnderNamespace<MarkerClass>().ShouldEqual(under); ;
+        }
+
+        [TestCase("ChildNamespace1", true)]
+        [TestCase("ChildNamespace2", false)]
+        public void Should_indicate_if_type_is_under_relative_namespace(string relativeNamespace, bool under)
+        {
+            typeof(UnderNamespaceClass).IsUnderNamespace<MarkerClass>(relativeNamespace).ShouldEqual(under);
         }
 
         [TestCase(typeof(int), typeof(int))]

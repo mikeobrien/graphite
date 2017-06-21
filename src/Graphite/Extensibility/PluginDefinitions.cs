@@ -15,6 +15,7 @@ namespace Graphite.Extensibility
         }
 
         private readonly State _state;
+        private readonly Func<TContext, bool> _defaultPredicate;
 
         public PluginDefinitions(bool singleton)
         {
@@ -25,9 +26,10 @@ namespace Graphite.Extensibility
             };
         }
 
-        private PluginDefinitions(State state)
+        private PluginDefinitions(State state, Func<TContext, bool> defaultPredicate)
         {
             _state = state;
+            _defaultPredicate = defaultPredicate;
         }
 
         public static PluginDefinitions<TPlugin, TContext> Create(
@@ -120,18 +122,21 @@ namespace Graphite.Extensibility
         public ReplaceDsl<TReplace> Replace<TReplace>()
             where TReplace : TPlugin
         {
-            return new ReplaceDsl<TReplace>(this, _state.Singleton);
+            return new ReplaceDsl<TReplace>(this, _state.Singleton, _defaultPredicate);
         }
 
         public class ReplaceDsl<TReplace> where TReplace : TPlugin
         {
             private readonly PluginDefinitions<TPlugin, TContext> _plugins;
             private readonly bool _singleton;
+            private readonly Func<TContext, bool> _defaultPredicate;
 
-            public ReplaceDsl(PluginDefinitions<TPlugin, TContext> plugins, bool singleton)
+            public ReplaceDsl(PluginDefinitions<TPlugin, TContext> plugins, bool singleton, 
+                Func<TContext, bool> defaultPredicate)
             {
                 _plugins = plugins;
                 _singleton = singleton;
+                _defaultPredicate = defaultPredicate;
             }
 
             public PluginDefinitions<TPlugin, TContext> With<TReplacement>(
@@ -139,7 +144,7 @@ namespace Graphite.Extensibility
                 where TReplacement : TPlugin
             {
                 return With<TReplacement>(PluginDefinition<TPlugin, TContext>
-                    .Create<TReplacement>(predicate, _singleton), @default);
+                    .Create<TReplacement>(predicate ?? _defaultPredicate, _singleton), @default);
             }
 
             public PluginDefinitions<TPlugin, TContext> With<TReplacement>(
@@ -148,7 +153,7 @@ namespace Graphite.Extensibility
                 where TReplacement : TPlugin
             {
                 return With<TReplacement>(PluginDefinition<TPlugin, TContext>
-                    .Create(instance, predicate, dispose), @default);
+                    .Create(instance, predicate ?? _defaultPredicate, dispose), @default);
             }
 
             public PluginDefinitions<TPlugin, TContext> With<TReplacement>(
@@ -167,7 +172,7 @@ namespace Graphite.Extensibility
             where TAppend : TPlugin
         {
             return Append<TAppend>(PluginDefinition<TPlugin, TContext>
-                .Create<TAppend>(predicate, _state.Singleton), @default);
+                .Create<TAppend>(predicate ?? _defaultPredicate, _state.Singleton), @default);
         }
 
         public AppendDsl<TAppend> Append<TAppend>(
@@ -176,7 +181,7 @@ namespace Graphite.Extensibility
             where TAppend : TPlugin
         {
             return Append<TAppend>(PluginDefinition<TPlugin, TContext>
-                .Create(instance, predicate, dispose), @default);
+                .Create(instance, predicate ?? _defaultPredicate, dispose), @default);
         }
 
         public AppendDsl<TAppend> Append<TAppend>(
@@ -186,7 +191,7 @@ namespace Graphite.Extensibility
             Remove<TAppend>();
             _state.Definitions.Add(plugin);
             if (@default) DefaultIs<TAppend>();
-            return new AppendDsl<TAppend>(plugin, _state);
+            return new AppendDsl<TAppend>(plugin, _state, _defaultPredicate);
         }
 
         public class AppendDsl<TAppend> : PluginDefinitions<TPlugin, TContext> where TAppend : TPlugin
@@ -194,7 +199,7 @@ namespace Graphite.Extensibility
             private readonly PluginDefinition<TPlugin, TContext> _plugin;
 
             public AppendDsl(PluginDefinition<TPlugin, TContext> plugin, 
-                State state) : base(state)
+                State state, Func<TContext, bool> defaultPredicate) : base(state, defaultPredicate)
             {
                 _plugin = plugin;
             }
@@ -216,7 +221,7 @@ namespace Graphite.Extensibility
             where TPrepend : TPlugin
         {
             return Prepend<TPrepend>(PluginDefinition<TPlugin, TContext>
-                .Create<TPrepend>(predicate, _state.Singleton), @default);
+                .Create<TPrepend>(predicate ?? _defaultPredicate, _state.Singleton), @default);
         }
 
         public PrependDsl<TPrepend> Prepend<TPrepend>(
@@ -225,7 +230,7 @@ namespace Graphite.Extensibility
             where TPrepend : TPlugin
         {
             return Prepend<TPrepend>(PluginDefinition<TPlugin, TContext>
-                .Create(instance, predicate, dispose), @default);
+                .Create(instance, predicate ?? _defaultPredicate, dispose), @default);
         }
 
         public PrependDsl<TPrepend> Prepend<TPrepend>(
@@ -235,7 +240,7 @@ namespace Graphite.Extensibility
             Remove<TPrepend>();
             _state.Definitions.Insert(0, plugin);
             if (@default) DefaultIs<TPrepend>();
-            return new PrependDsl<TPrepend>(plugin, _state);
+            return new PrependDsl<TPrepend>(plugin, _state, _defaultPredicate);
         }
 
         public class PrependDsl<TPrepend> : PluginDefinitions<TPlugin, TContext> where TPrepend : TPlugin
@@ -243,7 +248,7 @@ namespace Graphite.Extensibility
             private readonly PluginDefinition<TPlugin, TContext> _plugin;
 
             public PrependDsl(PluginDefinition<TPlugin, TContext> plugin, 
-                State state) : base(state)
+                State state, Func<TContext, bool> defaultPredicate) : base(state, defaultPredicate)
             {
                 _plugin = plugin;
             }
@@ -256,6 +261,13 @@ namespace Graphite.Extensibility
                 _state.Definitions.Insert(Order<TFind>(), _plugin);
                 return this;
             }
+        }
+
+        public PluginDefinitions<TPlugin, TContext> When(Func<TContext, bool> predicate, 
+            Action<PluginDefinitions<TPlugin, TContext>> configure)
+        {
+            configure(new PluginDefinitions<TPlugin, TContext>(_state, predicate));
+            return this;
         }
 
         IEnumerator IEnumerable.GetEnumerator()

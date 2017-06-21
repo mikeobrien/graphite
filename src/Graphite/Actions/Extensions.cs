@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Graphite.Extensibility;
 using Graphite.Extensions;
+using Graphite.Reflection;
 
 namespace Graphite.Actions
 {
@@ -36,6 +37,11 @@ namespace Graphite.Actions
         {
             actionSources.ForEach(x => x.Decorate(new 
                 ActionDecoratorContext(actionDescriptor)));
+        }
+
+        public static bool IsUnderNamespace<T>(this ActionMethod actionMethod, string relativeNamespace = null)
+        {
+            return actionMethod.HandlerTypeDescriptor.Type.IsUnderNamespace<T>(relativeNamespace);
         }
     }
 }
