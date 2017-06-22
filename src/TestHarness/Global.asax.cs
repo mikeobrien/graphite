@@ -9,6 +9,7 @@ using Graphite.Actions;
 using Graphite.Authentication;
 using Graphite.Behaviors;
 using Graphite.StructureMap;
+using TestHarness.Action;
 
 namespace TestHarness
 {
@@ -35,6 +36,9 @@ namespace TestHarness
                     .BindRequestInfo()
                     .BindHeaders()
                     .BindContainer()
+                    .ConfigureInterceptors(x => x
+                        .Append<ActionTestHandler.Interceptor>(i => i
+                            .ActionMethod.Name.Contains("Inteceptor")))
                     .ConfigureAuthenticators(x => x
                         .Append<TestBearerTokenAuthenticator>()
                         .Append<TestBasicAuthenticator>(a => a.ActionMethod.Name.EndsWith("BasicSecure")))

@@ -564,6 +564,16 @@ namespace Graphite
         }
 
         /// <summary>
+        /// Configures request interceptors.
+        /// </summary>
+        public ConfigurationDsl ConfigureInterceptors(Action<PluginDefinitions
+            <IInterceptor, ActionConfigurationContext>> configure)
+        {
+            configure(_configuration.Interceptors);
+            return this;
+        }
+
+        /// <summary>
         /// Configures request readers.
         /// </summary>
         public ConfigurationDsl ConfigureRequestReaders(Action<PluginDefinitions

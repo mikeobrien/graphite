@@ -115,6 +115,9 @@ namespace Graphite
             (c, a) => c.SupportedHttpMethods.MethodMatchesAny(a.MethodDescriptor
                 .Name.MatchGroups(c.ActionRegex(c)))?.Method;
 
+        public PluginDefinitions<IInterceptor, ActionConfigurationContext> Interceptors { get; } =
+            PluginDefinitions<IInterceptor, ActionConfigurationContext>.Create();
+
         public PluginDefinition<IUnhandledExceptionHandler> UnhandledExceptionHandler { get; } =
             PluginDefinition<IUnhandledExceptionHandler>
                 .Create<UnhandledExceptionHandler>();

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
 using Graphite.Extensibility;
 using Graphite.Extensions;
 using Graphite.Reflection;
@@ -37,6 +39,15 @@ namespace Graphite.Actions
         {
             actionSources.ForEach(x => x.Decorate(new 
                 ActionDecoratorContext(actionDescriptor)));
+        }
+        
+        public static IInterceptor ThatAppliesTo(this IEnumerable<IInterceptor> interceptors,
+            InterceptorContext interceptorContext, ConfigurationContext configurationContext)
+        {
+            var actionConfigurationcontext = new ActionConfigurationContext(
+                configurationContext, interceptorContext.ActionDescriptor);
+            return configurationContext.Configuration.Interceptors.FirstThatAppliesToOrDefault(
+                interceptors, actionConfigurationcontext, interceptorContext);
         }
 
         public static bool IsUnderNamespace<T>(this ActionMethod actionMethod, string relativeNamespace = null)
