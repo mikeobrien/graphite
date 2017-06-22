@@ -229,18 +229,18 @@ namespace Graphite
         /// <summary>
         /// Specifies the route mapper to use.
         /// </summary>
-        public ConfigurationDsl WithRouteMapper<T>() where T : IRouteMapper
+        public ConfigurationDsl WithRouteMapper<T>() where T : IHttpRouteMapper
         {
-            _configuration.RouteMapper.Set<T>();
+            _configuration.HttpRouteMapper.Set<T>();
             return this;
         }
 
         /// <summary>
         /// Specifies the route mapper to use.
         /// </summary>
-        public ConfigurationDsl WithRouteMapper<T>(T instance) where T : IRouteMapper
+        public ConfigurationDsl WithRouteMapper<T>(T instance) where T : IHttpRouteMapper
         {
-            _configuration.RouteMapper.Set(instance);
+            _configuration.HttpRouteMapper.Set(instance);
             return this;
         }
 
@@ -560,6 +560,16 @@ namespace Graphite
             <IUrlConvention, UrlConfigurationContext>> configure)
         {
             configure(_configuration.UrlConventions);
+            return this;
+        }
+
+        /// <summary>
+        /// Configures http route decorators.
+        /// </summary>
+        public ConfigurationDsl ConfigureHttpRouteDecorators(Action<PluginDefinitions
+            <IHttpRouteDecorator, ActionConfigurationContext>> configure)
+        {
+            configure(_configuration.HttpRouteDecorators);
             return this;
         }
 

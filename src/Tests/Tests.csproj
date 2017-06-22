@@ -160,7 +160,7 @@
     <Compile Include="Unit\Routing\DefaultRouteConventionTest.cs" />
     <Compile Include="Unit\Routing\DefaultUrlConventionTests.cs" />
     <Compile Include="Unit\Routing\RouteExtensionTests.cs" />
-    <Compile Include="Unit\Routing\RouteMapperTests.cs" />
+    <Compile Include="Unit\Routing\HttpRouteMapperTests.cs" />
     <Compile Include="Unit\Routing\UrlAliasConventionTests.cs" />
     <Compile Include="Unit\Writers\Bender\JsonWriterTests.cs" />
     <Compile Include="Unit\Writers\Bender\XmlWriterTests.cs" />

@@ -46,5 +46,23 @@ namespace TestHarness.Routing
         {
             return "guid:" + id;
         }
+
+        public string GetWithRouteDecorator()
+        {
+            return "fark";
+        }
+
+        public class HttpRouteDecorator : IHttpRouteDecorator
+        {
+            public bool AppliesTo(HttpRouteDecoratorContext context)
+            {
+                return true;
+            }
+
+            public void Decorate(HttpRouteDecoratorContext route)
+            {
+                route.Route.MethodConstraints.Add("POST");
+            }
+        }
     }
 }

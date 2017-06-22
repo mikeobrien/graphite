@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading;
 using Graphite.Extensibility;
 using Graphite.Extensions;
 using Graphite.Reflection;
@@ -37,8 +35,8 @@ namespace Graphite.Actions
         public static void Decorate(this IEnumerable<IActionDecorator> 
             actionSources, ActionDescriptor actionDescriptor)
         {
-            actionSources.ForEach(x => x.Decorate(new 
-                ActionDecoratorContext(actionDescriptor)));
+            var context = new ActionDecoratorContext(actionDescriptor);
+            actionSources.ForEach(x => x.Decorate(context));
         }
         
         public static IInterceptor ThatAppliesTo(this IEnumerable<IInterceptor> interceptors,

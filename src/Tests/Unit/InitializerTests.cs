@@ -43,8 +43,9 @@ namespace Tests.Unit
             });
             _configuration = new Configuration();
             _httpConfiguration = new HttpConfiguration(_routes);
-            _initializer = new Initializer(new RouteMapper(_httpConfiguration, 
-                    _container, new DefaultInlineConstraintResolver()), 
+            _initializer = new Initializer(new HttpRouteMapper(_httpConfiguration, _container,  
+                    new DefaultInlineConstraintResolver(), new List<IHttpRouteDecorator>(), 
+                    new ConfigurationContext(_configuration, null)), 
                 _actionSources, _container, _actionDecorators, 
                 new ConfigurationContext(_configuration, _httpConfiguration));
         }

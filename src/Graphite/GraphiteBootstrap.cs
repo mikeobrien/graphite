@@ -48,7 +48,8 @@ namespace Graphite
                 container.RegisterPlugins(configuration.UrlConventions);
                 container.RegisterPlugin(configuration.TypeCache);
                 container.RegisterPlugin(configuration.Initializer);
-                container.RegisterPlugin(configuration.RouteMapper);
+                container.RegisterPlugin(configuration.HttpRouteMapper);
+                container.RegisterPlugins(configuration.HttpRouteDecorators);
                 container.RegisterPlugin(configuration.InlineConstraintResolver);
                 container.RegisterPlugin(configuration.UnhandledExceptionHandler);
                 container.RegisterPlugins(configuration.Interceptors);

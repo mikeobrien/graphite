@@ -49,5 +49,14 @@ namespace Tests.Acceptance
             result.Status.ShouldEqual(HttpStatusCode.OK);
             result.Data.ShouldEqual(expected);
         }
+
+        [Test]
+        public void Should_decorate_route()
+        {
+            var result = Http.Post($"{BaseUrl}WithRouteDecorator");
+
+            result.Status.ShouldEqual(HttpStatusCode.OK);
+            result.Data.ShouldEqual("fark");
+        }
     }
 }

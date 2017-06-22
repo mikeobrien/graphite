@@ -29,6 +29,26 @@ namespace Graphite.Routing
                 new UrlConfigurationContext(configurationContext, urlContext), urlContext);
         }
 
+
+        public static IEnumerable<IHttpRouteDecorator> ThatApplyTo(
+            this IEnumerable<IHttpRouteDecorator> routeDecorators,
+            ActionDescriptor actionDescriptor,
+            HttpRouteConfiguration routeConfiguration,
+            ConfigurationContext configurationContext)
+        {
+            return configurationContext.Configuration.HttpRouteDecorators
+                .ThatApplyTo(routeDecorators,
+                    new ActionConfigurationContext(configurationContext, actionDescriptor),
+                    new HttpRouteDecoratorContext(routeConfiguration));
+        }
+
+        public static void Decorate(this IEnumerable<IHttpRouteDecorator>
+            routeDecorators, HttpRouteConfiguration routeConfiguration)
+        {
+            var context = new HttpRouteDecoratorContext(routeConfiguration);
+            routeDecorators.ForEach(x => x.Decorate(context));
+        }
+
         public static List<RouteDescriptor> GetRouteDescriptors(
             this IRouteConvention routeConvention, ActionMethod actionMethod)
 
@@ -74,11 +94,11 @@ namespace Graphite.Routing
 
         public const string HttpMethodConstraintName = "$httpMethod";
 
-        public static Dictionary<string, object> AddMethodConstraint(
-            this Dictionary<string, object> constraints, string method)
+        public static Dictionary<string, object> AddMethodConstraints(
+            this Dictionary<string, object> constraints, IEnumerable<string> methods)
         {
-            constraints.Add(HttpMethodConstraintName, 
-                new HttpMethodConstraint(new HttpMethod(method)));
+            constraints.Add(HttpMethodConstraintName, new HttpMethodConstraint(
+                methods.Select(x => new HttpMethod(x)).ToArray()));
             return constraints;
         }
     }

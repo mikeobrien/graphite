@@ -26,13 +26,20 @@ namespace Graphite
         public Registry Registry { get; set; } = new Registry();
         public List<Assembly> Assemblies { get; } = new List<Assembly>();
 
+        public string DiagnosticsUrl { get; set; } = "_graphite";
+        public bool ReturnErrorMessage { get; set; }
+        public bool Diagnostics { get; set; }
+        public bool Metrics { get; set; } = true;
+        public HttpStatusCode DefaultStatusCode = HttpStatusCode.NoContent;
+        public string UnhandledExceptionStatusText { get; set; } =
+            "There was a problem processing your request.";
+        public bool DefaultErrorHandlerEnabled { get; set; } = true;
+        public int DownloadBufferSize { get; set; } = 1024 * 1024;
+        public bool AutomaticallyConstrainUrlParameterByType { get; set; }
+
         public PluginDefinition<IInitializer> Initializer { get; } =
             PluginDefinition<IInitializer>
                 .Create<Initializer>(singleton: true);
-
-        public PluginDefinition<IRouteMapper> RouteMapper { get; } =
-            PluginDefinition<IRouteMapper>
-                .Create<RouteMapper>(singleton: true);
 
         public PluginDefinition<IInlineConstraintResolver> InlineConstraintResolver { get; } =
             PluginDefinition<IInlineConstraintResolver>
@@ -73,6 +80,9 @@ namespace Graphite
         public PluginDefinitions<IActionDecorator, ActionConfigurationContext> ActionDecorators { get; } =
             PluginDefinitions<IActionDecorator, ActionConfigurationContext>.Create(singleton: true);
 
+        public PluginDefinitions<IHttpRouteDecorator, ActionConfigurationContext> HttpRouteDecorators { get; } =
+            PluginDefinitions<IHttpRouteDecorator, ActionConfigurationContext>.Create(singleton: true);
+
         public List<Func<ActionMethod, Url, string>> UrlAliases { get; } =
             new List<Func<ActionMethod, Url, string>>();
         public string UrlPrefix { get; set; }
@@ -81,16 +91,9 @@ namespace Graphite
             HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Patch, HttpMethod.Delete,
             HttpMethod.Options, HttpMethod.Head, HttpMethod.Trace, HttpMethod.Connect };
 
-        public string DiagnosticsUrl { get; set; } = "_graphite";
-        public bool ReturnErrorMessage { get; set; }
-        public bool Diagnostics { get; set; }
-        public bool Metrics { get; set; } = true;
-        public HttpStatusCode DefaultStatusCode = HttpStatusCode.NoContent;
-        public string UnhandledExceptionStatusText { get; set; } =
-            "There was a problem processing your request.";
-        public bool DefaultErrorHandlerEnabled { get; set; } = true;
-        public int DownloadBufferSize { get; set; } = 1024 * 1024;
-        public bool AutomaticallyConstrainUrlParameterByType { get; set; }
+        public PluginDefinition<IHttpRouteMapper> HttpRouteMapper { get; } =
+            PluginDefinition<IHttpRouteMapper>
+                .Create<HttpRouteMapper>(singleton: true);
 
         public string HandlerNameFilterRegex { get; set; } = "Handler$";
 

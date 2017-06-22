@@ -2,7 +2,7 @@
 
 namespace Graphite.Routing
 {
-    public interface IRouteMapper
+    public interface IHttpRouteMapper
     {
         void Map(ActionDescriptor actionDescriptor);
     }

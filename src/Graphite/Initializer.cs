@@ -9,13 +9,13 @@ namespace Graphite
 {
     public class Initializer : IInitializer
     {
-        private readonly IRouteMapper _routeMapper;
+        private readonly IHttpRouteMapper _routeMapper;
         private readonly IEnumerable<IActionSource> _actionSources;
         private readonly IContainer _container;
         private readonly IEnumerable<IActionDecorator> _actionDecorators;
         private readonly ConfigurationContext _configurationContext;
 
-        public Initializer(IRouteMapper routeMapper, 
+        public Initializer(IHttpRouteMapper routeMapper, 
             IEnumerable<IActionSource> actionSources, IContainer container,
             IEnumerable<IActionDecorator> actionDecorators,
             ConfigurationContext configurationContext)
