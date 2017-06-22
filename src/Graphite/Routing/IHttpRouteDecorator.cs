@@ -14,6 +14,6 @@ namespace Graphite.Routing
 
     public interface IHttpRouteDecorator : IConditional<HttpRouteDecoratorContext>
     {
-        void Decorate(HttpRouteDecoratorContext route);
+        void Decorate(HttpRouteDecoratorContext context);
     }
 }

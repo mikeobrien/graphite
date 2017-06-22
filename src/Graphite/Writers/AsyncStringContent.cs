@@ -12,10 +12,10 @@ namespace Graphite.Writers
         private readonly string _data;
         private readonly Encoding _encoding;
 
-        public AsyncStringContent(string data, Encoding encoding)
+        public AsyncStringContent(string data, Encoding encoding = null)
         {
             _data = data;
-            _encoding = encoding;
+            _encoding = encoding ?? Encoding.UTF8;
         }
 
         protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)

@@ -115,7 +115,7 @@ namespace Graphite
             (c, a) => a.MethodDescriptor.Name.Remove(c.ActionRegex(c));
 
         public Func<Configuration, ActionMethod, string> GetHttpMethod { get; set; } = 
-            (c, a) => c.SupportedHttpMethods.MethodMatchesAny(a.MethodDescriptor
+            (c, a) => c.SupportedHttpMethods.MatchAny(a.MethodDescriptor
                 .Name.MatchGroups(c.ActionRegex(c)))?.Method;
         
         public PluginDefinition<IUnhandledExceptionHandler> UnhandledExceptionHandler { get; } =
@@ -132,7 +132,6 @@ namespace Graphite
         public PluginDefinition<IActionInvoker> ActionInvoker { get; } =
             PluginDefinition<IActionInvoker>
                 .Create<ActionInvoker>();
-
 
         public PluginDefinitions<IAuthenticator, ActionConfigurationContext> Authenticators { get; } =
             PluginDefinitions<IAuthenticator, ActionConfigurationContext>.Create();

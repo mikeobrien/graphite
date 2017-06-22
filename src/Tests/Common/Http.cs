@@ -9,12 +9,14 @@ using System.Net.Http.Headers;
 using Bender;
 using Graphite.Extensions;
 using Graphite.Http;
+using IISExpressBootstrapper;
 using HttpMethod = System.Net.Http.HttpMethod;
 
 namespace Tests.Common
 {
     public static class Http
     {
+        public const string TestHarnessProjectName = "TestHarness";
         public const int Port = 3091;
 
         private static readonly HttpClient HttpClient = 
@@ -81,11 +83,20 @@ namespace Tests.Common
             public T Data { get; }
         }
 
+        public static Result Options(string relativeUrl,
+            IDictionary<string, string> cookies = null,
+            Action<HttpRequestHeaders> requestHeaders = null)
+        {
+            return Execute<object>(HttpMethod.Options, relativeUrl, 
+                cookies: cookies, requestHeaders: requestHeaders);
+        }
+
         public static Result Get(string relativeUrl,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null)
         {
-            return Get<object>(relativeUrl, MimeTypes.ApplicationJson, x => null, cookies, requestHeaders);
+            return Get<object>(relativeUrl, MimeTypes.ApplicationJson, 
+                x => null, cookies, requestHeaders);
         }
 
         public static Result<string> GetText(string relativeUrl,
@@ -324,7 +335,9 @@ namespace Tests.Common
 
                 contentHeaders?.Invoke(request.Content.Headers);
             }
-            
+
+            EnsureWebServer();
+
             var response = HttpClient.SendAsync(request).Result;
             var responseStream = response.Content.ReadAsStreamAsync().Result;
 
@@ -336,6 +349,17 @@ namespace Tests.Common
             }
             
             return new Result<TResponse>(response, reader?.Invoke(responseStream));
+        }
+
+        private static IISExpressHost _iisExpress;
+
+        private static void EnsureWebServer()
+        {
+            if (_iisExpress != null) return;
+
+            _iisExpress = new IISExpressHost(TestHarnessProjectName, Port);
+            AppDomain.CurrentDomain.ProcessExit +=
+                (sender, e) => _iisExpress.Dispose();;
         }
     }
 }

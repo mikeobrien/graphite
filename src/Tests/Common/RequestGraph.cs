@@ -336,7 +336,7 @@ namespace Tests.Common
 
         private TypeDescriptor[] GetBehaviors()
         {
-            return Configuration.Behaviors.ThatApplyTo(new ActionConfigurationContext(
+            return Configuration.Behaviors.ThatApply(new ActionConfigurationContext(
                     GetConfigurationContext(), ActionMethod, GetRouteDescriptor()))
                 .Select(x => x.Type).Select(x => TypeCache.GetTypeDescriptor(x)).ToArray();
         }

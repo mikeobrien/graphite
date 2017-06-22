@@ -58,13 +58,15 @@ namespace Graphite.Extensibility
     public class PluginDefinition<T, TContext> : PluginDefinition<T>
     {
         private PluginDefinition(Type concrete, T instance, 
-            Func<TContext, bool> appliesTo, bool dispose) : base(concrete, instance, dispose)
+            Func<TContext, bool> appliesTo, bool dispose) : 
+            base(concrete, instance, dispose)
         {
             AppliesTo = appliesTo;
         }
 
-        private PluginDefinition(Type concrete, Func<TContext, bool> 
-            appliesTo, bool singleton) : base(concrete, singleton)
+        private PluginDefinition(Type concrete, 
+            Func<TContext, bool> appliesTo, bool singleton) : 
+            base(concrete, singleton)
         {
             AppliesTo = appliesTo;
         }
@@ -73,14 +75,16 @@ namespace Graphite.Extensibility
             Func<TContext, bool> predicate, bool singleton = false)
             where TConcrete : T
         {
-            return new PluginDefinition<T, TContext>(typeof(TConcrete), predicate, singleton);
+            return new PluginDefinition<T, TContext>( 
+                typeof(TConcrete), predicate, singleton);
         }
 
         public static PluginDefinition<T, TContext> Create<TConcrete>(
             TConcrete instance, Func<TContext, bool> predicate, bool dispose = false)
             where TConcrete : T
         {
-            return new PluginDefinition<T, TContext>(typeof(TConcrete), instance, predicate, dispose);
+            return new PluginDefinition<T, TContext>(
+                typeof(TConcrete), instance, predicate, dispose);
         }
 
         public Func<TContext, bool> AppliesTo { get; }

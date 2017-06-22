@@ -14,7 +14,7 @@ namespace Graphite.Binding
             this IEnumerable<IRequestBinder> binders, object[] actionArguments, 
             ActionConfigurationContext actionConfigurationContext)
         {
-            return actionConfigurationContext.Configuration.RequestBinders.ThatApplyTo(binders,
+            return actionConfigurationContext.Configuration.RequestBinders.ThatAppliesTo(binders,
                 actionConfigurationContext, new RequestBinderContext(actionArguments));
         }
 

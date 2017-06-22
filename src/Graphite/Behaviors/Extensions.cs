@@ -14,7 +14,7 @@ namespace Graphite.Behaviors
             ActionMethod actionMethod, RouteDescriptor routeDescriptor, 
             ConfigurationContext configurationContext)
         {
-            return behaviors.ThatApplyTo(new ActionConfigurationContext(
+            return behaviors.ThatApply(new ActionConfigurationContext(
                 configurationContext, actionMethod, routeDescriptor))
                 .Select(x => x.Type).ToList();
         }

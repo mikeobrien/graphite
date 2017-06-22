@@ -64,6 +64,12 @@ namespace Graphite.Extensions
             return new List<T> { item }.Concat(tail);
         }
 
+        public static IList<T> AddRange<T>(this IList<T> source, params T[] items)
+        {
+            items.ForEach(source.Add);
+            return source;
+        }
+
         public static ILookup<string, object> ToLookup(this NameValueCollection source,
             Func<string, string> getKey = null)
         {

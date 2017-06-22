@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.0
+VisualStudioVersion = 15.0.26430.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphite", "Graphite\Graphite.csproj", "{C4B8217D-1768-49C0-AEC5-F07B8816405E}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphite.StructureMap", "Integration\DependencyInjection\Graphite.StructureMap\Graphite.StructureMap.csproj", "{EC2DD82D-406B-4169-A5C9-EC9EAD8A0151}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphite.Bender", "Integration\Serializers\Graphite.Bender\Graphite.Bender.csproj", "{73744E67-B5EB-427A-8A4D-9E6D07532FF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphite.Cors", "Graphite.Cors\Graphite.Cors.csproj", "{0948B932-8AEA-4CCF-9F3D-DD6E2005FE03}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{73744E67-B5EB-427A-8A4D-9E6D07532FF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73744E67-B5EB-427A-8A4D-9E6D07532FF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73744E67-B5EB-427A-8A4D-9E6D07532FF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0948B932-8AEA-4CCF-9F3D-DD6E2005FE03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0948B932-8AEA-4CCF-9F3D-DD6E2005FE03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0948B932-8AEA-4CCF-9F3D-DD6E2005FE03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0948B932-8AEA-4CCF-9F3D-DD6E2005FE03}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

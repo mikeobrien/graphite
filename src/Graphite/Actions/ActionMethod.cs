@@ -29,6 +29,11 @@ namespace Graphite.Actions
             return MethodDescriptor.HasAttribute<T>();
         }
 
+        public bool HasActionOrHandlerAttribute<T>() where T : Attribute
+        {
+            return MethodDescriptor.HasAttribute<T>() || HandlerTypeDescriptor.HasAttribute<T>();
+        }
+
         public bool HasAttributes<T1, T2>() where T1 : Attribute where T2 : Attribute
         {
             return MethodDescriptor.HasAttributes<T1, T2>();
@@ -37,6 +42,11 @@ namespace Graphite.Actions
         public T GetAttribute<T>() where T : Attribute
         {
             return MethodDescriptor.GetAttribute<T>();
+        }
+
+        public T GetActionOrHandlerAttribute<T>() where T : Attribute
+        {
+            return MethodDescriptor.GetAttribute<T>() ?? HandlerTypeDescriptor.GetAttribute<T>();
         }
 
         public T[] GetAttributes<T>() where T : Attribute

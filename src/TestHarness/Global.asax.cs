@@ -8,6 +8,7 @@ using Graphite;
 using Graphite.Actions;
 using Graphite.Authentication;
 using Graphite.Behaviors;
+using Graphite.Cors;
 using Graphite.StructureMap;
 using TestHarness.Action;
 using TestHarness.Routing;
@@ -47,7 +48,16 @@ namespace TestHarness
                     .ConfigureBehaviors(b => b
                         .Append<AuthenticationBehavior>(a => a.ActionMethod.Name.EndsWith("Secure"))
                         .Append<Behavior1>()
-                        .Append<Behavior2>()));
+                        .Append<Behavior2>())
+                    .ConfigureCors(x => x
+                        .AppendPolicy(p => p
+                            .AllowOrigins("http://fark.com")
+                            .AllowAnyMethod()
+                            .AppliesWhen(a => a.ActionMethod.Name == "GetCorsPolicy1"))
+                        .AppendPolicy(p => p
+                            .AllowOrigins("http://farker.com")
+                            .AllowAnyMethod()
+                            .AppliesWhen(a => a.ActionMethod.Name == "GetCorsPolicy2"))));
 
             configuration.EnsureInitialized();
         }

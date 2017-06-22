@@ -25,12 +25,13 @@ namespace Tests.Unit.Extensibility
         public void Should_select_plugin_defintions_that_apply_in_order()
         {
             var instance3 = new PluginWithContext3();
+
             _definitionsWithContext
                 .Append<PluginWithContext1>(x => x.SomeValue < 6)
                 .Append<PluginWithContext2>(x => x.SomeValue > 5)
                 .Append(instance3);
 
-            var definitions = _definitionsWithContext.ThatApplyTo(new SomePluginContext { SomeValue = 5 }).ToList();
+            var definitions = _definitionsWithContext.ThatApply(new SomePluginContext { SomeValue = 5 }).ToList();
 
             definitions.Count.ShouldEqual(2);
             definitions[0].HasInstance.ShouldBeFalse();
@@ -43,12 +44,15 @@ namespace Tests.Unit.Extensibility
         public void Should_select_plugin_instances_that_apply_in_order()
         {
             var instance3 = new PluginWithContext3();
-            _definitionsWithContext.Append<PluginWithContext4>()
-                        .Append<PluginWithContext1>(x => x.SomeValue < 6)
-                        .Append<PluginWithContext2>(x => x.SomeValue > 5)
-                        .Append(instance3);
+
+            _definitionsWithContext
+                .Append<PluginWithContext4>()
+                .Append<PluginWithContext1>(x => x.SomeValue < 6)
+                .Append<PluginWithContext2>(x => x.SomeValue > 5)
+                .Append(instance3);
+
             var context = new SomePluginContext { SomeValue = 5 };
-            var definitions = _definitionsWithContext.ThatApplyTo(new List<IPluginWithContext>
+            var definitions = _definitionsWithContext.ThatAppliesTo(new List<IPluginWithContext>
             {
                 new PluginWithContext1(),
                 new PluginWithContext2(),
@@ -70,11 +74,13 @@ namespace Tests.Unit.Extensibility
         public void Should_select_plugin_instance_that_applies_to_plugin_context_in_order()
         {
             var instance3 = new PluginWithContext3();
+
             _definitionsWithContext
                 .Append<PluginWithContext4>()
                 .Append<PluginWithContext1>(x => x.SomeValue < 6)
                 .Append<PluginWithContext2>(x => x.SomeValue > 5)
                 .Append(instance3);
+
             var context = new SomePluginContext { SomeValue = 5 };
             var definition = _definitionsWithContext.FirstThatAppliesToOrDefault(new List<IPluginWithContext>
             {
@@ -96,6 +102,7 @@ namespace Tests.Unit.Extensibility
             _definitionsWithContext
                 .Append<PluginWithContext1>(x => x.SomeValue > 6)
                 .Append<PluginWithContext2>(x => x.SomeValue > 5);
+
             var context = new SomePluginContext { SomeValue = 4 };
             var definition = _definitionsWithContext.FirstThatAppliesToOrDefault(new List<IPluginWithContext>
             {
@@ -112,6 +119,7 @@ namespace Tests.Unit.Extensibility
             _definitionsWithContext
                 .Append<PluginWithContext1>(x => x.SomeValue > 6)
                 .Append<PluginWithContext2>(x => x.SomeValue > 5, true);
+
             var context = new SomePluginContext { SomeValue = 4 };
             var definition = _definitionsWithContext.FirstThatAppliesToOrDefault(new List<IPluginWithContext>
             {
@@ -127,13 +135,15 @@ namespace Tests.Unit.Extensibility
         public void Should_select_plugin_instance_that_applies_in_order()
         {
             var instance3 = new PluginWithoutContext3();
+
             _definitionsWithoutContext
                 .Append<PluginWithoutContext4>()
                 .Append<PluginWithoutContext1>(x => x.SomeValue < 6)
                 .Append<PluginWithoutContext2>(x => x.SomeValue > 5)
                 .Append(instance3);
+
             var context = new SomePluginContext { SomeValue = 4 };
-            var definition = _definitionsWithoutContext.FirstThatAppliesToOrDefault(new List<IPluginWithoutContext>
+            var definition = _definitionsWithoutContext.FirstThatAppliesOrDefault(new List<IPluginWithoutContext>
             {
                 new PluginWithoutContext1(),
                 new PluginWithoutContext2(),
@@ -153,7 +163,8 @@ namespace Tests.Unit.Extensibility
             _definitionsWithoutContext
                 .Append<PluginWithoutContext1>(x => false)
                 .Append<PluginWithoutContext2>(x => false);
-            var definition = _definitionsWithoutContext.FirstThatAppliesToOrDefault(new List<IPluginWithoutContext>
+
+            var definition = _definitionsWithoutContext.FirstThatAppliesOrDefault(new List<IPluginWithoutContext>
             {
                 new PluginWithoutContext1(),
                 new PluginWithoutContext2()
@@ -168,7 +179,8 @@ namespace Tests.Unit.Extensibility
             _definitionsWithoutContext
                 .Append<PluginWithoutContext1>(x => false)
                 .Append<PluginWithoutContext2>(x => false, true);
-            var definition = _definitionsWithoutContext.FirstThatAppliesToOrDefault(new List<IPluginWithoutContext>
+
+            var definition = _definitionsWithoutContext.FirstThatAppliesOrDefault(new List<IPluginWithoutContext>
             {
                 new PluginWithoutContext1(),
                 new PluginWithoutContext2()
@@ -182,83 +194,72 @@ namespace Tests.Unit.Extensibility
         public void Should_get_order_from_instance()
         {
             var instance2 = new PluginWithContext2();
-            _definitionsWithContext.Append<PluginWithContext1>()
-                        .Append(instance2);
+
+            _definitionsWithContext
+                .Append<PluginWithContext1>()
+                .Append(instance2);
 
             _definitionsWithContext.Order(new PluginWithContext1()).ShouldEqual(0);
             _definitionsWithContext.Order(new PluginWithContext2()).ShouldEqual(1);
         }
-
-        [Test]
-        public void Should_get_order_from_generic_type_param()
-        {
-            var instance2 = new PluginWithContext2();
-            _definitionsWithContext.Append<PluginWithContext1>()
-                        .Append(instance2);
-
-            _definitionsWithContext.Order<PluginWithContext1>().ShouldEqual(0);
-            _definitionsWithContext.Order<PluginWithContext2>().ShouldEqual(1);
-        }
-
-        [Test]
-        public void Should_get_order_from_type()
-        {
-            var instance2 = new PluginWithContext2();
-            _definitionsWithContext.Append<PluginWithContext1>()
-                        .Append(instance2);
-
-            _definitionsWithContext.Order(typeof(PluginWithContext1)).ShouldEqual(0);
-            _definitionsWithContext.Order(typeof(PluginWithContext2)).ShouldEqual(1);
-        }
-
+        
         [Test]
         public void Should_get_order_from_definition()
         {
             var instance2 = new PluginWithContext2();
-            _definitionsWithContext.Append<PluginWithContext1>()
-                        .Append(instance2);
 
-            _definitionsWithContext.Order(_definitionsWithContext.Get<PluginWithContext1>()).ShouldEqual(0);
-            _definitionsWithContext.Order(_definitionsWithContext.Get<PluginWithContext2>()).ShouldEqual(1);
+            _definitionsWithContext
+                .Append<PluginWithContext1>()
+                .Append(instance2);
+
+            _definitionsWithContext.Order(_definitionsWithContext.GetFirst<PluginWithContext1>()).ShouldEqual(0);
+            _definitionsWithContext.Order(_definitionsWithContext.GetFirst<PluginWithContext2>()).ShouldEqual(1);
         }
 
         [Test]
         public void Should_get_definition_from_generic_type_param()
         {
             var instance2 = new PluginWithContext2();
-            _definitionsWithContext.Append<PluginWithContext1>()
-                        .Append(instance2);
 
-            _definitionsWithContext.Get<PluginWithContext1>().Type.ShouldEqual(typeof(PluginWithContext1));
-            _definitionsWithContext.Get<PluginWithContext2>().Type.ShouldEqual(typeof(PluginWithContext2));
+            _definitionsWithContext
+                .Append<PluginWithContext1>()
+                .Append(instance2);
+
+            _definitionsWithContext.GetFirst<PluginWithContext1>().Type.ShouldEqual(typeof(PluginWithContext1));
+            _definitionsWithContext.GetFirst<PluginWithContext2>().Type.ShouldEqual(typeof(PluginWithContext2));
         }
 
         [Test]
         public void Should_get_definition_from_type()
         {
             var instance2 = new PluginWithContext2();
-            _definitionsWithContext.Append<PluginWithContext1>()
-                        .Append(instance2);
 
-            _definitionsWithContext.Get(typeof(PluginWithContext1)).Type.ShouldEqual(typeof(PluginWithContext1));
-            _definitionsWithContext.Get(typeof(PluginWithContext2)).Type.ShouldEqual(typeof(PluginWithContext2));
+            _definitionsWithContext
+                .Append<PluginWithContext1>()
+                .Append(instance2);
+
+            _definitionsWithContext.GetFirst(typeof(PluginWithContext1)).Type.ShouldEqual(typeof(PluginWithContext1));
+            _definitionsWithContext.GetFirst(typeof(PluginWithContext2)).Type.ShouldEqual(typeof(PluginWithContext2));
         }
 
         [Test]
         public void Should_get_definition_from_instance()
         {
             var instance2 = new PluginWithContext2();
-            _definitionsWithContext.Append<PluginWithContext1>()
-                        .Append(instance2);
 
-            _definitionsWithContext.Get(new PluginWithContext2()).Type.ShouldEqual(typeof(PluginWithContext2));
+            _definitionsWithContext
+                .Append<PluginWithContext1>()
+                .Append(instance2);
+
+            _definitionsWithContext.GetFirst(new PluginWithContext2()).Type.ShouldEqual(typeof(PluginWithContext2));
         }
 
         [Test]
         public void Should_clear_definitions()
         {
-            _definitionsWithContext.Append<PluginWithContext1>()
-                        .Append<PluginWithContext2>();
+            _definitionsWithContext
+                .Append<PluginWithContext1>()
+                .Append<PluginWithContext2>();
 
             _definitionsWithContext.Clear();
 
@@ -268,8 +269,10 @@ namespace Tests.Unit.Extensibility
         [Test]
         public void Should_indicate_if_a_definition_exists_by_type()
         {
-            _definitionsWithContext.Append<PluginWithContext1>();
-            _definitionsWithContext.Append(new PluginWithContext2());
+            _definitionsWithContext
+                .Append<PluginWithContext1>();
+            _definitionsWithContext
+                .Append(new PluginWithContext2());
 
             _definitionsWithContext.Exists(typeof(PluginWithContext1)).ShouldBeTrue();
             _definitionsWithContext.Exists(typeof(PluginWithContext2)).ShouldBeTrue();
@@ -279,8 +282,10 @@ namespace Tests.Unit.Extensibility
         [Test]
         public void Should_indicate_if_a_definition_exists_by_generic_type_param()
         {
-            _definitionsWithContext.Append<PluginWithContext1>();
-            _definitionsWithContext.Append(new PluginWithContext2());
+            _definitionsWithContext
+                .Append<PluginWithContext1>();
+            _definitionsWithContext
+                .Append(new PluginWithContext2());
 
             _definitionsWithContext.Exists<PluginWithContext1>().ShouldBeTrue();
             _definitionsWithContext.Exists<PluginWithContext2>().ShouldBeTrue();
@@ -291,16 +296,19 @@ namespace Tests.Unit.Extensibility
         public void Should_remove_a_definition()
         {
             var instance2 = new PluginWithContext2();
-            _definitionsWithContext.Append<PluginWithContext1>()
-                        .Append(instance2)
-                        .Append<PluginWithContext3>();
 
-            _definitionsWithContext.Remove<PluginWithContext3>();
+            _definitionsWithContext
+                .Append<PluginWithContext1>()
+                .Append(instance2)
+                .Append<PluginWithContext3>();
+
+            _definitionsWithContext
+                .Remove<PluginWithContext3>();
 
             _definitionsWithContext.Count().ShouldEqual(2);
-            _definitionsWithContext.Get<PluginWithContext1>().ShouldNotBeNull();
-            _definitionsWithContext.Get<PluginWithContext2>().ShouldNotBeNull();
-            _definitionsWithContext.Get<PluginWithContext3>().ShouldBeNull();
+            _definitionsWithContext.GetFirst<PluginWithContext1>().ShouldNotBeNull();
+            _definitionsWithContext.GetFirst<PluginWithContext2>().ShouldNotBeNull();
+            _definitionsWithContext.GetFirst<PluginWithContext3>().ShouldBeNull();
         }
 
         [Test]
@@ -318,12 +326,15 @@ namespace Tests.Unit.Extensibility
             var instance2 = new PluginWithContext2();
             var instance4 = new PluginWithContext4();
 
-            _definitionsWithContext.Append<PluginWithContext1>()
-                        .Append(instance2)
-                        .Append<PluginWithContext3>();
+            _definitionsWithContext
+                .Append<PluginWithContext1>()
+                .Append(instance2)
+                .Append<PluginWithContext3>();
 
-            _definitionsWithContext.Replace<PluginWithContext1>().With(instance4, predicate4);
-            _definitionsWithContext.Replace<PluginWithContext2>().With<PluginWithContext5>(predicate5);
+            _definitionsWithContext
+                .Replace<PluginWithContext1>().With(instance4, predicate4);
+            _definitionsWithContext
+                .Replace<PluginWithContext2>().With<PluginWithContext5>(predicate5);
 
             var definitions = _definitionsWithContext.ToList();
 
@@ -344,10 +355,13 @@ namespace Tests.Unit.Extensibility
         public void Should_append_a_definition_if_replacent_doesent_exist()
         {
             var instance6 = new PluginWithContext6();
-            _definitionsWithContext.Append<PluginWithContext1>()
-                        .Append<PluginWithContext2>();
 
-            _definitionsWithContext.Replace<PluginWithContext3>().With<PluginWithContext4>()
+            _definitionsWithContext
+                .Append<PluginWithContext1>()
+                .Append<PluginWithContext2>();
+
+            _definitionsWithContext
+                .Replace<PluginWithContext3>().With<PluginWithContext4>()
                 .Replace<PluginWithContext5>().With(instance6);
 
             var definitions = _definitionsWithContext.ToList();
@@ -370,8 +384,10 @@ namespace Tests.Unit.Extensibility
             Func<SomePluginContext, bool> predicate1 = x => true;
             Func<SomePluginContext, bool> predicate2 = x => true;
             var instance2 = new PluginWithContext2();
-            _definitionsWithContext.Append<PluginWithContext1>(predicate1)
-                        .Append(instance2, predicate2);
+
+            _definitionsWithContext
+                .Append<PluginWithContext1>(predicate1)
+                .Append(instance2, predicate2);
 
             var definitions = _definitionsWithContext.ToList();
 
@@ -387,22 +403,54 @@ namespace Tests.Unit.Extensibility
         }
 
         [Test]
-        public void Should_append_a_definition_and_remove_existing()
+        public void Should_append_a_type_definition_and_remove_existing_type_definitions_and_keep_existing_instance_definitions()
         {
             var instance2 = new PluginWithContext2();
-            _definitionsWithContext.Prepend<PluginWithContext1>()
-                        .Prepend<PluginWithContext2>();
 
-            _definitionsWithContext.Append<PluginWithContext1>()
-                        .Append(instance2);
+            _definitionsWithContext
+                .Prepend<PluginWithContext1>()
+                .Prepend<PluginWithContext2>()
+                .Prepend(instance2);
+
+            _definitionsWithContext
+                .Append<PluginWithContext2>();
 
             var definitions = _definitionsWithContext.ToList();
 
-            _definitionsWithContext.Count().ShouldEqual(2);
-            definitions[0].HasInstance.ShouldBeFalse();
-            definitions[0].Type.ShouldEqual(typeof(PluginWithContext1));
-            definitions[1].HasInstance.ShouldBeTrue();
-            definitions[1].Instance.ShouldEqual(instance2);
+            _definitionsWithContext.Count().ShouldEqual(3);
+            definitions[0].HasInstance.ShouldBeTrue();
+            definitions[0].Instance.ShouldEqual(instance2);
+            definitions[1].HasInstance.ShouldBeFalse();
+            definitions[1].Type.ShouldEqual(typeof(PluginWithContext1));
+            definitions[2].HasInstance.ShouldBeFalse();
+            definitions[2].Type.ShouldEqual(typeof(PluginWithContext2));
+        }
+
+        [Test]
+        public void Should_append_an_instance_definition_and_keep_existing_type_and_instance_definitions()
+        {
+            var instance2a = new PluginWithContext2();
+            var instance2b = new PluginWithContext2();
+
+            _definitionsWithContext
+                .Prepend<PluginWithContext1>()
+                .Prepend<PluginWithContext2>()
+                .Prepend(instance2a);
+
+            _definitionsWithContext
+                .Append(instance2b);
+
+            var definitions = _definitionsWithContext.ToList();
+
+            _definitionsWithContext.Count().ShouldEqual(4);
+            definitions[0].HasInstance.ShouldBeTrue();
+            definitions[0].Instance.ShouldEqual(instance2a);
+            definitions[1].HasInstance.ShouldBeFalse();
+            definitions[1].Type.ShouldEqual(typeof(PluginWithContext2));
+            definitions[2].HasInstance.ShouldBeFalse();
+            definitions[2].Type.ShouldEqual(typeof(PluginWithContext1));
+            definitions[3].HasInstance.ShouldBeTrue();
+            definitions[3].Instance.ShouldEqual(instance2b);
         }
 
         [Test]
@@ -410,11 +458,15 @@ namespace Tests.Unit.Extensibility
         {
             var instance1 = new PluginWithContext1();
             var instance4 = new PluginWithContext4();
-            _definitionsWithContext.Append(instance1)
-                        .Append<PluginWithContext2>();
 
-            _definitionsWithContext.Append<PluginWithContext3>().After<PluginWithContext1>();
-            _definitionsWithContext.Append(instance4).After<PluginWithContext2>();
+            _definitionsWithContext
+                .Append(instance1)
+                .Append<PluginWithContext2>();
+
+            _definitionsWithContext
+                .Append<PluginWithContext3>().After<PluginWithContext1>();
+            _definitionsWithContext
+                .Append(instance4).After<PluginWithContext2>();
 
             var definitions = _definitionsWithContext.ToList();
 
@@ -430,21 +482,52 @@ namespace Tests.Unit.Extensibility
         }
 
         [Test]
-        public void Should_append_after_a_definition_and_remove_existing()
+        public void Should_append_a_definition_after_another_or_prepend()
+        {
+            var instance1 = new PluginWithContext1();
+            var instance4 = new PluginWithContext4();
+
+            _definitionsWithContext
+                .Append(instance1);
+
+            _definitionsWithContext
+                .Append<PluginWithContext3>().AfterOrPrepend<PluginWithContext1>();
+            _definitionsWithContext
+                .Append(instance4).AfterOrPrepend<PluginWithContext2>();
+
+            var definitions = _definitionsWithContext.ToList();
+
+            _definitionsWithContext.Count().ShouldEqual(3);
+
+            definitions[0].HasInstance.ShouldBeTrue();
+            definitions[0].Instance.ShouldEqual(instance4);
+            definitions[1].HasInstance.ShouldBeTrue();
+            definitions[1].Instance.ShouldEqual(instance1);
+            definitions[2].HasInstance.ShouldBeFalse();
+            definitions[2].Type.ShouldEqual(typeof(PluginWithContext3));
+        }
+
+        [Test]
+        public void Should_append_after_a_definition_and_remove_existing_type_definitions_but_keep_existing_instance_definitions()
         {
             var instance2 = new PluginWithContext2();
             var instance3 = new PluginWithContext3();
-            _definitionsWithContext.Append<PluginWithContext1>()
-                        .Append(instance2)
-                        .Append<PluginWithContext3>()
-                        .Append<PluginWithContext4>();
 
-            _definitionsWithContext.Append(instance3).After<PluginWithContext1>();
-            _definitionsWithContext.Append<PluginWithContext4>().After<PluginWithContext2>();
+            _definitionsWithContext
+                .Append<PluginWithContext1>()
+                .Append(instance2)
+                .Append<PluginWithContext3>()
+                .Append<PluginWithContext4>();
+
+            _definitionsWithContext
+                .Append(instance3).After<PluginWithContext1>();
+            _definitionsWithContext
+                .Append<PluginWithContext4>().After<PluginWithContext2>();
 
             var definitions = _definitionsWithContext.ToList();
             
-            _definitionsWithContext.Count().ShouldEqual(4);
+            _definitionsWithContext.Count().ShouldEqual(5);
+
             definitions[0].HasInstance.ShouldBeFalse();
             definitions[0].Type.ShouldEqual(typeof(PluginWithContext1));
             definitions[1].HasInstance.ShouldBeTrue();
@@ -453,6 +536,8 @@ namespace Tests.Unit.Extensibility
             definitions[2].Instance.ShouldEqual(instance2);
             definitions[3].HasInstance.ShouldBeFalse();
             definitions[3].Type.ShouldEqual(typeof(PluginWithContext4));
+            definitions[4].HasInstance.ShouldBeFalse();
+            definitions[4].Type.ShouldEqual(typeof(PluginWithContext3));
         }
 
         [Test]
@@ -462,8 +547,11 @@ namespace Tests.Unit.Extensibility
             Func<SomePluginContext, bool> predicate1 = x => true;
             Func<SomePluginContext, bool> predicate2 = x => true;
             var instance2 = new PluginWithContext2();
-            _definitionsWithContext.Prepend<PluginWithContext1>(predicate1);
-            _definitionsWithContext.Prepend(instance2, predicate2);
+
+            _definitionsWithContext
+                .Prepend<PluginWithContext1>(predicate1);
+            _definitionsWithContext
+                .Prepend(instance2, predicate2);
 
             var definitions = _definitionsWithContext.ToList();
 
@@ -479,26 +567,61 @@ namespace Tests.Unit.Extensibility
         }
 
         [Test]
-        public void Should_prepend_a_definition_and_remove_existing()
+        public void Should_prepend_a_definition_before_another_or_append()
         {
-            var instance2 = new PluginWithContext2();
-            var instance3 = new PluginWithContext3();
-            _definitionsWithContext.Append<PluginWithContext1>()
-                        .Append(instance2)
-                        .Append<PluginWithContext3>();
+            var instance1 = new PluginWithContext1();
+            var instance4 = new PluginWithContext4();
 
-            _definitionsWithContext.Prepend<PluginWithContext2>()
-                .Prepend(instance3);
+            _definitionsWithContext
+                .Append(instance1);
+
+            _definitionsWithContext
+                .Prepend<PluginWithContext3>().BeforeOrAppend<PluginWithContext1>();
+            _definitionsWithContext
+                .Prepend(instance4).BeforeOrAppend<PluginWithContext2>();
 
             var definitions = _definitionsWithContext.ToList();
 
             _definitionsWithContext.Count().ShouldEqual(3);
-            definitions[0].HasInstance.ShouldBeTrue();
-            definitions[0].Instance.ShouldEqual(instance3);
-            definitions[1].HasInstance.ShouldBeFalse();
-            definitions[1].Type.ShouldEqual(typeof(PluginWithContext2));
+
+            definitions[0].Type.ShouldEqual(typeof(PluginWithContext3));
+            definitions[0].HasInstance.ShouldBeFalse();
+            definitions[1].Instance.ShouldEqual(instance1);
+            definitions[1].HasInstance.ShouldBeTrue();
+            definitions[2].Instance.ShouldEqual(instance4);
+            definitions[2].HasInstance.ShouldBeTrue();
+        }
+
+        [Test]
+        public void Should_prepend_a_definition_and_remove_existing_type_definitions_but_keep_existing_intance_definitions()
+        {
+            var instance2 = new PluginWithContext2();
+            var instance3 = new PluginWithContext3();
+
+            _definitionsWithContext
+                .Append<PluginWithContext1>()
+                .Append(instance2)
+                .Append<PluginWithContext3>();
+
+            _definitionsWithContext
+                .Prepend<PluginWithContext2>()
+                .Prepend(instance3)
+                .Prepend<PluginWithContext1>();
+
+            var definitions = _definitionsWithContext.ToList();
+
+            _definitionsWithContext.Count().ShouldEqual(5);
+
+            definitions[0].HasInstance.ShouldBeFalse();
+            definitions[0].Type.ShouldEqual(typeof(PluginWithContext1));
+            definitions[1].HasInstance.ShouldBeTrue();
+            definitions[1].Instance.ShouldEqual(instance3);
             definitions[2].HasInstance.ShouldBeFalse();
-            definitions[2].Type.ShouldEqual(typeof(PluginWithContext1));
+            definitions[2].Type.ShouldEqual(typeof(PluginWithContext2));
+            definitions[3].HasInstance.ShouldBeTrue();
+            definitions[3].Instance.ShouldEqual(instance2);
+            definitions[4].HasInstance.ShouldBeFalse();
+            definitions[4].Type.ShouldEqual(typeof(PluginWithContext3));
         }
 
         [Test]
@@ -506,13 +629,15 @@ namespace Tests.Unit.Extensibility
         {
             var instance2 = new PluginWithContext2();
             var instance3 = new PluginWithContext3();
-            _definitionsWithContext.Append<PluginWithContext1>()
-                        .Append(instance2);
 
-            _definitionsWithContext.Prepend(instance3)
-                .Before<PluginWithContext1>();
-            _definitionsWithContext.Prepend<PluginWithContext4>()
-                .Before<PluginWithContext2>();
+            _definitionsWithContext
+                .Append<PluginWithContext1>()
+                .Append(instance2);
+
+            _definitionsWithContext
+                .Prepend(instance3).Before<PluginWithContext1>();
+            _definitionsWithContext
+                .Prepend<PluginWithContext4>().Before<PluginWithContext2>();
 
             var definitions = _definitionsWithContext.ToList();
 
@@ -528,22 +653,26 @@ namespace Tests.Unit.Extensibility
         }
 
         [Test]
-        public void Should_prepend_a_plugin_before_another_and_remove_existing()
+        public void Should_prepend_a_definition_before_another_and_remove_existing_type_definitions_but_keep_existing_intance_definitions()
         {
             var instance2 = new PluginWithContext2();
             var instance3 = new PluginWithContext3();
 
-            _definitionsWithContext.Append<PluginWithContext1>()
-                        .Append(instance2)
-                        .Append<PluginWithContext3>()
-                        .Append<PluginWithContext4>();
+            _definitionsWithContext
+                .Append<PluginWithContext1>()
+                .Append(instance2)
+                .Append<PluginWithContext3>()
+                .Append<PluginWithContext4>();
 
-            _definitionsWithContext.Prepend(instance3).Before<PluginWithContext1>();
-            _definitionsWithContext.Prepend<PluginWithContext4>().Before<PluginWithContext2>();
+            _definitionsWithContext
+                .Prepend(instance3).Before<PluginWithContext1>();
+            _definitionsWithContext
+                .Prepend<PluginWithContext4>().Before<PluginWithContext2>();
 
             var definitions = _definitionsWithContext.ToList();
 
-            _definitionsWithContext.Count().ShouldEqual(4);
+            _definitionsWithContext.Count().ShouldEqual(5);
+
             definitions[0].HasInstance.ShouldBeTrue();
             definitions[0].Instance.ShouldEqual(instance3);
             definitions[1].HasInstance.ShouldBeFalse();
@@ -552,6 +681,8 @@ namespace Tests.Unit.Extensibility
             definitions[2].Type.ShouldEqual(typeof(PluginWithContext4));
             definitions[3].HasInstance.ShouldBeTrue();
             definitions[3].Instance.ShouldEqual(instance2);
+            definitions[4].HasInstance.ShouldBeFalse();
+            definitions[4].Type.ShouldEqual(typeof(PluginWithContext3));
         }
 
         public interface IPluginWithContext : IConditional<SomePluginContext> { }

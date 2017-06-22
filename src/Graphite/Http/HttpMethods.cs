@@ -81,9 +81,14 @@ namespace Graphite.Http
             return Configure(HttpMethod.Connect, configure);
         }
 
-        public HttpMethod MethodMatchesAny(IEnumerable<string> search)
+        public HttpMethod MatchAny(IEnumerable<string> search)
         {
             return this.FirstOrDefault(x => search.ContainsIgnoreCase(x.Method));
+        }
+
+        public bool Contains(string method)
+        {
+            return this.Any(x => method.EqualsIgnoreCase(x.Method));
         }
 
         private HttpMethods Configure(HttpMethod method, Action<HttpMethodDsl> configure)

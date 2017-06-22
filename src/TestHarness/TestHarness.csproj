@@ -103,6 +103,7 @@
     <Compile Include="ActionTestHandler.cs" />
     <Compile Include="AuthenticationTestsHandler.cs" />
     <Compile Include="BindingTestHandler.cs" />
+    <Compile Include="CorsTestHandler.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -115,6 +116,10 @@
     <Compile Include="WriterTestHandler.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Graphite.Cors\Graphite.Cors.csproj">
+      <Project>{0948b932-8aea-4ccf-9f3d-dd6e2005fe03}</Project>
+      <Name>Graphite.Cors</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Graphite\Graphite.csproj">
       <Project>{c4b8217d-1768-49c0-aec5-f07b8816405e}</Project>
       <Name>Graphite</Name>

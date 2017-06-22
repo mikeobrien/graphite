@@ -16,7 +16,7 @@ namespace Graphite.Routing
             this IEnumerable<IRouteConvention> routeConventions,
             ActionMethod actionMethod, ConfigurationContext configurationContext)
         {
-            return configurationContext.Configuration.RouteConventions.ThatApplyTo(routeConventions,
+            return configurationContext.Configuration.RouteConventions.ThatAppliesTo(routeConventions,
                 new RouteConfigurationContext(configurationContext, actionMethod), 
                         new RouteContext(actionMethod));
         }
@@ -25,7 +25,7 @@ namespace Graphite.Routing
             this IEnumerable<IUrlConvention> urlConventions,
             UrlContext urlContext, ConfigurationContext configurationContext)
         {
-            return configurationContext.Configuration.UrlConventions.ThatApplyTo(urlConventions, 
+            return configurationContext.Configuration.UrlConventions.ThatAppliesTo(urlConventions, 
                 new UrlConfigurationContext(configurationContext, urlContext), urlContext);
         }
 
@@ -37,7 +37,7 @@ namespace Graphite.Routing
             ConfigurationContext configurationContext)
         {
             return configurationContext.Configuration.HttpRouteDecorators
-                .ThatApplyTo(routeDecorators,
+                .ThatAppliesTo(routeDecorators,
                     new ActionConfigurationContext(configurationContext, actionDescriptor),
                     new HttpRouteDecoratorContext(routeConfiguration));
         }

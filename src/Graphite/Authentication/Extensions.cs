@@ -57,7 +57,7 @@ namespace Graphite.Authentication
             ActionConfigurationContext actionConfigurationContext)
         {
             return actionConfigurationContext.Configuration.Authenticators
-                .ThatApplyTo(authenticators, actionConfigurationContext);
+                .ThatApplies(authenticators, actionConfigurationContext);
         }
     }
 }

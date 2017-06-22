@@ -12,7 +12,7 @@ namespace Graphite.Actions
             ConfigurationContext configurationContext)
         {
             return configurationContext.Configuration.ActionMethodSources
-                .ThatApplyTo(methodSources, configurationContext);
+                .ThatApplies(methodSources, configurationContext);
         }
 
         public static IEnumerable<IActionSource> ThatApplyTo(
@@ -20,14 +20,14 @@ namespace Graphite.Actions
             ConfigurationContext configurationContext)
         {
             return configurationContext.Configuration.ActionSources
-                .ThatApplyTo(actionSources, configurationContext);
+                .ThatApplies(actionSources, configurationContext);
         }
 
         public static IEnumerable<IActionDecorator> ThatApplyTo(
             this IEnumerable<IActionDecorator> actionDecorators,
             ActionDescriptor actionDescriptor, ConfigurationContext configurationContext)
         {
-            return configurationContext.Configuration.ActionDecorators.ThatApplyTo(actionDecorators,
+            return configurationContext.Configuration.ActionDecorators.ThatAppliesTo(actionDecorators,
                 new ActionConfigurationContext(configurationContext, actionDescriptor), 
                 new ActionDecoratorContext(actionDescriptor));
         }

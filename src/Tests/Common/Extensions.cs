@@ -71,6 +71,11 @@ namespace Tests.Common
             1.To(iterations).AsParallel().ForEach(x => action());
         }
 
+        public static T Second<T>(this IEnumerable<T> source)
+        {
+            return source.Skip(1).FirstOrDefault();
+        }
+
         public static Task<HttpResponseMessage> SendAsync(this HttpMessageHandler handler,
             HttpRequestMessage request, CancellationToken cancellationToken)
         {

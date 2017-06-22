@@ -147,5 +147,17 @@ namespace Graphite.Extensions
             headers.AddCookies(new [] { new CookieHeaderValue(name, value) });
             return headers;
         }
+
+        public static string GetHeaderValue(this HttpRequestMessage request, string name)
+        {
+            return request.GetHeaderValues(name).FirstOrDefault();
+        }
+
+        public static IEnumerable<string> GetHeaderValues(this HttpRequestMessage request, string name)
+        {
+            IEnumerable<string> headerValues;
+            request.Headers.TryGetValues(name, out headerValues);
+            return headerValues ?? Enumerable.Empty<string>();
+        }
     }
 }

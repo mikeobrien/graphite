@@ -14,7 +14,7 @@ namespace Graphite.Readers
             ActionConfigurationContext actionConfigurationContext)
         {
             return actionConfigurationContext.Configuration
-                .RequestReaders.ThatAppliesToOrDefault(readers,
+                .RequestReaders.ThatAppliesOrDefault(readers,
                     actionConfigurationContext).FirstOrDefault();
         }
 

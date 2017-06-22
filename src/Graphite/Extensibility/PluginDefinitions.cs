@@ -40,7 +40,7 @@ namespace Graphite.Extensibility
             return plugins;
         }
 
-        public IEnumerable<PluginDefinition<TPlugin, TContext>> ThatApplyTo(TContext context)
+        public IEnumerable<PluginDefinition<TPlugin, TContext>> ThatApply(TContext context)
         {
             return _state.Definitions
                 .Where(x => x.AppliesTo?.Invoke(context) ?? true)
@@ -49,17 +49,7 @@ namespace Graphite.Extensibility
 
         public int Order(object instance)
         {
-            return Order(instance.GetType());
-        }
-
-        public int Order<TConcrete>()
-        {
-            return Order(typeof(TConcrete));
-        }
-
-        public int Order(Type type)
-        {
-            return Order(Get(type));
+            return Order(GetFirst(instance));
         }
 
         public int Order(PluginDefinition<TPlugin, TContext> definition)
@@ -80,20 +70,38 @@ namespace Graphite.Extensibility
             return concreteType != null && _state.Default == concreteType;
         }
 
-        public PluginDefinition<TPlugin, TContext> Get<TConcrete>()
+        public PluginDefinition<TPlugin, TContext> GetFirst<TConcrete>()
             where TConcrete : TPlugin
         {
-            return Get(typeof(TConcrete));
+            return GetFirst(typeof(TConcrete));
         }
 
-        public PluginDefinition<TPlugin, TContext> Get(object instance)
+        public PluginDefinition<TPlugin, TContext> GetFirst(object instance)
         {
-            return Get(instance.GetType());
+            return _state.Definitions.FirstOrDefault(x => 
+                (object)x.Instance == instance) ?? GetFirst(instance.GetType());
         }
 
-        public PluginDefinition<TPlugin, TContext> Get(Type type)
+        public PluginDefinition<TPlugin, TContext> GetFirst(Type type)
         {
             return _state.Definitions.FirstOrDefault(x => x.Type == type);
+        }
+
+        public PluginDefinition<TPlugin, TContext> GetLast<TConcrete>()
+            where TConcrete : TPlugin
+        {
+            return GetLast(typeof(TConcrete));
+        }
+
+        public PluginDefinition<TPlugin, TContext> GetLast(object instance)
+        {
+            return _state.Definitions.LastOrDefault(x =>
+                (object)x.Instance == instance) ?? GetLast(instance.GetType());
+        }
+
+        public PluginDefinition<TPlugin, TContext> GetLast(Type type)
+        {
+            return _state.Definitions.LastOrDefault(x => x.Type == type);
         }
 
         public PluginDefinitions<TPlugin, TContext> Clear()
@@ -112,10 +120,18 @@ namespace Graphite.Extensibility
             return _state.Definitions.Any(x => x.Type == type);
         }
 
-        public PluginDefinitions<TPlugin, TContext> Remove<TConcrete>() where TConcrete : TPlugin
+        public PluginDefinitions<TPlugin, TContext> Remove<TConcrete>(
+            bool typeOnly = false) where TConcrete : TPlugin
         {
-            var definition = Get<TConcrete>();
-            if (definition != null) _state.Definitions.Remove(definition);
+            var remove = _state.Definitions.Where(x => (!typeOnly || !x.HasInstance) && 
+                x.Type == typeof(TConcrete)).ToList();
+            remove.ForEach(x => _state.Definitions.Remove(x));
+            return this;
+        }
+
+        public PluginDefinitions<TPlugin, TContext> Remove(PluginDefinition<TPlugin, TContext> plugin) 
+        {
+            _state.Definitions.Remove(plugin);
             return this;
         }
 
@@ -160,6 +176,7 @@ namespace Graphite.Extensibility
                 PluginDefinition<TPlugin, TContext> plugin, bool @default = false)
                 where TReplacement : TPlugin
             {
+                _plugins.Remove(plugin);
                 _plugins.Append<TReplacement>(plugin).After<TReplace>();
                 _plugins.Remove<TReplace>();
                 if (@default) _plugins.DefaultIs<TReplace>();
@@ -188,7 +205,8 @@ namespace Graphite.Extensibility
             PluginDefinition<TPlugin, TContext> plugin, bool @default = false)
             where TAppend : TPlugin
         {
-            Remove<TAppend>();
+            if (!plugin.HasInstance) Remove<TAppend>(true);
+            _state.Definitions.Remove(plugin);
             _state.Definitions.Add(plugin);
             if (@default) DefaultIs<TAppend>();
             return new AppendDsl<TAppend>(plugin, _state, _defaultPredicate);
@@ -204,13 +222,19 @@ namespace Graphite.Extensibility
                 _plugin = plugin;
             }
 
+            public PluginDefinitions<TPlugin, TContext> AfterOrPrepend<TFind>()
+                where TFind : TPlugin
+            {
+                return Exists<TFind>() ? After<TFind>() : Prepend<TAppend>(_plugin);
+            }
+
             public PluginDefinitions<TPlugin, TContext> After<TFind>()
                 where TFind : TPlugin
             {
                 if (!Exists<TFind>()) return this;
-                var order = Order<TFind>() + 1;
+                var order = Order(GetLast<TFind>()) + 1;
                 if (order >= _state.Definitions.Count) return this;
-                Remove<TAppend>();
+                _state.Definitions.Remove(_plugin);
                 _state.Definitions.Insert(order, _plugin);
                 return this;
             }
@@ -237,7 +261,8 @@ namespace Graphite.Extensibility
             PluginDefinition<TPlugin, TContext> plugin, bool @default = false)
             where TPrepend : TPlugin
         {
-            Remove<TPrepend>();
+            if (!plugin.HasInstance) Remove<TPrepend>(true);
+            _state.Definitions.Remove(plugin);
             _state.Definitions.Insert(0, plugin);
             if (@default) DefaultIs<TPrepend>();
             return new PrependDsl<TPrepend>(plugin, _state, _defaultPredicate);
@@ -253,12 +278,18 @@ namespace Graphite.Extensibility
                 _plugin = plugin;
             }
 
+            public PluginDefinitions<TPlugin, TContext> BeforeOrAppend<TFind>()
+                where TFind : TPlugin
+            {
+                return Exists<TFind>() ? Before<TFind>() : Append<TPrepend>(_plugin);
+            }
+
             public PluginDefinitions<TPlugin, TContext> Before<TFind>()
                 where TFind : TPlugin
             {
-                Remove<TPrepend>();
-                if (!Exists<TFind>()) return Append<TPrepend>(_plugin);
-                _state.Definitions.Insert(Order<TFind>(), _plugin);
+                if (!Exists<TFind>()) return this;
+                _state.Definitions.Remove(_plugin);
+                _state.Definitions.Insert(Order(GetFirst<TFind>()), _plugin);
                 return this;
             }
         }
