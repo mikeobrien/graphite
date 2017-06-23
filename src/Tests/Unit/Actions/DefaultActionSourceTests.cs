@@ -255,14 +255,14 @@ namespace Tests.Unit.Actions
             var actions = _actionSource.GetActions();
 
             var behaviors = actions.FirstOrDefault(x => x.Action == _handler1Get).Behaviors;
-            behaviors.Length.ShouldEqual(3);
+            behaviors.Count().ShouldEqual(3);
             behaviors.ShouldOnlyContain(
                 _typeCache.GetTypeDescriptor<DefaultErrorHandlerBehavior>(),
                 _typeCache.GetTypeDescriptor<TestBehavior1>(),
                 _typeCache.GetTypeDescriptor<TestBehavior2>());
 
             behaviors = actions.FirstOrDefault(x => x.Action == _handler1Post).Behaviors;
-            behaviors.Length.ShouldEqual(2);
+            behaviors.Count().ShouldEqual(2);
             behaviors.ShouldOnlyContain(
                 _typeCache.GetTypeDescriptor<DefaultErrorHandlerBehavior>(),
                 _typeCache.GetTypeDescriptor<TestBehavior2>());

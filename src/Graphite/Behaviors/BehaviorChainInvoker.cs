@@ -1,11 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Graphite.Actions;
 using Graphite.DependencyInjection;
-using Graphite.Extensibility;
 using Graphite.Http;
 
 namespace Graphite.Behaviors
@@ -28,31 +25,9 @@ namespace Graphite.Behaviors
             {
                 Register(container, actionDescriptor, requestMessage, cancellationToken);
 
-                IBehavior behaviorChain;
-                try
-                {
-                    behaviorChain = BuildChain(container, actionDescriptor);
-                }
-                catch (Exception exception)
-                {
-                    throw new GraphiteRuntimeInitializationException(exception, 
-                        requestMessage, actionDescriptor.Action, container);
-                }
-
-                return await behaviorChain.Invoke();
+                return await container.GetInstance<IBehaviorChain>(
+                    _configuration.BehaviorChain).InvokeNext();
             }
-        }
-
-        public virtual IBehavior BuildChain(IContainer container, ActionDescriptor actionDescriptor)
-        {
-            return actionDescriptor.Behaviors.AsEnumerable().Reverse()
-                .Aggregate(_configuration.DefaultBehavior.GetInstance(container),
-                    (chain, type) =>
-                    {
-                        var behavior = container.GetInstance<IBehavior>(
-                            type.Type, Dependency.For(chain));
-                        return behavior.ShouldRun() ? behavior : chain;
-                    });
         }
 
         public virtual void Register(IContainer container, ActionDescriptor actionDescriptor,

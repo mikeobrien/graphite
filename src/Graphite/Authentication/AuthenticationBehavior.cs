@@ -17,13 +17,13 @@ namespace Graphite.Authentication
         private readonly Configuration _configuration;
         private readonly ActionConfigurationContext _actionConfigurationContext;
 
-        public AuthenticationBehavior(IBehavior innerBehavior,
+        public AuthenticationBehavior(IBehaviorChain behaviorChain,
             HttpRequestMessage requestMessage, 
             HttpResponseMessage responseMessage,
             List<IAuthenticator> authenticators,
             Configuration configuration,
             ActionConfigurationContext actionConfigurationContext) : 
-            base(innerBehavior)
+            base(behaviorChain)
         {
             _requestMessage = requestMessage;
             _responseMessage = responseMessage;
@@ -45,7 +45,7 @@ namespace Graphite.Authentication
             if (authenticator == null) return GetUnauthorizedResponse(authenticators);
 
             return authenticator.Authenticate(authorization.Parameter)
-                ? await InnerBehavior.Invoke() 
+                ? await BehaviorChain.InvokeNext() 
                 : GetUnauthorizedResponse(authenticators, authenticator);
         }
 

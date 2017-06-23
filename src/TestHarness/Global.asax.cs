@@ -55,21 +55,21 @@ namespace TestHarness
 
     public class Behavior1 : BehaviorBase
     {
-        public Behavior1(IBehavior innerBehavior) : base(innerBehavior) { }
+        public Behavior1(IBehaviorChain behaviorChain) : base(behaviorChain) { }
 
         public override Task<HttpResponseMessage> Invoke()
         {
-            return InnerBehavior.Invoke();
+            return BehaviorChain.InvokeNext();
         }
     }
 
     public class Behavior2 : BehaviorBase
     {
-        public Behavior2(IBehavior innerBehavior) : base(innerBehavior) { }
+        public Behavior2(IBehaviorChain behaviorChain) : base(behaviorChain) { }
 
         public override Task<HttpResponseMessage> Invoke()
         {
-            return InnerBehavior.Invoke();
+            return BehaviorChain.InvokeNext();
         }
     }
 

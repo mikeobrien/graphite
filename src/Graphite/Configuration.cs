@@ -126,13 +126,13 @@ namespace Graphite
             PluginDefinition<IBehaviorChainInvoker>
                 .Create<BehaviorChainInvoker>();
 
+        public Type BehaviorChain { get; set; } = typeof(BehaviorChain);
+        public Type DefaultBehavior { get; set; } = typeof(InvokerBehavior);
+
         public PluginDefinition<IActionInvoker> ActionInvoker { get; } =
             PluginDefinition<IActionInvoker>
                 .Create<ActionInvoker>();
 
-        public PluginDefinition<IBehavior> DefaultBehavior { get; } =
-            PluginDefinition<IBehavior>
-                .Create<InvokerBehavior>();
 
         public PluginDefinitions<IAuthenticator, ActionConfigurationContext> Authenticators { get; } =
             PluginDefinitions<IAuthenticator, ActionConfigurationContext>.Create();

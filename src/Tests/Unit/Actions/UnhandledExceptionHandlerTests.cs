@@ -38,39 +38,16 @@ namespace Tests.Unit.Actions
             unhandledException.InnerException.ShouldEqual(exception);
         }
 
-        public class Handler
-        {
-            public void Action() { }
-        }
-
-        [Test]
-        public void Should_not_wrap_runtime_exceptions_in_unhandled_exception()
-        {
-            var exception = new Exception();
-            var action = ActionMethod.From<Handler>(x => x.Action());
-            var initializationException = new GraphiteRuntimeInitializationException(
-                exception, new HttpRequestMessage(), action, _container);
-
-            var unhandledException = _exceptionHandler.Should()
-                .Throw<GraphiteRuntimeInitializationException>(
-                    x => x.HandleException(initializationException, null, null));
-            
-            unhandledException.ShouldEqual(initializationException);
-            unhandledException.InnerException.ShouldEqual(exception);
-        }
-
         [Test]
         public void Should_return_exception_if_configured()
         {
             _configuration.ReturnErrorMessage = true;
             var exception = new Exception();
-            var requestGraph = RequestGraph.CreateFor<Handler>(x => x.Action());
+            var requestGraph = RequestGraph.Create();
             var requestMessage = new HttpRequestMessage();
-            var initializationException = new GraphiteRuntimeInitializationException(
-                exception, requestMessage, requestGraph.ActionMethod, _container);
 
             var responseMessage = _exceptionHandler.Should()
-                .NotThrow(x => x.HandleException(initializationException, 
+                .NotThrow(x => x.HandleException(exception, 
                     requestGraph.GetActionDescriptor(), requestMessage));
 
             responseMessage.StatusCode.ShouldEqual(HttpStatusCode.InternalServerError);

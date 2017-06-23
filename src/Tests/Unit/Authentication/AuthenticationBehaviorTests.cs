@@ -24,7 +24,7 @@ namespace Tests.Unit.Authentication
         private Configuration _configuration;
         private HttpRequestMessage _requestMessage;
         private HttpResponseMessage _responseMessage;
-        private IBehavior _innerBehavior;
+        private IBehaviorChain _BehaviorChain;
         private List<IAuthenticator> _authenticators;
         private AuthenticationBehavior _behavior;
 
@@ -39,9 +39,9 @@ namespace Tests.Unit.Authentication
                 new ConfigurationContext(_configuration, null), new ActionDescriptor(null, null));
             _requestMessage = new HttpRequestMessage();
             _responseMessage = new HttpResponseMessage(HttpStatusCode.OK);
-            _innerBehavior = Substitute.For<IBehavior>();
-            _innerBehavior.Invoke().Returns(_responseMessage);
-            _behavior = new AuthenticationBehavior(_innerBehavior, _requestMessage, 
+            _BehaviorChain = Substitute.For<IBehaviorChain>();
+            _BehaviorChain.InvokeNext().Returns(_responseMessage);
+            _behavior = new AuthenticationBehavior(_BehaviorChain, _requestMessage, 
                 _responseMessage, _authenticators, _configuration, _actionConfigurationContext);
         }
 
@@ -50,7 +50,7 @@ namespace Tests.Unit.Authentication
         {
             await _behavior.Should().Throw<GraphiteException>(async x => await x.Invoke());
 
-            await _innerBehavior.DidNotReceiveWithAnyArgs().Invoke();
+            await _BehaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
         }
 
         [Test]
@@ -60,7 +60,7 @@ namespace Tests.Unit.Authentication
             
             var result = await _behavior.Invoke();
             
-            await _innerBehavior.DidNotReceiveWithAnyArgs().Invoke();
+            await _BehaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
 
             Should_be_unauthorized(result, authenticators: _basicAuthenticator);
         }
@@ -73,7 +73,7 @@ namespace Tests.Unit.Authentication
 
             var result = await _behavior.Invoke();
             
-            await _innerBehavior.DidNotReceiveWithAnyArgs().Invoke();
+            await _BehaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
 
             Should_be_unauthorized(result, authenticators: _bearerTokenAuthenticator);
         }
@@ -86,7 +86,7 @@ namespace Tests.Unit.Authentication
 
             var result = await _behavior.Invoke();
             
-            await _innerBehavior.DidNotReceiveWithAnyArgs().Invoke();
+            await _BehaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
 
             Should_be_unauthorized(result, authenticators: _basicAuthenticator);
         }
@@ -100,7 +100,7 @@ namespace Tests.Unit.Authentication
 
             var result = await _behavior.Invoke();
 
-            await _innerBehavior.DidNotReceiveWithAnyArgs().Invoke();
+            await _BehaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
 
             Should_be_unauthorized(result, null, null, _basicAuthenticator, _bearerTokenAuthenticator);
         }
@@ -115,7 +115,7 @@ namespace Tests.Unit.Authentication
 
             var result = await _behavior.Invoke();
 
-            await _innerBehavior.DidNotReceiveWithAnyArgs().Invoke();
+            await _BehaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
 
             Should_be_unauthorized(result, null, null, _bearerTokenAuthenticator);
         }
@@ -129,7 +129,7 @@ namespace Tests.Unit.Authentication
             var result = await _behavior.Invoke();
 
             result.StatusCode.ShouldEqual(HttpStatusCode.OK);
-            await _innerBehavior.ReceivedWithAnyArgs().Invoke();
+            await _BehaviorChain.ReceivedWithAnyArgs().InvokeNext();
         }
 
         [TestCase(null, "config")]

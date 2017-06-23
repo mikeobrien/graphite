@@ -359,20 +359,20 @@ namespace Graphite
         }
 
         /// <summary>
-        /// Specifies the last behavior in the chain.
+        /// Specifies the behavior chain to use.
         /// </summary>
-        public ConfigurationDsl WithDefaultBehavior<T>() where T : IBehavior
+        public ConfigurationDsl WithBehaviorChain<T>() where T : IBehaviorChain
         {
-            _configuration.DefaultBehavior.Set<T>();
+            _configuration.BehaviorChain = typeof(T);
             return this;
         }
 
         /// <summary>
         /// Specifies the last behavior in the chain.
         /// </summary>
-        public ConfigurationDsl WithDefaultBehavior<T>(T instance) where T : IBehavior
+        public ConfigurationDsl WithDefaultBehavior<T>() where T : IBehavior
         {
-            _configuration.DefaultBehavior.Set(instance);
+            _configuration.DefaultBehavior = typeof(T);
             return this;
         }
 

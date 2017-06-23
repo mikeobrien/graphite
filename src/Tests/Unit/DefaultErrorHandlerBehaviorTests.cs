@@ -19,11 +19,11 @@ namespace Tests.Unit
         public async Task Should_call_inner_behavior()
         {
             var responseMessage = new HttpResponseMessage();
-            var innerBehavior = Substitute.For<IBehavior>();
-            innerBehavior.Invoke().Returns(responseMessage);
+            var behaviorChain = Substitute.For<IBehaviorChain>();
+            behaviorChain.InvokeNext().Returns(responseMessage);
 
             var result = await new DefaultErrorHandlerBehavior(
-                new Configuration(), innerBehavior, new HttpRequestMessage(),
+                new Configuration(), behaviorChain, new HttpRequestMessage(),
                 new HttpResponseMessage()).Invoke();
 
             result.ShouldEqual(responseMessage);
@@ -32,11 +32,11 @@ namespace Tests.Unit
         [Test]
         public async Task Should_return_bad_request_when_bad_request_exception_thrown()
         {
-            var innerBehavior = Substitute.For<IBehavior>();
-            innerBehavior.Invoke().Throws(new BadRequestException("fark"));
+            var behaviorChain = Substitute.For<IBehaviorChain>();
+            behaviorChain.InvokeNext().Throws(new BadRequestException("fark"));
 
             var result = await new DefaultErrorHandlerBehavior(
-                new Configuration(), innerBehavior, new HttpRequestMessage(),
+                new Configuration(), behaviorChain, new HttpRequestMessage(),
                 new HttpResponseMessage()).Invoke();
 
             result.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
@@ -52,11 +52,11 @@ namespace Tests.Unit
                 ReturnErrorMessage = returnErrorMessages,
                 UnhandledExceptionStatusText = "fark"
             };
-            var innerBehavior = Substitute.For<IBehavior>();
-            innerBehavior.Invoke().Throws<Exception>();
+            var behaviorChain = Substitute.For<IBehaviorChain>();
+            behaviorChain.InvokeNext().Throws<Exception>();
 
             var result = await new DefaultErrorHandlerBehavior(
-                configuration, innerBehavior, new HttpRequestMessage(), 
+                configuration, behaviorChain, new HttpRequestMessage(), 
                 new HttpResponseMessage()).Invoke();
 
             result.StatusCode.ShouldEqual(HttpStatusCode.InternalServerError);

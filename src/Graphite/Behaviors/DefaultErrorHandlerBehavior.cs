@@ -13,8 +13,8 @@ namespace Graphite.Behaviors
         private readonly HttpResponseMessage _responseMessage;
 
         public DefaultErrorHandlerBehavior(Configuration configuration,
-            IBehavior innerBehavior, HttpRequestMessage requestMessage,
-            HttpResponseMessage responseMessage) : base(innerBehavior)
+            IBehaviorChain behaviorChain, HttpRequestMessage requestMessage,
+            HttpResponseMessage responseMessage) : base(behaviorChain)
         {
             _configuration = configuration;
             _requestMessage = requestMessage;
@@ -25,7 +25,7 @@ namespace Graphite.Behaviors
         {
             try
             {
-                return await InnerBehavior.Invoke();
+                return await BehaviorChain.InvokeNext();
             }
             catch (BadRequestException exception)
             {

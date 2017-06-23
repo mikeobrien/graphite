@@ -68,7 +68,7 @@ namespace Tests.Unit.Diagnostics
             result.ShouldContain(configuration.Initializer.Type.GetFriendlyTypeName());
             result.ShouldContain(configuration.TypeCache.Type.GetFriendlyTypeName());
             result.ShouldContain(configuration.BehaviorChainInvoker.Type.GetFriendlyTypeName());
-            result.ShouldContain(configuration.DefaultBehavior.Type.GetFriendlyTypeName());
+            result.ShouldContain(configuration.DefaultBehavior.GetFriendlyTypeName());
 
             configuration.ActionMethodSources.ForEach(x => result.ShouldContain(x.Type.GetFriendlyTypeName()));
             configuration.ActionSources.ForEach(x => result.ShouldContain(x.Type.GetFriendlyTypeName()));

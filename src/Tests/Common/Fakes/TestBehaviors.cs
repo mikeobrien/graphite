@@ -11,7 +11,7 @@ namespace Tests.Common.Fakes
     public class TestBehavior : IBehavior
     {
         public bool ShouldRunFlag { get; set; } = true;
-        public IBehavior InnerBehavior { get; set; }
+        public IBehaviorChain BehaviorChain { get; set; }
 
         public bool ShouldRun()
         {
@@ -20,12 +20,17 @@ namespace Tests.Common.Fakes
 
         public virtual Task<HttpResponseMessage> Invoke()
         {
-            return InnerBehavior.Invoke();
+            return BehaviorChain?.InvokeNext();
         }
     }
 
     public abstract class TestLoggingBehavior : TestBehavior
     {
+        protected TestLoggingBehavior(Logger logger = null)
+        {
+            Logger = logger;
+        }
+
         public Logger Logger { get; set; }
 
         public override Task<HttpResponseMessage> Invoke()
@@ -35,7 +40,7 @@ namespace Tests.Common.Fakes
         }
     }
 
-    public class TestInvokerBehavior : BehaviorBase
+    public class TestInvokerBehavior : IBehavior
     {
         private readonly HttpResponseMessage _response;
 
@@ -44,7 +49,12 @@ namespace Tests.Common.Fakes
             _response = response;
         }
 
-        public override Task<HttpResponseMessage> Invoke()
+        public bool ShouldRun()
+        {
+            return true;
+        }
+
+        public Task<HttpResponseMessage> Invoke()
         {
             return _response.ToTaskResult();
         }

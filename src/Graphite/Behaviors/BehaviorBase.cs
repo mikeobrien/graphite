@@ -5,12 +5,12 @@ namespace Graphite.Behaviors
 {
     public abstract class BehaviorBase : IBehavior
     {
-        protected BehaviorBase(IBehavior innerBehavior = null)
+        protected BehaviorBase(IBehaviorChain behaviorChain)
         {
-            InnerBehavior = innerBehavior;
+            BehaviorChain = behaviorChain;
         }
 
-        protected IBehavior InnerBehavior { get; }
+        public IBehaviorChain BehaviorChain { get; }
 
         public virtual bool ShouldRun()
         {

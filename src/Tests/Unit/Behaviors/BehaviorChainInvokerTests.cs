@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
-using Graphite;
 using Graphite.Actions;
 using Graphite.Behaviors;
 using Graphite.DependencyInjection;
@@ -13,11 +13,10 @@ using Graphite.Http;
 using Graphite.Routing;
 using NUnit.Framework;
 using Should;
-using StructureMap.Building;
 using Tests.Common;
 using Tests.Common.Fakes;
 
-namespace Tests.Unit.Actions
+namespace Tests.Unit.Behaviors
 {
     [TestFixture]
     public class BehaviorChainInvokerTests
@@ -29,22 +28,23 @@ namespace Tests.Unit.Actions
 
         private RequestGraph _requestGraph;
         private BehaviorChainInvoker _invoker;
-        private Configuration _configuration;
+        //private Configuration _configuration;
 
         [SetUp]
         public void Setup()
         {
-            _configuration = new Configuration();
             _requestGraph = RequestGraph.CreateFor<Handler>(x => x.Get(null, null));
-            _configuration.DefaultBehavior.Set<TestInvokerBehavior>();
-            _invoker = new BehaviorChainInvoker(_configuration, _requestGraph.Container);
+            _requestGraph.Configure(x => x
+                .ReturnErrorMessages()
+                .WithDefaultBehavior<TestInvokerBehavior>());
+            _invoker = new BehaviorChainInvoker(_requestGraph.Configuration, _requestGraph.Container);
         }
 
         public class RegistrationLoggingBehavior : TestBehavior
         {
             public RegistrationLoggingBehavior(
                 IContainer container,
-                IBehavior innerBehavior, Logger logger,
+                IBehaviorChain behaviorChainChain, Logger logger,
                 HttpRequestMessage requestMessage,
                 HttpResponseMessage responseMessage,
                 HttpResponseHeaders responseHeaders,
@@ -58,7 +58,7 @@ namespace Tests.Unit.Actions
                 QuerystringParameters querystringParameters,
                 SomeType someInstance)
             {
-                InnerBehavior = innerBehavior;
+                BehaviorChain = behaviorChainChain;
                 logger.Write(container);
                 logger.Write(requestMessage);
                 logger.Write(responseMessage);
@@ -97,8 +97,11 @@ namespace Tests.Unit.Actions
 
             actionDescriptor.Registry.Register(someInstance);
 
-            await _invoker.Invoke(actionDescriptor,
+            var response = await _invoker.Invoke(actionDescriptor,
                 requestMessage, _requestGraph.CancellationToken);
+
+            response.StatusCode.ShouldEqual(HttpStatusCode.OK, 
+                response.Content?.ReadAsStringAsync().Result);
 
             log.ShouldContain(requestMessage);
             log.ShouldContain(_requestGraph.ActionMethod);
@@ -149,9 +152,9 @@ namespace Tests.Unit.Actions
 
         public class DisposableBehavior : TestBehavior
         {
-            public DisposableBehavior(IBehavior innerBehavior, Disposable disposable)
+            public DisposableBehavior(IBehaviorChain behaviorChain, Disposable disposable)
             {
-                InnerBehavior = innerBehavior;
+                BehaviorChain = behaviorChain;
             }
         }
 
@@ -167,9 +170,12 @@ namespace Tests.Unit.Actions
                 x.For<Logger>().Use(log);
             });
 
-            await _invoker.Invoke(_requestGraph.GetActionDescriptor(), 
+            var response = await _invoker.Invoke(_requestGraph.GetActionDescriptor(), 
                 _requestGraph.GetHttpRequestMessage(),
                 _requestGraph.CancellationToken);
+
+            response.StatusCode.ShouldEqual(HttpStatusCode.OK,
+                response.Content?.ReadAsStringAsync().Result);
 
             log.ShouldContain(nameof(Disposable));
         }
@@ -182,32 +188,34 @@ namespace Tests.Unit.Actions
                 _requestGraph.CancellationToken);
 
             response.ShouldNotBeNull();
+            response.StatusCode.ShouldEqual(HttpStatusCode.OK,
+                response.Content?.ReadAsStringAsync().Result);
         }
 
         public class Behavior1 : TestLoggingBehavior
         {
-            public Behavior1(IBehavior innerBehavior, Logger logger)
+            public Behavior1(IBehaviorChain behaviorChain, Logger logger)
             {
                 Logger = logger;
-                InnerBehavior = innerBehavior;
+                BehaviorChain = behaviorChain;
             }
         }
 
         public class Behavior2 : TestLoggingBehavior
         {
-            public Behavior2(IBehavior innerBehavior, Logger logger)
+            public Behavior2(IBehaviorChain behaviorChain, Logger logger)
             {
                 Logger = logger;
-                InnerBehavior = innerBehavior;
+                BehaviorChain = behaviorChain;
             }
         }
 
         public class Behavior3 : TestLoggingBehavior
         {
-            public Behavior3(IBehavior innerBehavior, Logger logger)
+            public Behavior3(IBehaviorChain behaviorChain, Logger logger)
             {
                 Logger = logger;
-                InnerBehavior = innerBehavior;
+                BehaviorChain = behaviorChain;
             }
         }
 
@@ -228,15 +236,18 @@ namespace Tests.Unit.Actions
                 _requestGraph.GetHttpRequestMessage(),
                 _requestGraph.CancellationToken);
 
+            response.StatusCode.ShouldEqual(HttpStatusCode.OK,
+                response.Content?.ReadAsStringAsync().Result);
+
             log.ShouldOnlyContain(typeof(Behavior1), typeof(Behavior2), typeof(Behavior3));
         }
 
         public class ShouldNotRunBehavior : TestLoggingBehavior
         {
-            public ShouldNotRunBehavior(IBehavior innerBehavior, Logger logger)
+            public ShouldNotRunBehavior(IBehaviorChain behaviorChain, Logger logger)
             {
                 Logger = logger;
-                InnerBehavior = innerBehavior;
+                BehaviorChain = behaviorChain;
                 ShouldRunFlag = false;
             }
         }
@@ -261,89 +272,30 @@ namespace Tests.Unit.Actions
                 _requestGraph.CancellationToken);
 
             response.ShouldNotBeNull();
+            response.StatusCode.ShouldEqual(HttpStatusCode.OK,
+                response.Content?.ReadAsStringAsync().Result);
 
             log.ShouldOnlyContain(typeof(Behavior1), typeof(Behavior2));
         }
 
         public class BehaviorException : Exception { }
 
-        public class InitFailureBehavior : BehaviorBase
+        public class InitFailureBehavior : IBehavior
         {
             public InitFailureBehavior()
             {
                 throw new BehaviorException();
             }
 
-            public override async Task<HttpResponseMessage> Invoke()
+            public bool ShouldRun()
+            {
+                throw new NotImplementedException();
+            }
+
+            public async Task<HttpResponseMessage> Invoke()
             {
                 return new HttpResponseMessage();
             }
-        }
-
-        [Test]
-        public async Task Should_wrap_invoker_behavior_with_runtime_init_exception_during_behavior_chain_construction()
-        {
-            _configuration.DefaultBehavior.Set<InitFailureBehavior>();
-
-            var exception = await _invoker.Should()
-                .Throw<GraphiteRuntimeInitializationException>(x =>
-                    x.Invoke(_requestGraph.GetActionDescriptor(),
-                        _requestGraph.GetHttpRequestMessage(),
-                        _requestGraph.CancellationToken));
-
-            exception.GetChain().ShouldOnlyContainTypes<
-                GraphiteRuntimeInitializationException,
-                StructureMapBuildException,
-                BehaviorException>();
-        }
-
-        public class FailureBehavior : BehaviorBase
-        {
-            public override async Task<HttpResponseMessage> Invoke()
-            {
-                throw new BehaviorException();
-            }
-        }
-
-        [Test]
-        public async Task Should_not_wrap_invoker_behavior_with_runtime_init_exception_on_invoke()
-        {
-            _configuration.DefaultBehavior.Set<FailureBehavior>();
-            _requestGraph.Configuration.DefaultErrorHandlerEnabled = false;
-
-            await _invoker.Should().Throw<BehaviorException>(x =>
-                x.Invoke(_requestGraph.GetActionDescriptor(),
-                        _requestGraph.GetHttpRequestMessage(),
-                        _requestGraph.CancellationToken));
-        }
-
-        [Test]
-        public async Task Should_wrap_behavior_with_runtime_init_exception_during_behavior_chain_construction()
-        {
-            _requestGraph.Configuration.Behaviors.Append<InitFailureBehavior>();
-
-            var exception = await _invoker.Should().Throw<GraphiteRuntimeInitializationException>(x =>
-                x.Invoke(_requestGraph.GetActionDescriptor(),
-                        _requestGraph.GetHttpRequestMessage(),
-                        _requestGraph.CancellationToken));
-
-            exception.GetChain().ShouldOnlyContainTypes<
-                GraphiteRuntimeInitializationException,
-                StructureMapBuildException,
-                BehaviorException>();
-        }
-
-        [Test]
-        public async Task Should_not_wrap_behavior_with_runtime_init_exception_on_invoke()
-        {
-            _requestGraph.UnderlyingContainer.Configure(x => x.For<IBehavior>().Use<TestInvokerBehavior>());
-            _requestGraph.Configuration.DefaultErrorHandlerEnabled = false;
-            _requestGraph.Configuration.Behaviors.Append<FailureBehavior>();
-
-            await _invoker.Should().Throw<BehaviorException>(x =>
-                x.Invoke(_requestGraph.GetActionDescriptor(),
-                        _requestGraph.GetHttpRequestMessage(),
-                        _requestGraph.CancellationToken));
         }
     }
 }

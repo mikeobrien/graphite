@@ -436,7 +436,7 @@ namespace Graphite.Diagnostics
                                 <table>
                                     <tr>
                                         <td>Behaviors</td>
-                                        <td><table class=""behaviors"">{x.Behaviors.Append(_configuration.DefaultBehavior.Type.ToTypeDescriptor(_typeCache))
+                                        <td><table class=""behaviors"">{x.Behaviors.Append(_configuration.DefaultBehavior.ToTypeDescriptor(_typeCache))
                                             .Select(b => $@"<tr><td><code>{b.FriendlyFullName.HtmlEncode()}</code></td></tr>")
                                             .Join("<tr><td class=\"arrow\">&darr;</td></tr>")}</table></td>
                                     </tr>
@@ -479,7 +479,12 @@ namespace Graphite.Diagnostics
 
         private string RenderPlugin<T>(string name, PluginDefinition<T> definition)
         {
-            return $@"<tbody>{RenderPluginRow(name, definition.Type)}</tbody>";
+            return RenderPlugin(name, definition.Type);
+        }
+
+        private string RenderPlugin(string name, Type type)
+        {
+            return $@"<tbody>{RenderPluginRow(name, type)}</tbody>";
         }
 
         private string RenderPlugins<TPlugin, TContext>(string name, PluginDefinitions<TPlugin, TContext> definitions)

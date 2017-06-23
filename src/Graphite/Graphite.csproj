@@ -67,14 +67,15 @@
     <Compile Include="Authentication\BearerTokenAuthenticatorBase.cs" />
     <Compile Include="Authentication\Extensions.cs" />
     <Compile Include="Authentication\IAuthenticator.cs" />
+    <Compile Include="Behaviors\BehaviorChain.cs" />
     <Compile Include="Behaviors\BehaviorChainInvoker.cs" />
     <Compile Include="Actions\ActionMethod.cs" />
     <Compile Include="Behaviors\BehaviorBase.cs" />
     <Compile Include="Actions\DefaultActionSource.cs" />
     <Compile Include="Actions\Extensions.cs" />
-    <Compile Include="Actions\GraphiteRuntimeInitializationException.cs" />
     <Compile Include="Actions\IActionInvoker.cs" />
     <Compile Include="Behaviors\Extensions.cs" />
+    <Compile Include="Behaviors\IBehaviorChain.cs" />
     <Compile Include="Behaviors\IBehaviorChainInvoker.cs" />
     <Compile Include="Actions\IActionMethodSource.cs" />
     <Compile Include="Actions\IActionSource.cs" />

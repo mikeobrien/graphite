@@ -34,7 +34,6 @@ namespace Tests.Common
 
         public RequestGraph(ActionMethod actionMethod)
         {
-            Configuration = new Configuration();
             ActionMethod = actionMethod;
             ResponseType = !actionMethod.MethodDescriptor.HasResult ? 
                 null : actionMethod.MethodDescriptor.ReturnType;
@@ -45,7 +44,9 @@ namespace Tests.Common
             Url = "http://fark.com";
             _urlTemplate = "";
             UnderlyingContainer = new StructureMap.Container();
+            Configuration = new Configuration();
             Container = new Container(UnderlyingContainer);
+            Container.Register(Configuration);
             TypeCache = new TypeCache();
         }
 

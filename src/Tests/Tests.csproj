@@ -104,7 +104,7 @@
     <Compile Include="IISBootstrap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unit\Actions\ActionMessageHandlerTests.cs" />
-    <Compile Include="Unit\Actions\BehaviorChainInvokerTests.cs" />
+    <Compile Include="Unit\Behaviors\BehaviorChainInvokerTests.cs" />
     <Compile Include="Unit\Actions\AsyncInvokerTests.cs" />
     <Compile Include="Unit\Actions\DefaultActionMethodSourceTests.cs" />
     <Compile Include="Unit\Actions\DefaultActionSourceTests.cs" />
@@ -114,6 +114,7 @@
     <Compile Include="Unit\Authentication\ExtensionTests.cs" />
     <Compile Include="Unit\Authentication\BasicAuthenticatorBaseTests.cs" />
     <Compile Include="Unit\Authentication\AuthenticationBehaviorTests.cs" />
+    <Compile Include="Unit\Behaviors\BehaviorChainTests.cs" />
     <Compile Include="Unit\Binding\ExtensionsTests.cs" />
     <Compile Include="Unit\Binding\ParameterBinderTests.cs" />
     <Compile Include="Unit\Binding\ContainerBinderTests.cs" />
