@@ -35,14 +35,5 @@ namespace Tests.Acceptance
 
             result.Status.ShouldEqual(HttpStatusCode.PaymentRequired);
         }
-
-        [Test]
-        public void Should_intercept()
-        {
-            var result = Http.GetString($"{BaseUrl}WithInteceptor");
-
-            result.Status.ShouldEqual(HttpStatusCode.OK);
-            result.Data.ShouldEqual("farker");
-        }
     }
 }

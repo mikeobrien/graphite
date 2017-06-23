@@ -38,15 +38,6 @@ namespace Graphite.Actions
             var context = new ActionDecoratorContext(actionDescriptor);
             actionSources.ForEach(x => x.Decorate(context));
         }
-        
-        public static IInterceptor ThatAppliesTo(this IEnumerable<IInterceptor> interceptors,
-            InterceptorContext interceptorContext, ConfigurationContext configurationContext)
-        {
-            var actionConfigurationcontext = new ActionConfigurationContext(
-                configurationContext, interceptorContext.ActionDescriptor);
-            return configurationContext.Configuration.Interceptors.FirstThatAppliesToOrDefault(
-                interceptors, actionConfigurationcontext, interceptorContext);
-        }
 
         public static bool IsUnderNamespace<T>(this ActionMethod actionMethod, string relativeNamespace = null)
         {

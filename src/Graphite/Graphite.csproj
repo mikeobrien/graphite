@@ -97,7 +97,6 @@
     <Compile Include="Extensions\NumericExtensions.cs" />
     <Compile Include="GraphiteException.cs" />
     <Compile Include="Http\HttpMethods.cs" />
-    <Compile Include="Actions\IInterceptor.cs" />
     <Compile Include="Routing\IHttpRouteDecorator.cs" />
     <Compile Include="Routing\IHttpRouteMapper.cs" />
     <Compile Include="Monitoring\Metrics.cs" />

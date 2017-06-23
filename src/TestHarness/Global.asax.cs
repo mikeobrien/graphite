@@ -37,9 +37,6 @@ namespace TestHarness
                     .BindRequestInfo()
                     .BindHeaders()
                     .BindContainer()
-                    .ConfigureInterceptors(x => x
-                        .Append<ActionTestHandler.Interceptor>(i => i
-                            .ActionMethod.Name.Contains("Inteceptor")))
                     .ConfigureHttpRouteDecorators(x => x
                         .Append<RoutingTestHandler.HttpRouteDecorator>(d => d
                             .ActionMethod.Name.Contains("Decorator")))

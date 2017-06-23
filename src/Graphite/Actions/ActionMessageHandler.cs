@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +11,6 @@ namespace Graphite.Actions
     public class ActionMessageHandler : HttpMessageHandler
     {
         private readonly ConfigurationContext _configurationContext;
-        private readonly List<IInterceptor> _interceptors;
         private readonly ActionDescriptor _actionDescriptor;
         private readonly IUnhandledExceptionHandler _exceptionHandler;
         private readonly IBehaviorChainInvoker _behaviorChainInvoker;
@@ -21,7 +18,6 @@ namespace Graphite.Actions
         private readonly ActionMetrics _actionMetrics;
 
         public ActionMessageHandler(ConfigurationContext configurationContext,
-            List<IInterceptor> interceptors,
             ActionDescriptor actionDescriptor, 
             IUnhandledExceptionHandler exceptionHandler,
             IBehaviorChainInvoker behaviorChainInvoker, 
@@ -32,7 +28,6 @@ namespace Graphite.Actions
             _behaviorChainInvoker = behaviorChainInvoker;
             _metrics = metrics;
             _configurationContext = configurationContext;
-            _interceptors = interceptors;
             _actionMetrics = metrics.AddAction(_actionDescriptor);
         }
 
@@ -43,14 +38,6 @@ namespace Graphite.Actions
             stopwatch.Start();
             try
             {
-                if (_interceptors.Any())
-                {
-                    var inteceptorContext = new InterceptorContext(
-                        _actionDescriptor, requestMessage, cancellationToken);
-                    var interceptor = _interceptors.ThatAppliesTo(
-                        inteceptorContext, _configurationContext);
-                    if (interceptor != null) return await interceptor.Intercept(inteceptorContext);
-                }
                 return await _behaviorChainInvoker.Invoke(
                     _actionDescriptor, requestMessage, cancellationToken);
             }

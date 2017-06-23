@@ -31,25 +31,5 @@ namespace TestHarness.Action
         {
             return new HttpResponseMessage(HttpStatusCode.PaymentRequired);
         }
-
-        public string GetWithInteceptor()
-        {
-            return "fark";
-        }
-
-        public class Interceptor : IInterceptor
-        {
-            public bool AppliesTo(InterceptorContext context)
-            {
-                return true;
-            }
-
-            public Task<HttpResponseMessage> Intercept(InterceptorContext context)
-            {
-                var response = context.RequestMessage.CreateResponse();
-                response.Content = new AsyncStringContent("farker", Encoding.UTF8);
-                return response.ToTaskResult();
-            }
-        }
     }
 }
