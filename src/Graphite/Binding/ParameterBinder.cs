@@ -25,7 +25,7 @@ namespace Graphite.Binding
         }
 
         public void Bind(ILookup<string, object> values, object[] actionArguments, 
-            ActionParameter[] parameters, Func<ActionParameter, string> mapName = null)
+            IEnumerable<ActionParameter> parameters, Func<ActionParameter, string> mapName = null)
         {
             if (values == null || !values.Any()) return;
 

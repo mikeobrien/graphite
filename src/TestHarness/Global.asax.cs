@@ -37,6 +37,7 @@ namespace TestHarness
                     .BindRequestInfo()
                     .BindHeaders()
                     .BindContainer()
+                    .ReturnErrorMessages()
                     .ConfigureHttpRouteDecorators(x => x
                         .Append<RoutingTestHandler.HttpRouteDecorator>(d => d
                             .ActionMethod.Name.Contains("Decorator")))
@@ -45,30 +46,31 @@ namespace TestHarness
                         .Append<TestBasicAuthenticator>(a => a.ActionMethod.Name.EndsWith("BasicSecure")))
                     .ConfigureBehaviors(b => b
                         .Append<AuthenticationBehavior>(a => a.ActionMethod.Name.EndsWith("Secure"))
-                        .Append<Behavior2>()
+                        .Append<Behavior1>()
                         .Append<Behavior2>()));
 
             configuration.EnsureInitialized();
         }
     }
 
-    public class EmptyBehavior : BehaviorBase
+    public class Behavior1 : BehaviorBase
     {
-        public EmptyBehavior(IBehavior innerBehavior) : base(innerBehavior) { }
+        public Behavior1(IBehavior innerBehavior) : base(innerBehavior) { }
+
         public override Task<HttpResponseMessage> Invoke()
         {
             return InnerBehavior.Invoke();
         }
     }
 
-    public class Behavior1 : EmptyBehavior
-    {
-        public Behavior1(IBehavior innerBehavior) : base(innerBehavior) { }
-    }
-
-    public class Behavior2 : EmptyBehavior
+    public class Behavior2 : BehaviorBase
     {
         public Behavior2(IBehavior innerBehavior) : base(innerBehavior) { }
+
+        public override Task<HttpResponseMessage> Invoke()
+        {
+            return InnerBehavior.Invoke();
+        }
     }
 
     public class TestActionDecorator : IActionDecorator

@@ -62,11 +62,11 @@ namespace Tests.Unit.Routing
             descriptor.Method.ShouldEqual("POST");
             descriptor.Url.ShouldEqual(url);
 
-            descriptor.UrlParameters.Length.ShouldEqual(2);
+            descriptor.UrlParameters.Count().ShouldEqual(2);
             descriptor.UrlParameters.ShouldContain(x => x.Name == "urlParam1");
             descriptor.UrlParameters.ShouldContain(x => x.Name == "urlParam2");
 
-            descriptor.Parameters.Length.ShouldEqual(2);
+            descriptor.Parameters.Count().ShouldEqual(2);
             descriptor.Parameters.ShouldContain(x => x.Name == "param1");
             descriptor.Parameters.ShouldContain(x => x.Name == "param2");
 
@@ -310,7 +310,7 @@ namespace Tests.Unit.Routing
             else descriptor.RequestParameter.Name.ShouldEqual(requestParam);
 
             var urlParameters = descriptor.UrlParameters;
-            urlParameters.Length.ShouldEqual(urlParameterNames.Length);
+            urlParameters.Count().ShouldEqual(urlParameterNames.Length);
 
             foreach (var name in urlParameterNames)
             {
@@ -318,7 +318,7 @@ namespace Tests.Unit.Routing
             }
 
             var parameters = descriptor.Parameters;
-            parameters.Length.ShouldEqual(parameterNames.Length);
+            parameters.Count().ShouldEqual(parameterNames.Length);
 
             foreach (var name in parameterNames)
             {

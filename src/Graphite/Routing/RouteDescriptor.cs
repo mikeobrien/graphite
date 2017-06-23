@@ -1,4 +1,5 @@
-﻿using Graphite.Extensions;
+﻿using System.Collections.Generic;
+using Graphite.Extensions;
 using Graphite.Reflection;
 
 namespace Graphite.Routing
@@ -7,8 +8,8 @@ namespace Graphite.Routing
     {
         public RouteDescriptor(
             string method, string url,
-            UrlParameter[] urlParameters,
-            ActionParameter[] parameters,
+            IEnumerable<UrlParameter> urlParameters,
+            IEnumerable<ActionParameter> parameters,
             ParameterDescriptor requestParameter,
             TypeDescriptor responseType)
         {
@@ -26,8 +27,8 @@ namespace Graphite.Routing
         public virtual string Id { get; }
         public virtual string Method { get; }
         public virtual string Url { get; }
-        public virtual UrlParameter[] UrlParameters { get; }
-        public virtual ActionParameter[] Parameters { get; }
+        public virtual IEnumerable<UrlParameter> UrlParameters { get; }
+        public virtual IEnumerable<ActionParameter> Parameters { get; }
         public virtual bool HasRequest { get; }
         public virtual bool HasResponse { get; }
         public virtual ParameterDescriptor RequestParameter { get; }

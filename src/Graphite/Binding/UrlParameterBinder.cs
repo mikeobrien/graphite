@@ -40,14 +40,14 @@ namespace Graphite.Binding
         }
 
         private IEnumerable<KeyValuePair<string, object>> ExpandWildcardParameters
-            (KeyValuePair<string, object> value, UrlParameter[] parameters)
+            (KeyValuePair<string, object> value, IEnumerable<UrlParameter> parameters)
         {
-            var wildcard = parameters.FirstOrDefault(x => x.IsWildcard &&
-                                                          x.Name.EqualsIgnoreCase(value.Key));
+            var wildcard = parameters.FirstOrDefault(x => 
+                x.IsWildcard && x.Name.EqualsIgnoreCase(value.Key));
             return wildcard == null || !(wildcard.TypeDescriptor.IsArray ||
-                                         wildcard.TypeDescriptor.IsGenericListCastable)
-                ? new[] { value }
-                : value.Value.Split('/').ToKeyValuePairs(value.Key);
+                wildcard.TypeDescriptor.IsGenericListCastable)
+                    ? new[] { value }
+                    : value.Value.Split('/').ToKeyValuePairs(value.Key);
         }
     }
 }
