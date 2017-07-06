@@ -60,8 +60,8 @@ namespace Tests.Unit.Diagnostics
             result.ShouldContain(configuration.HandlerNameFilterRegex);
             result.ShouldContain(configuration.HandlerNamespaceRegex);
 
-            result.ShouldContain(typeof(GraphiteBootstrap).Assembly.GetFriendlyName());
-            result.ShouldContain(typeof(GraphiteBootstrap).Assembly.GetName().Version.ToString());
+            result.ShouldContain(typeof(GraphiteApplication).Assembly.GetFriendlyName());
+            result.ShouldContain(typeof(GraphiteApplication).Assembly.GetName().Version.ToString());
 
             configuration.SupportedHttpMethods.ForEach(x => result.ShouldContain(x.Method));
 

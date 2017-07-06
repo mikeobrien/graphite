@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
    <metadata>
-      <id>GraphiteWeb</id>
+      <id>GraphiteWeb.Core</id>
       <version>0.0.0.0</version>
       <title>Graphite Web Framework</title>
       <authors>Mike O'Brien</authors>

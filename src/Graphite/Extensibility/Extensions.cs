@@ -21,7 +21,8 @@ namespace Graphite.Extensibility
         {
             if (pluginDefinition.HasInstance) container.Register(
                 typeof(TPlugin), pluginDefinition.Instance, pluginDefinition.Dispose);
-            else container.Register<TPlugin>(pluginDefinition.Type, pluginDefinition.Singleton);
+            else if (pluginDefinition.Type != null)
+                container.Register<TPlugin>(pluginDefinition.Type, pluginDefinition.Singleton);
             return container;
         }
 

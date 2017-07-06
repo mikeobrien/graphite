@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Web.Http;
 using System.Web.Http.Routing;
 using Graphite.Actions;
 using Graphite.Authentication;
@@ -10,6 +12,7 @@ using Graphite.Binding;
 using Graphite.DependencyInjection;
 using Graphite.Extensibility;
 using Graphite.Extensions;
+using Graphite.Hosting;
 using Graphite.Http;
 using Graphite.Readers;
 using Graphite.Reflection;
@@ -22,10 +25,21 @@ namespace Graphite
     public class ConfigurationDsl
     {
         private readonly Configuration _configuration;
+        private readonly HttpConfiguration _httpConfiguration;
 
-        public ConfigurationDsl(Configuration configuration)
+        public ConfigurationDsl(Configuration configuration, HttpConfiguration httpConfiguration)
         {
             _configuration = configuration;
+            _httpConfiguration = httpConfiguration;
+        }
+
+        /// <summary>
+        /// Allows you to configure Web Api.
+        /// </summary>
+        public ConfigurationDsl ConfigureWebApi(Action<HttpConfiguration> configure)
+        {
+            configure(_httpConfiguration);
+            return this;
         }
 
         /// <summary>
@@ -55,6 +69,15 @@ namespace Graphite
         public ConfigurationDsl IncludeTypeAssembly(Type type)
         {
             return IncludeAssemblies(type.Assembly);
+        }
+
+        /// <summary>
+        /// Includes the current assemby.
+        /// </summary>
+        public ConfigurationDsl IncludeThisAssembly()
+        {
+            IncludeAssemblies(Assembly.GetCallingAssembly());
+            return this;
         }
 
         /// <summary>
@@ -205,6 +228,42 @@ namespace Graphite
         public ConfigurationDsl UseContainer<T>() where T : IContainer, new()
         {
             _configuration.Container = new T();
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the path provider to use.
+        /// </summary>
+        public ConfigurationDsl WithPathProvider<T>() where T : IPathProvider
+        {
+            _configuration.PathProvider.Set<T>();
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the path provider to use.
+        /// </summary>
+        public ConfigurationDsl WithPathProvider<T>(T instance) where T : IPathProvider
+        {
+            _configuration.PathProvider.Set(instance);
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the request properties provider to use.
+        /// </summary>
+        public ConfigurationDsl WithRequestPropertyProvider<T>() where T : IRequestPropertiesProvider
+        {
+            _configuration.RequestPropertiesProvider.Set<T>();
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the request properties provider to use.
+        /// </summary>
+        public ConfigurationDsl WithRequestPropertyProvider<T>(T instance) where T : IRequestPropertiesProvider
+        {
+            _configuration.RequestPropertiesProvider.Set(instance);
             return this;
         }
 
@@ -467,6 +526,14 @@ namespace Graphite
         public ConfigurationDsl ExcludeTypeNamespaceFromUrl<T>()
         {
             return ExcludeTypeNamespaceFromUrl(typeof(T));
+        }
+
+        /// <summary>
+        /// Removes the calling method's type namespace from the url.
+        /// </summary>
+        public ConfigurationDsl ExcludeCurrentNamespaceFromUrl()
+        {
+            return ExcludeTypeNamespaceFromUrl(new StackFrame(1).GetMethod().ReflectedType);
         }
 
         /// <summary>

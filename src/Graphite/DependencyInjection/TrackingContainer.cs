@@ -15,20 +15,17 @@ namespace Graphite.DependencyInjection
     public class TrackingContainer : IContainer, ITrackingContainer
     {
         private readonly IContainer _container;
-        private readonly ITypeCache _typeCache;
 
-        public TrackingContainer(IContainer container, ITypeCache typeCache)
+        public TrackingContainer(IContainer container)
         {
             _container = container;
-            _typeCache = typeCache;
             ParentRegistry = new Registry();
             Registry = new Registry();
         }
 
-        public TrackingContainer(IContainer container, Registry registry, ITypeCache typeCache)
+        public TrackingContainer(IContainer container, Registry registry)
         {
             _container = container;
-            _typeCache = typeCache;
             ParentRegistry = new Registry(registry);
             Registry = new Registry();
         }
@@ -55,7 +52,7 @@ namespace Graphite.DependencyInjection
 
         public IContainer CreateScopedContainer()
         {
-            return new TrackingContainer(_container.CreateScopedContainer(), Registry, _typeCache);
+            return new TrackingContainer(_container.CreateScopedContainer(), Registry);
         }
 
         public object GetInstance(Type type, params Dependency[] dependencies)
@@ -70,10 +67,12 @@ namespace Graphite.DependencyInjection
 
         public override string ToString()
         {
+            var typeCache = _container.GetInstance<ITypeCache>();
             return Registry.OrderBy(r => r.PluginType.FullName).Select(r =>
             {
-                var pluginType = _typeCache.GetTypeDescriptor(r.PluginType);
-                var concreteType = r.ConcreteType != null ? _typeCache.GetTypeDescriptor(r.ConcreteType) : null;
+                var pluginType = typeCache.GetTypeDescriptor(r.PluginType);
+                var concreteType = r.ConcreteType != null ? 
+                    typeCache.GetTypeDescriptor(r.ConcreteType) : null;
 
                 return new
                 {

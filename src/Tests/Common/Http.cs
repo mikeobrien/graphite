@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -9,30 +8,32 @@ using System.Net.Http.Headers;
 using Bender;
 using Graphite.Extensions;
 using Graphite.Http;
-using IISExpressBootstrapper;
 using HttpMethod = System.Net.Http.HttpMethod;
 
 namespace Tests.Common
 {
     public static class Http
     {
-        public const string TestHarnessProjectName = "TestHarness";
-        public const int Port = 3091;
+        public static RestClient ForHost(Host host)
+        {
+            return new RestClient(WebServers.EnsureHost(host));
+        }
 
-        private static readonly HttpClient HttpClient = 
-            new HttpClient(new HttpClientHandler
-            {
-                UseCookies = false, AllowAutoRedirect = false
-            })
-            {
-                // Fiddler can't hook into localhost so when its running 
-                // you can use localhost.fiddler
-                BaseAddress = new Uri($@"http://{(
-                    Process.GetProcessesByName("Fiddler").Any() ?
-                        "localhost.fiddler" : "localhost")}:{Port}/")
-            };
+        public static RestClient ForIISExpress()
+        {
+            return new RestClient(WebServers.EnsureHost(Host.IISExpress));
+        }
 
+        public static RestClient ForOwin()
+        {
+            return new RestClient(WebServers.EnsureHost(Host.Owin));
+        }
+    }
+
+    public class RestClient
+    {
         private static readonly HttpMethod Patch = new HttpMethod("PATCH");
+        private readonly HttpClient _httpClient;
 
         public class Result
         {
@@ -83,7 +84,12 @@ namespace Tests.Common
             public T Data { get; }
         }
 
-        public static Result Options(string relativeUrl,
+        public RestClient(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+
+        public Result Options(string relativeUrl,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null)
         {
@@ -91,7 +97,7 @@ namespace Tests.Common
                 cookies: cookies, requestHeaders: requestHeaders);
         }
 
-        public static Result Get(string relativeUrl,
+        public Result Get(string relativeUrl,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null)
         {
@@ -99,7 +105,7 @@ namespace Tests.Common
                 x => null, cookies, requestHeaders);
         }
 
-        public static Result<string> GetText(string relativeUrl,
+        public Result<string> GetText(string relativeUrl,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null)
         {
@@ -107,14 +113,14 @@ namespace Tests.Common
                 .ReadToEnd(), cookies, requestHeaders);
         }
 
-        public static Result<string> GetHtml(string relativeUrl,
+        public Result<string> GetHtml(string relativeUrl,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null)
         {
             return Get(relativeUrl, MimeTypes.TextHtml, x => new StreamReader(x).ReadToEnd());
         }
 
-        public static Result<TResponse> GetJson<TResponse>(string relativeUrl,
+        public Result<TResponse> GetJson<TResponse>(string relativeUrl,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
             Action<HttpContentHeaders> contentHeaders = null) where TResponse : class
@@ -123,12 +129,12 @@ namespace Tests.Common
                 Deserialize.Json<TResponse>(x), cookies, requestHeaders);
         }
 
-        public static Result<TResponse> GetXml<TResponse>(string relativeUrl) where TResponse : class
+        public Result<TResponse> GetXml<TResponse>(string relativeUrl) where TResponse : class
         {
             return Get(relativeUrl, MimeTypes.ApplicationXml, x => Deserialize.Xml<TResponse>(x));
         }
 
-        public static Result<string> GetString(string relativeUrl,
+        public Result<string> GetString(string relativeUrl,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
             Action<HttpContentHeaders> contentHeaders = null)
@@ -137,7 +143,7 @@ namespace Tests.Common
                 x => x.ReadAllText(), cookies, requestHeaders);
         }
 
-        public static Result PostJson<TRequest>(string relativeUrl, TRequest data,
+        public Result PostJson<TRequest>(string relativeUrl, TRequest data,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
             Action<HttpContentHeaders> contentHeaders = null)
@@ -147,7 +153,7 @@ namespace Tests.Common
                 cookies, requestHeaders, contentHeaders);
         }
 
-        public static Result PutJson<TRequest>(string relativeUrl, TRequest data,
+        public Result PutJson<TRequest>(string relativeUrl, TRequest data,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
             Action<HttpContentHeaders> contentHeaders = null)
@@ -157,7 +163,7 @@ namespace Tests.Common
                 cookies, requestHeaders, contentHeaders); ;
         }
 
-        public static Result PatchJson<TRequest>(string relativeUrl, TRequest data,
+        public Result PatchJson<TRequest>(string relativeUrl, TRequest data,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
             Action<HttpContentHeaders> contentHeaders = null)
@@ -167,7 +173,7 @@ namespace Tests.Common
                 cookies, requestHeaders, contentHeaders);
         }
 
-        public static Result DeleteJson<TRequest>(string relativeUrl, TRequest data,
+        public Result DeleteJson<TRequest>(string relativeUrl, TRequest data,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
             Action<HttpContentHeaders> contentHeaders = null)
@@ -177,7 +183,7 @@ namespace Tests.Common
                 cookies, requestHeaders, contentHeaders);
         }
 
-        public static Result<string> PostString(string relativeUrl, string data,
+        public Result<string> PostString(string relativeUrl, string data,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
             Action<HttpContentHeaders> contentHeaders = null)
@@ -186,7 +192,7 @@ namespace Tests.Common
                 x => x.WriteAllText(data), x => x.ReadAllText(), cookies, requestHeaders, contentHeaders);
         }
 
-        public static Result<string> PostStream(string relativeUrl, Stream stream,
+        public Result<string> PostStream(string relativeUrl, Stream stream,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
             Action<HttpContentHeaders> contentHeaders = null)
@@ -195,7 +201,7 @@ namespace Tests.Common
                 stream.CopyTo, x => x.ReadAllText(), cookies, requestHeaders, contentHeaders);
         }
 
-        public static Result<string> Post(string relativeUrl,
+        public Result<string> Post(string relativeUrl,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
             Action<HttpContentHeaders> contentHeaders = null)
@@ -204,7 +210,7 @@ namespace Tests.Common
                 x => {}, x => x.ReadAllText(), cookies, requestHeaders, contentHeaders);
         }
 
-        public static Result GetStream(string relativeUrl, Action<Stream> action,
+        public Result GetStream(string relativeUrl, Action<Stream> action,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null)
         {
@@ -212,7 +218,7 @@ namespace Tests.Common
                 x => { action(x); return null; }, cookies, requestHeaders);
         }
 
-        public static Result<TResponse> PostStream<TResponse>(string relativeUrl, 
+        public Result<TResponse> PostStream<TResponse>(string relativeUrl, 
             Stream stream, string mimeType, string filename,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
@@ -223,7 +229,7 @@ namespace Tests.Common
                 cookies: cookies, requestHeaders: requestHeaders, contentHeaders: contentHeaders);
         }
 
-        public static Result<TResponse> PostXml<TRequest, TResponse>(string relativeUrl, TRequest data,
+        public Result<TResponse> PostXml<TRequest, TResponse>(string relativeUrl, TRequest data,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
             Action<HttpContentHeaders> contentHeaders = null) where TResponse : class
@@ -233,7 +239,7 @@ namespace Tests.Common
                 x => Deserialize.Xml<TResponse>(x), cookies, requestHeaders, contentHeaders);
         }
 
-        public static Result<TResponse> PostJson<TRequest, TResponse>(string relativeUrl, TRequest data,
+        public Result<TResponse> PostJson<TRequest, TResponse>(string relativeUrl, TRequest data,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
             Action<HttpContentHeaders> contentHeaders = null) where TResponse : class
@@ -243,7 +249,7 @@ namespace Tests.Common
                 x => Deserialize.Json<TResponse>(x), cookies, requestHeaders, contentHeaders);
         }
 
-        public static Result<TResponse> PutJson<TRequest, TResponse>(string relativeUrl, TRequest data,
+        public Result<TResponse> PutJson<TRequest, TResponse>(string relativeUrl, TRequest data,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
             Action<HttpContentHeaders> contentHeaders = null) where TResponse : class
@@ -253,7 +259,7 @@ namespace Tests.Common
                 x => Deserialize.Json<TResponse>(x), cookies, requestHeaders, contentHeaders);
         }
 
-        public static Result<TResponse> PatchJson<TRequest, TResponse>(string relativeUrl, TRequest data,
+        public Result<TResponse> PatchJson<TRequest, TResponse>(string relativeUrl, TRequest data,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
             Action<HttpContentHeaders> contentHeaders = null) where TResponse : class
@@ -263,7 +269,7 @@ namespace Tests.Common
                 x => Deserialize.Json<TResponse>(x), cookies, requestHeaders, contentHeaders);
         }
 
-        public static Result<TResponse> DeleteJson<TRequest, TResponse>(string relativeUrl, TRequest data,
+        public Result<TResponse> DeleteJson<TRequest, TResponse>(string relativeUrl, TRequest data,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
             Action<HttpContentHeaders> contentHeaders = null) where TResponse : class
@@ -273,7 +279,7 @@ namespace Tests.Common
                 x => Deserialize.Json<TResponse>(x), cookies, requestHeaders, contentHeaders);
         }
 
-        public static Result<TResponse> PostForm<TResponse>(string relativeUrl, string data,
+        public Result<TResponse> PostForm<TResponse>(string relativeUrl, string data,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
             Action<HttpContentHeaders> contentHeaders = null) where TResponse : class
@@ -283,7 +289,7 @@ namespace Tests.Common
                 x => Deserialize.Json<TResponse>(x), cookies, requestHeaders, contentHeaders);
         }
 
-        private static Result<TResponse> Get<TResponse>(string relativeUrl,
+        private Result<TResponse> Get<TResponse>(string relativeUrl,
             string accept, Func<Stream, TResponse> reader,
             IDictionary<string, string> cookies = null, 
             Action<HttpRequestHeaders> requestHeaders = null) where TResponse : class
@@ -292,7 +298,7 @@ namespace Tests.Common
                 cookies: cookies, requestHeaders: requestHeaders, reader: reader);
         }
 
-        private static Result<TResponse> Send<TResponse>(HttpMethod method, 
+        private Result<TResponse> Send<TResponse>(HttpMethod method, 
             string relativeUrl, string contentType, string accept,
             Action<Stream> writer, Func<Stream, TResponse> reader,
             IDictionary<string, string> cookies = null,
@@ -304,7 +310,7 @@ namespace Tests.Common
                 cookies, filename, requestHeaders, contentHeaders);
         }
 
-        private static Result<TResponse> Execute<TResponse>(
+        private Result<TResponse> Execute<TResponse>(
             HttpMethod method, string relativeUrl, string contentType = null, 
             string accept = null, Func<Stream, TResponse> reader = null,
             Action<Stream> writer = null, IDictionary<string, string> cookies = null,
@@ -336,9 +342,7 @@ namespace Tests.Common
                 contentHeaders?.Invoke(request.Content.Headers);
             }
 
-            EnsureWebServer();
-
-            var response = HttpClient.SendAsync(request).Result;
+            var response = _httpClient.SendAsync(request).Result;
             var responseStream = response.Content.ReadAsStreamAsync().Result;
 
             if ((int)response.StatusCode >= 300)
@@ -349,17 +353,6 @@ namespace Tests.Common
             }
             
             return new Result<TResponse>(response, reader?.Invoke(responseStream));
-        }
-
-        private static IISExpressHost _iisExpress;
-
-        private static void EnsureWebServer()
-        {
-            if (_iisExpress != null) return;
-
-            _iisExpress = new IISExpressHost(TestHarnessProjectName, Port);
-            AppDomain.CurrentDomain.ProcessExit +=
-                (sender, e) => _iisExpress.Dispose();;
         }
     }
 }

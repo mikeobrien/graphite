@@ -3,22 +3,22 @@
    <metadata>
       <id>GraphiteWeb.Cors</id>
       <version>0.0.0.0</version>
-      <title>CORS suppert for the Graphite Web Framework.</title>
+      <title>CORS support for the Graphite Web Framework.</title>
       <authors>Mike O'Brien</authors>
-      <description>Adds CORS suppert to the Graphite Web Framework.</description>
+      <description>Adds CORS support to the Graphite Web Framework.</description>
       <releaseNotes />
       <copyright />
       <language>en-US</language>
       <licenseUrl>https://github.com/mikeobrien/graphite/blob/master/LICENSE</licenseUrl>
       <projectUrl>http://graphiteweb.io/</projectUrl>
       <owners>Mike O'Brien</owners>
-      <summary>Adds CORS suppert to the Graphite Web Framework.</summary>
+      <summary>Adds CORS support to the Graphite Web Framework.</summary>
       <iconUrl>https://github.com/mikeobrien/graphite/raw/master/misc/logo128x128.png</iconUrl>
       <tags>web api rest cors</tags>
       <dependencies>
          <dependency id="Microsoft.AspNet.WebApi.Core" version="5.2.3" />
          <dependency id="Microsoft.AspNet.Cors" version="5.2.3" />
-         <dependency id="GraphiteWeb" version="1.0.0" />
+         <dependency id="GraphiteWeb.Core" version="1.0.0" />
       </dependencies>
    </metadata>
 </package>

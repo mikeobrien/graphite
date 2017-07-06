@@ -29,6 +29,11 @@ namespace Graphite.Extensibility
         protected PluginDefinition(Type concrete, T instance, bool dispose) : base(concrete, instance, dispose) { }
         protected PluginDefinition(Type concrete, bool singleton) : base(concrete, singleton) { }
 
+        public static PluginDefinition<T> Create(bool singleton = false)
+        {
+            return new PluginDefinition<T>(null, singleton);
+        }
+
         public static PluginDefinition<T> Create<TConcrete>(bool singleton = false) where TConcrete : T
         {
             return new PluginDefinition<T>(typeof(TConcrete), singleton);

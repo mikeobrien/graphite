@@ -12,6 +12,7 @@ using Graphite.DependencyInjection;
 using Graphite.Diagnostics;
 using Graphite.Extensibility;
 using Graphite.Extensions;
+using Graphite.Hosting;
 using Graphite.Http;
 using Graphite.Readers;
 using Graphite.Reflection;
@@ -36,6 +37,9 @@ namespace Graphite
         public bool DefaultErrorHandlerEnabled { get; set; } = true;
         public int DownloadBufferSize { get; set; } = 1024 * 1024;
         public bool AutomaticallyConstrainUrlParameterByType { get; set; }
+
+        public PluginDefinition<IPathProvider> PathProvider { get; } =
+            PluginDefinition<IPathProvider>.Create(singleton: true);
 
         public PluginDefinition<IInitializer> Initializer { get; } =
             PluginDefinition<IInitializer>
@@ -136,6 +140,9 @@ namespace Graphite
         public PluginDefinitions<IAuthenticator, ActionConfigurationContext> Authenticators { get; } =
             PluginDefinitions<IAuthenticator, ActionConfigurationContext>.Create();
 
+        public PluginDefinition<IRequestPropertiesProvider> RequestPropertiesProvider { get; } =
+            PluginDefinition<IRequestPropertiesProvider>.Create();
+
         public string DefaultAuthenticationRealm { get; set; }
         public string DefaultUnauthorizedStatusMessage { get; set; }
 
@@ -155,7 +162,7 @@ namespace Graphite
                 .Append<XmlBinder>()
                 .Append<HeaderBinder>()
                 .Append<CookieBinder>()
-                .Append<RequestInfoBinder>()
+                .Append<RequestPropertiesBinder>()
                 .Append<ContainerBinder>()
             );
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Web.Http;
 using Graphite.DependencyInjection;
 using StructureMap;
 using StructureMap.Configuration.DSL.Expressions;
@@ -11,25 +10,6 @@ namespace Graphite.StructureMap
     public static class Extensions
     {
         public static ConfigurationDsl UseStructureMapContainer<TRegistry>(
-            this ConfigurationDsl configuration,
-            HttpConfiguration httpConfiguration) 
-            where TRegistry : global::StructureMap.Registry, new()
-        {
-            return configuration.UseStructureMapContainer(httpConfiguration,
-                x => x.AddRegistry<TRegistry>());
-        }
-
-        public static ConfigurationDsl UseStructureMapContainer(
-            this ConfigurationDsl configuration,
-            HttpConfiguration httpConfiguration,
-            Action<ConfigurationExpression> configure = null)
-        {
-            var container = configure == null ? new Container() : new Container(configure);
-            httpConfiguration.DependencyResolver = container;
-            return configuration.UseContainer(container);
-        }
-
-        public static ConfigurationDsl UseStructureMapContainer<TRegistry>(
             this ConfigurationDsl configuration)
             where TRegistry : global::StructureMap.Registry, new()
         {
@@ -38,16 +18,23 @@ namespace Graphite.StructureMap
 
         public static ConfigurationDsl UseStructureMapContainer(
             this ConfigurationDsl configuration,
-            Action<ConfigurationExpression> configure = null)
+            Action<ConfigurationExpression> configure = null,
+            bool isDependencyResolver = true)
         {
-            return configuration.UseContainer(configure == null ? 
-                new Container() : new Container(configure));
+            var container = configure == null ? new Container() : new Container(configure);
+            if (isDependencyResolver)
+                configuration.ConfigureWebApi(x => x.DependencyResolver = container);
+            return configuration.UseContainer(container);
         }
 
         public static ConfigurationDsl UseStructureMapContainer(this 
-            ConfigurationDsl configuration, global::StructureMap.IContainer container)
+            ConfigurationDsl configuration, global::StructureMap.IContainer container, 
+            bool isDependencyResolver = true)
         {
-            return configuration.UseContainer(new Container(container));
+            var graphiteContainer = new Container(container);
+            if (isDependencyResolver)
+                configuration.ConfigureWebApi(x => x.DependencyResolver = graphiteContainer);
+            return configuration.UseContainer(graphiteContainer);
         }
 
         public static ExplicitArguments ToExplicitArgs(this Dependency[] dependencies)

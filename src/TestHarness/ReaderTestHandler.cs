@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using System.Web.Http;
-using Bender.Extensions;
+using Graphite.Extensions;
 using Graphite.Readers;
 
 namespace TestHarness.Reader

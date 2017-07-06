@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Specialized;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.ServiceModel.Channels;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http;
 using Graphite.Actions;
 using Graphite.Binding;
+using Graphite.Http;
 using NSubstitute;
 using NUnit.Framework;
 using Should;
@@ -26,90 +25,79 @@ namespace Tests.Unit.Binding
 
         public class Handler
         {
-            public void ByAttribute([FromRequestInfo] ActionMethod actionMethod) { }
+            public void ByAttribute([FromRequestProperties] ActionMethod actionMethod) { }
             public void ByTypeWithFromUriAttribute([FromUri] ActionMethod actionMethod) { }
             public void ByTypeWithFromBodyAttribute([FromBody] ActionMethod actionMethod) { }
 
             public void ByName(string remoteAddress) { }
             public void ByName(int remotePort) { }
-            public void ByAttribute([FromRequestInfo] string remoteAddress) { }
-            public void ByAttributeName([FromRequestInfo(RemoteAddress)] string sourceIp) { }
+            public void ByAttribute([FromRequestProperties] string remoteAddress) { }
+            public void ByAttributeName([FromRequestProperties(RemoteAddress)] string sourceIp) { }
             public void ByNameWithFromUriAttribute([FromUri] string remoteAddress) { }
             public void ByNameWithFromBodyAttribute([FromBody] string remoteAddress) { }
         }
 
         public static object[][] BindingCases = TestCaseSource
-            .CreateWithExpression<Handler, string, BindingMode, bool, Type, object>(x => x
+            .CreateWithExpression<Handler, string, BindingMode, Type, object>(x => x
             
-                .Add(h => h.ByAttribute((ActionMethod)null), ActionMethod, BindingMode.None, false, null, null)
-                .Add(h => h.ByAttribute((ActionMethod)null), ActionMethod, BindingMode.Convention, false, null, null)
+                .Add(h => h.ByAttribute((ActionMethod)null), ActionMethod, BindingMode.None, null, null)
+                .Add(h => h.ByAttribute((ActionMethod)null), ActionMethod, BindingMode.Convention, null, null)
 
-                .Add(h => h.ByTypeWithFromUriAttribute(null), ActionMethod, BindingMode.Implicit, false, null, null)
-                .Add(h => h.ByTypeWithFromUriAttribute(null), ActionMethod, BindingMode.Explicit, false, null, null)
-                .Add(h => h.ByTypeWithFromUriAttribute(null), ActionMethod, BindingMode.None, false, null, null)
-                .Add(h => h.ByTypeWithFromUriAttribute(null), ActionMethod, BindingMode.Convention, false, null, null)
+                .Add(h => h.ByTypeWithFromUriAttribute(null), ActionMethod, BindingMode.Implicit, null, null)
+                .Add(h => h.ByTypeWithFromUriAttribute(null), ActionMethod, BindingMode.Explicit, null, null)
+                .Add(h => h.ByTypeWithFromUriAttribute(null), ActionMethod, BindingMode.None, null, null)
+                .Add(h => h.ByTypeWithFromUriAttribute(null), ActionMethod, BindingMode.Convention, null, null)
 
-                .Add(h => h.ByTypeWithFromBodyAttribute(null), ActionMethod, BindingMode.Implicit, false, null, null)
-                .Add(h => h.ByTypeWithFromBodyAttribute(null), ActionMethod, BindingMode.Explicit, false, null, null)
-                .Add(h => h.ByTypeWithFromBodyAttribute(null), ActionMethod, BindingMode.None, false, null, null)
-                .Add(h => h.ByTypeWithFromBodyAttribute(null), ActionMethod, BindingMode.Convention, false, null, null)
+                .Add(h => h.ByTypeWithFromBodyAttribute(null), ActionMethod, BindingMode.Implicit, null, null)
+                .Add(h => h.ByTypeWithFromBodyAttribute(null), ActionMethod, BindingMode.Explicit, null, null)
+                .Add(h => h.ByTypeWithFromBodyAttribute(null), ActionMethod, BindingMode.None, null, null)
+                .Add(h => h.ByTypeWithFromBodyAttribute(null), ActionMethod, BindingMode.Convention, null, null)
 
-                .Add(h => h.ByName(null), RemoteAddress, BindingMode.Implicit, false, null, RemoteAddressValue)
-                .Add(h => h.ByName(0), RemotePort, BindingMode.Implicit, false, null, RemotePortValue)
-                .Add(h => h.ByName(null), RemoteAddress, BindingMode.Implicit, true, null, RemoteAddressValue)
-                .Add(h => h.ByName(0), RemotePort, BindingMode.Implicit, true, null, RemotePortValue)
-                .Add(h => h.ByName(null), RemoteAddress, BindingMode.Explicit, false, null, null)
-                .Add(h => h.ByName(null), RemoteAddress, BindingMode.None, false, null, null)
-                .Add(h => h.ByName(null), RemoteAddress, BindingMode.Convention, false, null, null)
+                .Add(h => h.ByName(null), RemoteAddress, BindingMode.Implicit, null, RemoteAddressValue)
+                .Add(h => h.ByName(0), RemotePort, BindingMode.Implicit, null, RemotePortValue)
+                .Add(h => h.ByName(null), RemoteAddress, BindingMode.Explicit, null, null)
+                .Add(h => h.ByName(null), RemoteAddress, BindingMode.None, null, null)
+                .Add(h => h.ByName(null), RemoteAddress, BindingMode.Convention, null, null)
 
-                .Add(h => h.ByAttribute((string)null), RemoteAddress, BindingMode.Implicit, false, null, RemoteAddressValue)
-                .Add(h => h.ByAttribute((string)null), RemoteAddress, BindingMode.Explicit, false, null, RemoteAddressValue)
-                .Add(h => h.ByAttribute((string)null), RemoteAddress, BindingMode.None, false, null, null)
-                .Add(h => h.ByAttribute((string)null), RemoteAddress, BindingMode.Convention, false, null, null)
+                .Add(h => h.ByAttribute((string)null), RemoteAddress, BindingMode.Implicit, null, RemoteAddressValue)
+                .Add(h => h.ByAttribute((string)null), RemoteAddress, BindingMode.Explicit, null, RemoteAddressValue)
+                .Add(h => h.ByAttribute((string)null), RemoteAddress, BindingMode.None, null, null)
+                .Add(h => h.ByAttribute((string)null), RemoteAddress, BindingMode.Convention, null, null)
 
-                .Add(h => h.ByAttributeName(null), "sourceIp", BindingMode.Implicit, false, null, RemoteAddressValue)
-                .Add(h => h.ByAttributeName(null), "sourceIp", BindingMode.Explicit, false, null, RemoteAddressValue)
-                .Add(h => h.ByAttributeName(null), "sourceIp", BindingMode.None, false, null, null)
-                .Add(h => h.ByAttributeName(null), "sourceIp", BindingMode.Convention, false, null, null)
+                .Add(h => h.ByAttributeName(null), "sourceIp", BindingMode.Implicit, null, RemoteAddressValue)
+                .Add(h => h.ByAttributeName(null), "sourceIp", BindingMode.Explicit, null, RemoteAddressValue)
+                .Add(h => h.ByAttributeName(null), "sourceIp", BindingMode.None, null, null)
+                .Add(h => h.ByAttributeName(null), "sourceIp", BindingMode.Convention, null, null)
 
-                .Add(h => h.ByNameWithFromUriAttribute(null), RemoteAddress, BindingMode.Implicit, false, null, null)
-                .Add(h => h.ByNameWithFromUriAttribute(null), RemoteAddress, BindingMode.Explicit, false, null, null)
-                .Add(h => h.ByNameWithFromUriAttribute(null), RemoteAddress, BindingMode.None, false, null, null)
-                .Add(h => h.ByNameWithFromUriAttribute(null), RemoteAddress, BindingMode.Convention, false, null, null)
+                .Add(h => h.ByNameWithFromUriAttribute(null), RemoteAddress, BindingMode.Implicit, null, null)
+                .Add(h => h.ByNameWithFromUriAttribute(null), RemoteAddress, BindingMode.Explicit, null, null)
+                .Add(h => h.ByNameWithFromUriAttribute(null), RemoteAddress, BindingMode.None, null, null)
+                .Add(h => h.ByNameWithFromUriAttribute(null), RemoteAddress, BindingMode.Convention, null, null)
 
-                .Add(h => h.ByNameWithFromBodyAttribute(null), RemoteAddress, BindingMode.Implicit, false, null, null)
-                .Add(h => h.ByNameWithFromBodyAttribute(null), RemoteAddress, BindingMode.Explicit, false, null, null)
-                .Add(h => h.ByNameWithFromBodyAttribute(null), RemoteAddress, BindingMode.None, false, null, null)
-                .Add(h => h.ByNameWithFromBodyAttribute(null), RemoteAddress, BindingMode.Convention, false, null, null)
+                .Add(h => h.ByNameWithFromBodyAttribute(null), RemoteAddress, BindingMode.Implicit, null, null)
+                .Add(h => h.ByNameWithFromBodyAttribute(null), RemoteAddress, BindingMode.Explicit, null, null)
+                .Add(h => h.ByNameWithFromBodyAttribute(null), RemoteAddress, BindingMode.None, null, null)
+                .Add(h => h.ByNameWithFromBodyAttribute(null), RemoteAddress, BindingMode.Convention, null, null)
             );
 
         [TestCaseSource(nameof(BindingCases))]
         public async Task Should_bind_request_info(Expression<Action<Handler>> action,
-            string parameter, BindingMode bindingMode, bool selfHosted, 
-            Type expectedType, object expectedValue)
+            string parameter, BindingMode bindingMode, Type expectedType, object expectedValue)
         {
             var requestGraph = RequestGraph
                 .CreateFor(action)
                 .AddParameters(parameter)
                 .AddValueMapper(new SimpleTypeMapper());
 
-            if (selfHosted)
+            var properties = new Dictionary<string, object>
             {
-                requestGraph.AddRequestProperty(RemoteEndpointMessageProperty.Name, 
-                    new RemoteEndpointMessageProperty(RemoteAddressValue, 80));
-            }
-            else
-            {
-                AddHttpServerVariables(requestGraph, new NameValueCollection
-                {
-                    { "REMOTE_ADDR", RemoteAddressValue },
-                    { "REMOTE_PORT", RemotePortValue.ToString() }
-                });
-            }
+                ["REMOTEADDRESS"] = RemoteAddressValue,
+                ["REMOTEPORT"] = RemotePortValue.ToString()
+            };
 
             requestGraph.Configuration.RequestInfoBindingMode = bindingMode;
 
-            await CreateBinder(requestGraph)
+            await CreateBinder(requestGraph, properties)
                 .Bind(requestGraph.GetRequestBinderContext());
 
             if (expectedType != null)
@@ -118,17 +106,6 @@ namespace Tests.Unit.Binding
                 requestGraph.ActionArguments[0].ShouldBeType(expectedType);
             }
             else requestGraph.ActionArguments[0].ShouldEqual(expectedValue);
-        }
-
-        private void AddHttpServerVariables(RequestGraph requestGraph, NameValueCollection serverVariables)
-        {
-            var httpContext = Substitute.For<HttpContextBase>();
-            var httpRequest = Substitute.For<HttpRequestBase>();
-
-            httpContext.Request.Returns(httpRequest);
-            httpRequest.ServerVariables.Returns(serverVariables);
-
-            requestGraph.AddRequestProperty(RequestInfoBinder.HttpContextKey, httpContext);
         }
 
         public class MappingHandler
@@ -146,13 +123,13 @@ namespace Tests.Unit.Binding
                     .AddValueMapper1(x => x.Values.First() + "mapper1")
                     .AddValueMapper2(x => x.Values.First() + "mapper2");
 
-            AddHttpServerVariables(requestGraph, new NameValueCollection
+            var properties = new Dictionary<string, object>
             {
-                { "param2", "value2" },
-                { "param3", "value3" }
-            });
+                ["param2"] = "value2",
+                ["param3"] = "value3"
+            };
 
-            var binder = CreateBinder(requestGraph);
+            var binder = CreateBinder(requestGraph, properties);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
@@ -175,13 +152,13 @@ namespace Tests.Unit.Binding
                     .AddValueMapper1(x => x.Values.First() + "mapper1", configAppliesTo: x => false)
                     .AddValueMapper2(x => x.Values.First() + "mapper2");
 
-            AddHttpServerVariables(requestGraph, new NameValueCollection
+            var properties = new Dictionary<string, object>
             {
-                { "param2", "value2" },
-                { "param3", "value3" }
-            });
+                ["param2"] = "value2",
+                ["param3"] = "value3"
+            };
 
-            var binder = CreateBinder(requestGraph);
+            var binder = CreateBinder(requestGraph, properties);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
@@ -204,13 +181,13 @@ namespace Tests.Unit.Binding
                     .AddValueMapper1(x => x.Values.First() + "mapper1", instanceAppliesTo: x => false)
                     .AddValueMapper2(x => x.Values.First() + "mapper2");
 
-            AddHttpServerVariables(requestGraph, new NameValueCollection
+            var properties = new Dictionary<string, object>
             {
-                { "param2", "value2" },
-                { "param3", "value3" }
-            });
+                ["param2"] = "value2",
+                ["param3"] = "value3"
+            };
 
-            var binder = CreateBinder(requestGraph);
+            var binder = CreateBinder(requestGraph, properties);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
@@ -231,13 +208,13 @@ namespace Tests.Unit.Binding
                 .AddAllActionParameters()
                 .Configure(x => x.BindRequestInfo());
 
-            AddHttpServerVariables(requestGraph, new NameValueCollection
+            var properties = new Dictionary<string, object>
             {
-                { "param2", "value2" },
-                { "param3", "value3" }
-            });
+                ["param2"] = "value2",
+                ["param3"] = "value3"
+            };
 
-            var binder = CreateBinder(requestGraph);
+            var binder = CreateBinder(requestGraph, properties);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
@@ -251,26 +228,29 @@ namespace Tests.Unit.Binding
                 .CreateFor<MappingHandler>(h => h.Action(null, null, null))
                 .Configure(x => x.BindRequestInfo());
 
-            AddHttpServerVariables(requestGraph, new NameValueCollection
+            var properties = new Dictionary<string, object>
             {
-                { "param2", "value2" },
-                { "param3", "value3" }
-            });
+                ["param2"] = "value2",
+                ["param3"] = "value3"
+            };
 
-            var binder = CreateBinder(requestGraph);
+            var binder = CreateBinder(requestGraph, properties);
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
             requestGraph.ActionArguments.ShouldOnlyContain(null, null, null);
         }
 
-        public RequestInfoBinder CreateBinder(RequestGraph requestGraph)
+        public RequestPropertiesBinder CreateBinder(RequestGraph requestGraph, 
+            IDictionary<string, object> parameters)
         {
-            return new RequestInfoBinder(
+            var propertyProvider = Substitute.For<IRequestPropertiesProvider>();
+            propertyProvider.GetProperties().Returns(parameters);
+            return new RequestPropertiesBinder(
                 requestGraph.Configuration,
                 requestGraph.GetRouteDescriptor(),
                 requestGraph.GetParameterBinder(),
-                requestGraph.GetHttpRequestMessage());
+                propertyProvider);
         }
     }
 }

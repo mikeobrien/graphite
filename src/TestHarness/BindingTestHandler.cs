@@ -91,13 +91,14 @@ namespace TestHarness.Binding
         }
 
         public BindingModel GetWithRequestInfo(string param, string remoteAddress,
-            [FromRequestInfo("serverProtocol")] string someInfo, HttpRequestMessage requestMessage)
+            [FromRequestProperties("remotePort")] int someInfo, 
+            HttpRequestMessage requestMessage)
         {
             return new BindingModel
             {
                 Param = param,
                 ParamByName = remoteAddress,
-                ParamByAttribute = someInfo,
+                ParamByAttribute = someInfo.ToString(),
                 ParamByType = requestMessage != null
             };
         }

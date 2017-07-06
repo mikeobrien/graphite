@@ -14,9 +14,10 @@ namespace Tests.Acceptance
         private const string BaseUrl = "Binding/";
 
         [Test]
-        public void Should_post_json_to_action_parameters()
+        public void Should_post_json_to_action_parameters(
+            [Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.PostJson<BindingTestHandler.ParameterModel, 
+            var result = Http.ForHost(host).PostJson<BindingTestHandler.ParameterModel, 
                 BindingTestHandler.ParameterModel>($"{BaseUrl}ToParameters",
                 new BindingTestHandler.ParameterModel { Value = "fark" });
 
@@ -26,9 +27,10 @@ namespace Tests.Acceptance
         }
 
         [Test]
-        public void Should_post_xml_to_action_parameters()
+        public void Should_post_xml_to_action_parameters(
+            [Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.PostXml<BindingTestHandler.ParameterModel,
+            var result = Http.ForHost(host).PostXml<BindingTestHandler.ParameterModel,
                 BindingTestHandler.ParameterModel>($"{BaseUrl}ToParameters",
                 new BindingTestHandler.ParameterModel { Value = "fark" });
 
@@ -39,9 +41,10 @@ namespace Tests.Acceptance
 
         [Test]
         public void Should_post_form_url_encoded_to_params(
-            [Values("", "&form1=form1b&form2=7")] string querystring)
+            [Values("", "&form1=form1b&form2=7")] string querystring,
+            [Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.PostForm<BindingTestHandler.FormModel>(
+            var result = Http.ForHost(host).PostForm<BindingTestHandler.FormModel>(
                 $"{BaseUrl}FormToParams", $"form1=form1&form2=6{querystring}");
 
             result.Status.ShouldEqual(HttpStatusCode.OK);
@@ -50,9 +53,10 @@ namespace Tests.Acceptance
         }
 
         [Test]
-        public void Should_post_form_url_encoded_multi_to_params()
+        public void Should_post_form_url_encoded_multi_to_params(
+            [Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.PostForm<BindingTestHandler.MultiParamFormModel>(
+            var result = Http.ForHost(host).PostForm<BindingTestHandler.MultiParamFormModel>(
                 $"{BaseUrl}FormToMultiParams", "form1=forma&form2=6&form1=formb&form2=7");
 
             result.Status.ShouldEqual(HttpStatusCode.OK);
@@ -61,9 +65,10 @@ namespace Tests.Acceptance
         }
 
         [Test]
-        public void Should_post_form_url_encoded_to_model()
+        public void Should_post_form_url_encoded_to_model(
+            [Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.PostForm<BindingTestHandler.FormModel>($"{BaseUrl}FormToModel",
+            var result = Http.ForHost(host).PostForm<BindingTestHandler.FormModel>($"{BaseUrl}FormToModel",
                 "form1=forma&form2=6&form1=formb&form2=7");
 
             result.Status.ShouldEqual(HttpStatusCode.OK);
@@ -72,9 +77,10 @@ namespace Tests.Acceptance
         }
 
         [Test]
-        public void Should_post_form_url_encoded_multi_params_to_model()
+        public void Should_post_form_url_encoded_multi_params_to_model(
+            [Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.PostForm<BindingTestHandler.MultiParamFormModel>(
+            var result = Http.ForHost(host).PostForm<BindingTestHandler.MultiParamFormModel>(
                 $"{BaseUrl}FormToModelWithMultiParams",
                 "form1=forma&form2=6&form1=formb&form2=7");
 
@@ -84,9 +90,9 @@ namespace Tests.Acceptance
         }
 
         [Test]
-        public void Should_bind_cookies()
+        public void Should_bind_cookies([Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.GetJson<BindingTestHandler.BindingModel>($"{BaseUrl}WithCookies",
+            var result = Http.ForHost(host).GetJson<BindingTestHandler.BindingModel>($"{BaseUrl}WithCookies",
                 new Dictionary<string, string>
                 {
                     { "cookie1", "value1" },
@@ -101,9 +107,9 @@ namespace Tests.Acceptance
         }
 
         [Test]
-        public void Should_bind_headers()
+        public void Should_bind_headers([Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.GetJson<BindingTestHandler.BindingModel>(
+            var result = Http.ForHost(host).GetJson<BindingTestHandler.BindingModel>(
                 $"{BaseUrl}WithHeaders",
                 requestHeaders: x => {
                     x.Add("header1", "value1");
@@ -118,22 +124,22 @@ namespace Tests.Acceptance
         }
 
         [Test]
-        public void Should_bind_request_info()
+        public void Should_bind_request_info([Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.GetJson<BindingTestHandler.BindingModel>(
+            var result = Http.ForHost(host).GetJson<BindingTestHandler.BindingModel>(
                 $"{BaseUrl}WithRequestInfo");
 
             result.Status.ShouldEqual(HttpStatusCode.OK);
 
             result.Data.Param.ShouldBeNull();
             result.Data.ParamByName.ShouldEqual("::1");
-            result.Data.ParamByAttribute.ShouldEqual("HTTP/1.1");
+            result.Data.ParamByAttribute.ShouldBeInteger();
         }
 
         [Test]
-        public void Should_bind_with_ioc_container()
+        public void Should_bind_with_ioc_container([Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.GetJson<BindingTestHandler.ContainerBindingModel>(
+            var result = Http.ForHost(host).GetJson<BindingTestHandler.ContainerBindingModel>(
                 $"{BaseUrl}Container");
 
             result.Status.ShouldEqual(HttpStatusCode.OK);

@@ -13,5 +13,13 @@ namespace Graphite.Extensions
         {
             return Math.Max(value, min);
         }
+
+        public static int TryParseInt(this object value)
+        {
+            if (value is int) return (int) value;
+            int intValue;
+            return value is string && int.TryParse(
+                value.ToString(), out intValue) ? intValue : 0;
+        }
     }
 }

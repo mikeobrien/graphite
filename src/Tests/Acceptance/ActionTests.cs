@@ -11,27 +11,28 @@ namespace Tests.Acceptance
         private const string BaseUrl = "Action/";
 
         [Test]
-        public void Should_modify_cookies()
+        public void Should_modify_cookies([Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.Get($"{BaseUrl}UpdateCookies");
+            var result = Http.ForHost(host).Get($"{BaseUrl}UpdateCookies");
 
             result.Status.ShouldEqual(HttpStatusCode.NoContent);
             result.Cookies["fark"].ShouldEqual("farker");
         }
 
         [Test]
-        public void Should_modify_headers()
+        public void Should_modify_headers([Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.Get($"{BaseUrl}UpdateHeaders");
+            var result = Http.ForHost(host).Get($"{BaseUrl}UpdateHeaders");
 
             result.Status.ShouldEqual(HttpStatusCode.NoContent);
             result.Headers.GetValues("fark").ShouldContain("farker");
         }
 
         [Test]
-        public void Should_write_http_response_message()
+        public void Should_write_http_response_message(
+            [Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.Get($"{BaseUrl}WithResponseMessage");
+            var result = Http.ForHost(host).Get($"{BaseUrl}WithResponseMessage");
 
             result.Status.ShouldEqual(HttpStatusCode.PaymentRequired);
         }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,6 +24,17 @@ namespace Tests.Common
     
     public static class FluentAssertions
     {
+        public static void ShouldBeInteger(this string value)
+        {
+            int output;
+            int.TryParse(value, out output).ShouldEqual(true, $"{value} is not an integer.");
+        }
+
+        public static void ShouldEndWith(this string value, string expected)
+        {
+            value.EndsWith(expected).ShouldEqual(true, $"'{value}' does not end with '{expected}'.");
+        }
+
         public static void ShouldOnlyContain<T>(
             this IEnumerable<T> source, params T[] items)
         {

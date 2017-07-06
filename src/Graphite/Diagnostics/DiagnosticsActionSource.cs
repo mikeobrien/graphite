@@ -34,7 +34,7 @@ namespace Graphite.Diagnostics
             var configuration = new Configuration();
             var configurationContext = new ConfigurationContext(configuration, _httpConfiguration);
 
-            new ConfigurationDsl(configuration)
+            new ConfigurationDsl(configuration, _httpConfiguration)
                 .IncludeTypeAssembly<DiagnosticsActionSource>()
                 .OnlyIncludeHandlersUnder<DiagnosticsActionSource>()
                 .ExcludeTypeNamespaceFromUrl<DiagnosticsActionSource>();

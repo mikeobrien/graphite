@@ -15,9 +15,10 @@ namespace Tests.Acceptance
         private const string BaseUrl = "Cors/";
 
         [Test]
-        public void Should_not_apply_cors_policy_to_non_cors_action()
+        public void Should_not_apply_cors_policy_to_non_cors_action(
+            [Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.GetString($"{BaseUrl}NotCors");
+            var result = Http.ForHost(host).GetString($"{BaseUrl}NotCors");
 
             result.Status.ShouldEqual(HttpStatusCode.OK);
             result.Data.ShouldEqual("fark");
@@ -25,21 +26,27 @@ namespace Tests.Acceptance
         }
 
         [Test]
-        public void Should_not_apply_cors_preflight_policy_to_non_cors_action()
+        public void Should_not_apply_cors_preflight_policy_to_non_cors_action(
+            [Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.Options($"{BaseUrl}NotCors");
+            var result = Http.ForHost(host).Options($"{BaseUrl}NotCors");
 
             result.Status.ShouldEqual(HttpStatusCode.NotFound);
         }
 
-        [TestCase("1", "http://fark.com", true)]
-        [TestCase("1", "http://farker.com", false)]
-        [TestCase("2", "http://farker.com", true)]
-        [TestCase("2", "http://fark.com", false)]
+        [TestCase("1", "http://fark.com", true, Host.IISExpress)]
+        [TestCase("1", "http://farker.com", false, Host.IISExpress)]
+        [TestCase("2", "http://farker.com", true, Host.IISExpress)]
+        [TestCase("2", "http://fark.com", false, Host.IISExpress)]
+
+        [TestCase("1", "http://fark.com", true, Host.Owin)]
+        [TestCase("1", "http://farker.com", false, Host.Owin)]
+        [TestCase("2", "http://farker.com", true, Host.Owin)]
+        [TestCase("2", "http://fark.com", false, Host.Owin)]
         public void Should_apply_policies_to_correct_actions(
-            string policy, string url, bool valid)
+            string policy, string url, bool valid, Host host)
         {
-            var result = Http.GetString($"{BaseUrl}CorsPolicy{policy}", 
+            var result = Http.ForHost(host).GetString($"{BaseUrl}CorsPolicy{policy}", 
                 requestHeaders: x => x.Add(CorsConstants.Origin, url));
 
             result.Status.ShouldEqual(HttpStatusCode.OK);
@@ -57,14 +64,19 @@ namespace Tests.Acceptance
             }
         }
 
-        [TestCase("1", "http://fark.com", true)]
-        [TestCase("1", "http://farker.com", false)]
-        [TestCase("2", "http://farker.com", true)]
-        [TestCase("2", "http://fark.com", false)]
+        [TestCase("1", "http://fark.com", true, Host.IISExpress)]
+        [TestCase("1", "http://farker.com", false, Host.IISExpress)]
+        [TestCase("2", "http://farker.com", true, Host.IISExpress)]
+        [TestCase("2", "http://fark.com", false, Host.IISExpress)]
+
+        [TestCase("1", "http://fark.com", true, Host.Owin)]
+        [TestCase("1", "http://farker.com", false, Host.Owin)]
+        [TestCase("2", "http://farker.com", true, Host.Owin)]
+        [TestCase("2", "http://fark.com", false, Host.Owin)]
         public void Should_apply_policies_to_correct_actions_for_preflight(
-            string policy, string url, bool valid)
+            string policy, string url, bool valid, Host host)
         {
-            var result = Http.Options($"{BaseUrl}CorsPolicy{policy}", requestHeaders:
+            var result = Http.ForHost(host).Options($"{BaseUrl}CorsPolicy{policy}", requestHeaders:
                 x => {
                     x.Add(CorsConstants.Origin, url);
                     x.Add(CorsConstants.AccessControlRequestMethod, HttpMethod.Get.Method);

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace Graphite.Extensions
 {
@@ -82,11 +81,11 @@ namespace Graphite.Extensions
             return source?.ToLookup(x => x.Key, x => x.Value);
         }
 
-        private static ILookup<string, T> ToLookup<T>(this NameValueCollection source, 
+        private static ILookup<string, TValue> ToLookup<TValue>(this NameValueCollection source, 
             Func<string, string> getKey = null)
         {
             return source.AllKeys.SelectMany(key => source.GetValues(key)
-                .Select(value => new KeyValuePair<string, T>(key, (T)(object)value)))
+                .Select(value => new KeyValuePair<string, TValue>(key, (TValue)(object)value)))
                 .ToLookup(x => getKey?.Invoke(x.Key) ?? x.Key, x => x.Value);
         }
 
@@ -111,9 +110,11 @@ namespace Graphite.Extensions
                 resultSelector, StringComparer.OrdinalIgnoreCase);
         }
 
-        public static Dictionary<string, string> ToDictionary(this NameValueCollection source)
+        public static Dictionary<string, TValue> ToDictionary<TValue>(this NameValueCollection source, 
+            Func<string, string> key = null, Func<string, TValue> value = null) where TValue : class
         {
-            return source.AllKeys.ToDictionary(x => x, x => source[x], 
+            return source.AllKeys.ToDictionary(key ?? (x => x), 
+                x => value?.Invoke(source[x]) ?? (TValue)(object)source[x], 
                 StringComparer.OrdinalIgnoreCase);
         }
     }

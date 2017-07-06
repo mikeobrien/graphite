@@ -13,9 +13,9 @@ namespace Tests.Acceptance
         private const string BaseUrl = "Writer/";
 
         [Test]
-        public void Should_get_xml()
+        public void Should_get_xml([Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.GetXml<WriterTestHandler.XmlModel>($"{BaseUrl}Xml");
+            var result = Http.ForHost(host).GetXml<WriterTestHandler.XmlModel>($"{BaseUrl}Xml");
 
             result.Status.ShouldEqual(HttpStatusCode.OK);
             result.ContentType.ShouldEqual(MimeTypes.ApplicationXml);
@@ -23,9 +23,10 @@ namespace Tests.Acceptance
         }
 
         [Test]
-        public void Should_get_string([Values("String1", "String2")] string url)
+        public void Should_get_string([Values("String1", "String2")] string url,
+            [Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.GetStream(BaseUrl + url, data =>
+            var result = Http.ForHost(host).GetStream(BaseUrl + url, data =>
             {
                 data.ReadAllText().ShouldEqual("fark");
             });
@@ -35,9 +36,10 @@ namespace Tests.Acceptance
         }
 
         [Test]
-        public void Should_get_stream([Values("Stream1", "Stream2")] string url)
+        public void Should_get_stream([Values("Stream1", "Stream2")] string url,
+            [Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.GetStream(BaseUrl + url, data =>
+            var result = Http.ForHost(host).GetStream(BaseUrl + url, data =>
             {
                 data.ReadAllText().ShouldEqual("fark");
             });
@@ -47,9 +49,10 @@ namespace Tests.Acceptance
         }
 
         [Test]
-        public void Should_get_bytes([Values("Bytes1", "Bytes2")] string url)
+        public void Should_get_bytes([Values("Bytes1", "Bytes2")] string url,
+            [Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.GetStream(BaseUrl + url, data =>
+            var result = Http.ForHost(host).GetStream(BaseUrl + url, data =>
             {
                 data.ReadAllText().ShouldEqual("fark");
             });
@@ -59,10 +62,11 @@ namespace Tests.Acceptance
         }
 
         [Test]
-        public void Should_redirect([Values("Redirect",
-            "RedirectModel?redirect=true")] string url)
+        public void Should_redirect(
+            [Values("Redirect", "RedirectModel?redirect=true")] string url,
+            [Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.GetString(BaseUrl + url);
+            var result = Http.ForHost(host).GetString(BaseUrl + url);
             
             result.WasRedirected.ShouldBeTrue();
             result.RedirectUrl.ShouldEqual("http://www.google.com/");
@@ -70,9 +74,10 @@ namespace Tests.Acceptance
         }
 
         [Test]
-        public void Should_not_redirect_from_model_when_no_redirect_specified()
+        public void Should_not_redirect_from_model_when_no_redirect_specified(
+            [Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.GetJson<WriterTestHandler.RedirectModel>(
+            var result = Http.ForHost(host).GetJson<WriterTestHandler.RedirectModel>(
                 $"{BaseUrl}RedirectModel?redirect=false");
             
             result.WasRedirected.ShouldBeFalse();
@@ -81,9 +86,10 @@ namespace Tests.Acceptance
         }
 
         [Test]
-        public void Should_not_redirect_and_set_Status_when_status_specified()
+        public void Should_not_redirect_and_set_Status_when_status_specified(
+            [Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.GetJson<WriterTestHandler.RedirectModel>(
+            var result = Http.ForHost(host).GetJson<WriterTestHandler.RedirectModel>(
                 $"{BaseUrl}NoRedirectWithStatus");
 
             result.Status.ShouldEqual(HttpStatusCode.NotFound);

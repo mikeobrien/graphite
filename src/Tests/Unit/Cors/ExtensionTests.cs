@@ -26,7 +26,7 @@ namespace Tests.Unit.Cors
         public void Setup()
         {
             _configuration = new Configuration();
-            _dsl = new ConfigurationDsl(_configuration);
+            _dsl = new ConfigurationDsl(_configuration, null);
         }
 
         public class SomeEngine : CorsEngine { }

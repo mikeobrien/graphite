@@ -155,7 +155,7 @@ namespace Tests.Common
 
         public RequestGraph Configure(Action<ConfigurationDsl> config)
         {
-            config(new ConfigurationDsl(Configuration));
+            config(new ConfigurationDsl(Configuration, HttpConfiguration));
             return this;
         }
 

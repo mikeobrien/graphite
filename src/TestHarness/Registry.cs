@@ -1,6 +1,6 @@
 ﻿namespace TestHarness
 {
-    public class Registry : global::StructureMap.Registry
+    public class Registry : StructureMap.Registry
     {
         // IoC registration here...
     }

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 using Graphite.Extensions;
+using Graphite.Readers;
 
 namespace Graphite.Reflection
 {
@@ -209,6 +212,15 @@ namespace Graphite.Reflection
         public static bool Is<T>(this Type type, bool includeNullable) where T : struct
         {
             return type.Is<T>() || (includeNullable && type.Is<T?>());
+        }
+
+        public static string GetManifestResourceString(this Assembly assembly, 
+            string name, Encoding encoding = null)
+        {
+            using (var stream = assembly.GetManifestResourceStream(name))
+            {
+                return stream.ReadToEnd();
+            }
         }
 
         public static object WrapWithFormatException(this string value, Func<string, object> parse)

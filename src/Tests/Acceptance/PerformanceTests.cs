@@ -12,8 +12,9 @@ namespace Tests.Acceptance
     [TestFixture]
     public class PerformanceTests
     {
-        [Test][Ignore("Manually run")]
-        public void Performance()
+        [Test]
+        [Ignore("Manually run")]
+        public void Performance([Values(Host.Owin, Host.IISExpress)] Host host)
         {
             var guid = Guid.Parse("6e7335ea-5968-4cf5-84a2-0b8ef560a865");
             var url = $"performancetests/{{0}}/url1/{guid}/5?query1=query1&query2={guid}&query3=5";
@@ -29,20 +30,20 @@ namespace Tests.Acceptance
                 Value3 = "value3"
             };
 
-            Should_match_result(Http.PostJson<PerfInputModel, PerfOutputModel>(graphiteUrl, inputModel), guid);
-            Should_match_result(Http.PostJson<PerfInputModel, PerfOutputModel>(webapiUrl, inputModel), guid);
-            Should_match_result(Http.PostJson<PerfInputModel, PerfOutputModel>(graphiteAsyncUrl, inputModel), guid);
-            Should_match_result(Http.PostJson<PerfInputModel, PerfOutputModel>(webapiAsyncUrl, inputModel), guid);
+            Should_match_result(Http.ForHost(host).PostJson<PerfInputModel, PerfOutputModel>(graphiteUrl, inputModel), guid);
+            Should_match_result(Http.ForHost(host).PostJson<PerfInputModel, PerfOutputModel>(webapiUrl, inputModel), guid);
+            Should_match_result(Http.ForHost(host).PostJson<PerfInputModel, PerfOutputModel>(graphiteAsyncUrl, inputModel), guid);
+            Should_match_result(Http.ForHost(host).PostJson<PerfInputModel, PerfOutputModel>(webapiAsyncUrl, inputModel), guid);
 
             3.Times(() =>
             {
                 Thread.Sleep(5000);
                 var comparison = PerformanceComparison.InMilliseconds(100, 20, 40);
 
-                var graphite = comparison.AddCase("Graphite", () => Http.PostJson<PerfInputModel, PerfOutputModel>(graphiteUrl, inputModel));
-                var graphiteAsync = comparison.AddCase("Graphite Async", () => Http.PostJson<PerfInputModel, PerfOutputModel>(graphiteAsyncUrl, inputModel));
-                var webapi = comparison.AddCase("Web Api", () => Http.PostJson<PerfInputModel, PerfOutputModel>(webapiUrl, inputModel));
-                var webapiAsync = comparison.AddCase("Web Api Async", () => Http.PostJson<PerfInputModel, PerfOutputModel>(webapiAsyncUrl, inputModel));
+                var graphite = comparison.AddCase("Graphite", () => Http.ForHost(host).PostJson<PerfInputModel, PerfOutputModel>(graphiteUrl, inputModel));
+                var graphiteAsync = comparison.AddCase("Graphite Async", () => Http.ForHost(host).PostJson<PerfInputModel, PerfOutputModel>(graphiteAsyncUrl, inputModel));
+                var webapi = comparison.AddCase("Web Api", () => Http.ForHost(host).PostJson<PerfInputModel, PerfOutputModel>(webapiUrl, inputModel));
+                var webapiAsync = comparison.AddCase("Web Api Async", () => Http.ForHost(host).PostJson<PerfInputModel, PerfOutputModel>(webapiAsyncUrl, inputModel));
 
                 comparison.Run();
 
@@ -50,7 +51,7 @@ namespace Tests.Acceptance
             });
         }
 
-        private void Should_match_result(Http.Result<PerfOutputModel> outputModel, Guid guid)
+        private void Should_match_result(RestClient.Result<PerfOutputModel> outputModel, Guid guid)
         {
             outputModel.Status.ShouldEqual(HttpStatusCode.OK);
             outputModel.Data.ShouldNotBeNull();

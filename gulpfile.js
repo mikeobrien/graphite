@@ -54,64 +54,43 @@ gulp.task('test', ['build'], function () {
         }));
 });
 
-gulp.task('nuget-copy-graphite', ['test'], function() {
-    return gulp.src('src/Graphite/bin/Release/Graphite.{dll,pdb,xml}')
-        .pipe(gulp.dest('graphite-package/lib'));
-});
+function buildNugetPackage(assembly, packageName, path)
+{
+    var source = 'src/' + (path ? path + '/' : '') + assembly + 
+    	'/bin/Release/' + assembly + '.{dll,pdb,xml}';
+    var dest = packageName + '-package/lib';
 
-gulp.task('nuget-copy-structuremap', ['test'], function() {
-    return gulp.src('src/Integration/DependencyInjection/Graphite.StructureMap' + 
-            '/bin/Release/Graphite.StructureMap.{dll,pdb,xml}')
-        .pipe(gulp.dest('structuremap-package/lib'));
-});
-
-gulp.task('nuget-copy-bender', ['test'], function() {
-    return gulp.src('src/Integration/Serializers/Graphite.Bender/bin/' + 
-            'Release/Graphite.Bender.{dll,pdb,xml}')
-        .pipe(gulp.dest('bender-package/lib'));
-});
-
-gulp.task('nuget-copy-cors', ['test'], function() {
-    return gulp.src('src/Graphite.Cors/bin/' + 
-            'Release/Graphite.Cors.{dll,pdb,xml}')
-        .pipe(gulp.dest('cors-package/lib'));
-});
-
-gulp.task('nuget-pack-graphite', ['nuget-copy-graphite'], function() {
-
-    return nuget.pack({
-        spec: 'GraphiteWeb.nuspec',
-        basePath: 'graphite-package',
-        version: args.buildVersion
+    gulp.task('nuget-copy-' + packageName, ['test'], function() {
+    	console.log('Copying ' + source + ' to ' + dest + '...');
+        return gulp.src(source).pipe(gulp.dest(dest));
     });
-});
 
-gulp.task('nuget-pack-structuremap', ['nuget-copy-structuremap'], function() {
-    return nuget.pack({
-        spec: 'GraphiteWeb.StructureMap.nuspec',
-        basePath: 'structuremap-package',
-        version: args.buildVersion
+    gulp.task('nuget-pack-' + packageName, ['nuget-copy-' + packageName], function() {
+    	var spec = packageName + '.nuspec';
+    	var path = packageName + '-package';
+    	console.log('Packing ' + path + ' for ' + spec + '...');
+        return nuget.pack({
+            spec: spec,
+            basePath: path,
+            version: args.buildVersion
+        });
     });
-});
+}
 
-gulp.task('nuget-pack-bender', ['nuget-copy-bender'], function() {
-    return nuget.pack({
-        spec: 'GraphiteWeb.Bender.nuspec',
-        basePath: 'bender-package',
-        version: args.buildVersion
-    });
-});
+buildNugetPackage('Graphite', 'GraphiteWeb.Core');
+buildNugetPackage('Graphite.AspNet', 'GraphiteWeb.AspNet');
+buildNugetPackage('Graphite.Owin', 'GraphiteWeb.Owin');
+buildNugetPackage('Graphite.StructureMap', 'GraphiteWeb.StructureMap', 'Integration/DependencyInjection');
+buildNugetPackage('Graphite.Bender', 'GraphiteWeb.Bender', 'Integration/Serializers');
+buildNugetPackage('Graphite.Cors', 'GraphiteWeb.Cors');
 
-gulp.task('nuget-pack-cors', ['nuget-copy-cors'], function() {
-    return nuget.pack({
-        spec: 'GraphiteWeb.Cors.nuspec',
-        basePath: 'cors-package',
-        version: args.buildVersion
-    });
-});
-
-gulp.task('nuget-pack', ['nuget-pack-graphite', 'nuget-pack-structuremap', 
-    'nuget-pack-bender', 'nuget-pack-cors']);
+gulp.task('nuget-pack', [
+    'nuget-pack-GraphiteWeb.Core',
+    'nuget-pack-GraphiteWeb.AspNet', 
+    'nuget-pack-GraphiteWeb.Owin', 
+    'nuget-pack-GraphiteWeb.StructureMap', 
+    'nuget-pack-GraphiteWeb.Bender', 
+    'nuget-pack-GraphiteWeb.Cors']);
 
 gulp.task('nuget-push', ['nuget-pack'], function() {
     return nuget.push('*.nupkg', { 

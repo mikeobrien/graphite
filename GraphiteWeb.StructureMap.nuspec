@@ -16,8 +16,8 @@
       <iconUrl>https://github.com/mikeobrien/graphite/raw/master/misc/logo128x128.png</iconUrl>
       <tags>graphite web api rest structuremap ioc dependency injection</tags>
       <dependencies>
-         <dependency id="GraphiteWeb" version="1.0.0" />
-         <dependency id="StructureMap" version="4.0.0" />
+         <dependency id="GraphiteWeb.Core" version="1.0.0" />
+         <dependency id="StructureMap" version="4.5.0" />
       </dependencies>
    </metadata>
 </package>

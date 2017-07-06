@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Web.Http;
@@ -8,6 +9,7 @@ using Graphite.Behaviors;
 using Graphite.Binding;
 using Graphite.DependencyInjection;
 using Graphite.Diagnostics;
+using Graphite.Http;
 using Graphite.Readers;
 using Graphite.Reflection;
 using Graphite.Routing;
@@ -22,69 +24,54 @@ using Tests.Common.Fakes;
 namespace Tests.Unit
 {
     [TestFixture]
-    public class GraphiteBootstrapTests
+    public class GraphiteApplicationTests
     {
-        [SetUp, TearDown]
+        private Container _container;
+        private GraphiteApplication _application;
+
+        [SetUp]
         public void Setup()
         {
-            GlobalConfiguration.Configuration.Clear();
+            _container = new Container();
+            RegisterRequestObjects(_container);
+            _container.Register(Substitute.For<IRequestPropertiesProvider>());
+            _application = new GraphiteApplication(new HttpConfiguration());
         }
 
         [Test]
         public void Should_call_configured_initializer_instance()
         {
-            var container = new Container();
             var initializer = Substitute.For<IInitializer>();
 
-            GlobalConfiguration.Configure(httpConfig =>
-            {
-                httpConfig.InitializeGraphite(config => config
-                    .UseContainer(container)
-                    .FilterHandlersBy((c, t) => false)
-                    .WithInitializer(initializer)
-                );
-            });
-            
+            _application.Initialize(c => c
+                .UseContainer(_container)
+                .FilterHandlersBy((a, t) => false)
+                .WithInitializer(initializer)
+            );
+
             initializer.Received(1).Initialize();
         }
 
         [Test]
-        public void Should_initialize_graphite_with_defaults()
+        public void Should_initialize_graphite()
         {
-            var container = new Container();
+            _application.Initialized.ShouldBeFalse();
 
-            GlobalConfiguration.Configuration.InitializeGraphite(config => 
-                config
-                    .UseContainer(container)
-                    .FilterHandlersBy((c, t) => false)
-                    .ConfigureActionDecorators(x => x.Append<TestActionDecorator>())
-            );
-            
-            Should_be_configured_with_graphite_defaults(container);
+            _application.Initialize(c => c
+                .IncludeTypeAssembly<GraphiteApplicationTests>()
+                .UseContainer(_container)
+                .FilterHandlersBy((a, t) => false)
+                .ConfigureActionDecorators(x => x.Append<TestActionDecorator>()));
+
+            _application.Initialized.ShouldBeTrue();
+            _application.Container.ShouldNotBeNull();
+            _application.Metrics.ShouldNotBeNull();
+
+            Should_be_configured_with_graphite_defaults(_container);
         }
 
-        [Test]
-        public void Should_initialize_graphite_in_configuration_dsl_with_defaults()
+        public static void RegisterRequestObjects(Container container)
         {
-            var container = new Container();
-
-            GlobalConfiguration.Configure(httpConfig =>
-            {
-                httpConfig.InitializeGraphite(config => {
-                    config
-                        .IncludeTypeAssembly<GraphiteBootstrapTests>()
-                        .UseContainer(container)
-                        .FilterHandlersBy((c, t) => false)
-                        .ConfigureActionDecorators(x => x.Append<TestActionDecorator>());
-                });
-            });
-            
-            Should_be_configured_with_graphite_defaults(container);
-        }
-
-        public void Should_be_configured_with_graphite_defaults(Container container)
-        {
-            // Register per request instances
             var requestGraph = RequestGraph.Create();
             container.Register(requestGraph.GetRouteDescriptor());
             container.Register(requestGraph.GetHttpRequestMessage());
@@ -92,7 +79,10 @@ namespace Tests.Unit
             container.Register(requestGraph.ActionMethod);
             container.Register(requestGraph.GetUrlParameters());
             container.Register(requestGraph.GetQuerystringParameters());
+        }
 
+        public static void Should_be_configured_with_graphite_defaults(Container container)
+        {
             var configuration = container.GetInstance<Configuration>();
 
             configuration.Container.ShouldEqual(container);
@@ -135,7 +125,7 @@ namespace Tests.Unit
             requestBinders[5].ShouldBeType<XmlBinder>();
             requestBinders[6].ShouldBeType<HeaderBinder>();
             requestBinders[7].ShouldBeType<CookieBinder>();
-            requestBinders[8].ShouldBeType<RequestInfoBinder>();
+            requestBinders[8].ShouldBeType<RequestPropertiesBinder>();
             requestBinders[9].ShouldBeType<ContainerBinder>();
 
             var valueMappers = container.GetInstances<IValueMapper>().ToList();

@@ -59,7 +59,9 @@ namespace Tests.Unit.Writers
 
             content.ShouldEqual(
                 "<?xml version=\"1.0\"?>\r\n" +
-                "<OutputModel xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n" +
+                "<OutputModel " + 
+                    "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " +
+                    "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n" + 
                 "  <Value1>value1</Value1>\r\n" +
                 "  <Value2>value2</Value2>\r\n" +
                 "</OutputModel>");
