@@ -536,6 +536,14 @@ namespace Tests.Common
                     value3, value4);
                 return this;
             }
+
+            public CaseDsl<T1, T2, T3, T4> Add<TArg1, TType>
+            (Expression<Func<TArg1, object>> expression,
+                T1 value1, T2 value2, T3 value3, params T4[] value4)
+            {
+                AddCase(expression, typeof(TType), value1, value2, value3, value4);
+                return this;
+            }
         }
 
         public class CaseDsl<T1, T2, T3, T4, T5> : CaseDslBase

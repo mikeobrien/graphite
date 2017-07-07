@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Web.Http;
 using Graphite.Extensions;

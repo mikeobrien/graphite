@@ -12,6 +12,7 @@ namespace Graphite.Actions
         public ActionMethod(TypeDescriptor handlerTypeDescriptor, MethodDescriptor methodDescriptor)
         {
             FullName = $"{handlerTypeDescriptor.FriendlyFullName}.{methodDescriptor.FriendlyName}";
+            HandlerAssemblyDescriptor = handlerTypeDescriptor.AssemblyDescriptor;
             HandlerTypeDescriptor = handlerTypeDescriptor;
             MethodDescriptor = methodDescriptor;
             Invoke = methodDescriptor.GenerateAsyncInvoker(handlerTypeDescriptor);
@@ -20,6 +21,7 @@ namespace Graphite.Actions
         public virtual string FullName { get; }
         public virtual string Name => MethodDescriptor.Name;
         public virtual TypeDescriptor HandlerTypeDescriptor { get; }
+        public virtual AssemblyDescriptor HandlerAssemblyDescriptor { get; }
         public virtual MethodDescriptor MethodDescriptor { get; }
         public virtual Func<object, object[], Task<object>> Invoke { get; }
         public Attribute[] Attributes => MethodDescriptor.Attributes;
@@ -92,7 +94,7 @@ namespace Graphite.Actions
         public static ActionMethod From(MethodInfo method, ITypeCache typeCache = null)
         {
             typeCache = typeCache ?? new TypeCache();
-            var typeDescriptor = new TypeDescriptor(method.DeclaringType, typeCache);
+            var typeDescriptor = typeCache.GetTypeDescriptor(method.DeclaringType);
             return new ActionMethod(typeDescriptor, new MethodDescriptor(
                 typeDescriptor, method, typeCache));
         }

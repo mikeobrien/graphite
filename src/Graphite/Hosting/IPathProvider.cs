@@ -4,5 +4,6 @@
     {
         string ApplicationPath { get; }
         string MapPath(string virtualPath);
+        bool Exists(string virtualPath);
     }
 }

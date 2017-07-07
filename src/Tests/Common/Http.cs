@@ -121,7 +121,8 @@ namespace Tests.Common
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null)
         {
-            return Get(relativeUrl, MimeTypes.TextHtml, x => new StreamReader(x).ReadToEnd());
+            return Get(relativeUrl, MimeTypes.TextHtml, 
+                x => new StreamReader(x).ReadToEnd());
         }
 
         public Result<TResponse> GetJson<TResponse>(string relativeUrl,
@@ -143,7 +144,7 @@ namespace Tests.Common
             Action<HttpRequestHeaders> requestHeaders = null,
             Action<HttpContentHeaders> contentHeaders = null)
         {
-            return Get<string>(relativeUrl, MimeTypes.ApplicationJson, 
+            return Get(relativeUrl, MimeTypes.TextPlain, 
                 x => x.ReadAllText(), cookies, requestHeaders);
         }
 

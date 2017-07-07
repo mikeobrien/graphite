@@ -33,16 +33,7 @@ namespace Graphite.Routing
             return configuration.UrlConventions.ThatAppliesTo(
                 urlConventions, urlContext, urlContext);
         }
-
-        public static IEnumerable<INamespaceUrlMappingConvention> ThatApplyTo(
-            this IEnumerable<INamespaceUrlMappingConvention> urlConventions,
-            UrlContext urlContext, Configuration configuration,
-            HttpConfiguration httpConfiguration)
-        {
-            return configuration.NamespaceUrlMappingConventions.ThatAppliesTo(
-                urlConventions, urlContext, urlContext);
-        }
-
+        
         public static IEnumerable<IHttpRouteDecorator> ThatApplyTo(
             this IEnumerable<IHttpRouteDecorator> routeDecorators,
             ActionDescriptor actionDescriptor,

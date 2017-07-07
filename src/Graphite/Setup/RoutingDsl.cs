@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using System.Web.Http.Routing;
 using Graphite.Actions;
 using Graphite.Extensibility;
+using Graphite.Reflection;
 using Graphite.Routing;
 
 namespace Graphite.Setup
@@ -84,7 +85,7 @@ namespace Graphite.Setup
             public NamespaceUrlMappingDsl Add(string namespaceRegex, string url)
             {
                 _configuration.NamespaceUrlMappings.Add(
-                    new NamespaceUrlMapping(new Regex(namespaceRegex), url));
+                    new NamespaceMapping(new Regex(namespaceRegex), url));
                 return this;
             }
 
@@ -118,7 +119,7 @@ namespace Graphite.Setup
             public NamespaceUrlMappingDsl MapNamespaceAfter(string @namespace)
             {
                 _configuration.NamespaceUrlMappings.Add(
-                    NamespaceUrlMapping.MapAfterNamespace(@namespace));
+                    NamespaceMapping.MapAfterNamespace(@namespace));
                 return this;
             }
         }

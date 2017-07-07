@@ -108,6 +108,8 @@
     <Compile Include="Extensibility\PluginsBase.cs" />
     <Compile Include="Extensibility\ConditionalPluginsDsl.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
+    <Compile Include="Extensions\CollectionExtensions.cs" />
+    <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Extensions\IOExtensions.cs" />
     <Compile Include="Extensions\ListExtensions.cs" />
     <Compile Include="Extensions\NumericExtensions.cs" />
@@ -121,7 +123,8 @@
     <Compile Include="Http\RemoteHost.cs" />
     <Compile Include="Readers\ReadResult.cs" />
     <Compile Include="Readers\RequestParameterCreationException.cs" />
-    <Compile Include="Routing\DefaultNamespaceUrlMappingConvention.cs" />
+    <Compile Include="Reflection\AssemblyDescriptor.cs" />
+    <Compile Include="Reflection\AssemblyResource.cs" />
     <Compile Include="Routing\IHttpRouteDecorator.cs" />
     <Compile Include="Routing\IHttpRouteMapper.cs" />
     <Compile Include="Monitoring\Metrics.cs" />
@@ -168,8 +171,7 @@
     <Compile Include="Routing\DefaultInlineConstraintBuilder.cs" />
     <Compile Include="Routing\Extensions.cs" />
     <Compile Include="Routing\IInlineConstraintBuilder.cs" />
-    <Compile Include="Routing\INamespaceUrlMappingConvention.cs" />
-    <Compile Include="Routing\NamespaceUrlMapping.cs" />
+    <Compile Include="Reflection\NamespaceMapping.cs" />
     <Compile Include="Routing\RouteConfigurationContext.cs" />
     <Compile Include="Routing\UrlSegment.cs" />
     <Compile Include="Routing\UrlContext.cs" />

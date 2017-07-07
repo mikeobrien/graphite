@@ -121,16 +121,10 @@ namespace Graphite
                 .Configure(x => x
                     .Append<DefaultUrlConvention>());
 
-        public ConditionalPlugins<INamespaceUrlMappingConvention, UrlContext> 
-                NamespaceUrlMappingConventions { get; } =
-            new ConditionalPlugins<INamespaceUrlMappingConvention, UrlContext>(true)
-                .Configure(x => x
-                    .Append<DefaultNamespaceUrlMappingConvention>());
-
-        public List<NamespaceUrlMapping> NamespaceUrlMappings { get; set; } = 
-            new List<NamespaceUrlMapping>
+        public List<NamespaceMapping> NamespaceUrlMappings { get; set; } = 
+            new List<NamespaceMapping>
             {
-                NamespaceUrlMapping.DefaultMapping
+                NamespaceMapping.DefaultMapping
             };
 
         public List<Func<UrlContext, string>> UrlAliases { get; } =

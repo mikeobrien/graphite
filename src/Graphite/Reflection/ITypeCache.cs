@@ -5,7 +5,7 @@ namespace Graphite.Reflection
 {
     public interface ITypeCache
     {
-        TypeDescriptor[] GetTypeDescriptors(Assembly assembly);
+        AssemblyDescriptor GetAssemblyDescriptor(Assembly assembly);
         TypeDescriptor GetTypeDescriptor(Type type);
     }
 }

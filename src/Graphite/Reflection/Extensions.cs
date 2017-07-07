@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
 using Graphite.Extensions;
+using Graphite.Linq;
 
 namespace Graphite.Reflection
 {
@@ -62,13 +62,35 @@ namespace Graphite.Reflection
         public static bool IsInDebugMode(this Assembly assembly)
         {
             return assembly.GetCustomAttributes(typeof(DebuggableAttribute), false)
-                .Cast<DebuggableAttribute>().Any(x => x.IsJITTrackingEnabled && x.IsJITOptimizerDisabled);
+                .Cast<DebuggableAttribute>()
+                .Any(x => x.IsJITTrackingEnabled && x.IsJITOptimizerDisabled);
         }
 
-        public static string GetGenericTypeBaseName(this Type type)
+        public static string GetNestedName(this Type type)
         {
-            var index = type.Name.IndexOf('`');
-            return index > 0 ? type.Name.Remove(index) : type.Name;
+            return type.Enumerate(x => x.DeclaringType)
+                .Reverse().Select(x => x.Name).Join('+');
+        }
+
+        public static string GetNonGenericName(this Type type)
+        {
+            return GetNonGenericName(type.Name);
+        }
+
+        public static string GetNonGenericFullName(this Type type)
+        {
+            return GetNonGenericName(type.FullName);
+        }
+
+        public static string GetNonGenericName(this string name)
+        {
+            var index = name.IndexOf('`');
+            return index > 0 ? name.Remove(index) : name;
+        }
+
+        public static string NormalizeNestedTypeName(this string typeName)
+        {
+            return typeName.Replace('+', '.');
         }
 
         private static readonly Dictionary<Type, string> 
@@ -103,7 +125,7 @@ namespace Graphite.Reflection
                 : @namespace + (!type.IsGenericType ? type.Name :
                     (type.IsNullable() 
                         ? $"{GetFriendlyTypeName(underlyingType)}?" 
-                        : $@"{type.GetGenericTypeBaseName()}<{type.GetGenericArguments()
+                        : $@"{type.GetNonGenericName()}<{type.GetGenericArguments()
                             .Select(x => x.GetFriendlyTypeName(includeNamespace)).Join(", ")}>"));
         }
 
@@ -217,15 +239,6 @@ namespace Graphite.Reflection
             return type.Is<T>() || (includeNullable && type.Is<T?>());
         }
 
-        public static string GetManifestResourceString(this Assembly assembly, 
-            string name, Encoding encoding)
-        {
-            using (var stream = assembly.GetManifestResourceStream(name))
-            {
-                return stream.ReadToEnd(encoding);
-            }
-        }
-
         public static object WrapWithFormatException(this string value, Func<string, object> parse)
         {
             try
@@ -240,9 +253,11 @@ namespace Graphite.Reflection
 
         public static bool IsSimpleType(this Type type)
         {
-            Func<Type, bool> isSimpleType = x => x.IsPrimitive || x.IsEnum || x == typeof(string) || x == typeof(decimal) ||
-                 x == typeof(DateTime) || x == typeof(TimeSpan) || x == typeof(Guid) || x == typeof(Uri);
-            return isSimpleType(type) || (type.IsNullable() && isSimpleType(Nullable.GetUnderlyingType(type)));
+            bool SimpleType(Type x) => x.IsPrimitive || x.IsEnum || x == typeof(string) || 
+                x == typeof(decimal) || x == typeof(DateTime) || x == typeof(TimeSpan) || 
+                x == typeof(Guid) || x == typeof(Uri);
+
+            return SimpleType(type) || (type.IsNullable() && SimpleType(Nullable.GetUnderlyingType(type)));
         }
 
         public static object ParseSimpleType(this string value, TypeDescriptor type)

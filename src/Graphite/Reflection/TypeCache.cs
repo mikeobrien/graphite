@@ -7,6 +7,9 @@ namespace Graphite.Reflection
 {
     public class TypeCache : ITypeCache
     {
+        private static readonly Func<Assembly, AssemblyDescriptor> AssemblyDescriptors =
+            Memoize.Func<Assembly, AssemblyDescriptor>(x => new AssemblyDescriptor(x, AssemblyTypes));
+
         private static readonly Func<Type, TypeDescriptor> TypeDescriptors =
             Memoize.Func<Type, TypeDescriptor>(x => new TypeDescriptor(x, Instance));
 
@@ -16,11 +19,11 @@ namespace Graphite.Reflection
 
         private static ITypeCache Instance => new TypeCache();
 
-        public TypeDescriptor[] GetTypeDescriptors(Assembly assembly)
+        public AssemblyDescriptor GetAssemblyDescriptor(Assembly assembly)
         {
-            return assembly == null ? null : AssemblyTypes(assembly);
+            return assembly == null ? null : AssemblyDescriptors(assembly);
         }
-        
+
         public TypeDescriptor GetTypeDescriptor(Type type)
         {
             return type == null ? null : TypeDescriptors(type);

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+   <metadata>
+      <id>GraphiteWeb.Views</id>
+      <version>0.0.0.0</version>
+      <title>View support for the Graphite Web Framework</title>
+      <authors>Mike O'Brien</authors>
+      <description>Adds view support to the Graphite web framework.</description>
+      <releaseNotes />
+      <copyright />
+      <language>en-US</language>
+      <licenseUrl>https://github.com/mikeobrien/graphite/blob/master/LICENSE</licenseUrl>
+      <projectUrl>http://graphiteweb.io/</projectUrl>
+      <owners>Mike O'Brien</owners>
+      <summary>Adds view support to the Graphite web framework.</summary>
+      <iconUrl>https://github.com/mikeobrien/graphite/raw/master/misc/logo128x128.png</iconUrl>
+      <tags>graphite web api view razor mustache template</tags>
+      <dependencies>
+         <dependency id="GraphiteWeb.Core" version="1.0.0" />
+         <dependency id="Nustache" version="1.16.0" />
+         <dependency id="Nustache.Compilation" version="1.16.0" />
+         <dependency id="RazorEngine" version="3.10.0" />
+      </dependencies>
+   </metadata>
+</package>

@@ -15,24 +15,36 @@ namespace Graphite.Cors
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Specifies the CORS engine type.
+        /// </summary>
         public CorsConfigurationDsl WithEngine<T>() where T : ICorsEngine
         {
             _configuration.CorsEngine.Set<T>(true);
             return this;
         }
 
+        /// <summary>
+        /// Specifies the CORS engine instance.
+        /// </summary>
         public CorsConfigurationDsl WithEngine<T>(T engine) where T : ICorsEngine
         {
             _configuration.CorsEngine.Set(engine);
             return this;
         }
 
+        /// <summary>
+        /// Configure policy sources.
+        /// </summary>
         public CorsConfigurationDsl ConfigurePolicySources(Action<CorsSourcePluginDefinitions> configure)
         {
             configure(_configuration.PolicySources);
             return this;
         }
 
+        /// <summary>
+        /// Appends a policy.
+        /// </summary>
         public CorsConfigurationDsl AppendPolicy(
             Action<CorsPolicySource> configure)
         {
@@ -40,6 +52,9 @@ namespace Graphite.Cors
             return this;
         }
 
+        /// <summary>
+        /// Prepends a policy.
+        /// </summary>
         public CorsConfigurationDsl PrependPolicy(
             Action<CorsPolicySource> configure)
         {
@@ -47,6 +62,9 @@ namespace Graphite.Cors
             return this;
         }
 
+        /// <summary>
+        /// Appends a policy source type.
+        /// </summary>
         public CorsConfigurationDsl AppendPolicySource<T>(
             Func<ActionConfigurationContext, bool> predicate = null) where T : ICorsPolicySource
         {
@@ -54,6 +72,9 @@ namespace Graphite.Cors
             return this;
         }
 
+        /// <summary>
+        /// Preppends a policy source type.
+        /// </summary>
         public CorsConfigurationDsl PrependPolicySource<T>(
             Func<ActionConfigurationContext, bool> predicate = null) where T : ICorsPolicySource
         {
@@ -61,6 +82,9 @@ namespace Graphite.Cors
             return this;
         }
 
+        /// <summary>
+        /// Appends a policy source instance.
+        /// </summary>
         public CorsConfigurationDsl AppendPolicySource<T>(T policy,
             Func<ActionConfigurationContext, bool> predicate = null) where T : ICorsPolicySource
         {
@@ -68,6 +92,9 @@ namespace Graphite.Cors
             return this;
         }
 
+        /// <summary>
+        /// Preppends a policy source instance.
+        /// </summary>
         public CorsConfigurationDsl PrependPolicySource<T>(T policy,
             Func<ActionConfigurationContext, bool> predicate = null) where T : ICorsPolicySource
         {
@@ -75,6 +102,9 @@ namespace Graphite.Cors
             return this;
         }
 
+        /// <summary>
+        /// Appends the attribute policy source.
+        /// </summary>
         public CorsConfigurationDsl AppendAttributePolicySource(
             Func<ActionConfigurationContext, bool> predicate = null)
         {
@@ -82,6 +112,9 @@ namespace Graphite.Cors
             return this;
         }
 
+        /// <summary>
+        /// Preppends the attribute policy source.
+        /// </summary>
         public CorsConfigurationDsl PrependAttributePolicySource(
             Func<ActionConfigurationContext, bool> predicate = null)
         {

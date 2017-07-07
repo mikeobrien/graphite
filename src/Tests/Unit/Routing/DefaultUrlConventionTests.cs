@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using Graphite;
 using Graphite.Actions;
 using Graphite.Routing;
+using Graphite.Setup;
 using NUnit.Framework;
 using Tests.Common;
-using Tests.Common.Fakes;
+
+public class NoNamespace { public void Post() { } }
 
 namespace Tests.Unit.Routing
 {
@@ -20,24 +23,23 @@ namespace Tests.Unit.Routing
             public void NoOverride() { }
         }
 
-        private List<INamespaceUrlMappingConvention> _mappingConventions;
+        private ConfigurationDsl.NamespaceUrlMappingDsl _mappingDsl;
+        private List<UrlSegment> _methodSegments;
         private Configuration _configuration;
 
         [SetUp]
         public void Setup()
         {
             _configuration = new Configuration();
-            _mappingConventions = new List<INamespaceUrlMappingConvention>
-            {
-                new DefaultNamespaceUrlMappingConvention(_configuration)
-            };
+            _methodSegments = new List<UrlSegment>();
+            _mappingDsl = new ConfigurationDsl.NamespaceUrlMappingDsl(_configuration);
         }
 
         [Test]
         public void Should_return_overriden_urls()
         {
             var actionMethod = ActionMethod.From<Handler>(x => x.Override());
-            var urls = new DefaultUrlConvention(_mappingConventions, _configuration, null)
+            var urls = new DefaultUrlConvention(_configuration, null)
                 .GetUrls(new UrlContext(actionMethod,
                     null, new List<UrlSegment>
                     {
@@ -53,7 +55,7 @@ namespace Tests.Unit.Routing
         public void Should_return_default_url_when_override_not_specified()
         {
             var actionMethod = ActionMethod.From<Handler>(x => x.NoOverride());
-            var urls = new DefaultUrlConvention(_mappingConventions, _configuration, null)
+            var urls = new DefaultUrlConvention(_configuration, null)
                 .GetUrls(new UrlContext(actionMethod,
                     null, new List<UrlSegment>
                     {
@@ -75,7 +77,7 @@ namespace Tests.Unit.Routing
         {
             var actionMethod = ActionMethod.From<Handler>(x => x.NoOverride());
             _configuration.UrlPrefix = prefix;
-            var urls = new DefaultUrlConvention(_mappingConventions, _configuration, null)
+            var urls = new DefaultUrlConvention(_configuration, null)
                 .GetUrls(new UrlContext(actionMethod,
                     null, new List<UrlSegment>
                     {
@@ -99,7 +101,7 @@ namespace Tests.Unit.Routing
         public void Should_return_attribute_url_aliases()
         {
             var actionMethod = ActionMethod.From<AliasHandler>(x => x.Get());
-            var urls = new DefaultUrlConvention(_mappingConventions, _configuration, null)
+            var urls = new DefaultUrlConvention(_configuration, null)
                 .GetUrls(new UrlContext(actionMethod,
                     null, new List<UrlSegment>
                     {
@@ -116,7 +118,7 @@ namespace Tests.Unit.Routing
             var actionMethod = ActionMethod.From<AliasHandler>(x => x.Post());
             _configuration.UrlAliases.Add(x => $"{x.ActionMethod.MethodDescriptor.Name}/url1/{x.MethodSegments.ToUrl()}");
             _configuration.UrlAliases.Add(x => $"{x.ActionMethod.MethodDescriptor.Name}/url2/{x.MethodSegments.ToUrl()}");
-            var urls = new DefaultUrlConvention(_mappingConventions, _configuration, null)
+            var urls = new DefaultUrlConvention(_configuration, null)
                 .GetUrls(new UrlContext(actionMethod,
                     null, new List<UrlSegment>
                     {
@@ -130,47 +132,74 @@ namespace Tests.Unit.Routing
         }
 
         [Test]
-        public void Should_only_include_url_conventions_that_apply()
+        public void Should_not_fail_if_type_doesent_have_a_namespace()
         {
-            _mappingConventions.Clear();
-
-            var applies1 = new TestUrlConvention(true, "applies1");
-            var applies2 = new TestUrlConvention(true, "applies2");
-            var appliesNot = new TestUrlConvention(false, "appliesnot");
-            var appliesNotConfig = new TestUrlConvention(true, "appliesnot");
-
-            _mappingConventions.Add(appliesNot);
-            _mappingConventions.Add(appliesNotConfig);
-            _mappingConventions.Add(applies2);
-            _mappingConventions.Add(applies1);
-            _configuration.NamespaceUrlMappingConventions.Configure(x => x
-                .Clear()
-                .Append(appliesNot)
-                .Append(appliesNotConfig, c => false)
-                .Append(applies2)
-                .Append(applies1));
-
-            var actionMethod = ActionMethod.From<Handler>(x => x.NoOverride());
-            var urls = new DefaultUrlConvention(_mappingConventions, _configuration, null)
-                .GetUrls(new UrlContext(actionMethod, null, 
-                    new List<UrlSegment>(), null, null, null, null));
-
-            urls.ShouldOnlyContain("applies2", "applies1");
+            new DefaultUrlConvention(_configuration, null)
+                .GetUrls(CreateUrlContext<NoNamespace>(x => x.Post()))
+                .ShouldOnlyContain("");
         }
 
-        public class TestUrlConvention : INamespaceUrlMappingConvention
+        [Test]
+        public void Should_not_map_a_mapping_that_doesent_match_namespace()
         {
-            private readonly bool _applies;
-            private readonly string _url;
+            _mappingDsl.Clear()
+                .Add("NoMatch", "nomatch")
+                .Add(@"Tests\.Unit\.Routing", "match");
 
-            public TestUrlConvention(bool applies, string url)
-            {
-                _applies = applies;
-                _url = url;
-            }
+            new DefaultUrlConvention(_configuration, null)
+                .GetUrls(CreateUrlContext<Handler>(x => x.NoOverride()))
+                .ShouldOnlyContain("match");
+        }
 
-            public bool AppliesTo(UrlContext context) => _applies;
-            public string[] GetUrls(UrlContext context) => new [] { _url };
+        [Test]
+        public void Should_match_multiple_namespaces()
+        {
+            _mappingDsl.Clear()
+                .Add("^.*$", "all")
+                .Add(@"Tests\.Unit\.Routing", "namespace");
+
+            new DefaultUrlConvention(_configuration, null)
+                .GetUrls(CreateUrlContext<Handler>(x => x.NoOverride()))
+                .ShouldOnlyContain("all", "namespace");
+        }
+
+        [Test]
+        public void Should_split_on_delimiters(
+            [Values(".", @"\", @"/")] string delimiter)
+        {
+            _mappingDsl.Clear()
+                .Add(@"^Tests.Unit.Routing$", $"fark{delimiter}farker");
+
+            new DefaultUrlConvention(_configuration, null)
+                .GetUrls(CreateUrlContext<Handler>(x => x.NoOverride()))
+                .ShouldOnlyContain("fark/farker");
+        }
+
+        [Test]
+        public void Should_remove_empty_segments(
+            [Values("..", @"\\", @"//")] string delimiter)
+        {
+            _mappingDsl.Clear()
+                .Add(@"^Tests.Unit.Routing$", $"fark{delimiter}farker");
+
+            new DefaultUrlConvention(_configuration, null)
+                .GetUrls(CreateUrlContext<Handler>(x => x.NoOverride()))
+                .ShouldOnlyContain("fark/farker");
+        }
+
+        [Test]
+        public void Should_union_method_segments()
+        {
+            _methodSegments.AddRange(new UrlSegment("fark"), new UrlSegment("farker"));
+            new DefaultUrlConvention(_configuration, null)
+                .GetUrls(CreateUrlContext<Handler>(x => x.NoOverride()))
+                .ShouldOnlyContain("Unit/Routing/fark/farker");
+        }
+
+        public UrlContext CreateUrlContext<T>(Expression<Action<T>> method)
+        {
+            return new UrlContext(ActionMethod.From(method),
+                null, _methodSegments, null, null, null, null);
         }
     }
 }

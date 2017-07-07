@@ -31,16 +31,13 @@ namespace Graphite.Routing
     public class DefaultUrlConvention : IUrlConvention
     {
         private readonly Configuration _configuration;
-        private readonly List<INamespaceUrlMappingConvention> _mappingConventions;
         private readonly HttpConfiguration _httpConfiguration;
 
         public DefaultUrlConvention(
-            List<INamespaceUrlMappingConvention> mappingConventions,
             Configuration configuration,
             HttpConfiguration httpConfiguration)
         {
             _configuration = configuration;
-            _mappingConventions = mappingConventions;
             _httpConfiguration = httpConfiguration;
         }
 
@@ -62,8 +59,15 @@ namespace Graphite.Routing
         protected virtual string[] MapNamespaceToUrls(UrlContext context)
         {
             var prefix = _configuration.UrlPrefix?.Trim('/');
-            return _mappingConventions.ThatApplyTo(context, _configuration, _httpConfiguration)
-                .SelectMany(x => x.GetUrls(context))
+            var @namespace = context.ActionMethod
+                .HandlerTypeDescriptor.Type.Namespace ?? "";
+
+            return _configuration.NamespaceUrlMappings
+                .Where(x => x.Applies(@namespace))
+                .Select(x => x.Map(@namespace, s => new UrlSegment(s))
+                    .Concat(context.MethodSegments
+                        .Select(s => s))
+                    .ToUrl())
                 .Select(x => prefix.IsNotNullOrEmpty() ? prefix.JoinUrls(x) : x)
                 .ToArray();
         }

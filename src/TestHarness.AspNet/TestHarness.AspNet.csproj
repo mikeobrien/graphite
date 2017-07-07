@@ -85,6 +85,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <Content Include="Views\MultipleViewTestHandler.cshtml" />
+    <Content Include="Views\MultipleViewTestHandler.mustache" />
+    <Content Include="Views\RazorFileViewTestHandler.cshtml" />
+    <Content Include="Views\MustacheFileViewTestHandler.mustache" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

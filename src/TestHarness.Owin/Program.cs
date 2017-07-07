@@ -20,7 +20,11 @@ namespace TestHarness.Owin
     {
         public void Configuration(IAppBuilder appBuilder)
         {
-            appBuilder.InitializeGraphite(TestHarness.Configuration.Configure);
+            appBuilder.InitializeGraphite(x =>
+            {
+                TestHarness.Configuration.Configure(x);
+                x.IncludeTypeAssembly<Startup>();
+            });
 
             // Manually setup Web Api
             //var httpConfiguration = new HttpConfiguration();

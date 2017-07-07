@@ -10,6 +10,7 @@ namespace Graphite.Reflection
         private readonly Lazy<bool> _isSimpleType;
         private readonly Lazy<string> _friendlyName;
         private readonly Lazy<string> _friendlyFullName;
+        private readonly Lazy<string> _baseName;
         private readonly Lazy<MethodDescriptor[]> _methods;
         private readonly Lazy<PropertyDescriptor[]> _properties;
         private readonly Lazy<TypeDescriptor> _arrayElementType;
@@ -26,10 +27,12 @@ namespace Graphite.Reflection
            : base(type.Name, type.ToLazy(x => x.GetCustomAttributes().ToArray()))
         {
             Type = type;
+            AssemblyDescriptor = typeCache.GetAssemblyDescriptor(type.Assembly);
             IsBclType = type.IsBclType();
             _isSimpleType = type.ToLazy(x => x.IsSimpleType());
             _friendlyName = type.ToLazy(x => x.GetFriendlyTypeName());
             _friendlyFullName = type.ToLazy(x => x.GetFriendlyTypeName(true));
+            _baseName = type.ToLazy(x => x.GetNonGenericName());
             _tryCreate = type.ToLazy(x => x.CompileTryCreate());
             _hasDefaultConstructor = type.ToLazy(x => x.GetConstructor(Type.EmptyTypes) != null);
 
@@ -52,8 +55,10 @@ namespace Graphite.Reflection
         }
 
         public Type Type { get; }
+        public AssemblyDescriptor AssemblyDescriptor { get; }
         public string FriendlyName => _friendlyName.Value;
         public string FriendlyFullName => _friendlyFullName.Value;
+        public string GenericBaseName => _baseName.Value;
         public bool IsBclType { get; }
         public bool IsSimpleType => _isSimpleType.Value;
         public bool HasDefaultConstructor => _hasDefaultConstructor.Value;

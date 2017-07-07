@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using Graphite.Linq;
@@ -58,22 +59,22 @@ namespace Graphite.Extensions
 
         public static bool IsNullOrEmpty(this string value)
         {
-            return string.IsNullOrEmpty(value);
+            return String.IsNullOrEmpty(value);
         }
 
         public static bool IsNotNullOrEmpty(this string value)
         {
-            return !string.IsNullOrEmpty(value);
+            return !String.IsNullOrEmpty(value);
         }
 
         public static bool IsNullOrWhiteSpace(this string value)
         {
-            return string.IsNullOrWhiteSpace(value);
+            return String.IsNullOrWhiteSpace(value);
         }
 
         public static bool IsNotNullOrWhiteSpace(this string value)
         {
-            return !string.IsNullOrWhiteSpace(value);
+            return !String.IsNullOrWhiteSpace(value);
         }
 
         public static string Join(this IEnumerable<object> parts, string seperator = "")
@@ -84,6 +85,11 @@ namespace Graphite.Extensions
         public static string Join(this IEnumerable<string> parts, string seperator = "")
         {
             return string.Join(seperator, parts);
+        }
+
+        public static string Join(this IEnumerable<string> parts, char seperator)
+        {
+            return string.Join(seperator.ToString(), parts);
         }
 
         public static bool MatchesGroup(this string source, Regex regex, string name)
@@ -125,6 +131,13 @@ namespace Graphite.Extensions
                 : (value.Length <= length 
                     ? "" 
                     : value.Substring(0, value.Length - length));
+        }
+
+        public static string Hash(this string value)
+        {
+            using (var hash = MD5.Create())
+                return hash.ComputeHash(Encoding.Unicode
+                    .GetBytes(value)).ToHex();
         }
 
         public static string ToTable<T, TRow>(this IEnumerable<T> source, Expression<Func<T, TRow>> row)

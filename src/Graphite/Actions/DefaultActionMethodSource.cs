@@ -32,7 +32,7 @@ namespace Graphite.Actions
         public virtual IEnumerable<ActionMethod> GetActionMethods()
         {
             return _configuration.Assemblies
-                .SelectMany(x => _typeCache.GetTypeDescriptors(x))
+                .SelectMany(x => _typeCache.GetAssemblyDescriptor(x).Types)
                 .Where(x => 
                     (_configuration.HandlerNameConvention ?? 
                         DefaultHandlerNameConvention).IsMatch(x.Name) && 

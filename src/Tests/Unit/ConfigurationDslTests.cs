@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Graphite.Routing;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
@@ -40,8 +39,8 @@ namespace Tests.Unit
                     .Clear().MapNamespaceAfter(marker)));
 
             var mapping = request.Configuration.NamespaceUrlMappings.First();
-            var @namespace = mapping.Namespace.Replace(
-                request.HandlerType.Namespace, mapping.Url);
+            var @namespace = mapping.Map(
+                request.HandlerType.Namespace, '.');
 
             @namespace.ShouldEqual(expected);
         }

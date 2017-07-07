@@ -131,7 +131,7 @@ namespace Tests.Unit.Reflection
         [TestCase(typeof(int?), "Nullable")]
         public void should_get_generic_type_base_full_name(Type type, string name)
         {
-            type.GetGenericTypeBaseName().ShouldEqual(name);
+            type.GetNonGenericName().ShouldEqual(name);
         }
 
         public class NestedType { }
@@ -152,6 +152,13 @@ namespace Tests.Unit.Reflection
         public void should_get_friendly_full_type_name(Type type, bool includeNamespace, string name)
         {
             type.GetFriendlyTypeName(includeNamespace).ShouldEqual(name);
+        }
+
+        [Test]
+        public void Should_get_nested_type_name()
+        {
+            typeof(NestedType).GetNestedName()
+                .ShouldEqual($"{nameof(ExtensionTests)}+{nameof(NestedType)}");
         }
 
         public class MethodNames

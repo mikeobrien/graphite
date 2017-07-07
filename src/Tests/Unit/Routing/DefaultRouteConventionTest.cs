@@ -29,10 +29,7 @@ namespace Tests.Unit.Routing
             _configuration = new Configuration();
             _urlConventions = new List<IUrlConvention>
             {
-                new DefaultUrlConvention(new List<INamespaceUrlMappingConvention>
-                {
-                    new DefaultNamespaceUrlMappingConvention(_configuration)
-                }, _configuration, null)
+                new DefaultUrlConvention(_configuration, null)
             };
             _configuration.UrlConventions.Configure(c => c.Append<DefaultUrlConvention>());
             _routeConvention = new DefaultRouteConvention(

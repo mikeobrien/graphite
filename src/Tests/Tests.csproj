@@ -49,6 +49,9 @@
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="RazorEngine, Version=3.10.0.0, Culture=neutral, PublicKeyToken=9ee697374c7e744a, processorArchitecture=MSIL">
+      <HintPath>..\packages\RazorEngine.3.10.0\lib\net45\RazorEngine.dll</HintPath>
+    </Reference>
     <Reference Include="Should, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Should.1.1.20\lib\Should.dll</HintPath>
     </Reference>
@@ -75,6 +78,9 @@
     <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.0.0\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -92,6 +98,7 @@
     <Compile Include="Acceptance\ReaderTests.cs" />
     <Compile Include="Acceptance\RequestTests.cs" />
     <Compile Include="Acceptance\RoutingTests.cs" />
+    <Compile Include="Acceptance\ViewTests.cs" />
     <Compile Include="Acceptance\WriterTests.cs" />
     <Compile Include="Common\Fakes\TestActionDescriptor.cs" />
     <Compile Include="Common\Fakes\TestAutenticator.cs" />
@@ -178,8 +185,14 @@
     <Compile Include="Unit\InitializerTests.cs" />
     <Compile Include="Unit\Owin\BootstrapTests.cs" />
     <Compile Include="Unit\Owin\RequestPropertyProviderTests.cs" />
-    <Compile Include="Unit\Routing\NamespaceUrlMappingTests.cs" />
-    <Compile Include="Unit\Routing\DefaultNamespaceUrlMappingConventionTests.cs" />
+    <Compile Include="Unit\Reflection\NamespaceMappingTests.cs" />
+    <Compile Include="Unit\Views\Engines\MustacheEngineTests.cs" />
+    <Compile Include="Unit\Views\Engines\RazorEngineTests.cs" />
+    <Compile Include="Unit\Views\ViewDecoratorTests.cs" />
+    <Compile Include="Unit\Views\ViewSource\EmbeddedViewSourceTests.cs" />
+    <Compile Include="Unit\Views\ViewSource\FileViewSourceTests.cs" />
+    <Compile Include="Unit\Views\ViewSource\ViewSourceBaseTests.cs" />
+    <Compile Include="Unit\Views\ViewWriterTests.cs" />
     <Compile Include="Unit\Writers\SerializerWriterBaseTests.cs" />
     <Compile Include="Unit\Writers\WeightedContentWriterBaseTests.cs" />
     <Compile Include="Unit\Writers\ExtensionTests.cs" />
@@ -221,6 +234,10 @@
       <Project>{ec2dd82d-406b-4169-a5c9-ec9ead8a0151}</Project>
       <Name>Graphite.StructureMap</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Graphite.Views\Graphite.Views.csproj">
+      <Project>{1daf1566-c4a6-4216-981f-69a8f82cb8af}</Project>
+      <Name>Graphite.Views</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Graphite\Graphite.csproj">
       <Project>{c4b8217d-1768-49c0-aec5-f07b8816405e}</Project>
       <Name>Graphite</Name>
@@ -233,6 +250,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <EmbeddedResource Include="Unit\Views\ViewSource\EmbeddedViewSourceTests.Handler.fark" />
+    <EmbeddedResource Include="Unit\Views\ViewSource\EmbeddedViewSourceTests.Model.farker" />
+    <EmbeddedResource Include="Unit\Views\ViewDecoratorTests.Handler.mustache" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

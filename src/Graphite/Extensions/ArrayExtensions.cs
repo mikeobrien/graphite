@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
+using Graphite.Linq;
 
 namespace Graphite.Extensions
 {
@@ -27,10 +30,24 @@ namespace Graphite.Extensions
             return new ArrayItem<T>(source, index);
         }
 
-        public static T AddItem<T>(this IList<T> source, T item)
+        public static string ToHex(this byte[] bytes)
         {
-            source.Add(item);
-            return item;
+            return new SoapHexBinary(bytes).ToString();
+        }
+
+        public static T[] AsArray<T>(this T source, params T[] tail)
+        {
+            return source.AsArray((IEnumerable<T>)tail);
+        }
+
+        public static T[] AsArray<T>(this T source, IEnumerable<T> tail)
+        {
+            return source.Join(tail).ToArray();
+        }
+
+        public static List<T> AsList<T>(this T source, params T[] tail)
+        {
+            return source.AsList((IEnumerable<T>)tail);
         }
     }
 }

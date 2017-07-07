@@ -76,6 +76,7 @@
     <Compile Include="Registry.cs" />
     <Compile Include="RequestTestHandler.cs" />
     <Compile Include="RoutingTestHandler.cs" />
+    <Compile Include="Views\ViewTestHandler.cs" />
     <Compile Include="WriterTestHandler.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -87,6 +88,10 @@
       <Project>{ec2dd82d-406b-4169-a5c9-ec9ead8a0151}</Project>
       <Name>Graphite.StructureMap</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Graphite.Views\Graphite.Views.csproj">
+      <Project>{1daf1566-c4a6-4216-981f-69a8f82cb8af}</Project>
+      <Name>Graphite.Views</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Graphite\Graphite.csproj">
       <Project>{c4b8217d-1768-49c0-aec5-f07b8816405e}</Project>
       <Name>Graphite</Name>
@@ -94,6 +99,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="Views\RazorResourceViewTestHandler.cshtml" />
+    <EmbeddedResource Include="Views\MustacheResourceViewTestHandler.mustache" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

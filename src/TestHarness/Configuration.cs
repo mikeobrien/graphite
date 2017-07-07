@@ -3,6 +3,7 @@ using Graphite.Authentication;
 using Graphite.Cors;
 using Graphite.Setup;
 using Graphite.StructureMap;
+using Graphite.Views;
 using TestHarness.Handlers;
 using TestHarness.Routing;
 
@@ -17,6 +18,7 @@ namespace TestHarness
                 .IncludeThisAssembly()
                 .EnableDiagnosticsInDebugMode()
                 .ConfigureWebApi(x => x
+                    .RouteExistingFiles()
                     .Configuration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Never)
                 //.ConfigureSerialization(s => s
                 //    .Json(j => j.UseCamelCaseNaming())
@@ -24,14 +26,12 @@ namespace TestHarness
                 //        .Reader(r => r.IgnoreComments = true)
                 //        .Writer(w => w.Indent = true)))
                 .UseStructureMapContainer<Registry>()
-                .ConfigureNamespaceUrlMapping(x => x
-                    .Clear()    
-                    .MapNamespaceAfterCallingType())
                 .ConfigureActionDecorators(d => d.Append<TestActionDecorator>())
                 .BindCookies()
                 .BindRequestInfo()
                 .BindHeaders()
                 .BindContainer()
+                .EnableViews()
                 .ConfigureHttpRouteDecorators(x => x
                     .Append<RoutingTestHandler.HttpRouteDecorator>(d => d
                         .ActionMethod.Name.Contains("Decorator")))

@@ -17,7 +17,11 @@ namespace TestHarness.AspNet
             configuration.MapHttpAttributeRoutes();
 
             configuration
-                .InitializeGraphite(Configuration.Configure);
+                .InitializeGraphite(x =>
+                {
+                    Configuration.Configure(x);
+                    x.IncludeTypeAssembly<Global>();
+                });
 
             configuration.EnsureInitialized();
         }

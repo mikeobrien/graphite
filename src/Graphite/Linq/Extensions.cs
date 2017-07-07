@@ -34,31 +34,6 @@ namespace Graphite.Linq
             return source.Any(x => search.Any(x.EqualsIgnoreCase));
         }
 
-        public static List<T> AsList<T>(this T source, params T[] tail)
-        {
-            return source.AsList((IEnumerable<T>)tail);
-        }
-
-        public static List<T> AsList<T>(this T source, IEnumerable<T> tail)
-        {
-            return source.Join(tail).ToList();
-        }
-
-        public static T[] AsArray<T>(this T source, params T[] tail)
-        {
-            return source.AsArray((IEnumerable<T>)tail);
-        }
-
-        public static T[] AsArray<T>(this T source, IEnumerable<T> tail)
-        {
-            return source.Join(tail).ToArray();
-        }
-
-        public static TValue TryGetValue<TKey, TValue>(this IDictionary<TKey, TValue> source, TKey key)
-        {
-            return source.ContainsKey(key) ? source[key] : default(TValue);
-        }
-
         public static IEnumerable<T> Append<T>(this IEnumerable<T> source, T item)
         {
             return source.Concat(new List<T> { item });
@@ -69,10 +44,9 @@ namespace Graphite.Linq
             return new List<T> { item }.Concat(tail);
         }
 
-        public static IList<T> AddRange<T>(this IList<T> source, params T[] items)
+        public static List<T> AsList<T>(this T source, IEnumerable<T> tail)
         {
-            items.ForEach(source.Add);
-            return source;
+            return source.Join(tail).ToList();
         }
 
         public static IEnumerable<T> AnyOrDefault<T>(
@@ -127,14 +101,6 @@ namespace Graphite.Linq
         {
             return outer.Join(inner, outerKeySelector, innerKeySelector, 
                 resultSelector, StringComparer.OrdinalIgnoreCase);
-        }
-
-        public static Dictionary<string, TValue> ToDictionary<TValue>(this NameValueCollection source, 
-            Func<string, string> key = null, Func<string, TValue> value = null) where TValue : class
-        {
-            return source.AllKeys.ToDictionary(key ?? (x => x), 
-                x => value?.Invoke(source[x]) ?? (TValue)(object)source[x], 
-                StringComparer.OrdinalIgnoreCase);
         }
 
         public static IEnumerable<T> Enumerate<T>(this T source, Func<T, T> map) where T : class

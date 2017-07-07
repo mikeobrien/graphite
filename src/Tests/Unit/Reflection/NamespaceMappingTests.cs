@@ -1,19 +1,20 @@
-﻿using Graphite.Routing;
+﻿using Graphite.Reflection;
 using NUnit.Framework;
 using Should;
 
-namespace Tests.Unit.Routing
+namespace Tests.Unit.Reflection
 {
     [TestFixture]
-    public class NamespaceUrlMappingTests
+    public class NamespaceMappingTests
     {
+
         [TestCase("Root", "")]
         [TestCase("Root.Child", "Child")]
         [TestCase("Root.Child1.Child2", "Child1.Child2")]
         public void Should_map_namespace_to_url(string @namespace, string expected)
         {
-            var mapping = NamespaceUrlMapping.DefaultMapping;
-            mapping.Namespace.Replace(@namespace, mapping.Url)
+            var mapping = NamespaceMapping.DefaultMapping;
+            mapping.Map(@namespace, '.')
                 .ShouldEqual(expected);
         }
 
@@ -22,9 +23,8 @@ namespace Tests.Unit.Routing
         [TestCase("MyWebApp.Api.Users", "")]
         public void Should_map_namespace_after(string @namespace, string expected)
         {
-            var mapping = NamespaceUrlMapping.MapAfterNamespace(@namespace);
-            var url = mapping.Namespace.Replace(
-                "MyWebApp.Api.Users", mapping.Url);
+            var mapping = NamespaceMapping.MapAfterNamespace(@namespace);
+            var url = mapping.Map("MyWebApp.Api.Users", '.');
 
             url.ShouldEqual(expected);
         }

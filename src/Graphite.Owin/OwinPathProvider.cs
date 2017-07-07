@@ -18,5 +18,10 @@ namespace Graphite.Owin
                 Path.GetFullPath(Path.Combine(ApplicationBase, 
                     virtualPath.Trim('~', '/', '\\').Replace("/", @"\")));
         }
+
+        public bool Exists(string virtualPath)
+        {
+            return File.Exists(MapPath(virtualPath));
+        }
     }
 }

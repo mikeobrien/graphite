@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
 using Graphite.Actions;
-using Graphite.Linq;
+using Graphite.Extensions;
 using Graphite.Reflection;
 using Graphite.Routing;
 using Graphite.Setup;
@@ -37,9 +37,7 @@ namespace Graphite.Diagnostics
         {
             var configuration = new Configuration();
             var actionMethodSource = new DefaultActionMethodSource(configuration, _typeCache);
-            var urlMappingConvention = new DefaultNamespaceUrlMappingConvention(configuration);
-            var urlConvention = new DefaultUrlConvention(urlMappingConvention
-                .AsList<INamespaceUrlMappingConvention>(), configuration, _httpConfiguration);
+            var urlConvention = new DefaultUrlConvention(configuration, _httpConfiguration);
             var routeConvention = new DefaultRouteConvention(configuration,
                 _httpConfiguration, urlConvention.AsList<IUrlConvention>(), _constraintBuilder);
 

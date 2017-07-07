@@ -13,7 +13,8 @@ namespace Graphite.Actions
 {
     public class ActionDescriptor
     {
-        public ActionDescriptor(ActionMethod action,
+        public ActionDescriptor(
+            ActionMethod action,
             RouteDescriptor route, 
             Plugins<IAuthenticator> authenticators, 
             Plugins<IRequestBinder> requestBinders, 
@@ -33,17 +34,17 @@ namespace Graphite.Actions
             Behaviors = behaviors;
             Registry = new Registry(typeCache);
         }
-
+        
         public virtual ActionMethod Action { get; }
         public virtual RouteDescriptor Route { get; }
         public virtual Registry Registry { get; }
         
-        public Plugins<IAuthenticator> Authenticators { get; }
-        public Plugins<IRequestBinder> RequestBinders { get; }
-        public Plugins<IRequestReader> RequestReaders { get; } 
-        public Plugins<IResponseWriter> ResponseWriters { get; }
-        public Plugins<IResponseStatus> ResponseStatus { get; }
-        public Plugins<IBehavior> Behaviors { get; }
+        public virtual Plugins<IAuthenticator> Authenticators { get; }
+        public virtual Plugins<IRequestBinder> RequestBinders { get; }
+        public virtual Plugins<IRequestReader> RequestReaders { get; } 
+        public virtual Plugins<IResponseWriter> ResponseWriters { get; }
+        public virtual Plugins<IResponseStatus> ResponseStatus { get; }
+        public virtual Plugins<IBehavior> Behaviors { get; }
 
         public override int GetHashCode()
         {
