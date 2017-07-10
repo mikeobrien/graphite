@@ -3,7 +3,7 @@
    <metadata>
       <id>GraphiteWeb.Core</id>
       <version>0.0.0.0</version>
-      <title>Graphite Web Framework</title>
+      <title>Graphite Web Framework Core</title>
       <authors>Mike O'Brien</authors>
       <description>Simple, lightweight, convention based web framework built on Web Api.</description>
       <releaseNotes />

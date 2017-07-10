@@ -3,16 +3,16 @@
    <metadata>
       <id>GraphiteWeb.Owin</id>
       <version>0.0.0.0</version>
-      <title>Graphite Web Framework OWIN hosting support</title>
+      <title>Graphite Web Framework for OWIN</title>
       <authors>Mike O'Brien</authors>
-      <description>Enables OWIN hosting of the Graphite Web Framework.</description>
+      <description>Simple, lightweight, convention based web framework built on Web Api.</description>
       <releaseNotes />
       <copyright />
       <language>en-US</language>
       <licenseUrl>https://github.com/mikeobrien/graphite/blob/master/LICENSE</licenseUrl>
       <projectUrl>http://graphiteweb.io/</projectUrl>
       <owners>Mike O'Brien</owners>
-      <summary>Enables OWIN hosting of the Graphite Web Framework.</summary>
+      <summary>Simple, lightweight, convention based web framework built on Web Api.</summary>
       <iconUrl>https://github.com/mikeobrien/graphite/raw/master/misc/logo128x128.png</iconUrl>
       <tags>web api rest owin</tags>
       <dependencies>
