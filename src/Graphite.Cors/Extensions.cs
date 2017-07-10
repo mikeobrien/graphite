@@ -19,9 +19,9 @@ namespace Graphite.Cors
             configure?.Invoke(new CorsConfigurationDsl(corsConfiguration));
             return configuration
                 .ConfigureHttpRouteDecorators(x => x
-                    .Append<OptionsRouteDecorator>(a => corsConfiguration.PolicySources.ThatApply(a).Any()))
+                    .Append<OptionsRouteDecorator>(a => corsConfiguration.PolicySources.ThatApplyTo(a).Any()))
                 .ConfigureBehaviors(x => x
-                    .Append<CorsBehavior>(a => corsConfiguration.PolicySources.ThatApply(a).Any())
+                    .Append<CorsBehavior>(a => corsConfiguration.PolicySources.ThatApplyTo(a).Any())
                         .AfterOrPrepend<DefaultErrorHandlerBehavior>())
                 .ConfigureRegistry(x => x
                     .Register(corsConfiguration)
@@ -33,8 +33,10 @@ namespace Graphite.Cors
             this IEnumerable<ICorsPolicySource> sources, CorsConfiguration corsConfiguration,
             ActionDescriptor actionDescriptor, ConfigurationContext configurationContext)
         {
-            return corsConfiguration.PolicySources.ThatApplies(sources,
-                new ActionConfigurationContext(configurationContext, actionDescriptor)).FirstOrDefault();
+            return corsConfiguration.PolicySources.ThatApply(sources,
+                new ActionConfigurationContext(configurationContext, 
+                    actionDescriptor.Action, actionDescriptor.Route))
+                .FirstOrDefault();
         }
 
         public static CorsRequestContext GetCorsRequestContext(this HttpRequestMessage request)

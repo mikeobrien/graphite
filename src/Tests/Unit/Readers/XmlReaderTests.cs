@@ -50,8 +50,7 @@ namespace Tests.Unit.Readers
                     .WithContentType(MimeTypes.ApplicationXml)
                     .AddParameters("param");
 
-            var result = await CreateReader(requestGraph)
-                .Read(requestGraph.GetRequestBinderContext());
+            var result = await CreateReader(requestGraph).Read();
 
             result.ShouldNotBeNull();
             result.ShouldBeType<InputModel>();

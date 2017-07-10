@@ -28,7 +28,7 @@ namespace Tests.Unit.Routing
         {
             _configuration = new Configuration();
             _urlConventions = new List<IUrlConvention> { new DefaultUrlConvention(_configuration) };
-            _configuration.UrlConventions.Append<DefaultUrlConvention>();
+            _configuration.UrlConventions.Configure(c => c.Append<DefaultUrlConvention>());
             _routeConvention = new DefaultRouteConvention(
                 new ConfigurationContext(_configuration, null), _urlConventions,
                 new DefaultInlineConstraintBuilder(_configuration));
@@ -464,6 +464,7 @@ namespace Tests.Unit.Routing
                     .MethodDescriptor.Name}/{c.Url}").ToArray()
             };
             _urlConventions.Add(urlConvention);
+            _configuration.UrlConventions.Configure(x => x.Append(urlConvention));
                 
             var descriptors = _routeConvention.GetRouteDescriptors(
                 new RouteContext(actionMethod));
@@ -475,7 +476,6 @@ namespace Tests.Unit.Routing
             descriptors[0].Url.ShouldEqual(defaultUrl);
             descriptors[1].Url.ShouldEqual("fark/Get_Segment/Tests/Unit/Routing/Segment");
             descriptors[2].Url.ShouldEqual("farker/Get_Segment/Tests/Unit/Routing/Segment");
-
 
             urlConvention.AppliesToCalled.ShouldBeTrue();
             urlConvention.AppliesToContext.ActionMethod.ShouldEqual(actionMethod);
@@ -505,6 +505,7 @@ namespace Tests.Unit.Routing
                 GetUrlsFunc = c => new[] { "fark", "farker" }
             };
             _urlConventions.Add(urlConvention);
+            _configuration.UrlConventions.Configure(x => x.Append(urlConvention));
 
             var descriptors = _routeConvention.GetRouteDescriptors(new RouteContext(
                 ActionMethod.From<UrlConventionHandler>(x => x.Get_Segment())));
@@ -523,7 +524,25 @@ namespace Tests.Unit.Routing
                 GetUrlsFunc = c => new[] { "fark", "farker" }
             };
             _urlConventions.Add(urlConvention);
-            _configuration.UrlConventions.Append<TestUrlConvention>(x => false);
+            _configuration.UrlConventions.Configure(c => c.Append<TestUrlConvention>(x => false));
+
+            var descriptors = _routeConvention.GetRouteDescriptors(new RouteContext(
+                ActionMethod.From<UrlConventionHandler>(x => x.Get_Segment())));
+
+            descriptors.Count.ShouldEqual(1);
+
+            urlConvention.AppliesToCalled.ShouldBeFalse();
+            urlConvention.GetUrlsCalled.ShouldBeFalse();
+        }
+
+        [Test]
+        public void Should_not_use_url_conventions_if_no_plugin_definition_found()
+        {
+            var urlConvention = new TestUrlConvention
+            {
+                GetUrlsFunc = c => new[] { "fark", "farker" }
+            };
+            _urlConventions.Add(urlConvention);
 
             var descriptors = _routeConvention.GetRouteDescriptors(new RouteContext(
                 ActionMethod.From<UrlConventionHandler>(x => x.Get_Segment())));

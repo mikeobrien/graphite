@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -7,8 +6,7 @@ using Graphite;
 using Graphite.Actions;
 using Graphite.Behaviors;
 using Graphite.DependencyInjection;
-using Graphite.Extensions;
-using Graphite.Reflection;
+using Graphite.Extensibility;
 using Graphite.StructureMap;
 using NUnit.Framework;
 using Should;
@@ -22,7 +20,7 @@ namespace Tests.Unit.Behaviors
     {
         private Logger _logger;
         private Configuration _configuration;
-        private List<TypeDescriptor> _behaviors;
+        private Plugins<IBehavior> _behaviors;
         private ActionDescriptor _actionDescriptor;
         private IContainer _container;
 
@@ -31,8 +29,9 @@ namespace Tests.Unit.Behaviors
         {
             _logger = new Logger();
             _configuration = new Configuration();
-            _behaviors = new List<TypeDescriptor>();
-            _actionDescriptor = new ActionDescriptor(null, null, _behaviors);
+            _behaviors = new Plugins<IBehavior>(false);
+            _actionDescriptor = new ActionDescriptor(null, null, 
+                null, null, null, null, _behaviors);
             _container = new Container();
             _container.Register(_logger);
         }
@@ -41,8 +40,9 @@ namespace Tests.Unit.Behaviors
         public async Task Should_invoke_behaviors_in_order()
         {
             _configuration.DefaultBehavior = typeof(TestDefaultBehavior);
-            _behaviors.Add(typeof(TestBehavior1).ToTypeDescriptor());
-            _behaviors.Add(typeof(TestBehavior2).ToTypeDescriptor());
+            _behaviors.Configure(x => x
+                .Append<TestBehavior1>()
+                .Append<TestBehavior2>());
 
             var behaviorChain = new BehaviorChain(_configuration, _actionDescriptor, _container);
 
@@ -61,9 +61,10 @@ namespace Tests.Unit.Behaviors
         public async Task Should_not_invoke_behaviors_that_dont_appy()
         {
             _configuration.DefaultBehavior = typeof(TestDefaultBehavior);
-            _behaviors.Add(typeof(TestBehavior1).ToTypeDescriptor());
-            _behaviors.Add(typeof(TestDoesentApplyBehavior).ToTypeDescriptor());
-            _behaviors.Add(typeof(TestBehavior2).ToTypeDescriptor());
+            _behaviors.Configure(x => x
+                .Append<TestBehavior1>()
+                .Append<TestDoesentApplyBehavior>()
+                .Append<TestBehavior2>());
 
             var behaviorChain = new BehaviorChain(_configuration, _actionDescriptor, _container);
 

@@ -66,6 +66,7 @@
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Cors, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -99,6 +100,7 @@
     <Compile Include="Acceptance\RoutingTests.cs" />
     <Compile Include="Acceptance\WriterTests.cs" />
     <Compile Include="Common\Fakes\TestActionDescriptor.cs" />
+    <Compile Include="Common\Fakes\TestAutenticator.cs" />
     <Compile Include="Common\Fakes\TestBehaviors.cs" />
     <Compile Include="Common\Fakes\TestValueMapper.cs" />
     <Compile Include="Common\Fakes\TestRequestReader.cs" />
@@ -117,6 +119,7 @@
     <Compile Include="Common\FluentAssertions.cs" />
     <Compile Include="Common\WebServers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Unit\Actions\ActionDescriptorFactoryTests.cs" />
     <Compile Include="Unit\Actions\ActionMessageHandlerTests.cs" />
     <Compile Include="Unit\AspNet\BootstrapTests.cs" />
     <Compile Include="Unit\AspNet\RequestPropertyProviderTests.cs" />
@@ -157,7 +160,14 @@
     <Compile Include="Unit\DependencyInjection\StructureMapTests.cs" />
     <Compile Include="Unit\Diagnostics\DiagnosticsActionSourceTests.cs" />
     <Compile Include="Unit\Diagnostics\DiagnosticsHandlerTests.cs" />
-    <Compile Include="Unit\Extensibility\PluginDefinitionTests.cs" />
+    <Compile Include="Unit\Extensibility\ConditionalPluginTests.cs" />
+    <Compile Include="Unit\Extensibility\ConditionalPluginsTests.cs" />
+    <Compile Include="Unit\Extensibility\ConditionalPluginsDslTests.cs" />
+    <Compile Include="Unit\Extensibility\ContainerExtensionTests.cs" />
+    <Compile Include="Unit\Extensibility\PluginTests.cs" />
+    <Compile Include="Unit\Extensibility\PluginsDslTests.cs" />
+    <Compile Include="Unit\Extensibility\PluginsBaseTests.cs" />
+    <Compile Include="Unit\Extensibility\ConditionalExtensionTests.cs" />
     <Compile Include="Unit\Extensions\ExpressionTests.cs" />
     <Compile Include="Unit\Extensions\ExtensionTests.cs" />
     <Compile Include="Unit\Extensions\LinqExtensionTests.cs" />

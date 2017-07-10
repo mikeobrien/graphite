@@ -38,66 +38,28 @@ namespace Graphite
         public int DownloadBufferSize { get; set; } = 1024 * 1024;
         public bool AutomaticallyConstrainUrlParameterByType { get; set; }
 
-        public PluginDefinition<IPathProvider> PathProvider { get; } =
-            PluginDefinition<IPathProvider>.Create(singleton: true);
-
-        public PluginDefinition<IInitializer> Initializer { get; } =
-            PluginDefinition<IInitializer>
-                .Create<Initializer>(singleton: true);
-
-        public PluginDefinition<IInlineConstraintResolver> InlineConstraintResolver { get; } =
-            PluginDefinition<IInlineConstraintResolver>
-                .Create<DefaultInlineConstraintResolver>(singleton: true);
-
-        public PluginDefinition<IInlineConstraintBuilder> InlineConstraintBuilder { get; } =
-            PluginDefinition<IInlineConstraintBuilder>
-                .Create<DefaultInlineConstraintBuilder>(singleton: true);
-
-        public PluginDefinition<ITypeCache> TypeCache { get; } =
-            PluginDefinition<ITypeCache>
-                .Create<TypeCache>(singleton: true);
-        
-        public PluginDefinitions<IActionMethodSource, ConfigurationContext> ActionMethodSources { get; } =
-            PluginDefinitions<IActionMethodSource, ConfigurationContext>.Create(x => x
-                .Append<DefaultActionMethodSource>(), singleton: true);
-
-        public PluginDefinitions<IActionSource, ConfigurationContext> ActionSources { get; } =
-            PluginDefinitions<IActionSource, ConfigurationContext>.Create(x => x
-                .Append<DiagnosticsActionSource>()
-                .Append<DefaultActionSource>(), singleton: true);
-
-        public PluginDefinitions<IRouteConvention, RouteConfigurationContext> RouteConventions { get; } =
-            PluginDefinitions<IRouteConvention, RouteConfigurationContext>.Create(x => x
-                .Append<DefaultRouteConvention>(), 
-                singleton: true);
-
-        public PluginDefinition<IInlineConstraintBuilder> ConstraintBuilder { get; } =
-            PluginDefinition<IInlineConstraintBuilder>
-                .Create<DefaultInlineConstraintBuilder>(singleton: true);
-
-        public PluginDefinitions<IUrlConvention, UrlConfigurationContext> UrlConventions { get; } =
-            PluginDefinitions<IUrlConvention, UrlConfigurationContext>.Create(x => x
-                .Append<DefaultUrlConvention>()
-                .Append<AliasUrlConvention>(), 
-                singleton: true);
-
-        public PluginDefinitions<IActionDecorator, ActionConfigurationContext> ActionDecorators { get; } =
-            PluginDefinitions<IActionDecorator, ActionConfigurationContext>.Create(singleton: true);
-
-        public PluginDefinitions<IHttpRouteDecorator, ActionConfigurationContext> HttpRouteDecorators { get; } =
-            PluginDefinitions<IHttpRouteDecorator, ActionConfigurationContext>.Create(singleton: true);
-
-        public List<Func<ActionMethod, Url, string>> UrlAliases { get; } =
-            new List<Func<ActionMethod, Url, string>>();
-        public string UrlPrefix { get; set; }
-
         public HttpMethods SupportedHttpMethods { get; } = new HttpMethods {
             HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Patch, HttpMethod.Delete,
             HttpMethod.Options, HttpMethod.Head, HttpMethod.Trace, HttpMethod.Connect };
 
-        public PluginDefinition<IHttpRouteMapper> HttpRouteMapper { get; } =
-            PluginDefinition<IHttpRouteMapper>
-                .Create<HttpRouteMapper>(singleton: true);
+        public Plugin<IPathProvider> PathProvider { get; } =
+            Plugin<IPathProvider>.Create(singleton: true);
+
+        public Plugin<IInitializer> Initializer { get; } =
+            Plugin<IInitializer>
+                .Create<Initializer>(singleton: true);
+
+        public Plugin<IInlineConstraintResolver> InlineConstraintResolver { get; } =
+            Plugin<IInlineConstraintResolver>
+                .Create<DefaultInlineConstraintResolver>(singleton: true);
+
+        public Plugin<IInlineConstraintBuilder> InlineConstraintBuilder { get; } =
+            Plugin<IInlineConstraintBuilder>
+                .Create<DefaultInlineConstraintBuilder>(singleton: true);
+
+        public Plugin<ITypeCache> TypeCache { get; } =
+            Plugin<ITypeCache>
+                .Create<TypeCache>(singleton: true);
 
         public string HandlerNameFilterRegex { get; set; } = "Handler$";
 
@@ -110,6 +72,22 @@ namespace Graphite
         public Func<Configuration, MethodDescriptor, bool> ActionFilter { get; set; } =
             (c, a) => a.Name.IsMatch(c.ActionRegex(c));
 
+        public Plugins<IActionMethodSource> ActionMethodSources { get; } = 
+            new Plugins<IActionMethodSource>(true)
+                .Configure(x => x
+                    .Append<DefaultActionMethodSource>());
+
+        public Plugins<IActionSource> ActionSources { get; } = 
+            new Plugins<IActionSource>(true)
+                .Configure(x => x
+                    .Append<DiagnosticsActionSource>()
+                    .Append<DefaultActionSource>());
+
+        public ConditionalPlugins<IRouteConvention, RouteConfigurationContext> RouteConventions { get; } = 
+            new ConditionalPlugins<IRouteConvention, RouteConfigurationContext>(true)
+                .Configure(x => x
+                    .Append<DefaultRouteConvention>());
+
         public string HandlerNamespaceRegex { get; set; } = "(.*)";
 
         public Func<Configuration, ActionMethod, string> GetHandlerNamespace { get; set; } =
@@ -118,42 +96,73 @@ namespace Graphite
         public Func<Configuration, ActionMethod, string> GetActionMethodName { get; set; } =
             (c, a) => a.MethodDescriptor.Name.Remove(c.ActionRegex(c));
 
-        public Func<Configuration, ActionMethod, string> GetHttpMethod { get; set; } = 
+        public Func<Configuration, ActionMethod, string> GetHttpMethod { get; set; } =
             (c, a) => c.SupportedHttpMethods.MatchAny(a.MethodDescriptor
                 .Name.MatchGroups(c.ActionRegex(c)))?.Method;
-        
-        public PluginDefinition<IUnhandledExceptionHandler> UnhandledExceptionHandler { get; } =
-            PluginDefinition<IUnhandledExceptionHandler>
-                .Create<UnhandledExceptionHandler>();
 
-        public PluginDefinition<IBehaviorChainInvoker> BehaviorChainInvoker { get; } =
-            PluginDefinition<IBehaviorChainInvoker>
+        public Plugin<IInlineConstraintBuilder> ConstraintBuilder { get; } =
+            Plugin<IInlineConstraintBuilder>
+                .Create<DefaultInlineConstraintBuilder>(singleton: true);
+
+        public ConditionalPlugins<IUrlConvention, UrlConfigurationContext> UrlConventions { get; } = 
+            new ConditionalPlugins<IUrlConvention, UrlConfigurationContext>(true)
+                .Configure(x => x
+                    .Append<DefaultUrlConvention>()
+                    .Append<AliasUrlConvention>());
+
+        public List<Func<ActionMethod, Url, string>> UrlAliases { get; } =
+            new List<Func<ActionMethod, Url, string>>();
+        public string UrlPrefix { get; set; }
+
+        public ConditionalPlugins<IActionDecorator, ActionConfigurationContext> ActionDecorators { get; } = 
+            new ConditionalPlugins<IActionDecorator, ActionConfigurationContext>(true);
+
+        public ConditionalPlugins<IHttpRouteDecorator, ActionConfigurationContext> HttpRouteDecorators { get; } = 
+            new ConditionalPlugins<IHttpRouteDecorator, ActionConfigurationContext>(true);
+
+        public Plugin<IHttpRouteMapper> HttpRouteMapper { get; } =
+            Plugin<IHttpRouteMapper>
+                .Create<HttpRouteMapper>(singleton: true);
+
+        public Plugin<IBehaviorChainInvoker> BehaviorChainInvoker { get; } =
+            Plugin<IBehaviorChainInvoker>
                 .Create<BehaviorChainInvoker>();
 
-        public Type BehaviorChain { get; set; } = typeof(BehaviorChain);
-        public Type DefaultBehavior { get; set; } = typeof(InvokerBehavior);
-
-        public PluginDefinition<IActionInvoker> ActionInvoker { get; } =
-            PluginDefinition<IActionInvoker>
+        public Plugin<IActionInvoker> ActionInvoker { get; } =
+            Plugin<IActionInvoker>
                 .Create<ActionInvoker>();
+        
+        public Plugin<IUnhandledExceptionHandler> UnhandledExceptionHandler { get; } =
+            Plugin<IUnhandledExceptionHandler>
+                .Create<UnhandledExceptionHandler>();
 
-        public PluginDefinitions<IAuthenticator, ActionConfigurationContext> Authenticators { get; } =
-            PluginDefinitions<IAuthenticator, ActionConfigurationContext>.Create();
-
-        public PluginDefinition<IRequestPropertiesProvider> RequestPropertiesProvider { get; } =
-            PluginDefinition<IRequestPropertiesProvider>.Create();
+        public Plugin<IRequestPropertiesProvider> RequestPropertiesProvider { get; } =
+            Plugin<IRequestPropertiesProvider>.Create();
 
         public string DefaultAuthenticationRealm { get; set; }
         public string DefaultUnauthorizedStatusMessage { get; set; }
 
+        public Type BehaviorChain { get; set; } = typeof(BehaviorChain);
+        public Type DefaultBehavior { get; set; } = typeof(InvokerBehavior);
         public BindingMode HeadersBindingMode { get; set; } = BindingMode.None;
         public BindingMode CookiesBindingMode { get; set; } = BindingMode.None;
         public BindingMode RequestInfoBindingMode { get; set; } = BindingMode.None;
         public BindingMode ContinerBindingMode { get; set; } = BindingMode.None;
         public bool BindComplexTypeProperties { get; set; }
 
-        public PluginDefinitions<IRequestBinder, ActionConfigurationContext> RequestBinders { get; } =
-            PluginDefinitions<IRequestBinder, ActionConfigurationContext>.Create(x => x
+        public ConditionalPlugins<IValueMapper, ValueMapperConfigurationContext> ValueMappers { get; } = 
+            new ConditionalPlugins<IValueMapper, ValueMapperConfigurationContext>(false)
+            .Configure(x => x
+                .Append<SimpleTypeMapper>());
+
+        // Action scoped configuration
+
+        public ConditionalPlugins<IAuthenticator, ActionConfigurationContext> Authenticators { get; } = 
+            new ConditionalPlugins<IAuthenticator, ActionConfigurationContext>(false);
+
+        public ConditionalPlugins<IRequestBinder, ActionConfigurationContext> RequestBinders { get; } = 
+            new ConditionalPlugins<IRequestBinder, ActionConfigurationContext>(false)
+            .Configure(x => x
                 .Append<ReaderBinder>()
                 .Append<UrlParameterBinder>()
                 .Append<QuerystringBinder>()
@@ -163,11 +172,11 @@ namespace Graphite
                 .Append<HeaderBinder>()
                 .Append<CookieBinder>()
                 .Append<RequestPropertiesBinder>()
-                .Append<ContainerBinder>()
-            );
+                .Append<ContainerBinder>());
 
-        public PluginDefinitions<IRequestReader, ActionConfigurationContext> RequestReaders { get; } =
-            PluginDefinitions<IRequestReader, ActionConfigurationContext>.Create(x => x
+        public ConditionalPlugins<IRequestReader, ActionConfigurationContext> RequestReaders { get; } =
+            new ConditionalPlugins<IRequestReader, ActionConfigurationContext>(false)
+            .Configure(x => x
                 .Append<StringReader>()
                 .Append<StreamReader>()
                 .Append<ByteReader>()
@@ -175,12 +184,9 @@ namespace Graphite
                 .Append<XmlReader>()
                 .Append<FormReader>());
 
-        public PluginDefinitions<IValueMapper, ValueMapperConfigurationContext> ValueMappers { get; } =
-            PluginDefinitions<IValueMapper, ValueMapperConfigurationContext>.Create(x => x
-                .Append<SimpleTypeMapper>());
-
-        public PluginDefinitions<IResponseWriter, ActionConfigurationContext> ResponseWriters { get; } =
-            PluginDefinitions<IResponseWriter, ActionConfigurationContext>.Create(x => x
+        public ConditionalPlugins<IResponseWriter, ActionConfigurationContext> ResponseWriters { get; } =
+            new ConditionalPlugins<IResponseWriter, ActionConfigurationContext>(false)
+            .Configure(x => x
                 .Append<RedirectWriter>()
                 .Append<StringWriter>()
                 .Append<StreamWriter>()
@@ -188,8 +194,10 @@ namespace Graphite
                 .Append<JsonWriter>()
                 .Append<XmlWriter>());
 
-        public PluginDefinitions<IBehavior, ActionConfigurationContext> Behaviors { get; } =
-            PluginDefinitions<IBehavior, ActionConfigurationContext>.Create(x => x
-                .Append<DefaultErrorHandlerBehavior>(y => y.Configuration.DefaultErrorHandlerEnabled));
+        public ConditionalPlugins<IBehavior, ActionConfigurationContext> Behaviors { get; } = 
+            new ConditionalPlugins<IBehavior, ActionConfigurationContext>(false)
+            .Configure(x => x
+                .Append<DefaultErrorHandlerBehavior>(y => y
+                    .Configuration.DefaultErrorHandlerEnabled));
     }
 }

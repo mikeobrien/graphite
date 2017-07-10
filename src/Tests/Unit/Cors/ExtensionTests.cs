@@ -11,7 +11,7 @@ using NUnit.Framework;
 using Graphite.Cors;
 using Should;
 using Tests.Common;
-using PolicyPlugin = Graphite.Extensibility.PluginDefinition<Graphite.Cors
+using PolicyPlugin = Graphite.Extensibility.ConditionalPlugin<Graphite.Cors
     .ICorsPolicySource, Graphite.Actions.ActionConfigurationContext>;
 
 namespace Tests.Unit.Cors
@@ -92,9 +92,9 @@ namespace Tests.Unit.Cors
 
             var policySource = policySources[0];
             policySource.AppliesTo(new ActionConfigurationContext(null,
-                new ActionDescriptor(getAction, null))).ShouldBeFalse();
+                getAction, null)).ShouldBeFalse();
             policySource.AppliesTo(new ActionConfigurationContext(null,
-                new ActionDescriptor(postAction, null))).ShouldBeTrue();
+                postAction, null)).ShouldBeTrue();
             Should_be_policy_source_type<CorsAttributePolicySource>(policySources[0]);
 
             Should_have_type_registration<ICorsPolicySource, CorsAttributePolicySource>();
@@ -139,9 +139,9 @@ namespace Tests.Unit.Cors
 
             behavior.Type.ShouldEqual(typeof(CorsBehavior));
             behavior.AppliesTo(new ActionConfigurationContext(null,
-                new ActionDescriptor(getAction, null))).ShouldBeFalse();
+                getAction, null)).ShouldBeFalse();
             behavior.AppliesTo(new ActionConfigurationContext(null,
-                new ActionDescriptor(postAction, null))).ShouldBeTrue();
+                postAction, null)).ShouldBeTrue();
         }
 
         [Test]
@@ -159,15 +159,15 @@ namespace Tests.Unit.Cors
 
             decorator.Type.ShouldEqual(typeof(OptionsRouteDecorator));
             decorator.AppliesTo(new ActionConfigurationContext(null,
-                new ActionDescriptor(getAction, null))).ShouldBeFalse();
+                getAction, null)).ShouldBeFalse();
             decorator.AppliesTo(new ActionConfigurationContext(null,
-                new ActionDescriptor(postAction, null))).ShouldBeTrue();
+                postAction, null)).ShouldBeTrue();
         }
 
         private CorsConfiguration GetCorsConfig()
         {
             return _configuration.Registry
-                .FirstOrDefault(x => x.PluginType == typeof(CorsConfiguration))
+                .FirstOrDefault(x => x.PluginType.IsType<CorsConfiguration>())
                 .Instance.As<CorsConfiguration>();
         }
 
@@ -180,10 +180,10 @@ namespace Tests.Unit.Cors
 
             var corsConfiguration = new CorsConfiguration();
 
-            corsConfiguration.PolicySources.Append(policy1,
-                p => p.ActionMethod.Name == "Get");
-            corsConfiguration.PolicySources.Append(policy2);
-            corsConfiguration.PolicySources.Append(policy3);
+            corsConfiguration.PolicySources.Configure(c => c
+                .Append(policy1, p => p.ActionMethod.Name == "Get")
+                .Append(policy2)
+                .Append(policy3));
 
             var sources = new List<ICorsPolicySource>
             {
@@ -191,7 +191,8 @@ namespace Tests.Unit.Cors
             };
 
             var applies = sources.ThatApplies(corsConfiguration, new ActionDescriptor(
-                ActionMethod.From<Handler>(x => x.Post()), null), null);
+                ActionMethod.From<Handler>(x => x.Post()), null, 
+                    null, null, null, null, null), null);
 
             applies.ShouldEqual(policy2);
         }

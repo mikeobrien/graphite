@@ -56,8 +56,7 @@ namespace Tests.Unit.Readers.Bender
 
             var result = await new Graphite.Bender.JsonReader(new Options(),
                     requestGraph.GetRouteDescriptor(),
-                    requestGraph.GetHttpRequestMessage())
-                .Read(requestGraph.GetRequestBinderContext());
+                    requestGraph.GetHttpRequestMessage()).Read();
 
             result.ShouldNotBeNull();
             result.ShouldBeType<InputModel>();

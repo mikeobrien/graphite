@@ -73,6 +73,7 @@ namespace Tests.Unit
         public static void RegisterRequestObjects(Container container)
         {
             var requestGraph = RequestGraph.Create();
+            container.Register(requestGraph.GetActionDescriptor());
             container.Register(requestGraph.GetRouteDescriptor());
             container.Register(requestGraph.GetHttpRequestMessage());
             container.Register(requestGraph.GetHttpResponseMessage());

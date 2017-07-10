@@ -14,15 +14,6 @@ namespace Graphite.Actions
             RouteDescriptor = routeDescriptorDescriptor;
         }
 
-        public ActionConfigurationContext(ConfigurationContext configurationContext, 
-            ActionDescriptor actionDescriptor)
-        {
-            Configuration = configurationContext?.Configuration;
-            HttpConfiguration = configurationContext?.HttpConfiguration;
-            ActionMethod = actionDescriptor?.Action;
-            RouteDescriptor = actionDescriptor?.Route;
-        }
-
         public Configuration Configuration { get; }
         public HttpConfiguration HttpConfiguration { get; }
         public virtual ActionMethod ActionMethod { get; }

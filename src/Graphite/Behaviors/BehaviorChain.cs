@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Graphite.Actions;
 using Graphite.DependencyInjection;
-using Graphite.Reflection;
 
 namespace Graphite.Behaviors
 {
@@ -13,14 +12,15 @@ namespace Graphite.Behaviors
     {
         private readonly Type _defaultBehavior;
         private readonly IContainer _container;
-        private readonly Stack<TypeDescriptor> _behaviors;
+        private readonly Stack<Type> _behaviors;
 
-        public BehaviorChain(Configuration configuration, 
+        public BehaviorChain(Configuration configuration,
             ActionDescriptor actionDescriptor, IContainer container)
         {
             _defaultBehavior = configuration.DefaultBehavior;
             _container = container;
-            _behaviors = new Stack<TypeDescriptor>(actionDescriptor.Behaviors.Reverse());
+            _behaviors = new Stack<Type>(actionDescriptor.Behaviors
+                .Select(x => x.Type).Reverse());
         }
 
         public async Task<HttpResponseMessage> InvokeNext()
@@ -30,7 +30,7 @@ namespace Graphite.Behaviors
                 if (_behaviors.Count == 0)
                     return await _container.GetInstance<IBehavior>(_defaultBehavior).Invoke();
 
-                var behaviorType = _behaviors.Pop().Type;
+                var behaviorType = _behaviors.Pop();
                 var behavior = _container.GetInstance<IBehavior>(
                     behaviorType, Dependency.For<IBehaviorChain>(this));
 

@@ -33,22 +33,23 @@ namespace Tests.Unit.Diagnostics
         public void Should_return_configuration()
         {
             var configuration = new Configuration();
-            configuration.Behaviors.Append<TestBehavior1>();
-            configuration.Behaviors.Append<TestBehavior2>();
+            configuration.Behaviors.Configure(c => c
+                .Append<TestBehavior1>()
+                .Append<TestBehavior2>());
             var parameters = new TypeCache().GetTypeDescriptor(typeof(Handler)).Methods
-                .FirstOrDefault(x => x.Name == nameof(Handler.Get)).Parameters;
+                .FirstOrDefault(x => x.Name == nameof(Handler.Get))?.Parameters;
+            var actionMethod = ActionMethod.From<Handler>(x => x.Get(null, 0, DateTime.MaxValue));
+            var routeDescriptor = new RouteDescriptor("GET", "some/url", 
+                parameters.Where(x => x.Name == "urlParam")
+                    .Select(x => new UrlParameter(x, false)).ToArray(), 
+                parameters.Where(x => x.Name == "queryParam")
+                    .Select(x => new ActionParameter(x)).ToArray(), 
+                parameters.First(x => x.Name == "request"),
+                new TypeCache().GetTypeDescriptor(typeof(OutputModel)));
             var actionDescriptors = new List<ActionDescriptor>
             {
-                new ActionDescriptor(
-                    ActionMethod.From<Handler>(x => x.Get(null, 0, DateTime.MaxValue)), 
-                    new RouteDescriptor("GET", "some/url", 
-                        parameters.Where(x => x.Name == "urlParam")
-                            .Select(x => new UrlParameter(x, false)).ToArray(), 
-                        parameters.Where(x => x.Name == "queryParam")
-                            .Select(x => new ActionParameter(x)).ToArray(), 
-                        parameters.First(x => x.Name == "request"),
-                        new TypeCache().GetTypeDescriptor(typeof(OutputModel))),
-                    new TypeDescriptor[] {})
+                new ActionDescriptorFactory(configuration, new ConfigurationContext(configuration, null))
+                    .CreateDescriptor(actionMethod ,routeDescriptor)
             };
             var runtimeConfiguration = new RuntimeConfiguration(actionDescriptors);
             var handler = new DiagnosticsHandler(configuration, runtimeConfiguration, 

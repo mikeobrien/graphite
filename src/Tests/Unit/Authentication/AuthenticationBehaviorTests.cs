@@ -7,6 +7,7 @@ using Graphite;
 using Graphite.Actions;
 using Graphite.Authentication;
 using Graphite.Behaviors;
+using Graphite.Extensibility;
 using Graphite.Extensions;
 using NSubstitute;
 using NUnit.Framework;
@@ -20,11 +21,11 @@ namespace Tests.Unit.Authentication
     {
         private TestBasicAuthenticator _basicAuthenticator;
         private TestBearerTokenAuthenticator _bearerTokenAuthenticator;
-        private ActionConfigurationContext _actionConfigurationContext;
         private Configuration _configuration;
         private HttpRequestMessage _requestMessage;
         private HttpResponseMessage _responseMessage;
-        private IBehaviorChain _BehaviorChain;
+        private IBehaviorChain _behaviorChain;
+        private ActionDescriptor _actionDescriptor;
         private List<IAuthenticator> _authenticators;
         private AuthenticationBehavior _behavior;
 
@@ -35,14 +36,14 @@ namespace Tests.Unit.Authentication
             _basicAuthenticator = new TestBasicAuthenticator("fark", "farker");
             _bearerTokenAuthenticator = new TestBearerTokenAuthenticator("fark");
             _configuration = new Configuration();
-            _actionConfigurationContext = new ActionConfigurationContext(
-                new ConfigurationContext(_configuration, null), new ActionDescriptor(null, null));
             _requestMessage = new HttpRequestMessage();
             _responseMessage = new HttpResponseMessage(HttpStatusCode.OK);
-            _BehaviorChain = Substitute.For<IBehaviorChain>();
-            _BehaviorChain.InvokeNext().Returns(_responseMessage);
-            _behavior = new AuthenticationBehavior(_BehaviorChain, _requestMessage, 
-                _responseMessage, _authenticators, _configuration, _actionConfigurationContext);
+            _behaviorChain = Substitute.For<IBehaviorChain>();
+            _behaviorChain.InvokeNext().Returns(_responseMessage);
+            _actionDescriptor = new ActionDescriptorFactory(_configuration, 
+                new ConfigurationContext(_configuration, null)).CreateDescriptor(null, null);
+            _behavior = new AuthenticationBehavior(_behaviorChain, _requestMessage, 
+                _responseMessage, _authenticators, _configuration, _actionDescriptor);
         }
 
         [Test]
@@ -50,17 +51,18 @@ namespace Tests.Unit.Authentication
         {
             await _behavior.Should().Throw<GraphiteException>(async x => await x.Invoke());
 
-            await _BehaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
+            await _behaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
         }
 
         [Test]
         public async Task Should_return_unauthorized_if_no_authorization_header_found()
         {
             _authenticators.Add(_basicAuthenticator);
+            _actionDescriptor.Authenticators.Configure(x => x.Append<TestBasicAuthenticator>());
             
             var result = await _behavior.Invoke();
             
-            await _BehaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
+            await _behaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
 
             Should_be_unauthorized(result, authenticators: _basicAuthenticator);
         }
@@ -70,10 +72,11 @@ namespace Tests.Unit.Authentication
         {
             _requestMessage.SetBasicAuthorizationHeader("fark", "farker");
             _authenticators.Add(_bearerTokenAuthenticator);
+            _actionDescriptor.Authenticators.Configure(x => x.Append<TestBearerTokenAuthenticator>());
 
             var result = await _behavior.Invoke();
             
-            await _BehaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
+            await _behaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
 
             Should_be_unauthorized(result, authenticators: _bearerTokenAuthenticator);
         }
@@ -83,10 +86,11 @@ namespace Tests.Unit.Authentication
         {
             _requestMessage.SetBasicAuthorizationHeader("fark", "wrong");
             _authenticators.Add(_basicAuthenticator);
+            _actionDescriptor.Authenticators.Configure(x => x.Append<TestBasicAuthenticator>());
 
             var result = await _behavior.Invoke();
             
-            await _BehaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
+            await _behaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
 
             Should_be_unauthorized(result, authenticators: _basicAuthenticator);
         }
@@ -97,27 +101,15 @@ namespace Tests.Unit.Authentication
             _requestMessage.SetBasicAuthorizationHeader("fark", "wrong");
             _authenticators.Add(_basicAuthenticator);
             _authenticators.Add(_bearerTokenAuthenticator);
+            _actionDescriptor.Authenticators.Configure(x => x
+                .Append<TestBasicAuthenticator>()
+                .Append<TestBearerTokenAuthenticator>());
 
             var result = await _behavior.Invoke();
 
-            await _BehaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
+            await _behaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
 
             Should_be_unauthorized(result, null, null, _basicAuthenticator, _bearerTokenAuthenticator);
-        }
-
-        [Test]
-        public async Task Should_only_use_authenticators_that_apply()
-        {
-            _requestMessage.SetBasicAuthorizationHeader("fark", "farker");
-            _authenticators.Add(_basicAuthenticator);
-            _authenticators.Add(_bearerTokenAuthenticator);
-            _configuration.Authenticators.Append(_basicAuthenticator, x => false);
-
-            var result = await _behavior.Invoke();
-
-            await _BehaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
-
-            Should_be_unauthorized(result, null, null, _bearerTokenAuthenticator);
         }
 
         [Test]
@@ -125,11 +117,13 @@ namespace Tests.Unit.Authentication
         {
             _requestMessage.SetBasicAuthorizationHeader("fark", "farker");
             _authenticators.Add(_basicAuthenticator);
+            _actionDescriptor.Authenticators.Configure(x => 
+                x.Append<TestBasicAuthenticator>());
 
             var result = await _behavior.Invoke();
 
             result.StatusCode.ShouldEqual(HttpStatusCode.OK);
-            await _BehaviorChain.ReceivedWithAnyArgs().InvokeNext();
+            await _behaviorChain.ReceivedWithAnyArgs().InvokeNext();
         }
 
         [TestCase(null, "config")]
@@ -141,6 +135,8 @@ namespace Tests.Unit.Authentication
             _configuration.DefaultUnauthorizedStatusMessage = "config";
             _basicAuthenticator.StatusMessageOverride = authenticatorStatusMessage;
             _authenticators.Add(_basicAuthenticator);
+            _actionDescriptor.Authenticators.Configure(x => x
+                .Append<TestBasicAuthenticator>());
 
             var result = await _behavior.Invoke();
 
@@ -155,6 +151,8 @@ namespace Tests.Unit.Authentication
             _configuration.DefaultAuthenticationRealm = "config";
             _basicAuthenticator.RealmOverride = authenticatorRealm;
             _authenticators.Add(_basicAuthenticator);
+            _actionDescriptor.Authenticators.Configure(x => x
+                .Append<TestBasicAuthenticator>());
 
             var result = await _behavior.Invoke();
 

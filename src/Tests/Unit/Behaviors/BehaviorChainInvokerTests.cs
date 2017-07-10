@@ -28,7 +28,6 @@ namespace Tests.Unit.Behaviors
 
         private RequestGraph _requestGraph;
         private BehaviorChainInvoker _invoker;
-        //private Configuration _configuration;
 
         [SetUp]
         public void Setup()
@@ -81,7 +80,7 @@ namespace Tests.Unit.Behaviors
         public async Task Should_register_request_objects_in_scoped_container()
         {
             var someInstance = new SomeType();
-            _requestGraph.Configuration.Behaviors.Append<RegistrationLoggingBehavior>();
+            _requestGraph.Configuration.Behaviors.Configure(c => c.Append<RegistrationLoggingBehavior>());
             _requestGraph.Url = "http://fark.com/urlparamvalue?queryparam=queryvalue";
             _requestGraph.UrlTemplate = "{urlParam}";
             _requestGraph.AddParameters("queryParam");
@@ -161,7 +160,7 @@ namespace Tests.Unit.Behaviors
         [Test]
         public async Task Should_dispose_scoped_container()
         {
-            _requestGraph.Configuration.Behaviors.Append<DisposableBehavior>();
+            _requestGraph.Configuration.Behaviors.Configure(c => c.Append<DisposableBehavior>());
 
             var log = new Logger();
             _requestGraph.UnderlyingContainer.Configure(x =>
@@ -222,9 +221,10 @@ namespace Tests.Unit.Behaviors
         [Test]
         public async Task Should_invoke_behaviors_in_correct_order()
         {
-            _requestGraph.Configuration.Behaviors.Append<Behavior1>();
-            _requestGraph.Configuration.Behaviors.Append<Behavior2>();
-            _requestGraph.Configuration.Behaviors.Append<Behavior3>();
+            _requestGraph.Configuration.Behaviors.Configure(c => c
+                .Append<Behavior1>()
+                .Append<Behavior2>()
+                .Append<Behavior3>());
 
             var log = new Logger();
             _requestGraph.UnderlyingContainer.Configure(x =>
@@ -257,9 +257,10 @@ namespace Tests.Unit.Behaviors
         [TestCase(typeof(Behavior1), typeof(Behavior2), typeof(ShouldNotRunBehavior))]
         public async Task Should_not_invoke_behaviors_that_should_not_run(Type behaviorA, Type behaviorB, Type behaviorC)
         {
-            _requestGraph.Configuration.Behaviors.Append<IBehavior, ActionConfigurationContext>(behaviorA);
-            _requestGraph.Configuration.Behaviors.Append<IBehavior, ActionConfigurationContext>(behaviorB);
-            _requestGraph.Configuration.Behaviors.Append<IBehavior, ActionConfigurationContext>(behaviorC);
+            _requestGraph.Configuration.Behaviors.Configure(x => x
+                .Append<IBehavior, ActionConfigurationContext>(behaviorA)
+                .Append<IBehavior, ActionConfigurationContext>(behaviorB)
+                .Append<IBehavior, ActionConfigurationContext>(behaviorC));
 
             var log = new Logger();
             _requestGraph.UnderlyingContainer.Configure(x =>

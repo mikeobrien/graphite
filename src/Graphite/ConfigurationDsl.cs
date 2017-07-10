@@ -583,120 +583,120 @@ namespace Graphite
         /// <summary>
         /// Configures action method sources.
         /// </summary>
-        public ConfigurationDsl ConfigureActionMethodSources(Action<PluginDefinitions
-            <IActionMethodSource, ConfigurationContext>> configure)
+        public ConfigurationDsl ConfigureActionMethodSources(
+            Action<PluginsDsl<IActionMethodSource>> configure)
         {
-            configure(_configuration.ActionMethodSources);
+            _configuration.ActionMethodSources.Configure(configure);
             return this;
         }
 
         /// <summary>
         /// Configures action sources.
         /// </summary>
-        public ConfigurationDsl ConfigureActionSources(Action<PluginDefinitions
-            <IActionSource, ConfigurationContext>> configure)
+        public ConfigurationDsl ConfigureActionSources(
+            Action<PluginsDsl<IActionSource>> configure)
         {
-            configure(_configuration.ActionSources);
+            _configuration.ActionSources.Configure(configure);
             return this;
         }
 
         /// <summary>
         /// Configures action decorators.
         /// </summary>
-        public ConfigurationDsl ConfigureActionDecorators(Action<PluginDefinitions
+        public ConfigurationDsl ConfigureActionDecorators(Action<ConditionalPluginsDsl
             <IActionDecorator, ActionConfigurationContext>> configure)
         {
-            configure(_configuration.ActionDecorators);
+            _configuration.ActionDecorators.Configure(configure);
             return this;
         }
 
         /// <summary>
         /// Configures route conventions.
         /// </summary>
-        public ConfigurationDsl ConfigureRouteConventions(Action<PluginDefinitions
+        public ConfigurationDsl ConfigureRouteConventions(Action<ConditionalPluginsDsl
             <IRouteConvention, RouteConfigurationContext>> configure)
         {
-            configure(_configuration.RouteConventions);
+            _configuration.RouteConventions.Configure(configure);
             return this;
         }
 
         /// <summary>
         /// Configures url conventions.
         /// </summary>
-        public ConfigurationDsl ConfigureUrlConventions(Action<PluginDefinitions
+        public ConfigurationDsl ConfigureUrlConventions(Action<ConditionalPluginsDsl
             <IUrlConvention, UrlConfigurationContext>> configure)
         {
-            configure(_configuration.UrlConventions);
+            _configuration.UrlConventions.Configure(configure);
             return this;
         }
 
         /// <summary>
         /// Configures http route decorators.
         /// </summary>
-        public ConfigurationDsl ConfigureHttpRouteDecorators(Action<PluginDefinitions
+        public ConfigurationDsl ConfigureHttpRouteDecorators(Action<ConditionalPluginsDsl
             <IHttpRouteDecorator, ActionConfigurationContext>> configure)
         {
-            configure(_configuration.HttpRouteDecorators);
+            _configuration.HttpRouteDecorators.Configure(configure);
             return this;
         }
 
         /// <summary>
         /// Configures request readers.
         /// </summary>
-        public ConfigurationDsl ConfigureRequestReaders(Action<PluginDefinitions
+        public ConfigurationDsl ConfigureRequestReaders(Action<ConditionalPluginsDsl
             <IRequestReader, ActionConfigurationContext>> configure)
         {
-            configure(_configuration.RequestReaders);
+            _configuration.RequestReaders.Configure(configure);
             return this;
         }
 
         /// <summary>
         /// Configures request binders.
         /// </summary>
-        public ConfigurationDsl ConfigureRequestBinders(Action<PluginDefinitions
+        public ConfigurationDsl ConfigureRequestBinders(Action<ConditionalPluginsDsl
             <IRequestBinder, ActionConfigurationContext>> configure)
         {
-            configure(_configuration.RequestBinders);
+            _configuration.RequestBinders.Configure(configure);
             return this;
         }
 
         /// <summary>
         /// Configures value mappers.
         /// </summary>
-        public ConfigurationDsl ConfigureValueMappers(Action<PluginDefinitions
+        public ConfigurationDsl ConfigureValueMappers(Action<ConditionalPluginsDsl
             <IValueMapper, ValueMapperConfigurationContext>> configure)
         {
-            configure(_configuration.ValueMappers);
+            _configuration.ValueMappers.Configure(configure);
             return this;
         }
 
         /// <summary>
         /// Configures response writers.
         /// </summary>
-        public ConfigurationDsl ConfigureResponseWriters(Action<PluginDefinitions
+        public ConfigurationDsl ConfigureResponseWriters(Action<ConditionalPluginsDsl
             <IResponseWriter, ActionConfigurationContext>> configure)
         {
-            configure(_configuration.ResponseWriters);
+            _configuration.ResponseWriters.Configure(configure);
             return this;
         }
 
         /// <summary>
         /// Configures behaviors.
         /// </summary>
-        public ConfigurationDsl ConfigureBehaviors(Action<PluginDefinitions
+        public ConfigurationDsl ConfigureBehaviors(Action<ConditionalPluginsDsl
             <IBehavior, ActionConfigurationContext>> configure)
         {
-            configure(_configuration.Behaviors);
+            _configuration.Behaviors.Configure(configure);
             return this;
         }
 
         /// <summary>
         /// Configures authenticators.
         /// </summary>
-        public ConfigurationDsl ConfigureAuthenticators(Action<PluginDefinitions
+        public ConfigurationDsl ConfigureAuthenticators(Action<ConditionalPluginsDsl
             <IAuthenticator, ActionConfigurationContext>> configure)
         {
-            configure(_configuration.Authenticators);
+            _configuration.Authenticators.Configure(configure);
             return this;
         }
 

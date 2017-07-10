@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Graphite;
+using Graphite.Actions;
 using Graphite.Diagnostics;
 using Graphite.Reflection;
 using NUnit.Framework;
@@ -19,7 +20,7 @@ namespace Tests.Unit.Diagnostics
                 Diagnostics = enabled
             };
 
-            new DiagnosticsActionSource(configuration, null, null, null)
+            new DiagnosticsActionSource(configuration, null, null, null, null)
                 .Applies().ShouldEqual(enabled);
         }
 
@@ -29,7 +30,8 @@ namespace Tests.Unit.Diagnostics
             var diagnosticsHandler = typeof(DiagnosticsHandler);
             var configuration = new Configuration();
             var actionSource = new DiagnosticsActionSource(
-                configuration, null, new TypeCache(), null);
+                configuration, null, new TypeCache(), null, new ActionDescriptorFactory(
+                    configuration, new ConfigurationContext(configuration, null)));
 
             var actions = actionSource.GetActions();
 

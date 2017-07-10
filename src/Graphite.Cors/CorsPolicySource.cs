@@ -2,9 +2,8 @@ using System;
 using Graphite.Actions;
 using Graphite.Extensibility;
 using Graphite.Extensions;
-using CorsSourcePluginDefinitions = Graphite.Extensibility.PluginDefinitions<
-    Graphite.Cors.ICorsPolicySource,
-    Graphite.Actions.ActionConfigurationContext>;
+using CorsSourcePluginDefinitions = Graphite.Extensibility.ConditionalPlugins<
+    Graphite.Cors.ICorsPolicySource, Graphite.Actions.ActionConfigurationContext>;
 
 namespace Graphite.Cors
 {
@@ -17,14 +16,14 @@ namespace Graphite.Cors
             CorsSourcePluginDefinitions definitions,
             Action<CorsPolicySource> configure)
         {
-            return AddPolicy(configure, (po, pr) => definitions.Append(po, pr));
+            return AddPolicy(configure, (po, pr) => definitions.Configure(x => x.Append(po, pr)));
         }
 
         public static CorsPolicySource PrependPolicy(
             CorsSourcePluginDefinitions definitions,
             Action<CorsPolicySource> configure)
         {
-            return AddPolicy(configure, (po, pr) => definitions.Prepend(po, pr));
+            return AddPolicy(configure, (po, pr) => definitions.Configure(x => x.Prepend(po, pr)));
         }
 
         private static CorsPolicySource AddPolicy(

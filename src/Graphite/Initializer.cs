@@ -29,7 +29,7 @@ namespace Graphite
 
         public void Initialize()
         {
-            var actions = _actionSources.ThatApplyTo(_configurationContext)
+            var actions = _actionSources
                 .SelectMany(x => x.GetActions())
                 .OrderBy(x => x.Route.Url, StringComparer.OrdinalIgnoreCase).ToList();
 

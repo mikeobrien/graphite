@@ -38,7 +38,8 @@ namespace Graphite.Routing
         {
             return configurationContext.Configuration.HttpRouteDecorators
                 .ThatAppliesTo(routeDecorators,
-                    new ActionConfigurationContext(configurationContext, actionDescriptor),
+                    new ActionConfigurationContext(configurationContext, 
+                        actionDescriptor.Action, actionDescriptor.Route),
                     new HttpRouteDecoratorContext(routeConfiguration));
         }
 

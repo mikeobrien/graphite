@@ -18,7 +18,8 @@ namespace Tests.Unit.Cors
         public void Should_not_apply_when_no_attributes_applied()
         {
             new CorsAttributePolicySource(new ActionDescriptor(
-                ActionMethod.From<NoAttributesHandler>(x => x.Get()), null))
+                ActionMethod.From<NoAttributesHandler>(x => x.Get()),
+                    null, null, null, null, null, null))
                 .Applies().ShouldBeFalse();
         }
 
@@ -26,7 +27,8 @@ namespace Tests.Unit.Cors
         public void Should_get_cors_config_when_no_attributes_applied()
         {
             var policy = new CorsAttributePolicySource(new ActionDescriptor(
-                ActionMethod.From<NoAttributesHandler>(x => x.Get()), null)).CreatePolicy();
+                ActionMethod.From<NoAttributesHandler>(x => x.Get()),
+                null, null, null, null, null, null)).CreatePolicy();
 
             policy.AllowOptionRequestsToPassThrough.ShouldBeFalse();
             policy.AllowRequestsWithoutOriginHeader.ShouldBeTrue();
@@ -56,7 +58,8 @@ namespace Tests.Unit.Cors
         public void Should_apply_when_attributes_applied_to_action()
         {
             new CorsAttributePolicySource(new ActionDescriptor(
-                    ActionMethod.From<ActionAttributesHandler>(x => x.Get()), null))
+                    ActionMethod.From<ActionAttributesHandler>(x => x.Get()),
+                    null, null, null, null, null, null))
                 .Applies().ShouldBeTrue();
         }
 
@@ -64,7 +67,8 @@ namespace Tests.Unit.Cors
         public void Should_get_cors_config_from_attributes_applied_to_action()
         {
             var policy = new CorsAttributePolicySource(new ActionDescriptor(
-                ActionMethod.From<ActionAttributesHandler>(x => x.Get()), null)).CreatePolicy();
+                ActionMethod.From<ActionAttributesHandler>(x => x.Get()),
+                null, null, null, null, null, null)).CreatePolicy();
 
             policy.AllowOptionRequestsToPassThrough.ShouldBeTrue();
             policy.AllowRequestsWithoutOriginHeader.ShouldBeFalse();
@@ -94,7 +98,8 @@ namespace Tests.Unit.Cors
         public void Should_apply_when_attributes_applied_to_handler()
         {
             new CorsAttributePolicySource(new ActionDescriptor(
-                    ActionMethod.From<HandlerAttributesHandler>(x => x.Get()), null))
+                    ActionMethod.From<HandlerAttributesHandler>(x => x.Get()),
+                    null, null, null, null, null, null))
                 .Applies().ShouldBeTrue();
         }
 
@@ -102,7 +107,8 @@ namespace Tests.Unit.Cors
         public void Should_get_cors_config_from_attributes_applied_to_handler()
         {
             var policy = new CorsAttributePolicySource(new ActionDescriptor(
-                ActionMethod.From<HandlerAttributesHandler>(x => x.Get()), null)).CreatePolicy();
+                ActionMethod.From<HandlerAttributesHandler>(x => x.Get()),
+                null, null, null, null, null, null)).CreatePolicy();
 
             policy.AllowOptionRequestsToPassThrough.ShouldBeTrue();
             policy.AllowRequestsWithoutOriginHeader.ShouldBeFalse();
@@ -140,7 +146,8 @@ namespace Tests.Unit.Cors
         public void Should_override_cors_config_on_action()
         {
             var policy = new CorsAttributePolicySource(new ActionDescriptor(
-                ActionMethod.From<OverrideAttributesHandler>(x => x.Get()), null)).CreatePolicy();
+                ActionMethod.From<OverrideAttributesHandler>(x => x.Get()),
+                null, null, null, null, null, null)).CreatePolicy();
 
             policy.AllowOptionRequestsToPassThrough.ShouldBeTrue();
             policy.AllowRequestsWithoutOriginHeader.ShouldBeFalse();
@@ -160,7 +167,8 @@ namespace Tests.Unit.Cors
         public void Should_not_apply_when_overriden()
         {
             new CorsAttributePolicySource(new ActionDescriptor(
-                    ActionMethod.From<OverrideAttributesHandler>(x => x.GetOverride()), null))
+                    ActionMethod.From<OverrideAttributesHandler>(x => x.GetOverride()), 
+                    null, null, null, null, null, null))
                 .Applies().ShouldBeFalse();
         }
     }

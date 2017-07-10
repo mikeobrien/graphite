@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Graphite.Actions;
 using Graphite.Behaviors;
+using Graphite.Extensibility;
 using Graphite.Extensions;
 
 namespace Graphite.Authentication
@@ -15,26 +16,26 @@ namespace Graphite.Authentication
         private readonly HttpResponseMessage _responseMessage;
         private readonly IEnumerable<IAuthenticator> _authenticators;
         private readonly Configuration _configuration;
-        private readonly ActionConfigurationContext _actionConfigurationContext;
+        private readonly ActionDescriptor _actionDescriptor;
 
         public AuthenticationBehavior(IBehaviorChain behaviorChain,
             HttpRequestMessage requestMessage, 
             HttpResponseMessage responseMessage,
             List<IAuthenticator> authenticators,
             Configuration configuration,
-            ActionConfigurationContext actionConfigurationContext) : 
+            ActionDescriptor actionDescriptor) : 
             base(behaviorChain)
         {
             _requestMessage = requestMessage;
             _responseMessage = responseMessage;
             _authenticators = authenticators;
             _configuration = configuration;
-            _actionConfigurationContext = actionConfigurationContext;
+            _actionDescriptor = actionDescriptor;
         }
 
         public override async Task<HttpResponseMessage> Invoke()
         {
-            var authenticators = _authenticators.ThatApplyTo(_actionConfigurationContext).ToList();
+            var authenticators = _actionDescriptor.Authenticators.ThatApply(_authenticators).ToList();
             if (!authenticators.Any()) throw new GraphiteException("No authenticators registered.");
 
             var authorization = _requestMessage.Headers.Authorization;

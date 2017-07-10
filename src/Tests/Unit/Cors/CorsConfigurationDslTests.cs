@@ -40,7 +40,7 @@ namespace Tests.Unit.Cors
             var configuration = new CorsConfiguration();
 
             new CorsConfigurationDsl(configuration).ConfigurePolicySources(x => x
-                .Append<CorsPolicySource>());
+                .Configure(c => c.Append<CorsPolicySource>()));
 
             configuration.PolicySources.Count().ShouldEqual(1);
             var plugin = configuration.PolicySources.First();

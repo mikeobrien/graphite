@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Graphite.Binding;
+using Graphite.Extensibility;
 using Graphite.Extensions;
 using Graphite.Routing;
 using Graphite.Writers;
@@ -12,25 +13,20 @@ namespace Graphite.Actions
     public class ActionInvoker : IActionInvoker
     {
         private readonly Configuration _configuration;
-        private readonly ActionMethod _actionMethod;
-        private readonly RouteDescriptor _routeDescriptor;
         private readonly IEnumerable<IRequestBinder> _requestBinders;
         private readonly IEnumerable<IResponseWriter> _writers;
         private readonly HttpResponseMessage _responseMessage;
-        private readonly ActionConfigurationContext _actionConfigurationContext;
+        private readonly ActionDescriptor _actionDescriptor;
 
         public ActionInvoker(
-            ActionConfigurationContext actionConfigurationContext,
-            ActionMethod actionMethod,
-            RouteDescriptor routeDescriptor,
+            Configuration configuration,
+            ActionDescriptor actionDescriptor,
             IEnumerable<IRequestBinder> requestBinders, 
             IEnumerable<IResponseWriter> writers,
             HttpResponseMessage responseMessage)
         {
-            _actionConfigurationContext = actionConfigurationContext;
-            _configuration = actionConfigurationContext.Configuration;
-            _actionMethod = actionMethod;
-            _routeDescriptor = routeDescriptor;
+            _actionDescriptor = actionDescriptor;
+            _configuration = configuration;
             _requestBinders = requestBinders;
             _writers = writers;
             _responseMessage = responseMessage;
@@ -38,25 +34,26 @@ namespace Graphite.Actions
 
         public virtual async Task<HttpResponseMessage> Invoke(object handler)
         {
-            var actionArguments = new object[_actionMethod.MethodDescriptor.Parameters.Length];
+            var actionArguments = new object[_actionDescriptor
+                .Action.MethodDescriptor.Parameters.Length];
 
             if (actionArguments.Any())
             {
                 var requestBinderContext = new RequestBinderContext(actionArguments);
-                foreach (var binder in _requestBinders.ThatApplyTo(actionArguments, 
-                    _actionConfigurationContext))
+                foreach (var binder in _actionDescriptor.RequestBinders
+                    .ThatApplyTo(_requestBinders, requestBinderContext))
                 {
                     await binder.Bind(requestBinderContext);
                 }
             }
 
-            var response = await _actionMethod.Invoke(handler, actionArguments);
+            var response = await _actionDescriptor.Action.Invoke(handler, actionArguments);
 
             if (response is HttpResponseMessage) return response.As<HttpResponseMessage>();
 
-            if (_routeDescriptor.HasResponse)
+            if (_actionDescriptor.Route.HasResponse)
             {
-                var writer = _writers.ThatAppliesTo(response, _actionConfigurationContext);
+                var writer = _writers.ThatApply(response, _actionDescriptor).FirstOrDefault();
                 if (writer != null) return await writer.Write(response);
             }
 

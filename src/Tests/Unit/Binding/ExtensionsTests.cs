@@ -15,17 +15,30 @@ namespace Tests.Unit.Binding
     [TestFixture]
     public class ExtensionsTests
     {
+        private Configuration _configuration;
+        private ConfigurationContext _configurationContext;
+
+        [SetUp]
+        public void Setup()
+        {
+            _configuration = new Configuration();
+            _configurationContext = new ConfigurationContext(_configuration, null);
+        }
+
         [Test]
         public void Should_map_parameter_with_first_matching_mapper_applies_to()
         {
             var mappers = new List<IValueMapper>
             {
-                new TestValueMapper { MapFunc = c => $"{c.Values.First()}1", AppliesToFunc = c => false },
-                new TestValueMapper { MapFunc = c => $"{c.Values.First()}2" }
+                new TestValueMapper1 { MapFunc = c => $"{c.Values.First()}1", AppliesToFunc = c => false },
+                new TestValueMapper2 { MapFunc = c => $"{c.Values.First()}2" }
             };
 
-            var result = mappers.Map(null, null, null, new object[] { "value" }, 
-                new ConfigurationContext(new Configuration(), null));
+            _configuration.ValueMappers.Configure(c => c
+                .Append<TestValueMapper1>()
+                .Append<TestValueMapper2>());
+
+            var result = mappers.Map(null, null, null, new object[] { "value" }, _configurationContext);
 
             result.Mapped.ShouldBeTrue();
             result.Value.ShouldEqual("value2");
@@ -39,12 +52,12 @@ namespace Tests.Unit.Binding
                 new TestValueMapper1 { MapFunc = c => $"{c.Values.First()}1" },
                 new TestValueMapper2 { MapFunc = c => $"{c.Values.First()}2" }
             };
-            var configuration = new Configuration();
 
-            configuration.ValueMappers.Append<TestValueMapper1>(x => false);
+            _configuration.ValueMappers.Configure(c => c
+                .Append<TestValueMapper1>(x => false)
+                .Append<TestValueMapper2>(x => true));
 
-            var result = mappers.Map(null, null, null, new object[] { "value" },
-                new ConfigurationContext(configuration, null));
+            var result = mappers.Map(null, null, null, new object[] { "value" }, _configurationContext);
 
             result.Mapped.ShouldBeTrue();
             result.Value.ShouldEqual("value2");
@@ -58,13 +71,12 @@ namespace Tests.Unit.Binding
                 new TestValueMapper1 { MapFunc = c => $"{c.Values.First()}1" },
                 new TestValueMapper2 { MapFunc = c => $"{c.Values.First()}2" }
             };
-            var configuration = new Configuration();
 
-            configuration.ValueMappers.Append<TestValueMapper1>(x => false);
-            configuration.ValueMappers.Append<TestValueMapper2>(x => false, true);
+            _configuration.ValueMappers.Configure(c => c
+                .Append<TestValueMapper1>(x => false)
+                .Append<TestValueMapper2>(x => false, true));
 
-            var result = mappers.Map(null, null, null, new object[] { "value" },
-                new ConfigurationContext(configuration, null));
+            var result = mappers.Map(null, null, null, new object[] { "value" }, _configurationContext);
 
             result.Mapped.ShouldBeTrue();
             result.Value.ShouldEqual("value2");
@@ -78,8 +90,7 @@ namespace Tests.Unit.Binding
                 new TestValueMapper { MapFunc = c => $"{c.Values.First()}1", AppliesToFunc = c => false }
             };
 
-            var result = mappers.Map(null, null, null, new object[] { "value" },
-                new ConfigurationContext(new Configuration(), null));
+            var result = mappers.Map(null, null, null, new object[] { "value" }, _configurationContext);
 
             result.Mapped.ShouldBeFalse();
             result.Value.ShouldBeNull();
@@ -93,12 +104,12 @@ namespace Tests.Unit.Binding
                 new TestValueMapper1 { MapFunc = c => $"{c.Values.First()}1" },
                 new TestValueMapper2 { MapFunc = c => $"{c.Values.First()}2" }
             };
-            var configuration = new Configuration();
 
-            configuration.ValueMappers.Append<TestValueMapper1>(x => false);
+            _configuration.ValueMappers.Configure(c => c
+                .Append<TestValueMapper1>(x => false)
+                .Append<TestValueMapper2>(x => true));
 
-            var result = mappers.Map(null, null, null, new object[] { "value" },
-                new ConfigurationContext(configuration, null));
+            var result = mappers.Map(null, null, null, new object[] { "value" }, _configurationContext);
 
             result.Mapped.ShouldBeTrue();
             result.Value.ShouldEqual("value2");

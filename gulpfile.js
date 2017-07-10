@@ -34,7 +34,7 @@ gulp.task('build', ['packageRestore'], function() {
     return gulp
         .src('src/*.sln')
         .pipe(msbuild({
-            toolsVersion: 14.0,
+            toolsVersion: 15.0,
             targets: ['Clean', 'Build'],
             errorOnFail: true,
             stdout: true

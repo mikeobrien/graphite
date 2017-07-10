@@ -69,6 +69,14 @@ namespace Graphite.Extensions
             return source;
         }
 
+        public static IEnumerable<T> AnyOrDefault<T>(
+            this IEnumerable<T> source, Func<T> getDefault)
+        {
+            if (source.Any()) return source;
+            var @default = getDefault();
+            return @default != null ? @default.AsList() : Enumerable.Empty<T>();
+        }
+
         public static ILookup<string, object> ToLookup(this NameValueCollection source,
             Func<string, string> getKey = null)
         {

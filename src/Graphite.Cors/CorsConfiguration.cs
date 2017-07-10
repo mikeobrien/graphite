@@ -6,10 +6,10 @@ namespace Graphite.Cors
 {
     public class CorsConfiguration
     {
-        public PluginDefinition<ICorsEngine> CorsEngine { get; } =
-            PluginDefinition<ICorsEngine>.Create<CorsEngine>(singleton: true);
+        public Plugin<ICorsEngine> CorsEngine { get; } =
+            Plugin<ICorsEngine>.Create<CorsEngine>(singleton: true);
 
-        public PluginDefinitions<ICorsPolicySource, ActionConfigurationContext> PolicySources { get; } =
-            PluginDefinitions<ICorsPolicySource, ActionConfigurationContext>.Create();
+        public ConditionalPlugins<ICorsPolicySource, ActionConfigurationContext> PolicySources { get; } =
+            new ConditionalPlugins<ICorsPolicySource, ActionConfigurationContext>(false);
     }
 }

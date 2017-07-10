@@ -1,26 +1,44 @@
-﻿using System.Collections.Generic;
+﻿using Graphite.Authentication;
+using Graphite.Behaviors;
+using Graphite.Binding;
 using Graphite.DependencyInjection;
+using Graphite.Extensibility;
 using Graphite.Routing;
 using Graphite.Extensions;
-using Graphite.Reflection;
+using Graphite.Readers;
+using Graphite.Writers;
 
 namespace Graphite.Actions
 {
     public class ActionDescriptor
     {
-        public ActionDescriptor(ActionMethod action, 
-            RouteDescriptor route, IEnumerable<TypeDescriptor> behaviors = null)
+        public ActionDescriptor(ActionMethod action,
+            RouteDescriptor route, 
+            Plugins<IAuthenticator> authenticators, 
+            Plugins<IRequestBinder> requestBinders, 
+            Plugins<IRequestReader> requestReaders, 
+            Plugins<IResponseWriter> responseWriters, 
+            Plugins<IBehavior> behaviors)
         {
             Action = action;
             Route = route;
-            Behaviors = behaviors ?? new List<TypeDescriptor>();
+            Authenticators = authenticators;
+            RequestBinders = requestBinders;
+            RequestReaders = requestReaders;
+            ResponseWriters = responseWriters;
+            Behaviors = behaviors;
             Registry = new Registry();
         }
 
         public virtual ActionMethod Action { get; }
         public virtual RouteDescriptor Route { get; }
-        public virtual IEnumerable<TypeDescriptor> Behaviors { get; }
         public virtual Registry Registry { get; }
+        
+        public Plugins<IAuthenticator> Authenticators { get; }
+        public Plugins<IRequestBinder> RequestBinders { get; }
+        public Plugins<IRequestReader> RequestReaders { get; } 
+        public Plugins<IResponseWriter> ResponseWriters { get; }
+        public Plugins<IBehavior> Behaviors { get; }
 
         public override int GetHashCode()
         {

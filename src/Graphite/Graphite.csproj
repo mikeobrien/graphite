@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\ActionConfigurationContext.cs" />
+    <Compile Include="Actions\ActionDescriptorFactory.cs" />
     <Compile Include="Actions\ActionInvoker.cs" />
     <Compile Include="Actions\IUnhandledExceptionHandler.cs" />
     <Compile Include="Actions\UnhandledExceptionHandler.cs" />
@@ -93,6 +94,13 @@
     <Compile Include="ConfigurationContext.cs" />
     <Compile Include="DependencyInjection\TrackingContainer.cs" />
     <Compile Include="Actions\IActionDecorator.cs" />
+    <Compile Include="Extensibility\ConditionalPlugins.cs" />
+    <Compile Include="Extensibility\ContainerExtensions.cs" />
+    <Compile Include="Extensibility\PluginsDsl.cs" />
+    <Compile Include="Extensibility\Plugin.cs" />
+    <Compile Include="Extensibility\Plugins.cs" />
+    <Compile Include="Extensibility\PluginsBase.cs" />
+    <Compile Include="Extensibility\ConditionalPluginsDsl.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Extensions\IOExtensions.cs" />
     <Compile Include="Extensions\NumericExtensions.cs" />
@@ -122,16 +130,14 @@
     <Compile Include="Binding\ReaderBinder.cs" />
     <Compile Include="Binding\SimpleTypeMapper.cs" />
     <Compile Include="DependencyInjection\Dependency.cs" />
-    <Compile Include="Extensibility\Extensions.cs" />
+    <Compile Include="Extensibility\ConditionalExtensions.cs" />
     <Compile Include="Extensibility\IConditional.cs" />
-    <Compile Include="Extensibility\PluginDefinition.cs" />
+    <Compile Include="Extensibility\ConditionalPlugin.cs" />
     <Compile Include="Extensions\SerializerExtensions.cs" />
     <Compile Include="GraphiteInitializationException.cs" />
     <Compile Include="Http\HttpMethod.cs" />
     <Compile Include="Http\MimeTypes.cs" />
-    <Compile Include="Extensibility\PluginDefinitions.cs" />
     <Compile Include="Readers\BodyReaderBase.cs" />
-    <Compile Include="Readers\Extensions.cs" />
     <Compile Include="Readers\FormReader.cs" />
     <Compile Include="Readers\IRequestReader.cs" />
     <Compile Include="Readers\JsonReader.cs" />

@@ -10,14 +10,6 @@ namespace Graphite.Binding
 {
     public static class Extensions
     {
-        public static IEnumerable<IRequestBinder> ThatApplyTo(
-            this IEnumerable<IRequestBinder> binders, object[] actionArguments, 
-            ActionConfigurationContext actionConfigurationContext)
-        {
-            return actionConfigurationContext.Configuration.RequestBinders.ThatAppliesTo(binders,
-                actionConfigurationContext, new RequestBinderContext(actionArguments));
-        }
-
         public static MapResult Map(this IEnumerable<IValueMapper> mappers,
             ActionMethod actionMethod, RouteDescriptor route,
             ActionParameter parameter, object[] values, 

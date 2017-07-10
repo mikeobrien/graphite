@@ -51,13 +51,5 @@ namespace Graphite.Authentication
                 : new AuthenticationHeaderValue(authorizationType));
             return response;
         }
-
-        public static IEnumerable<IAuthenticator> ThatApplyTo(
-            this IEnumerable<IAuthenticator> authenticators,
-            ActionConfigurationContext actionConfigurationContext)
-        {
-            return actionConfigurationContext.Configuration.Authenticators
-                .ThatApplies(authenticators, actionConfigurationContext);
-        }
     }
 }

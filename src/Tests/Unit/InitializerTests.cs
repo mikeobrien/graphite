@@ -95,19 +95,7 @@ namespace Tests.Unit
 
             _routes.Select(x => x.RouteTemplate).ShouldOnlyContain("fark", "fark/segment", "fark/{param}");
         }
-
-        [Test]
-        public void Should_not_add_routes_for_action_sources_that_do_not_apply()
-        {
-            AddRoute(AddActionSource(false), "fark1");
-            AddRoute(AddActionSource(true), "fark2");
-
-            _initializer.Initialize();
-            
-            _routes.Count.ShouldEqual(1);
-            _routes.First().RouteTemplate.ShouldEqual("fark2");
-        }
-
+        
         [Test]
         public void Should_fail_to_add_duplicate_routes()
         {
@@ -149,7 +137,7 @@ namespace Tests.Unit
                 AppliesToFunc = x => runtimeAppliesTo,
                 DecorateFunc = x => x.ActionDescriptor.Registry.Register(instance)
             };
-            _configuration.ActionDecorators.Append<TestActionDecorator>(x => configAppliesTo);
+            _configuration.ActionDecorators.Configure(c => c.Append<TestActionDecorator>(x => configAppliesTo));
             _actionDecorators.Add(decorator);
 
             _initializer.Initialize();
@@ -185,7 +173,8 @@ namespace Tests.Unit
         private ActionDescriptor AddRoute(List<ActionDescriptor> actions, string route)
         {
             var descriptor = new ActionDescriptor(ActionMethod.From<Handler>(x => x.Get()),
-                new RouteDescriptor("GET", route, null, null, null, null));
+                new RouteDescriptor("GET", route, null, null, null, null), 
+                null, null, null, null, null);
             actions.Add(descriptor);
             return descriptor;
         }

@@ -31,6 +31,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bender, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bender.3.0.1.0\lib\Bender.dll</HintPath>
+    </Reference>
+    <Reference Include="Flexo, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\flexo.1.0.3.0\lib\Flexo.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -81,6 +87,10 @@
     <ProjectReference Include="..\Integration\DependencyInjection\Graphite.StructureMap\Graphite.StructureMap.csproj">
       <Project>{ec2dd82d-406b-4169-a5c9-ec9ead8a0151}</Project>
       <Name>Graphite.StructureMap</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Integration\Serializers\Graphite.Bender\Graphite.Bender.csproj">
+      <Project>{73744e67-b5eb-427a-8a4d-9e6d07532ff9}</Project>
+      <Name>Graphite.Bender</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

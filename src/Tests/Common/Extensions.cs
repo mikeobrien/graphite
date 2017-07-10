@@ -27,6 +27,11 @@ namespace Tests.Common
 
     public static class Extensions
     {
+        public static bool IsType<T>(this Type type)
+        {
+            return type == typeof(T);
+        }
+
         public static void Add<TKey, TValue>(
             this List<KeyValuePair<TKey, TValue>> source, 
             TKey key, TValue value)
@@ -76,6 +81,21 @@ namespace Tests.Common
             return source.Skip(1).FirstOrDefault();
         }
 
+        public static T Third<T>(this IEnumerable<T> source)
+        {
+            return source.Skip(2).FirstOrDefault();
+        }
+
+        public static T Fourth<T>(this IEnumerable<T> source)
+        {
+            return source.Skip(3).FirstOrDefault();
+        }
+
+        public static T Fifth<T>(this IEnumerable<T> source)
+        {
+            return source.Skip(4).FirstOrDefault();
+        }
+
         public static Task<HttpResponseMessage> SendAsync(this HttpMessageHandler handler,
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -113,15 +133,15 @@ namespace Tests.Common
             source.AddRange(items);
         }
 
-        public static void Append<TPlugin, TContext>(this
-            PluginDefinitions<TPlugin, TContext> definitions, Type type,
+        public static ConditionalPluginsDsl<TPlugin, TContext> Append<TPlugin, TContext>(this
+            ConditionalPluginsDsl<TPlugin, TContext> definitions, Type type,
             Func<TContext, bool> predicate = null, bool @default = false)
         {
-            typeof(PluginDefinitions<TPlugin, TContext>)
-                .GetMethods().FirstOrDefault(x => x.Name == nameof(
-                    PluginDefinitions<TPlugin, TContext>.Append))
-                .MakeGenericMethod(type)
+            Type<ConditionalPluginsDsl<TPlugin, TContext>>
+                .Method(x => x.Append<TPlugin>(y => false, false))?
+                .GetGenericMethodDefinition().MakeGenericMethod(type)
                 .Invoke(definitions, new object[] { predicate, @default });
+            return definitions;
         }
 
         public static void WriteAllText(this Stream stream, string text)

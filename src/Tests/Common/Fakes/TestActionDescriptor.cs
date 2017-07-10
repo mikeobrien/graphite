@@ -23,7 +23,7 @@ namespace Tests.Common.Fakes
         {
             DecorateCalled = true;
             DecorateContext = context;
-            DecorateFunc(context);
+            DecorateFunc?.Invoke(context);
         }
     }
 }

@@ -346,6 +346,8 @@ namespace Graphite.Diagnostics
                     {RenderPlugins("Behavior", _configuration.Behaviors)}
                     {RenderPlugin("Invoker Behavior", _configuration.DefaultBehavior)}
                     {RenderPlugin("Action Invoker", _configuration.ActionInvoker)}
+
+                    {RenderPlugins("Authenticators", _configuration.Authenticators)}
                     {RenderPlugins("Request Binder", _configuration.RequestBinders)}
                     {RenderPlugins("Request Reader", _configuration.RequestReaders)}
                     {RenderPlugins("Parameter Mapper", _configuration.ValueMappers)}
@@ -436,7 +438,9 @@ namespace Graphite.Diagnostics
                                 <table>
                                     <tr>
                                         <td>Behaviors</td>
-                                        <td><table class=""behaviors"">{x.Behaviors.Append(_configuration.DefaultBehavior.ToTypeDescriptor(_typeCache))
+                                        <td><table class=""behaviors"">{x.Behaviors
+                                            .Select(b => b.Type.ToTypeDescriptor(_typeCache))
+                                            .Append(_configuration.DefaultBehavior.ToTypeDescriptor(_typeCache))
                                             .Select(b => $@"<tr><td><code>{b.FriendlyFullName.HtmlEncode()}</code></td></tr>")
                                             .Join("<tr><td class=\"arrow\">&darr;</td></tr>")}</table></td>
                                     </tr>
@@ -477,9 +481,9 @@ namespace Graphite.Diagnostics
                 </table>";
         }
 
-        private string RenderPlugin<T>(string name, PluginDefinition<T> definition)
+        private string RenderPlugin<T>(string name, Plugin<T> plugin)
         {
-            return RenderPlugin(name, definition.Type);
+            return RenderPlugin(name, plugin.Type);
         }
 
         private string RenderPlugin(string name, Type type)
@@ -487,12 +491,28 @@ namespace Graphite.Diagnostics
             return $@"<tbody>{RenderPluginRow(name, type)}</tbody>";
         }
 
-        private string RenderPlugins<TPlugin, TContext>(string name, PluginDefinitions<TPlugin, TContext> definitions)
+        private string RenderPlugins<TPlugin>(string name, Plugins<TPlugin> plugins)
         {
-            return $@"<tbody>{(definitions.Any()
-                ? definitions.Select(x => RenderPluginRow(name, x.Type,
-                    x.AppliesTo != null, definitions.Order(x), x.Singleton)).Join()
-                : $"<tr><td>{name}</td><td colspan=\"5\"><span class=\"red\">None configured</span></td></tr>")}</tbody>";
+            return RenderPlugins(name, plugins, () => plugins
+                .Select(x => RenderPluginRow(name, x.Type,
+                    false, plugins.IndexOf(x), x.Singleton)).Join());
+        }
+
+        private string RenderPlugins<TPlugin, TContext>(string name, 
+            ConditionalPlugins<TPlugin, TContext> plugins)
+        {
+            return RenderPlugins(name, plugins, () => plugins
+                .Select(x => RenderPluginRow(name, x.Type,
+                    x.AppliesTo != null, plugins.IndexOf(x), x.Singleton)).Join());
+        }
+
+        private string RenderPlugins(string name, IEnumerable plugins, 
+            Func<string> render)
+        {
+            return $@"<tbody>{(plugins.Cast<object>().Any()
+                ? render()
+                : $"<tr><td>{name}</td><td colspan=\"5\"><span class=\"red\">" +
+                  "None configured</span></td></tr>")}</tbody>";
         }
 
         private string RenderPluginRow(string name, Type type,

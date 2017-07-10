@@ -5,7 +5,6 @@ using Graphite.Extensions;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
-using Tests.Common.Fakes;
 
 namespace Tests.Unit.Binding
 {
@@ -102,9 +101,8 @@ namespace Tests.Unit.Binding
                 .AddRequestReader1(() => "reader1".ToTaskResult<object>(),
                     instanceAppliesTo: () => false)
                 .AddRequestReader2(() => "reader2".ToTaskResult<object>(),
-                    instanceAppliesTo: () => false)
+                    instanceAppliesTo: () => false, @default: true)
                 .AddValueMapper1(x => x.Values.First());
-            requestGraph.Configuration.RequestReaders.DefaultIs<TestRequestReader2>();
 
             var binder = CreateBinder(requestGraph);
 
@@ -137,8 +135,8 @@ namespace Tests.Unit.Binding
 
         public ReaderBinder CreateBinder(RequestGraph requestGraph)
         {
-            return new ReaderBinder(requestGraph.GetActionConfigurationContext(),
-                requestGraph.GetRouteDescriptor(), requestGraph.RequestReaders);
+            return new ReaderBinder(requestGraph.GetActionDescriptor(),
+                requestGraph.RequestReaders);
         }
     }
 }

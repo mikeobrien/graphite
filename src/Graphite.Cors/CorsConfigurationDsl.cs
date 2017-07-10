@@ -1,9 +1,8 @@
 using System;
 using System.Web.Cors;
 using Graphite.Actions;
-using CorsSourcePluginDefinitions = Graphite.Extensibility.PluginDefinitions<
-    Graphite.Cors.ICorsPolicySource,
-    Graphite.Actions.ActionConfigurationContext>;
+using CorsSourcePluginDefinitions = Graphite.Extensibility.ConditionalPlugins<
+    Graphite.Cors.ICorsPolicySource, Graphite.Actions.ActionConfigurationContext>;
 
 namespace Graphite.Cors
 {
@@ -51,42 +50,42 @@ namespace Graphite.Cors
         public CorsConfigurationDsl AppendPolicySource<T>(
             Func<ActionConfigurationContext, bool> predicate = null) where T : ICorsPolicySource
         {
-            _configuration.PolicySources.Append<T>(predicate);
+            _configuration.PolicySources.Configure(x => x.Append<T>(predicate));
             return this;
         }
 
         public CorsConfigurationDsl PrependPolicySource<T>(
             Func<ActionConfigurationContext, bool> predicate = null) where T : ICorsPolicySource
         {
-            _configuration.PolicySources.Prepend<T>(predicate);
+            _configuration.PolicySources.Configure(x => x.Prepend<T>(predicate));
             return this;
         }
 
         public CorsConfigurationDsl AppendPolicySource<T>(T policy,
             Func<ActionConfigurationContext, bool> predicate = null) where T : ICorsPolicySource
         {
-            _configuration.PolicySources.Append(policy, predicate);
+            _configuration.PolicySources.Configure(x => x.Append(policy, predicate));
             return this;
         }
 
         public CorsConfigurationDsl PrependPolicySource<T>(T policy,
             Func<ActionConfigurationContext, bool> predicate = null) where T : ICorsPolicySource
         {
-            _configuration.PolicySources.Prepend(policy, predicate);
+            _configuration.PolicySources.Configure(x => x.Prepend(policy, predicate));
             return this;
         }
 
         public CorsConfigurationDsl AppendAttributePolicySource(
             Func<ActionConfigurationContext, bool> predicate = null)
         {
-            _configuration.PolicySources.Append<CorsAttributePolicySource>(predicate);
+            _configuration.PolicySources.Configure(x => x.Append<CorsAttributePolicySource>(predicate));
             return this;
         }
 
         public CorsConfigurationDsl PrependAttributePolicySource(
             Func<ActionConfigurationContext, bool> predicate = null)
         {
-            _configuration.PolicySources.Prepend<CorsAttributePolicySource>(predicate);
+            _configuration.PolicySources.Configure(x => x.Prepend<CorsAttributePolicySource>(predicate));
             return this;
         }
     }

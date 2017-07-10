@@ -11,7 +11,6 @@ using NSubstitute;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
-using Tests.Common.Fakes;
 
 namespace Tests.Unit.Actions
 {
@@ -171,13 +170,11 @@ namespace Tests.Unit.Actions
         public async Task Should_use_default_writer_if_set_and_no_writers_apply()
         {
             var requestGraph = RequestGraph.CreateFor<IHandler>(x => x.Response());
-
-            requestGraph.Configuration.ResponseWriters.DefaultIs<TestResponseWriter2>();
-
+            
             requestGraph.AddResponseWriter1(x => $"{x.Response}1".CreateTextResponse()
                 .ToTaskResult(), instanceAppliesTo: x => false);
             requestGraph.AddResponseWriter2(x => $"{x.Response}2".CreateTextResponse()
-                .ToTaskResult(), instanceAppliesTo: x => false);
+                .ToTaskResult(), instanceAppliesTo: x => false, @default:  true);
 
             var invoker = CreateInvoker(requestGraph);
             var handler = Substitute.For<IHandler>();
@@ -226,8 +223,8 @@ namespace Tests.Unit.Actions
 
         private ActionInvoker CreateInvoker(RequestGraph requestGraph)
         {
-            return new ActionInvoker(requestGraph.GetActionConfigurationContext(),
-                requestGraph.ActionMethod, requestGraph.GetRouteDescriptor(),
+            return new ActionInvoker(requestGraph.Configuration,
+                requestGraph.GetActionDescriptor(),
                 requestGraph.RequestBinders, requestGraph.ResponseWriters,
                 requestGraph.GetHttpResponseMessage());
         }

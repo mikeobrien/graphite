@@ -101,7 +101,7 @@ namespace Tests.Common
 
         public string UrlTemplate
         {
-            get { return _urlTemplate; }
+            get => _urlTemplate;
             set
             {
                 _urlTemplate = value;
@@ -203,7 +203,9 @@ namespace Tests.Common
 
         public ActionDescriptor GetActionDescriptor()
         {
-            return new ActionDescriptor(ActionMethod, GetRouteDescriptor(), GetBehaviors());
+            return new ActionDescriptorFactory(Configuration,
+                new ConfigurationContext(Configuration, HttpConfiguration))
+                .CreateDescriptor(ActionMethod, GetRouteDescriptor());
         }
 
         public HttpRequestMessage GetHttpRequestMessage()
@@ -334,13 +336,6 @@ namespace Tests.Common
                 ActionMethod, GetRouteDescriptor());
         }
 
-        private TypeDescriptor[] GetBehaviors()
-        {
-            return Configuration.Behaviors.ThatApply(new ActionConfigurationContext(
-                    GetConfigurationContext(), ActionMethod, GetRouteDescriptor()))
-                .Select(x => x.Type).Select(x => TypeCache.GetTypeDescriptor(x)).ToArray();
-        }
-
         /* ---------------- Parameter Mappers --------------- */
 
         public ValueMapperContext GetParameterMapperContext(ActionParameter parameter, 
@@ -357,7 +352,7 @@ namespace Tests.Common
             Func<ValueMapperContext, bool> configAppliesTo = null) 
             where T : IValueMapper
         {
-            Configuration.ValueMappers.Append<T>(configAppliesTo);
+            Configuration.ValueMappers.Configure(x => x.Append<T>(configAppliesTo));
             ValueMappers.Add(mapper);
             return this;
         }
@@ -385,7 +380,7 @@ namespace Tests.Common
             Func<ValueMapperContext, bool> instanceAppliesTo)
             where T : TestValueMapper, new()
         {
-            Configuration.ValueMappers.Append<T>(configAppliesTo);
+            Configuration.ValueMappers.Configure(x => x.Append<T>(configAppliesTo));
             var mapper = new T
             {
                 AppliesToFunc = instanceAppliesTo,
@@ -398,7 +393,7 @@ namespace Tests.Common
         public RequestGraph AppendValueMapper<T>(Func<ValueMapperContext, bool> configAppliesTo = null)
             where T : IValueMapper, new()
         {
-            Configuration.ValueMappers.Append<T>(configAppliesTo);
+            Configuration.ValueMappers.Configure(x => x.Append<T>(configAppliesTo));
             var mapper = new T();
             ValueMappers.Add(mapper);
             return this;
@@ -412,28 +407,30 @@ namespace Tests.Common
 
         public RequestGraph AddRequestReader1(Func<Task<object>> read,
             Func<ActionConfigurationContext, bool> configAppliesTo = null,
-            Func<bool> instanceAppliesTo = null)
+            Func<bool> instanceAppliesTo = null, bool @default = false)
         {
             if (RequestReader1 != null) throw new Exception("Request reader 1 already added.");
-            RequestReader1 = AddRequestReader<TestRequestReader1>(read, configAppliesTo, instanceAppliesTo);
+            RequestReader1 = AddRequestReader<TestRequestReader1>(
+                read, configAppliesTo, instanceAppliesTo, @default);
             return this;
         }
 
         public RequestGraph AddRequestReader2(Func<Task<object>> read,
             Func<ActionConfigurationContext, bool> configAppliesTo = null,
-            Func<bool> instanceAppliesTo = null)
+            Func<bool> instanceAppliesTo = null, bool @default = false)
         {
             if (RequestReader2 != null) throw new Exception("Request reader 2 already added.");
-            RequestReader2 = AddRequestReader<TestRequestReader2>(read, configAppliesTo, instanceAppliesTo);
+            RequestReader2 = AddRequestReader<TestRequestReader2>(
+                read, configAppliesTo, instanceAppliesTo, @default);
             return this;
         }
 
         private T AddRequestReader<T>(Func<Task<object>> read,
             Func<ActionConfigurationContext, bool> configAppliesTo,
-            Func<bool> instanceAppliesTo)
+            Func<bool> instanceAppliesTo, bool @default)
             where T : TestRequestReader, new()
         {
-            Configuration.RequestReaders.Append<T>(configAppliesTo);
+            Configuration.RequestReaders.Configure(x => x.Append<T>(configAppliesTo, @default));
             var reader = new T
             {
                 AppliesFunc = instanceAppliesTo,
@@ -477,7 +474,7 @@ namespace Tests.Common
             Func<RequestBinderContext, bool> instanceAppliesTo)
             where T : TestRequestBinder, new()
         {
-            Configuration.RequestBinders.Append<T>(configAppliesTo);
+            Configuration.RequestBinders.Configure(x => x.Append<T>(configAppliesTo));
             var binder = new T
             {
                 AppliesToFunc = instanceAppliesTo,
@@ -500,28 +497,32 @@ namespace Tests.Common
 
         public RequestGraph AddResponseWriter1(Func<ResponseWriterContext, Task<HttpResponseMessage>> write,
             Func<ActionConfigurationContext, bool> configAppliesTo = null,
-            Func<ResponseWriterContext, bool> instanceAppliesTo = null)
+            Func<ResponseWriterContext, bool> instanceAppliesTo = null,
+            bool @default = false)
         {
             if (ResponseWriter1 != null) throw new Exception("Response writer 1 already added.");
-            ResponseWriter1 = AddResponseWriter<TestResponseWriter1>(write, configAppliesTo, instanceAppliesTo);
+            ResponseWriter1 = AddResponseWriter<TestResponseWriter1>(write, 
+                configAppliesTo, instanceAppliesTo, @default);
             return this;
         }
 
         public RequestGraph AddResponseWriter2(Func<ResponseWriterContext, Task<HttpResponseMessage>> write,
             Func<ActionConfigurationContext, bool> configAppliesTo = null,
-            Func<ResponseWriterContext, bool> instanceAppliesTo = null)
+            Func<ResponseWriterContext, bool> instanceAppliesTo = null, 
+            bool @default = false)
         {
             if (ResponseWriter2 != null) throw new Exception("Response writer 2 already added.");
-            ResponseWriter2 = AddResponseWriter<TestResponseWriter2>(write, configAppliesTo, instanceAppliesTo);
+            ResponseWriter2 = AddResponseWriter<TestResponseWriter2>(write, 
+                configAppliesTo, instanceAppliesTo, @default);
             return this;
         }
 
         private T AddResponseWriter<T>(Func<ResponseWriterContext, Task<HttpResponseMessage>> write,
             Func<ActionConfigurationContext, bool> configAppliesTo,
-            Func<ResponseWriterContext, bool> instanceAppliesTo)
+            Func<ResponseWriterContext, bool> instanceAppliesTo, bool @default)
             where T : TestResponseWriter, new()
         {
-            Configuration.ResponseWriters.Append<T>(configAppliesTo);
+            Configuration.ResponseWriters.Configure(x => x.Append<T>(configAppliesTo, @default));
             var writer = new T
             {
                 AppliesToFunc = instanceAppliesTo,

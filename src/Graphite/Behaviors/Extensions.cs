@@ -9,13 +9,14 @@ namespace Graphite.Behaviors
 {
     public static class Extensions
     {
-        public static List<Type> ThatApplyTo(this PluginDefinitions
-            <IBehavior, ActionConfigurationContext> behaviors, 
-            ActionMethod actionMethod, RouteDescriptor routeDescriptor, 
+        public static List<Type> ThatApplyTo(this ConditionalPlugins
+                <IBehavior, ActionConfigurationContext> behaviors,
+            ActionMethod actionMethod, RouteDescriptor routeDescriptor,
             ConfigurationContext configurationContext)
         {
-            return behaviors.ThatApply(new ActionConfigurationContext(
-                configurationContext, actionMethod, routeDescriptor))
+            var context = new ActionConfigurationContext(
+                configurationContext, actionMethod, routeDescriptor);
+            return behaviors.ThatApplyTo(context)
                 .Select(x => x.Type).ToList();
         }
     }

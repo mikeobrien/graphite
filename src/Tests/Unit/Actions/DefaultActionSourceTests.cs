@@ -2,14 +2,19 @@
 using System.Linq;
 using Graphite;
 using Graphite.Actions;
+using Graphite.Authentication;
 using Graphite.Behaviors;
-using Graphite.Reflection;
+using Graphite.Binding;
+using Graphite.Extensibility;
+using Graphite.Readers;
 using Graphite.Routing;
+using Graphite.Writers;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
 using Tests.Common.Fakes;
 using Tests.Unit.Actions.ActionSourceTests;
+using Configuration = Graphite.Configuration;
 
 namespace Tests.Unit.Actions
 {
@@ -31,7 +36,6 @@ namespace Tests.Unit.Actions
     [TestFixture]
     public class DefaultActionSourceTests
     {
-        private ITypeCache _typeCache;
         private Configuration _configuration;
         private TestActionMethodSource _actionMethodSource1;
         private TestActionMethodSource _actionMethodSource2;
@@ -52,7 +56,6 @@ namespace Tests.Unit.Actions
         [SetUp]
         public void Setup()
         {
-            _typeCache = new TypeCache();
             _configuration = new Configuration();
             _actionMethodSource1 = new TestActionMethodSource1();
             _actionMethodSource2 = new TestActionMethodSource2();
@@ -77,8 +80,10 @@ namespace Tests.Unit.Actions
             _routeConvention1.AppliesToPredicate = x => true;
             _routeConvention2.AppliesToPredicate = x => true;
 
+            var configurationContext = new ConfigurationContext(_configuration, null);
+
             _actionSource = new DefaultActionSource(
-                new ConfigurationContext(_configuration, null), 
+                configurationContext, 
                 new List<IActionMethodSource>
                 {
                     _actionMethodSource1, _actionMethodSource2
@@ -86,50 +91,17 @@ namespace Tests.Unit.Actions
                 new List<IRouteConvention>
                 {
                     _routeConvention1, _routeConvention2
-                },
-                new TypeCache());
-        }
-
-        [Test]
-        public void Should_conditionally_query_action_method_sources_from_configuration()
-        {
-            _configuration.ActionMethodSources.Append<TestActionMethodSource1>(x => false);
-
-            var actions = _actionSource.GetActions();
-
-            actions.Count.ShouldEqual(4);
-
-            _actionMethodSource1.AppliesCalled.ShouldBeFalse();
-            _actionMethodSource1.GetActionMethodsCalled.ShouldBeFalse();
-
-            _actionMethodSource2.AppliesCalled.ShouldBeTrue();
-            _actionMethodSource2.GetActionMethodsCalled.ShouldBeTrue();
-        }
-
-        [Test]
-        public void Should_conditionally_query_action_method_sources_from_instance()
-        {
-            _actionMethodSource1.AppliesFunc = () => false;
-
-            var actions = _actionSource.GetActions();
-
-            actions.Count.ShouldEqual(4);
-
-            _actionMethodSource1.AppliesCalled.ShouldBeTrue();
-            _actionMethodSource1.GetActionMethodsCalled.ShouldBeFalse();
-
-            _actionMethodSource2.AppliesCalled.ShouldBeTrue();
-            _actionMethodSource2.GetActionMethodsCalled.ShouldBeTrue();
+                }, new ActionDescriptorFactory(_configuration, configurationContext));
         }
 
         [Test]
         public void Should_conditionally_apply_route_conventions_by_configuration()
         {
-            _configuration.RouteConventions.Append<TestRouteConvention1>(
-                x => x.ActionMethod.HandlerTypeDescriptor.Type == typeof(Handler1));
-            _configuration.RouteConventions.Append<TestRouteConvention2>(
-                x => x.ActionMethod.HandlerTypeDescriptor.Type == typeof(Handler2) &&
-                    x.ActionMethod.MethodDescriptor.Name == nameof(Handler2.Post));
+            _configuration.RouteConventions.Configure(c => c.Append<TestRouteConvention1>(
+                x => x.ActionMethod.HandlerTypeDescriptor.Type.IsType<Handler1>()));
+            _configuration.RouteConventions.Configure(c => c.Append<TestRouteConvention2>(
+                x => x.ActionMethod.HandlerTypeDescriptor.Type.IsType<Handler2>() &&
+                    x.ActionMethod.MethodDescriptor.Name == nameof(Handler2.Post)));
 
             var actions = _actionSource.GetActions();
 
@@ -167,6 +139,10 @@ namespace Tests.Unit.Actions
             _routeConvention2.AppliesToPredicate = x => x.ActionMethod
                     .HandlerTypeDescriptor.Type == typeof(Handler2) && 
                 x.ActionMethod.MethodDescriptor.Name == nameof(Handler2.Post);
+            
+            _configuration.RouteConventions.Configure(c => c
+                .Append(_routeConvention1)
+                .Append(_routeConvention2));
 
             var actions = _actionSource.GetActions();
 
@@ -214,6 +190,10 @@ namespace Tests.Unit.Actions
                         "farker", null, null, null, null)
                 };
 
+            _configuration.RouteConventions.Configure(c => c
+                .Append(_routeConvention1)
+                .Append(_routeConvention2));
+
             var actions = _actionSource.GetActions();
 
             actions.Count.ShouldEqual(16);
@@ -239,33 +219,143 @@ namespace Tests.Unit.Actions
         {
             _actionMethodSource1.Add<Handler2>(x => x.Get());
 
+            _configuration.RouteConventions.Configure(c => c
+                .Append(_routeConvention1)
+                .Append(_routeConvention2));
+
             var actions = _actionSource.GetActions();
 
             actions.Count.ShouldEqual(8);
         }
 
         [Test]
+        public void Should_only_configure_matching_authenticators_on_action()
+        {
+            _configuration
+                .Authenticators.Configure(c => c.Clear()
+                    .Append<TestAutenticator1>(x => x.ActionMethod
+                        .MethodDescriptor.Name == nameof(Handler1.Get))
+                    .Append<TestAutenticator2>());
+            _configuration.RouteConventions.Configure(c => c
+                .Append(_routeConvention1)
+                .Append(_routeConvention2));
+
+            var actions = _actionSource.GetActions();
+
+            var authenticators = actions.FirstOrDefault(x => x.Action == _handler1Get).Authenticators;
+            authenticators.Count().ShouldEqual(2);
+            authenticators.ShouldOnlyContain(
+                Plugin<IAuthenticator>.Create<TestAutenticator1>(),
+                Plugin<IAuthenticator>.Create<TestAutenticator2>());
+
+            authenticators = actions.FirstOrDefault(x => x.Action == _handler1Post).Authenticators;
+            authenticators.Count().ShouldEqual(1);
+            authenticators.ShouldOnlyContain(
+                Plugin<IAuthenticator>.Create<TestAutenticator2>());
+        }
+
+        [Test]
+        public void Should_only_configure_matching_request_binders_on_action()
+        {
+            _configuration
+                .RequestBinders.Configure(c => c.Clear()
+                    .Append<TestRequestBinder1>(x => x.ActionMethod
+                        .MethodDescriptor.Name == nameof(Handler1.Get))
+                    .Append<TestRequestBinder2>());
+            _configuration.RouteConventions.Configure(c => c
+                .Append(_routeConvention1)
+                .Append(_routeConvention2));
+
+            var actions = _actionSource.GetActions();
+
+            var binders = actions.FirstOrDefault(x => x.Action == _handler1Get).RequestBinders;
+            binders.Count().ShouldEqual(2);
+            binders.ShouldOnlyContain(
+                Plugin<IRequestBinder>.Create<TestRequestBinder1>(),
+                Plugin<IRequestBinder>.Create<TestRequestBinder2>());
+
+            binders = actions.FirstOrDefault(x => x.Action == _handler1Post).RequestBinders;
+            binders.Count().ShouldEqual(1);
+            binders.ShouldOnlyContain(
+                Plugin<IRequestBinder>.Create<TestRequestBinder2>());
+        }
+
+        [Test]
+        public void Should_only_configure_matching_request_readers_on_action()
+        {
+            _configuration
+                .RequestReaders.Configure(c => c.Clear()
+                    .Append<TestRequestReader1>(x => x.ActionMethod
+                        .MethodDescriptor.Name == nameof(Handler1.Get))
+                    .Append<TestRequestReader2>());
+            _configuration.RouteConventions.Configure(c => c
+                .Append(_routeConvention1)
+                .Append(_routeConvention2));
+
+            var actions = _actionSource.GetActions();
+
+            var readers = actions.FirstOrDefault(x => x.Action == _handler1Get).RequestReaders;
+            readers.Count().ShouldEqual(2);
+            readers.ShouldOnlyContain(
+                Plugin<IRequestReader>.Create<TestRequestReader1>(),
+                Plugin<IRequestReader>.Create<TestRequestReader2>());
+
+            readers = actions.FirstOrDefault(x => x.Action == _handler1Post).RequestReaders;
+            readers.Count().ShouldEqual(1);
+            readers.ShouldOnlyContain(
+                Plugin<IRequestReader>.Create<TestRequestReader2>());
+        }
+
+        [Test]
+        public void Should_only_configure_matching_response_writers_on_action()
+        {
+            _configuration
+                .ResponseWriters.Configure(c => c.Clear()
+                    .Append<TestResponseWriter1>(x => x.ActionMethod
+                        .MethodDescriptor.Name == nameof(Handler1.Get))
+                    .Append<TestResponseWriter2>());
+            _configuration.RouteConventions.Configure(c => c
+                .Append(_routeConvention1)
+                .Append(_routeConvention2));
+
+            var actions = _actionSource.GetActions();
+
+            var writers = actions.FirstOrDefault(x => x.Action == _handler1Get).ResponseWriters;
+            writers.Count().ShouldEqual(2);
+            writers.ShouldOnlyContain(
+                Plugin<IResponseWriter>.Create<TestResponseWriter1>(),
+                Plugin<IResponseWriter>.Create<TestResponseWriter2>());
+
+            writers = actions.FirstOrDefault(x => x.Action == _handler1Post).ResponseWriters;
+            writers.Count().ShouldEqual(1);
+            writers.ShouldOnlyContain(
+                Plugin<IResponseWriter>.Create<TestResponseWriter2>());
+        }
+
+        [Test]
         public void Should_only_configure_matching_behaviors_on_action()
         {
-            _configuration.Behaviors.Append<TestBehavior1>(x => x.ActionMethod
-                .MethodDescriptor.Name == nameof(Handler1.Get));
-
-            _configuration.Behaviors.Append<TestBehavior2>();
+            _configuration
+                .Behaviors.Configure(c => c.Clear()
+                    .Append<TestBehavior1>(x => x.ActionMethod
+                        .MethodDescriptor.Name == nameof(Handler1.Get))
+                    .Append<TestBehavior2>());
+            _configuration.RouteConventions.Configure(c => c
+                    .Append(_routeConvention1)
+                    .Append(_routeConvention2));
 
             var actions = _actionSource.GetActions();
 
             var behaviors = actions.FirstOrDefault(x => x.Action == _handler1Get).Behaviors;
-            behaviors.Count().ShouldEqual(3);
-            behaviors.ShouldOnlyContain(
-                _typeCache.GetTypeDescriptor<DefaultErrorHandlerBehavior>(),
-                _typeCache.GetTypeDescriptor<TestBehavior1>(),
-                _typeCache.GetTypeDescriptor<TestBehavior2>());
-
-            behaviors = actions.FirstOrDefault(x => x.Action == _handler1Post).Behaviors;
             behaviors.Count().ShouldEqual(2);
             behaviors.ShouldOnlyContain(
-                _typeCache.GetTypeDescriptor<DefaultErrorHandlerBehavior>(),
-                _typeCache.GetTypeDescriptor<TestBehavior2>());
+                Plugin<IBehavior>.Create<TestBehavior1>(),
+                Plugin<IBehavior>.Create<TestBehavior2>());
+
+            behaviors = actions.FirstOrDefault(x => x.Action == _handler1Post).Behaviors;
+            behaviors.Count().ShouldEqual(1);
+            behaviors.ShouldOnlyContain(
+                Plugin<IBehavior>.Create<TestBehavior2>());
         }
     }
 }

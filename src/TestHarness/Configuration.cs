@@ -1,7 +1,9 @@
 ﻿using Graphite;
 using Graphite.Authentication;
+using Graphite.Bender;
 using Graphite.Cors;
 using Graphite.StructureMap;
+using Newtonsoft.Json.Serialization;
 using TestHarness.Handlers;
 using TestHarness.Routing;
 
@@ -16,7 +18,7 @@ namespace TestHarness
                 .IncludeThisAssembly()
                 .EnableDiagnosticsInDebugMode()
                 //.UseBender(x => x.UseCamelCaseNaming())
-                //.ConfigureJsonNet(x => x.ContractResolver = 
+                //.ConfigureJsonNet(x => x.ContractResolver =
                 //    new CamelCasePropertyNamesContractResolver())
                 .UseStructureMapContainer<Registry>()
                 .ExcludeCurrentNamespaceFromUrl()

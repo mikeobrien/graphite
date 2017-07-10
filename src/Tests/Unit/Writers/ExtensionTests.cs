@@ -31,15 +31,18 @@ namespace Tests.Unit.Writers
 
             var configuration = new Configuration();
 
-            configuration.ResponseWriters.Append<WeightedWriter1>();
-            configuration.ResponseWriters.Append<NotWeightedWriter1>();
-            configuration.ResponseWriters.Append<WeightedWriter2>();
-            configuration.ResponseWriters.Append<NotWeightedWriter2>();
-            configuration.ResponseWriters.Append<WeightedWriter3>();
-            configuration.ResponseWriters.Append<NotWeightedWriter3>();
+            configuration.ResponseWriters.Configure(c => c
+                .Append<WeightedWriter1>()
+                .Append<NotWeightedWriter1>()
+                .Append<WeightedWriter2>()
+                .Append<NotWeightedWriter2>()
+                .Append<WeightedWriter3>()
+                .Append<NotWeightedWriter3>());
 
-            var results = writers.ThatApply(null, new ActionConfigurationContext(
-                new ConfigurationContext(configuration, null), null));
+            var actionDescriptor = new ActionDescriptor(null, null, null, null, null, 
+                configuration.ResponseWriters.CloneAllThatApplyTo(null), null);
+
+            var results = writers.ThatApply(null, actionDescriptor);
 
             results.ShouldOnlyContain(
                 notWeightedWriter1,
