@@ -15,6 +15,13 @@ namespace Graphite.Extensibility
             DefaultPredicate = defaultPredicate;
         }
 
+        public ConditionalPluginsDsl<TPlugin, TContext> DefaultIs<TConcrete>() 
+            where TConcrete : TPlugin
+        {
+            Plugins.DefaultIs(Plugins.FirstOfType<TConcrete>());
+            return this;
+        }
+
         public ConditionalPluginsDsl<TPlugin, TContext> Clear()
         {
             Plugins.Clear();
