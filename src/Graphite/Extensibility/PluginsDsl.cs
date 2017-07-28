@@ -21,6 +21,12 @@
             return this;
         }
 
+        public PluginsDsl<TPlugin> DefaultIs<TConcrete>() where TConcrete : TPlugin
+        {
+            Plugins.DefaultIs(Plugins.FirstOfType<TConcrete>());
+            return this;
+        }
+
         public PluginsDsl<TPlugin> Remove<TConcrete>(
             bool typeOnly = false) where TConcrete : TPlugin
         {
