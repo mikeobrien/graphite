@@ -766,7 +766,7 @@ namespace Graphite
         /// <summary>
         /// Binds cookie values to action parameters by attribute.
         /// </summary>
-        public ConfigurationDsl BindCookiesByByAttriubute()
+        public ConfigurationDsl BindCookiesByAttribute()
         {
             _configuration.CookiesBindingMode = BindingMode.Explicit;
             return this;
