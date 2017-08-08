@@ -1,4 +1,5 @@
-﻿using Graphite.Authentication;
+﻿using System.Text;
+using Graphite.Authentication;
 using Graphite.Extensions;
 using NUnit.Framework;
 using Should;
@@ -18,7 +19,7 @@ namespace Tests.Unit.Authentication
             var authenticator = new TestBasicAuthenticator("fark", "farker");
 
             authenticator.Authenticate(password == null ? username : 
-                $"{username}:{password}".ToBase64()).ShouldEqual(expected);
+                $"{username}:{password}".ToBase64(Encoding.UTF8)).ShouldEqual(expected);
         }
     }
 
@@ -33,8 +34,8 @@ namespace Tests.Unit.Authentication
             _password = password;
         }
 
-        public string RealmOverride { set { Realm = value; } }
-        public string StatusMessageOverride { set { UnauthorizedStatusMessage = value; } }
+        public string RealmOverride { set => Realm = value; }
+        public string StatusMessageOverride { set => UnauthorizedStatusMessage = value; }
 
         public override bool Authenticate(string username, string password)
         {

@@ -49,7 +49,7 @@ namespace TestHarness.Reader
         {
             return new OutputInfoModel
             {
-                Data = stream.ReadToEnd()
+                Data = stream.ReadToEnd(Encoding.UTF8)
             };
         }
 
@@ -60,7 +60,7 @@ namespace TestHarness.Reader
                 Filename = stream.Filename,
                 MimeType = stream.MimeType,
                 Length = stream.Length,
-                Data = stream.Data.ReadToEnd()
+                Data = stream.Data.ReadToEnd(Encoding.UTF8)
             };
         }
 

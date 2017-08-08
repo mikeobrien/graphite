@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Text;
 using System.Web.Http.Routing;
+using System.Xml;
 using Graphite.Actions;
 using Graphite.Authentication;
 using Graphite.Behaviors;
@@ -18,6 +20,11 @@ using Graphite.Readers;
 using Graphite.Reflection;
 using Graphite.Routing;
 using Graphite.Writers;
+using Newtonsoft.Json;
+using JsonReader = Graphite.Readers.JsonReader;
+using JsonWriter = Graphite.Writers.JsonWriter;
+using XmlReader = Graphite.Readers.XmlReader;
+using XmlWriter = Graphite.Writers.XmlWriter;
 
 namespace Graphite
 {
@@ -26,6 +33,7 @@ namespace Graphite
         public IContainer Container { get; set; }
         public Registry Registry { get; set; } = new Registry();
         public List<Assembly> Assemblies { get; } = new List<Assembly>();
+        public Encoding DefaultEncoding { get; set; } = new UTF8Encoding(false);
 
         public string DiagnosticsUrl { get; set; } = "_graphite";
         public bool ReturnErrorMessage { get; set; }
@@ -37,6 +45,11 @@ namespace Graphite
         public bool DefaultErrorHandlerEnabled { get; set; } = true;
         public int DownloadBufferSize { get; set; } = 1024 * 1024;
         public bool AutomaticallyConstrainUrlParameterByType { get; set; }
+        public bool DisposeResponses { get; set; }
+
+        public XmlReaderSettings XmlReaderSettings { get; } = new XmlReaderSettings();
+        public XmlWriterSettings XmlWriterSettings { get; } = new XmlWriterSettings();
+        public JsonSerializerSettings JsonSerializerSettings { get; } = new JsonSerializerSettings();
 
         public HttpMethods SupportedHttpMethods { get; } = new HttpMethods {
             HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Patch, HttpMethod.Delete,

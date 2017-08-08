@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
-using Bender.Extensions;
 using Graphite.Extensibility;
 using Graphite.Extensions;
 using Tests.Common.Fakes;
@@ -69,6 +68,11 @@ namespace Tests.Common
             {
                 action();
             }
+        }
+
+        public static IEnumerable<int> To(this int start, int end)
+        {
+            return Enumerable.Range(start, end);
         }
 
         public static void TimesParallel(this int iterations, Action action)

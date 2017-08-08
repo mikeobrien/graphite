@@ -31,12 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bender, Version=3.0.65.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Bender.3.0.65.0\lib\Bender.dll</HintPath>
-    </Reference>
-    <Reference Include="Flexo, Version=1.0.24.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\flexo.1.0.24.0\lib\Flexo.dll</HintPath>
-    </Reference>
     <Reference Include="IISExpressBootstrapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\IISExpressBootstrapper.1.2.0\lib\net45\IISExpressBootstrapper.dll</HintPath>
     </Reference>
@@ -58,8 +52,8 @@
     <Reference Include="Should, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Should.1.1.20\lib\Should.dll</HintPath>
     </Reference>
-    <Reference Include="StructureMap, Version=4.4.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\StructureMap.4.4.5\lib\net45\StructureMap.dll</HintPath>
+    <Reference Include="StructureMap, Version=4.5.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\StructureMap.4.5.2\lib\net45\StructureMap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -180,8 +174,8 @@
     <Compile Include="Unit\InitializerTests.cs" />
     <Compile Include="Unit\Owin\BootstrapTests.cs" />
     <Compile Include="Unit\Owin\RequestPropertyProviderTests.cs" />
-    <Compile Include="Unit\Readers\Bender\JsonReaderTests.cs" />
-    <Compile Include="Unit\Readers\Bender\XmlReaderTests.cs" />
+    <Compile Include="Unit\Writers\PushWriterBaseTests.cs" />
+    <Compile Include="Unit\Writers\WeightedContentWriterBaseTests.cs" />
     <Compile Include="Unit\Writers\ExtensionTests.cs" />
     <Compile Include="Unit\Readers\StreamReaderTests.cs" />
     <Compile Include="Unit\Readers\ByteReaderTests.cs" />
@@ -197,8 +191,6 @@
     <Compile Include="Unit\Routing\RouteExtensionTests.cs" />
     <Compile Include="Unit\Routing\HttpRouteMapperTests.cs" />
     <Compile Include="Unit\Routing\UrlAliasConventionTests.cs" />
-    <Compile Include="Unit\Writers\Bender\JsonWriterTests.cs" />
-    <Compile Include="Unit\Writers\Bender\XmlWriterTests.cs" />
     <Compile Include="Unit\Writers\RedirectWriterTests.cs" />
     <Compile Include="Unit\Writers\ByteWriterTests.cs" />
     <Compile Include="Unit\Writers\StreamWriterTests.cs" />
@@ -220,17 +212,13 @@
       <Project>{0fbdf277-7998-4744-92fd-160258f07cbe}</Project>
       <Name>Graphite.Owin</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Graphite\Graphite.csproj">
-      <Project>{c4b8217d-1768-49c0-aec5-f07b8816405e}</Project>
-      <Name>Graphite</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Integration\DependencyInjection\Graphite.StructureMap\Graphite.StructureMap.csproj">
+    <ProjectReference Include="..\Graphite.StructureMap\Graphite.StructureMap.csproj">
       <Project>{ec2dd82d-406b-4169-a5c9-ec9ead8a0151}</Project>
       <Name>Graphite.StructureMap</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Integration\Serializers\Graphite.Bender\Graphite.Bender.csproj">
-      <Project>{73744e67-b5eb-427a-8a4d-9e6d07532ff9}</Project>
-      <Name>Graphite.Bender</Name>
+    <ProjectReference Include="..\Graphite\Graphite.csproj">
+      <Project>{c4b8217d-1768-49c0-aec5-f07b8816405e}</Project>
+      <Name>Graphite</Name>
     </ProjectReference>
     <ProjectReference Include="..\TestHarness\TestHarness.csproj">
       <Project>{3987de7f-3c92-40c4-a6d1-d22bf28e89cd}</Project>

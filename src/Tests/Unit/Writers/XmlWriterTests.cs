@@ -1,8 +1,11 @@
 ﻿using System.Threading.Tasks;
-using Graphite.Writers;
+using System.Xml;
+using Graphite;
+using Graphite.Http;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
+using XmlWriter = Graphite.Writers.XmlWriter;
 
 namespace Tests.Unit.Writers
 {
@@ -45,7 +48,8 @@ namespace Tests.Unit.Writers
         public async Task Should_write_xml()
         {
             var requestGraph = RequestGraph
-                .CreateFor<Handler>(h => h.Post());
+                .CreateFor<Handler>(h => h.Post())
+                    .WithAccept(MimeTypes.ApplicationXml); ;
             var context = requestGraph.GetResponseWriterContext(new OutputModel
             {
                 Value1 = "value1",
@@ -58,20 +62,21 @@ namespace Tests.Unit.Writers
             var content = await response.Content.ReadAsStringAsync();
 
             content.ShouldEqual(
-                "<?xml version=\"1.0\"?>\r\n" +
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
                 "<OutputModel " + 
                     "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " +
-                    "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n" + 
-                "  <Value1>value1</Value1>\r\n" +
-                "  <Value2>value2</Value2>\r\n" +
+                    "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + 
+                "<Value1>value1</Value1>" +
+                "<Value2>value2</Value2>" +
                 "</OutputModel>");
         }
 
         private XmlWriter CreateWriter(RequestGraph requestGraph)
         {
-            return new XmlWriter(requestGraph.GetRouteDescriptor(),
+            return new XmlWriter(
                 requestGraph.GetHttpRequestMessage(), 
-                requestGraph.GetHttpResponseMessage());
+                requestGraph.GetHttpResponseMessage(),
+                new Configuration(), new XmlWriterSettings());
         }
     }
 }

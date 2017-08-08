@@ -1,26 +1,23 @@
-using Graphite.Extensions;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Graphite.Writers
 {
-    public class AsyncStringContent : HttpContent
+    public class PushContent : HttpContent
     {
-        private readonly string _data;
-        private readonly Encoding _encoding;
+        private readonly Func<Stream, TransportContext, Task> _writeToString;
 
-        public AsyncStringContent(string data, Encoding encoding)
+        public PushContent(Func<Stream, TransportContext, Task> writeToString)
         {
-            _data = data;
-            _encoding = encoding;
+            _writeToString = writeToString;
         }
 
         protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)
         {
-            return stream.WriteAsync(_data, _encoding);
+            return _writeToString(stream, context);
         }
 
         protected override bool TryComputeLength(out long length)

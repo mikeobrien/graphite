@@ -1,6 +1,7 @@
-﻿using System.Net.Http;
-using System.Text;
-using Graphite.Extensions;
+﻿using System.IO;
+using System.Net.Http;
+using System.Xml;
+using System.Xml.Serialization;
 using Graphite.Http;
 using Graphite.Routing;
 
@@ -9,17 +10,28 @@ namespace Graphite.Readers
     public class XmlReader : StringReaderBase
     {
         private readonly RouteDescriptor _routeDescriptor;
+        private readonly Configuration _configuration;
+        private readonly XmlReaderSettings _xmlReaderSettings;
 
-        public XmlReader(RouteDescriptor routeDescriptor, HttpRequestMessage requestMessage) : 
+        public XmlReader(RouteDescriptor routeDescriptor, 
+            HttpRequestMessage requestMessage,
+            Configuration configuration,
+            XmlReaderSettings xmlReaderSettings) : 
             base(requestMessage, MimeTypes.ApplicationXml)
         {
             _routeDescriptor = routeDescriptor;
+            _configuration = configuration;
+            _xmlReaderSettings = xmlReaderSettings;
         }
 
         protected override object GetRequest(string data)
         {
-            return data.DeserializeXml(_routeDescriptor
-                .RequestParameter.ParameterType.Type, Encoding.UTF8);
+            using (var stream = new MemoryStream(_configuration.DefaultEncoding.GetBytes(data)))
+            {
+                var reader = System.Xml.XmlReader.Create(stream, _xmlReaderSettings);
+                return new XmlSerializer(_routeDescriptor.RequestParameter
+                    .ParameterType.Type).Deserialize(reader);
+            }
         }
     }
 }

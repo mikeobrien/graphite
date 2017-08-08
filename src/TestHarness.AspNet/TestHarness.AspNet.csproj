@@ -57,9 +57,6 @@
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="StructureMap, Version=4.4.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\StructureMap.4.4.5\lib\net45\StructureMap.dll</HintPath>
-    </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -117,14 +114,6 @@
     <ProjectReference Include="..\Graphite\Graphite.csproj">
       <Project>{c4b8217d-1768-49c0-aec5-f07b8816405e}</Project>
       <Name>Graphite</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Integration\DependencyInjection\Graphite.StructureMap\Graphite.StructureMap.csproj">
-      <Project>{ec2dd82d-406b-4169-a5c9-ec9ead8a0151}</Project>
-      <Name>Graphite.StructureMap</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Integration\Serializers\Graphite.Bender\Graphite.Bender.csproj">
-      <Project>{73744e67-b5eb-427a-8a4d-9e6d07532ff9}</Project>
-      <Name>Graphite.Bender</Name>
     </ProjectReference>
     <ProjectReference Include="..\TestHarness\TestHarness.csproj">
       <Project>{3987de7f-3c92-40c4-a6d1-d22bf28e89cd}</Project>

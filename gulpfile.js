@@ -54,10 +54,10 @@ gulp.task('test', ['build'], function () {
         }));
 });
 
-function buildNugetPackage(assembly, packageName, path)
+function buildNugetPackage(assembly, packageName)
 {
-    var source = 'src/' + (path ? path + '/' : '') + assembly + 
-    	'/bin/Release/' + assembly + '.{dll,pdb,xml}';
+    var source = 'src/' + assembly + '/bin/Release/' + 
+    	assembly + '.{dll,pdb,xml}';
     var dest = packageName + '-package/lib';
 
     gulp.task('nuget-copy-' + packageName, ['test'], function() {
@@ -80,8 +80,7 @@ function buildNugetPackage(assembly, packageName, path)
 buildNugetPackage('Graphite', 'GraphiteWeb.Core');
 buildNugetPackage('Graphite.AspNet', 'GraphiteWeb.AspNet');
 buildNugetPackage('Graphite.Owin', 'GraphiteWeb.Owin');
-buildNugetPackage('Graphite.StructureMap', 'GraphiteWeb.StructureMap', 'Integration/DependencyInjection');
-buildNugetPackage('Graphite.Bender', 'GraphiteWeb.Bender', 'Integration/Serializers');
+buildNugetPackage('Graphite.StructureMap', 'GraphiteWeb.StructureMap');
 buildNugetPackage('Graphite.Cors', 'GraphiteWeb.Cors');
 
 gulp.task('nuget-pack', [
@@ -89,7 +88,6 @@ gulp.task('nuget-pack', [
     'nuget-pack-GraphiteWeb.AspNet', 
     'nuget-pack-GraphiteWeb.Owin', 
     'nuget-pack-GraphiteWeb.StructureMap', 
-    'nuget-pack-GraphiteWeb.Bender', 
     'nuget-pack-GraphiteWeb.Cors']);
 
 gulp.task('nuget-push', ['nuget-pack'], function() {

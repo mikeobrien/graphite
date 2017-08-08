@@ -62,7 +62,7 @@ namespace Tests.Unit.Readers
         private JsonReader CreateReader(RequestGraph requestGraph)
         {
             return new JsonReader(
-                new JsonSerializerSettings(),
+                new JsonSerializer(),
                 requestGraph.GetRouteDescriptor(),
                 requestGraph.GetHttpRequestMessage());
         }

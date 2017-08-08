@@ -1,26 +1,37 @@
-﻿using System.Net.Http;
-using System.Text;
+﻿using System;
+using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Graphite.Http;
 using Newtonsoft.Json;
 
 namespace Graphite.Writers
 {
-    public class JsonWriter  : StringWriterBase
+    public class JsonWriter : PushWriterBase
     {
-        private readonly JsonSerializerSettings _settings;
+        private readonly JsonSerializer _serializer;
+        private readonly Configuration _configuration;
 
-        public JsonWriter(JsonSerializerSettings settings, 
+        public JsonWriter(JsonSerializer serializer,
             HttpRequestMessage requestMessage,
-            HttpResponseMessage responseMessage) : 
-            base(requestMessage, responseMessage, Encoding.UTF8, 
-                MimeTypes.ApplicationJson)
+            HttpResponseMessage responseMessage,
+            Configuration configuration) :
+            base(requestMessage, responseMessage,
+                configuration, MimeTypes.ApplicationJson)
         {
-            _settings = settings;
+            _serializer = serializer;
+            _configuration = configuration;
         }
-
-        protected override string GetResponse(ResponseWriterContext context)
+        
+        protected override Task WriteResponse(ResponseWriterContext context,
+            Stream stream, TransportContext transportContext)
         {
-            return JsonConvert.SerializeObject(context.Response, _settings);
+            var jsonWriter = new JsonTextWriter(new System.IO
+                .StreamWriter(stream, _configuration.DefaultEncoding));
+            _serializer.Serialize(jsonWriter, context.Response);
+            jsonWriter.Flush();
+            return Task.CompletedTask;
         }
     }
 }

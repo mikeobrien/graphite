@@ -94,7 +94,8 @@ namespace Graphite.Cors
             response = response ?? _requestMessage.CreateResponse();
             response.StatusCode = HttpStatusCode.BadRequest;
             if (message.IsNotNullOrEmpty() && response.Content == null)
-                response.Content = new StringContent(message, Encoding.UTF8, MimeTypes.TextPlain);
+                response.Content = new StringContent(message, 
+                    _configuration.DefaultEncoding, MimeTypes.TextPlain);
             return response;
         }
     }

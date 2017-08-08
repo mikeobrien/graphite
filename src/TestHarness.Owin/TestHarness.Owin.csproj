@@ -48,9 +48,6 @@
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
-    <Reference Include="StructureMap, Version=4.5.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\StructureMap.4.5.1\lib\net45\StructureMap.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -89,10 +86,6 @@
     <ProjectReference Include="..\Graphite\Graphite.csproj">
       <Project>{c4b8217d-1768-49c0-aec5-f07b8816405e}</Project>
       <Name>Graphite</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Integration\DependencyInjection\Graphite.StructureMap\Graphite.StructureMap.csproj">
-      <Project>{ec2dd82d-406b-4169-a5c9-ec9ead8a0151}</Project>
-      <Name>Graphite.StructureMap</Name>
     </ProjectReference>
     <ProjectReference Include="..\TestHarness\TestHarness.csproj">
       <Project>{3987de7f-3c92-40c4-a6d1-d22bf28e89cd}</Project>

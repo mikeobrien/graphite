@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Bender.Extensions;
+using System.Text;
 using Graphite.Extensions;
 using NUnit.Framework;
 using Should;
@@ -59,7 +59,7 @@ namespace Tests.Unit.Extensions
         [TestCase("fark", "ZmFyaw==")]
         public void Should_encode_base64(string text, string expected)
         {
-            text.ToBase64().ShouldEqual(expected);
+            text.ToBase64(Encoding.UTF8).ShouldEqual(expected);
         }
 
         [TestCase(null, "")]
@@ -68,7 +68,7 @@ namespace Tests.Unit.Extensions
         [TestCase("ZmFyaw==", "fark")]
         public void Should_decode_base64(string base64, string expected)
         {
-            base64.FromBase64().ShouldEqual(expected);
+            base64.FromBase64(Encoding.UTF8).ShouldEqual(expected);
         }
     }
 }

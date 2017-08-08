@@ -162,12 +162,15 @@
     <Compile Include="Routing\UrlConfigurationContext.cs" />
     <Compile Include="Routing\UrlParameter.cs" />
     <Compile Include="Writers\AsyncByteContent.cs" />
+    <Compile Include="Writers\WeightedContentWriterBase.cs" />
+    <Compile Include="Writers\PushContent.cs" />
     <Compile Include="Writers\AsyncStreamContent.cs" />
     <Compile Include="Writers\AsyncStringContent.cs" />
     <Compile Include="Writers\BodyWriterBase.cs" />
     <Compile Include="Writers\Extensions.cs" />
     <Compile Include="Writers\IResponseWriter.cs" />
     <Compile Include="Writers\JsonWriter.cs" />
+    <Compile Include="Writers\PushWriterBase.cs" />
     <Compile Include="Writers\RedirectWriter.cs" />
     <Compile Include="Writers\StreamWriter.cs" />
     <Compile Include="Writers\ByteWriter.cs" />
@@ -192,7 +195,6 @@
     <Compile Include="Extensions\LinqExtensions.cs" />
     <Compile Include="Extensions\WebApiExtensions.cs" />
     <Compile Include="DependencyInjection\IContainer.cs" />
-    <Compile Include="IInitializer.cs" />
     <Compile Include="Initializer.cs" />
     <Compile Include="RuntimeConfiguration.cs" />
     <Compile Include="Routing\AliasUrlConvention.cs" />

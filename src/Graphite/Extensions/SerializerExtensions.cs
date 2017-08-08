@@ -1,39 +1,65 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using System.Web.Script.Serialization;
-using System.Xml.Serialization;
+﻿using System.Reflection;
+using Graphite.Reflection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Graphite.Extensions
 {
     public static class SerializerExtensions
     {
-        public static string SerializeXml(this object source, Type type)
+        public static JsonSerializerSettings WriteDateTimeAsUtc(this JsonSerializerSettings settings)
         {
-            using (var stream = new MemoryStream())
-            {
-                new XmlSerializer(type).Serialize(stream, source);
-                stream.Seek(0, SeekOrigin.Begin);
-                return new StreamReader(stream).ReadToEnd();
-            }
+            settings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+            return settings;
         }
 
-        public static object DeserializeXml(this string source, Type type, Encoding encoding)
+        public static JsonSerializerSettings WriteMicrosoftJsonDateTime(this JsonSerializerSettings settings)
         {
-            using (var stream = new MemoryStream(encoding.GetBytes(source)))
-            {
-                return new XmlSerializer(type).Deserialize(stream);
-            }
+            settings.DateFormatHandling = DateFormatHandling.MicrosoftDateFormat;
+            return settings;
         }
 
-        public static string SerializeJson(this object source, Type type)
+        public static JsonSerializerSettings WriteEnumNames(this JsonSerializerSettings settings)
         {
-            return new JavaScriptSerializer().Serialize(source);
+            settings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+            return settings;
         }
 
-        public static object DeserializeJson(this string source, Type type)
+        public static JsonSerializerSettings WriteNonNumericFloatsAsDefault(this JsonSerializerSettings settings)
         {
-            return new JavaScriptSerializer().Deserialize(source, type);
+            settings.FloatFormatHandling = FloatFormatHandling.DefaultValue;
+            return settings;
+        }
+
+        public static JsonSerializerSettings UseCamelCaseNaming(this JsonSerializerSettings settings)
+        {
+            settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            return settings;
+        }
+
+        public static JsonSerializerSettings IgnoreCircularReferences(this JsonSerializerSettings settings)
+        {
+            settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            return settings;
+        }
+
+        public static JsonSerializerSettings IgnoreNullValues(this JsonSerializerSettings settings)
+        {
+            settings.NullValueHandling = NullValueHandling.Ignore;
+            return settings;
+        }
+
+        public static JsonSerializerSettings FailOnUnmatchedElements(this JsonSerializerSettings settings)
+        {
+            settings.MissingMemberHandling = MissingMemberHandling.Error;
+            return settings;
+        }
+
+        public static JsonSerializerSettings PrettyPrintInDebugMode(this JsonSerializerSettings settings)
+        {
+            if (Assembly.GetCallingAssembly().IsInDebugMode())
+                settings.Formatting = Formatting.Indented;
+            return settings;
         }
     }
 }

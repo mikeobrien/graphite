@@ -5,9 +5,10 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using Bender;
+using System.Xml.Serialization;
 using Graphite.Extensions;
 using Graphite.Http;
+using Newtonsoft.Json;
 using HttpMethod = System.Net.Http.HttpMethod;
 
 namespace Tests.Common
@@ -125,13 +126,13 @@ namespace Tests.Common
             Action<HttpRequestHeaders> requestHeaders = null,
             Action<HttpContentHeaders> contentHeaders = null) where TResponse : class
         {
-            return Get(relativeUrl, MimeTypes.ApplicationJson, x => 
-                Deserialize.Json<TResponse>(x), cookies, requestHeaders);
+            return Get(relativeUrl, MimeTypes.ApplicationJson, 
+                DeserializeJson<TResponse>, cookies, requestHeaders);
         }
 
         public Result<TResponse> GetXml<TResponse>(string relativeUrl) where TResponse : class
         {
-            return Get(relativeUrl, MimeTypes.ApplicationXml, x => Deserialize.Xml<TResponse>(x));
+            return Get(relativeUrl, MimeTypes.ApplicationXml, DeserializeXml<TResponse>);
         }
 
         public Result<string> GetString(string relativeUrl,
@@ -149,7 +150,7 @@ namespace Tests.Common
             Action<HttpContentHeaders> contentHeaders = null)
         {
             return Send<object>(HttpMethod.Post, relativeUrl, MimeTypes.ApplicationJson, 
-                MimeTypes.TextPlain, x => Serialize.JsonStream(data, x), x => null,
+                MimeTypes.TextPlain, x => SerializeJson(data, x), x => null,
                 cookies, requestHeaders, contentHeaders);
         }
 
@@ -159,7 +160,7 @@ namespace Tests.Common
             Action<HttpContentHeaders> contentHeaders = null)
         {
             return Send<object>(HttpMethod.Put, relativeUrl, MimeTypes.ApplicationJson,
-                MimeTypes.TextPlain, x => Serialize.JsonStream(data, x), x => null,
+                MimeTypes.TextPlain, x => SerializeJson(data, x), x => null,
                 cookies, requestHeaders, contentHeaders); ;
         }
 
@@ -169,7 +170,7 @@ namespace Tests.Common
             Action<HttpContentHeaders> contentHeaders = null)
         {
             return Send<object>(Patch, relativeUrl, MimeTypes.ApplicationJson,
-                MimeTypes.TextPlain, x => Serialize.JsonStream(data, x), x => null,
+                MimeTypes.TextPlain, x => SerializeJson(data, x), x => null,
                 cookies, requestHeaders, contentHeaders);
         }
 
@@ -179,7 +180,7 @@ namespace Tests.Common
             Action<HttpContentHeaders> contentHeaders = null)
         {
             return Send<object>(HttpMethod.Delete, relativeUrl, MimeTypes.ApplicationJson,
-                MimeTypes.TextPlain, x => Serialize.JsonStream(data, x), x => null, 
+                MimeTypes.TextPlain, x => SerializeJson(data, x), x => null, 
                 cookies, requestHeaders, contentHeaders);
         }
 
@@ -225,7 +226,7 @@ namespace Tests.Common
             Action<HttpContentHeaders> contentHeaders = null) where TResponse : class
         {
             return Send(HttpMethod.Post, relativeUrl, mimeType, MimeTypes
-                .ApplicationJson, stream.CopyTo, x => Deserialize.Json<TResponse>(x), filename: filename,
+                .ApplicationJson, stream.CopyTo, DeserializeJson<TResponse>, filename: filename,
                 cookies: cookies, requestHeaders: requestHeaders, contentHeaders: contentHeaders);
         }
 
@@ -235,8 +236,8 @@ namespace Tests.Common
             Action<HttpContentHeaders> contentHeaders = null) where TResponse : class
         {
             return Send(HttpMethod.Post, relativeUrl, MimeTypes.ApplicationXml, 
-                MimeTypes.ApplicationXml, x => Serialize.XmlStream(data, x), 
-                x => Deserialize.Xml<TResponse>(x), cookies, requestHeaders, contentHeaders);
+                MimeTypes.ApplicationXml, x => SerializeXml(data, x), 
+                DeserializeXml<TResponse>, cookies, requestHeaders, contentHeaders);
         }
 
         public Result<TResponse> PostJson<TRequest, TResponse>(string relativeUrl, TRequest data,
@@ -245,8 +246,8 @@ namespace Tests.Common
             Action<HttpContentHeaders> contentHeaders = null) where TResponse : class
         {
             return Send(HttpMethod.Post, relativeUrl, MimeTypes.ApplicationJson, 
-                MimeTypes.ApplicationJson, x => Serialize.JsonStream(data, x), 
-                x => Deserialize.Json<TResponse>(x), cookies, requestHeaders, contentHeaders);
+                MimeTypes.ApplicationJson, x => SerializeJson(data, x), 
+                DeserializeJson<TResponse>, cookies, requestHeaders, contentHeaders);
         }
 
         public Result<TResponse> PutJson<TRequest, TResponse>(string relativeUrl, TRequest data,
@@ -255,8 +256,8 @@ namespace Tests.Common
             Action<HttpContentHeaders> contentHeaders = null) where TResponse : class
         {
             return Send(HttpMethod.Put, relativeUrl, MimeTypes.ApplicationJson,
-                MimeTypes.ApplicationJson, x => Serialize.JsonStream(data, x),
-                x => Deserialize.Json<TResponse>(x), cookies, requestHeaders, contentHeaders);
+                MimeTypes.ApplicationJson, x => SerializeJson(data, x),
+                DeserializeJson<TResponse>, cookies, requestHeaders, contentHeaders);
         }
 
         public Result<TResponse> PatchJson<TRequest, TResponse>(string relativeUrl, TRequest data,
@@ -265,8 +266,8 @@ namespace Tests.Common
             Action<HttpContentHeaders> contentHeaders = null) where TResponse : class
         {
             return Send(Patch, relativeUrl, MimeTypes.ApplicationJson,
-                MimeTypes.ApplicationJson, x => Serialize.JsonStream(data, x),
-                x => Deserialize.Json<TResponse>(x), cookies, requestHeaders, contentHeaders);
+                MimeTypes.ApplicationJson, x => SerializeJson(data, x),
+                DeserializeJson<TResponse>, cookies, requestHeaders, contentHeaders);
         }
 
         public Result<TResponse> DeleteJson<TRequest, TResponse>(string relativeUrl, TRequest data,
@@ -275,8 +276,8 @@ namespace Tests.Common
             Action<HttpContentHeaders> contentHeaders = null) where TResponse : class
         {
             return Send(HttpMethod.Delete, relativeUrl, MimeTypes.ApplicationJson,
-                MimeTypes.ApplicationJson, x => Serialize.JsonStream(data, x),
-                x => Deserialize.Json<TResponse>(x), cookies, requestHeaders, contentHeaders);
+                MimeTypes.ApplicationJson, x => SerializeJson(data, x),
+                DeserializeJson<TResponse>, cookies, requestHeaders, contentHeaders);
         }
 
         public Result<TResponse> PostForm<TResponse>(string relativeUrl, string data,
@@ -286,7 +287,7 @@ namespace Tests.Common
         {
             return Send(HttpMethod.Post, relativeUrl, MimeTypes.ApplicationFormUrlEncoded, 
                 MimeTypes.ApplicationJson, x => x.WriteAllText(data), 
-                x => Deserialize.Json<TResponse>(x), cookies, requestHeaders, contentHeaders);
+                DeserializeJson<TResponse>, cookies, requestHeaders, contentHeaders);
         }
 
         private Result<TResponse> Get<TResponse>(string relativeUrl,
@@ -353,6 +354,29 @@ namespace Tests.Common
             }
             
             return new Result<TResponse>(response, reader?.Invoke(responseStream));
+        }
+
+        private static T DeserializeJson<T>(Stream stream)
+        {
+            return new JsonSerializer().Deserialize<T>(
+                new JsonTextReader(new StreamReader(stream)));
+        }
+
+        private static void SerializeJson<T>(T instance, Stream stream)
+        {
+            var writer = new JsonTextWriter(new StreamWriter(stream));
+            new JsonSerializer().Serialize(writer, instance);
+            writer.Flush();
+        }
+
+        private static T DeserializeXml<T>(Stream stream)
+        {
+            return (T)new XmlSerializer(typeof(T)).Deserialize(stream);
+        }
+
+        private static void SerializeXml<T>(T instance, Stream stream)
+        {
+            new XmlSerializer(typeof(T)).Serialize(stream, instance);
         }
     }
 }

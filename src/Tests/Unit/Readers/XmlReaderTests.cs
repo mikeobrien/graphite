@@ -1,10 +1,12 @@
 ﻿using System.Threading.Tasks;
+using System.Xml;
+using Graphite;
 using Graphite.Extensions;
 using Graphite.Http;
-using Graphite.Readers;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
+using XmlReader = Graphite.Readers.XmlReader;
 
 namespace Tests.Unit.Readers
 {
@@ -60,8 +62,9 @@ namespace Tests.Unit.Readers
         private XmlReader CreateReader(RequestGraph requestGraph)
         {
             return new XmlReader(
-                    requestGraph.GetRouteDescriptor(),
-                    requestGraph.GetHttpRequestMessage());
+                requestGraph.GetRouteDescriptor(),
+                requestGraph.GetHttpRequestMessage(),
+                new Configuration(), new XmlReaderSettings());
         }
     }
 }

@@ -116,13 +116,14 @@ namespace Graphite.Extensions
                 y.PadRight(columnWidths[i], r % 2 == 0 ? '·' : ' ')).Join(" ")).Join("\r\n");
         }
 
-        public static string ToBase64(this string text, Encoding encoding = null)
+        public static string ToBase64(this string text, Encoding encoding)
         {
-            return text.IsNullOrEmpty() ? "" : Convert.ToBase64String(
-                (encoding ?? Encoding.UTF8).GetBytes(text));
+            return text.IsNullOrEmpty() 
+                ? "" 
+                : Convert.ToBase64String(encoding.GetBytes(text));
         }
 
-        public static string FromBase64(this string base64, Encoding encoding = null)
+        public static string FromBase64(this string base64, Encoding encoding)
         {
             if (base64.IsNullOrEmpty()) return "";
             byte[] bytes;
@@ -134,7 +135,7 @@ namespace Graphite.Extensions
             {
                 return "";
             }
-            return (encoding ?? Encoding.UTF8).GetString(bytes);
+            return encoding.GetString(bytes);
         }
     }
 }

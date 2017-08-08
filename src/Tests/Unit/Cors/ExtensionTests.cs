@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Cors;
-using Bender.Collections;
 using Graphite;
 using Graphite.Actions;
 using Graphite.Behaviors;
 using NUnit.Framework;
 using Graphite.Cors;
+using Graphite.Extensions;
 using Should;
 using Tests.Common;
 using PolicyPlugin = Graphite.Extensibility.ConditionalPlugin<Graphite.Cors

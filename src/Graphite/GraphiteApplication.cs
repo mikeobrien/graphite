@@ -6,6 +6,7 @@ using Graphite.DependencyInjection;
 using Graphite.Extensibility;
 using Graphite.Monitoring;
 using Graphite.Reflection;
+using Newtonsoft.Json;
 
 namespace Graphite
 {
@@ -68,6 +69,10 @@ namespace Graphite
                 Container.RegisterPlugin(configuration.BehaviorChainInvoker);
                 Container.RegisterPlugins(configuration.Authenticators);
                 Container.RegisterPlugin(configuration.ActionInvoker);
+                Container.Register(configuration.XmlWriterSettings);
+                Container.Register(configuration.XmlReaderSettings);
+                Container.Register(JsonSerializer.Create(
+                    configuration.JsonSerializerSettings));
                 Container.RegisterPlugins(configuration.RequestBinders);
                 Container.RegisterPlugins(configuration.RequestReaders);
                 Container.RegisterPlugins(configuration.ValueMappers);

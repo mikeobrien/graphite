@@ -7,21 +7,22 @@ namespace Graphite.Readers
 {
     public class JsonReader : StringReaderBase
     {
-        private readonly JsonSerializerSettings _settings;
+        private readonly JsonSerializer _serializer;
         private readonly RouteDescriptor _routeDescriptor;
 
-        public JsonReader(JsonSerializerSettings settings,
+        public JsonReader(JsonSerializer serializer,
             RouteDescriptor routeDescriptor, HttpRequestMessage requestMessage) : 
             base(requestMessage, MimeTypes.ApplicationJson)
         {
-            _settings = settings;
+            _serializer = serializer;
             _routeDescriptor = routeDescriptor;
         }
 
         protected override object GetRequest(string data)
         {
-            return JsonConvert.DeserializeObject(data, _routeDescriptor
-                .RequestParameter.ParameterType.Type, _settings);
+            var jsonReader = new JsonTextReader(new System.IO.StringReader(data));
+            return _serializer.Deserialize(jsonReader, _routeDescriptor
+                .RequestParameter.ParameterType.Type);
         }
     }
 }

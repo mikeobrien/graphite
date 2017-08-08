@@ -1,4 +1,6 @@
 ﻿using System.Threading.Tasks;
+using Graphite;
+using Graphite.Http;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Should;
@@ -47,15 +49,15 @@ namespace Tests.Unit.Writers
         public async Task Should_write_json()
         {
             var requestGraph = RequestGraph
-                .CreateFor<Handler>(h => h.Post());
+                .CreateFor<Handler>(h => h.Post())
+                .WithAccept(MimeTypes.ApplicationJson);
             var context = requestGraph.GetResponseWriterContext(new OutputModel
             {
                 Value1 = "value1",
                 Value2 = "value2"
             });
 
-            var response = await CreateWriter(requestGraph)
-                .Write(context);
+            var response = await CreateWriter(requestGraph).Write(context);
 
             var content = await response.Content.ReadAsStringAsync();
 
@@ -64,9 +66,10 @@ namespace Tests.Unit.Writers
 
         private JsonWriter CreateWriter(RequestGraph requestGraph)
         {
-            return new JsonWriter(new JsonSerializerSettings(),
+            return new JsonWriter(new JsonSerializer(),
                 requestGraph.GetHttpRequestMessage(),
-                requestGraph.GetHttpResponseMessage());
+                requestGraph.GetHttpResponseMessage(),
+                new Configuration());
         }
     }
 }

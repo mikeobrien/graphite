@@ -37,15 +37,22 @@ namespace Graphite.Writers
     public class StringWriter : BodyWriterBase<string, 
         OutputString, OutputStringAttribute, IStringOutputInfo>
     {
+        private readonly Configuration _configuration;
+
         public StringWriter(ActionMethod actionMethod, 
             RouteDescriptor routeDescriptor,
-            HttpResponseMessage responseMessage) : 
-            base(actionMethod, routeDescriptor, responseMessage) { }
+            HttpResponseMessage responseMessage,
+            Configuration configuration) : 
+            base(actionMethod, routeDescriptor, responseMessage)
+        {
+            _configuration = configuration;
+        }
 
         protected override HttpContent GetContent(string data, 
             IStringOutputInfo outputInfo)
         {
-            return new AsyncStringContent(data, outputInfo?.Encoding ?? Encoding.UTF8);
+            return new AsyncStringContent(data, outputInfo?.Encoding ??
+                _configuration.DefaultEncoding);
         }
 
         protected override string GetContentType(string data)

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Net.Http;
+using System.Text;
 using Graphite.Authentication;
 using Graphite.Extensions;
 using NUnit.Framework;
@@ -20,7 +21,7 @@ namespace Tests.Unit.Authentication
             request.Headers.Authorization.Scheme.ShouldEqual(
                 BasicAuthenticatorBase.BasicScheme);
             request.Headers.Authorization.Parameter
-                .FromBase64().ShouldEqual("fark:farker");
+                .FromBase64(Encoding.UTF8).ShouldEqual("fark:farker");
         }
 
         [Test]

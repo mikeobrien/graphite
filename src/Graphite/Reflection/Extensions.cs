@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using Graphite.Extensions;
-using Graphite.Readers;
 
 namespace Graphite.Reflection
 {
@@ -198,9 +196,9 @@ namespace Graphite.Reflection
             if (!type.IsGenericType) return null;
             var typeDefinition = type.GetGenericTypeDefinition();
             return typeDefinition == typeof(List<>) ||
-                typeDefinition == typeof(IList<>) ||
-                typeDefinition == typeof(IEnumerable<>) ||
-                typeDefinition == typeof(ICollection<>) 
+                   typeDefinition == typeof(IList<>) ||
+                   typeDefinition == typeof(IEnumerable<>) ||
+                   typeDefinition == typeof(ICollection<>)
                 ? type.GenericTypeArguments[0] : null;
         }
 
@@ -215,11 +213,11 @@ namespace Graphite.Reflection
         }
 
         public static string GetManifestResourceString(this Assembly assembly, 
-            string name, Encoding encoding = null)
+            string name, Encoding encoding)
         {
             using (var stream = assembly.GetManifestResourceStream(name))
             {
-                return stream.ReadToEnd();
+                return stream.ReadToEnd(encoding);
             }
         }
 

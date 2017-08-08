@@ -1,25 +1,35 @@
-﻿using System.Net.Http;
-using System.Text;
-using Graphite.Extensions;
+﻿using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 using Graphite.Http;
-using Graphite.Routing;
 
 namespace Graphite.Writers
 {
-    public class XmlWriter : StringWriterBase
+    public class XmlWriter : PushWriterBase
     {
-        private readonly RouteDescriptor _routeDescriptor;
+        private readonly XmlWriterSettings _xmlWriterSettings;
 
-        public XmlWriter(RouteDescriptor routeDescriptor, 
-            HttpRequestMessage requestMessage, HttpResponseMessage responseMessage) : 
-            base(requestMessage, responseMessage, Encoding.UTF8, MimeTypes.ApplicationXml)
+        public XmlWriter(
+            HttpRequestMessage requestMessage,
+            HttpResponseMessage responseMessage,
+            Configuration configuration,
+            XmlWriterSettings xmlWriterSettings) :
+            base(requestMessage, responseMessage,
+                configuration, MimeTypes.ApplicationXml)
         {
-            _routeDescriptor = routeDescriptor;
+            _xmlWriterSettings = xmlWriterSettings;
         }
 
-        protected override string GetResponse(ResponseWriterContext context)
+        protected override Task WriteResponse(ResponseWriterContext context,
+            Stream stream, TransportContext transportContext)
         {
-            return context.Response.SerializeXml(_routeDescriptor.ResponseType.Type);
+            var writer = System.Xml.XmlWriter.Create(stream, _xmlWriterSettings);
+            new XmlSerializer(context.Response.GetType())
+                .Serialize(writer, context.Response);
+            return Task.CompletedTask;
         }
     }
 }

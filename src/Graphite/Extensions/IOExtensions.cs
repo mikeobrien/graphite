@@ -16,10 +16,10 @@ namespace Graphite.Extensions
             return stream.WriteAsync(encoding.GetBytes(data));
         }
 
-        public static string ReadToEnd(this Stream stream, Encoding encoding = null)
+        public static string ReadToEnd(this Stream stream, Encoding encoding)
         {
             if (stream == null) return null;
-            using (var reader = new System.IO.StreamReader(stream, encoding ?? Encoding.UTF8))
+            using (var reader = new System.IO.StreamReader(stream, encoding))
             {
                 return reader.ReadToEnd();
             }

@@ -132,7 +132,10 @@ namespace Tests.Acceptance
             result.Status.ShouldEqual(HttpStatusCode.OK);
 
             result.Data.Param.ShouldBeNull();
-            result.Data.ParamByName.ShouldEqual("::1");
+            result.Data.ParamByName.ShouldEqual(
+                result.Data.ParamByName.Contains(":") 
+                ? "::1" 
+                : "127.0.0.1");
             result.Data.ParamByAttribute.ShouldBeInteger();
         }
 

@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Net.Http.Headers;
-using Graphite.Actions;
-using Graphite.Extensibility;
+using System.Text;
 using Graphite.Extensions;
 
 namespace Graphite.Authentication
@@ -20,7 +18,7 @@ namespace Graphite.Authentication
             this HttpRequestHeaders headers, string username, string password)
         {
             return headers.SetAuthorizationHeader(BasicAuthenticatorBase
-                .BasicScheme, $"{username}:{password}".ToBase64());
+                .BasicScheme, $"{username}:{password}".ToBase64(Encoding.UTF8));
         }
 
         public static HttpRequestMessage SetBearerTokenAuthorizationHeader(

@@ -7,6 +7,11 @@ using Graphite.Routing;
 
 namespace Graphite
 {
+    public interface IInitializer
+    {
+        void Initialize();
+    }
+
     public class Initializer : IInitializer
     {
         private readonly IHttpRouteMapper _routeMapper;

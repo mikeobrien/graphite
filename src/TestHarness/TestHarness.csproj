@@ -41,7 +41,7 @@
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="StructureMap, Version=4.5.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\StructureMap.4.5.1\lib\net45\StructureMap.dll</HintPath>
+      <HintPath>..\packages\StructureMap.4.5.2\lib\net45\StructureMap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -80,17 +80,13 @@
       <Project>{0948b932-8aea-4ccf-9f3d-dd6e2005fe03}</Project>
       <Name>Graphite.Cors</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Graphite\Graphite.csproj">
-      <Project>{c4b8217d-1768-49c0-aec5-f07b8816405e}</Project>
-      <Name>Graphite</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Integration\DependencyInjection\Graphite.StructureMap\Graphite.StructureMap.csproj">
+    <ProjectReference Include="..\Graphite.StructureMap\Graphite.StructureMap.csproj">
       <Project>{ec2dd82d-406b-4169-a5c9-ec9ead8a0151}</Project>
       <Name>Graphite.StructureMap</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Integration\Serializers\Graphite.Bender\Graphite.Bender.csproj">
-      <Project>{73744e67-b5eb-427a-8a4d-9e6d07532ff9}</Project>
-      <Name>Graphite.Bender</Name>
+    <ProjectReference Include="..\Graphite\Graphite.csproj">
+      <Project>{c4b8217d-1768-49c0-aec5-f07b8816405e}</Project>
+      <Name>Graphite</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

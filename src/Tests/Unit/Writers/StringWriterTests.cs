@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using Graphite;
 using Graphite.Http;
 using Graphite.Writers;
 using NUnit.Framework;
@@ -149,7 +150,8 @@ namespace Tests.Unit.Writers
             return new StringWriter(
                 requestGraph.ActionMethod,
                 requestGraph.GetRouteDescriptor(),
-                requestGraph.GetHttpResponseMessage());
+                requestGraph.GetHttpResponseMessage(),
+                new Configuration());
         }
     }
 }

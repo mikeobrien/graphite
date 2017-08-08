@@ -3,8 +3,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Text;
 using System.Web.Http;
 using System.Web.Http.Routing;
+using System.Xml;
 using Graphite.Actions;
 using Graphite.Authentication;
 using Graphite.Behaviors;
@@ -42,14 +44,69 @@ namespace Graphite
             return this;
         }
 
-        /// <summary>
-        /// Allows you to configure Json.NET.
-        /// </summary>
-        public ConfigurationDsl ConfigureJsonNet(Action<JsonSerializerSettings> configure)
+        public class XmlSerializationDsl
         {
-            var settings = new JsonSerializerSettings();
-            configure?.Invoke(settings);
-            return ConfigureRegistry(x => x.Register(settings));
+            private readonly Configuration _configuration;
+
+            public XmlSerializationDsl(Configuration configuration)
+            {
+                _configuration = configuration;
+            }
+
+            /// <summary>
+            /// Allows you to configure the XML writer.
+            /// </summary>
+            public XmlSerializationDsl Writer(Action<XmlWriterSettings> configure)
+            {
+                configure?.Invoke(_configuration.XmlWriterSettings);
+                return this;
+            }
+
+            /// <summary>
+            /// Allows you to configure the XML reader.
+            /// </summary>
+            public XmlSerializationDsl Reader(Action<XmlReaderSettings> configure)
+            {
+                configure?.Invoke(_configuration.XmlReaderSettings);
+                return this;
+            }
+        }
+
+        public class SerializationDsl
+        {
+            private readonly Configuration _configuration;
+
+            public SerializationDsl(Configuration configuration)
+            {
+                _configuration = configuration;
+            }
+
+            /// <summary>
+            /// Allows you to configure Json.NET.
+            /// </summary>
+            public SerializationDsl Json(Action<JsonSerializerSettings> configure)
+            {
+                configure?.Invoke(_configuration.JsonSerializerSettings);
+                return this;
+            }
+
+            /// <summary>
+            /// Allows you to configure the XML serializer.
+            /// </summary>
+            public SerializationDsl Xml(Action<XmlSerializationDsl> configure)
+            {
+                configure?.Invoke(new XmlSerializationDsl(_configuration));
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// Allows you to configure serialization.
+        /// </summary>
+        public ConfigurationDsl ConfigureSerialization(Action<SerializationDsl> configure)
+        {
+            configure?.Invoke(new SerializationDsl(_configuration));
+            return this;
         }
 
         /// <summary>
@@ -178,6 +235,16 @@ namespace Graphite
         }
 
         /// <summary>
+        /// Indicates that responses should be disposed 
+        /// if they implement IDisposable.
+        /// </summary>
+        public ConfigurationDsl DisposeResponses()
+        {
+            _configuration.DisposeResponses = true;
+            return this;
+        }
+
+        /// <summary>
         /// Specifies the download buffer size in bytes. The default is 1MB.
         /// </summary>
         public ConfigurationDsl WithDownloadBufferSizeOf(int length)
@@ -210,6 +277,15 @@ namespace Graphite
         public ConfigurationDsl DisableDefaultErrorHandler()
         {
             _configuration.DefaultErrorHandlerEnabled = false;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the default encoding.
+        /// </summary>
+        public ConfigurationDsl WithDefaultEncoding<T>(T encoding) where T : Encoding
+        {
+            _configuration.DefaultEncoding = encoding;
             return this;
         }
 

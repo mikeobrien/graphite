@@ -141,6 +141,8 @@ namespace Tests.Unit.Reflection
                 .IsGenericListCastable.ShouldEqual(listCastable);
         }
 
+        public class InheritedType : List<int> { }
+
         [TestCase(typeof(int), null)]
         [TestCase(typeof(List<int>), typeof(int))]
         [TestCase(typeof(IList<int>), typeof(int))]
