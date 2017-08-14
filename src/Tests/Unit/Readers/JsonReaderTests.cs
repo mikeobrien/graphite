@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Http;
 using Newtonsoft.Json;
@@ -19,7 +21,7 @@ namespace Tests.Unit.Readers
 
         public class Handler
         {
-            public void Post(InputModel request, string param) { }
+            public void Post(InputModel request) { }
         }
 
         [Test]
@@ -27,10 +29,9 @@ namespace Tests.Unit.Readers
             [Values(true, false)] bool isJson)
         {
             var requestGraph = RequestGraph
-                .CreateFor<Handler>(h => h.Post(null, null))
+                .CreateFor<Handler>(h => h.Post(null))
                     .WithRequestData("{}")
-                    .WithRequestParameter("request")
-                    .AddParameters("param");
+                    .WithRequestParameter("request");
 
             if (isJson)
             {
@@ -46,17 +47,37 @@ namespace Tests.Unit.Readers
         public async Task Should_read_json()
         {
             var requestGraph = RequestGraph
-                .CreateFor<Handler>(h => h.Post(null, null))
+                .CreateFor<Handler>(h => h.Post(null))
                     .WithRequestData("{\"Value\":\"fark\"}")
                     .WithRequestParameter("request")
-                    .WithContentType(MimeTypes.ApplicationJson)
-                    .AddParameters("param");
+                    .WithContentType(MimeTypes.ApplicationJson);
 
             var result = await CreateReader(requestGraph).Read();
 
             result.ShouldNotBeNull();
             result.ShouldBeType<InputModel>();
             result.CastTo<InputModel>().Value.ShouldEqual("fark");
+        }
+
+        //JsonReaderException
+        [TestCase("{ \"sdfsdf\" }", "Invalid character after parsing property name. " +
+                                    "Expected ':' but got: }. Path '', line 1, position 11.")]
+        // JsonSerializationException
+        [TestCase("{ \"sdfsdf\": { }", "Unexpected end when deserializing object. " +
+                                       "Path 'sdfsdf', line 1, position 15.")]
+        public async Task should_return_friendly_error_message_when_malformed(
+            string json, string message)
+        {
+            var requestGraph = RequestGraph
+                .CreateFor<Handler>(h => h.Post(null))
+                .WithRequestData(json)
+                .WithRequestParameter("request")
+                .WithContentType(MimeTypes.ApplicationJson);
+
+            var exception = await CreateReader(requestGraph).Should()
+                .Throw<BadRequestException>(async x => await x.Read());
+
+            exception.Message.ShouldEqual(message);
         }
 
         private JsonReader CreateReader(RequestGraph requestGraph)

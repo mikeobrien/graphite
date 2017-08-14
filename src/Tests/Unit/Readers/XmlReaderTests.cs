@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using System.Xml;
 using Graphite;
+using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Http;
 using NUnit.Framework;
@@ -20,7 +21,7 @@ namespace Tests.Unit.Readers
 
         public class Handler
         {
-            public void Post(InputModel request, string param) { }
+            public void Post(InputModel request) { }
         }
 
         [Test]
@@ -28,10 +29,9 @@ namespace Tests.Unit.Readers
             [Values(true, false)] bool isXml)
         {
             var requestGraph = RequestGraph
-                .CreateFor<Handler>(h => h.Post(null, null))
+                .CreateFor<Handler>(h => h.Post(null))
                     .WithRequestData("<InputModel/>")
-                    .WithRequestParameter("request")
-                    .AddParameters("param");
+                    .WithRequestParameter("request");
 
             if (isXml)
             {
@@ -46,17 +46,35 @@ namespace Tests.Unit.Readers
         public async Task Should_read_xml()
         {
             var requestGraph = RequestGraph
-                .CreateFor<Handler>(h => h.Post(null, null))
+                .CreateFor<Handler>(h => h.Post(null))
                     .WithRequestData("<InputModel><Value>fark</Value></InputModel>")
                     .WithRequestParameter("request")
-                    .WithContentType(MimeTypes.ApplicationXml)
-                    .AddParameters("param");
+                    .WithContentType(MimeTypes.ApplicationXml);
 
             var result = await CreateReader(requestGraph).Read();
 
             result.ShouldNotBeNull();
             result.ShouldBeType<InputModel>();
             result.CastTo<InputModel>().Value.ShouldEqual("fark");
+        }
+        
+        [TestCase("<InputModel fark", "There is an error in XML document (1, 17).")]
+        [TestCase("<InputModel></Value>", "There is an error in XML document (1, 15).")]
+        [TestCase("<InputModel><Value><fark/></Value></InputModel>", 
+            "There is an error in XML document (1, 21).")]
+        public async Task should_return_friendly_error_message_when_malformed(
+            string json, string message)
+        {
+            var requestGraph = RequestGraph
+                .CreateFor<Handler>(h => h.Post(null))
+                .WithRequestData(json)
+                .WithRequestParameter("request")
+                .WithContentType(MimeTypes.ApplicationJson);
+
+            var exception = await CreateReader(requestGraph).Should()
+                .Throw<BadRequestException>(async x => await x.Read());
+
+            exception.Message.ShouldEqual(message);
         }
 
         private XmlReader CreateReader(RequestGraph requestGraph)
