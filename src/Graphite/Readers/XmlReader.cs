@@ -1,7 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net.Http;
 using System.Xml;
 using System.Xml.Serialization;
+using Graphite.Binding;
 using Graphite.Http;
 using Graphite.Routing;
 
@@ -26,11 +28,18 @@ namespace Graphite.Readers
 
         protected override object GetRequest(string data)
         {
-            using (var stream = new MemoryStream(_configuration.DefaultEncoding.GetBytes(data)))
+            try
             {
-                var reader = System.Xml.XmlReader.Create(stream, _xmlReaderSettings);
-                return new XmlSerializer(_routeDescriptor.RequestParameter
-                    .ParameterType.Type).Deserialize(reader);
+                using (var stream = new MemoryStream(_configuration.DefaultEncoding.GetBytes(data)))
+                {
+                    var reader = System.Xml.XmlReader.Create(stream, _xmlReaderSettings);
+                    return new XmlSerializer(_routeDescriptor.RequestParameter
+                        .ParameterType.Type).Deserialize(reader);
+                }
+            }
+            catch (InvalidOperationException exception)
+            {
+                throw new BadRequestException(exception.Message, exception);
             }
         }
     }
