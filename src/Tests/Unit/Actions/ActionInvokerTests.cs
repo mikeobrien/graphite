@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Graphite.Actions;
 using Graphite.Binding;
 using Graphite.Extensions;
+using Graphite.Linq;
 using Graphite.Reflection;
 using NSubstitute;
 using NUnit.Framework;

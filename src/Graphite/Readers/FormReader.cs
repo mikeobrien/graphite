@@ -5,6 +5,7 @@ using Graphite.Actions;
 using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Http;
+using Graphite.Linq;
 using Graphite.Routing;
 
 namespace Graphite.Readers

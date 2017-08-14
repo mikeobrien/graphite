@@ -106,8 +106,11 @@
     <Compile Include="Extensions\NumericExtensions.cs" />
     <Compile Include="GraphiteException.cs" />
     <Compile Include="Hosting\IPathProvider.cs" />
+    <Compile Include="Collections\DictionaryWrapper.cs" />
+    <Compile Include="Http\Extensions.cs" />
     <Compile Include="Http\HttpMethods.cs" />
     <Compile Include="Http\IRequestPropertiesProvider.cs" />
+    <Compile Include="Linq\LookupWrapper.cs" />
     <Compile Include="Http\RemoteHost.cs" />
     <Compile Include="Routing\IHttpRouteDecorator.cs" />
     <Compile Include="Routing\IHttpRouteMapper.cs" />
@@ -192,7 +195,7 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Reflection\Extensions.cs" />
     <Compile Include="Extensions\Extensions.cs" />
-    <Compile Include="Extensions\LinqExtensions.cs" />
+    <Compile Include="Linq\Extensions.cs" />
     <Compile Include="Extensions\WebApiExtensions.cs" />
     <Compile Include="DependencyInjection\IContainer.cs" />
     <Compile Include="Initializer.cs" />
@@ -215,5 +218,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Diagnostics\favicon.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Graphite.Extensions;
 using Graphite.Http;
+using Graphite.Linq;
 using Graphite.Routing;
 using Newtonsoft.Json;
 

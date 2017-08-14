@@ -1,7 +1,11 @@
-﻿using Graphite;
+﻿using System.Linq;
+using System.Net.Http;
+using Graphite;
 using Graphite.Authentication;
 using Graphite.Cors;
 using Graphite.Extensions;
+using Graphite.Http;
+using Graphite.Linq;
 using Graphite.StructureMap;
 using Newtonsoft.Json.Serialization;
 using TestHarness.Handlers;
@@ -29,7 +33,7 @@ namespace TestHarness
                 .BindRequestInfo()
                 .BindHeaders()
                 .BindContainer()
-                .ReturnErrorMessages()
+                .ReturnErrorMessagesWhen(x => !x.Querystring("_error").Contains("false"))
                 .ConfigureHttpRouteDecorators(x => x
                     .Append<RoutingTestHandler.HttpRouteDecorator>(d => d
                         .ActionMethod.Name.Contains("Decorator")))

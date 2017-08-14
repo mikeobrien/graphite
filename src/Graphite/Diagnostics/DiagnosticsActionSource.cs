@@ -2,6 +2,7 @@
 using System.Web.Http;
 using Graphite.Actions;
 using Graphite.Extensions;
+using Graphite.Linq;
 using Graphite.Reflection;
 using Graphite.Routing;
 

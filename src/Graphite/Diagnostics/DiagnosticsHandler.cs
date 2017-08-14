@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Graphite.DependencyInjection;
 using Graphite.Extensibility;
+using Graphite.Linq;
 using Graphite.Monitoring;
 using Graphite.Reflection;
 

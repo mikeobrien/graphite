@@ -49,7 +49,7 @@ namespace Tests.Unit
         {
             var configuration = new Configuration
             {
-                ReturnErrorMessage = returnErrorMessages,
+                ReturnErrorMessage = x => returnErrorMessages,
                 UnhandledExceptionStatusText = "fark"
             };
             var behaviorChain = Substitute.For<IBehaviorChain>();

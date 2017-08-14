@@ -18,6 +18,7 @@ using Graphite.DependencyInjection;
 using Graphite.Routing;
 using Graphite.Extensions;
 using Graphite.Http;
+using Graphite.Linq;
 using Graphite.Readers;
 using Graphite.Reflection;
 using Graphite.StructureMap;
@@ -190,8 +191,7 @@ namespace Tests.Common
         public QuerystringParameters GetQuerystringParameters()
         {
             return new QuerystringParameters(
-                GetHttpRequestMessage().GetQueryNameValuePairs()
-                    .ToLookup(x => x.Key, x => (object)x.Value));
+                GetHttpRequestMessage().GetQueryNameValuePairs());
         }
 
         public UrlParameters GetUrlParameters()

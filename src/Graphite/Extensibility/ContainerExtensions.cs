@@ -1,5 +1,6 @@
 ﻿using Graphite.DependencyInjection;
 using Graphite.Extensions;
+using Graphite.Linq;
 
 namespace Graphite.Extensibility
 {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Graphite.Actions;
 using Graphite.Extensions;
+using Graphite.Linq;
 using Graphite.Routing;
 
 namespace Graphite.Binding

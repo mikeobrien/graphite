@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Web;
 using Graphite.Extensions;
 using Graphite.Http;
+using Graphite.Linq;
 
 namespace Graphite.AspNet
 {

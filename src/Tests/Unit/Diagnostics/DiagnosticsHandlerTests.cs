@@ -5,6 +5,7 @@ using Graphite;
 using Graphite.Actions;
 using Graphite.Diagnostics;
 using Graphite.Extensions;
+using Graphite.Linq;
 using Graphite.Monitoring;
 using Graphite.Reflection;
 using Graphite.Routing;

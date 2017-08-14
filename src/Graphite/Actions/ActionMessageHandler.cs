@@ -18,9 +18,9 @@ namespace Graphite.Actions
         private readonly ActionMetrics _actionMetrics;
 
         public ActionMessageHandler(ConfigurationContext configurationContext,
-            ActionDescriptor actionDescriptor, 
+            ActionDescriptor actionDescriptor,
             IUnhandledExceptionHandler exceptionHandler,
-            IBehaviorChainInvoker behaviorChainInvoker, 
+            IBehaviorChainInvoker behaviorChainInvoker,
             Metrics metrics)
         {
             _actionDescriptor = actionDescriptor;

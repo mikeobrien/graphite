@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Graphite.Binding;
 using Graphite.Extensions;
+using Graphite.Linq;
 using Graphite.Reflection;
 using Graphite.Routing;
 using NUnit.Framework;

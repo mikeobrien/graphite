@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Graphite.Extensibility;
 using Graphite.Extensions;
+using Graphite.Linq;
 using Tests.Common.Fakes;
 
 namespace Tests.Common

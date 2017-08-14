@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Graphite.Extensions;
+using Graphite.Linq;
 using Should;
 using Should.Core.Assertions;
 using Should.Core.Exceptions;

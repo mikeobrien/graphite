@@ -5,6 +5,7 @@ using System.Web.Http;
 using Graphite.Http;
 using Graphite.Routing;
 using Graphite.Extensions;
+using Graphite.Linq;
 
 namespace Graphite.Binding
 {

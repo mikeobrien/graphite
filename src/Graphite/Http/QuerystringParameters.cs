@@ -1,41 +1,22 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using Graphite.Linq;
 
 namespace Graphite.Http
 {
-    public class QuerystringParameters : ILookup<string, object>
+    public class QuerystringParameters : LookupWrapper<string, object>
     {
-        private readonly ILookup<string, object> _source;
+        public QuerystringParameters() : base(null, null) { }
 
-        public QuerystringParameters(ILookup<string, object> source)
-        {
-            _source = source;
-        }
+        public QuerystringParameters(IEnumerable<KeyValuePair<string, string>> source):
+            base(source?.Select(x => new KeyValuePair<string, object>(x.Key, x.Value)), 
+                StringComparer.OrdinalIgnoreCase) { }
 
         public static QuerystringParameters CreateFrom(HttpRequestMessage message)
         {
-            return new QuerystringParameters(message.GetQueryNameValuePairs()?
-                .ToLookup(x => x.Key, x => (object)x.Value));
-        }
-
-        public int Count => _source.Count;
-        public IEnumerable<object> this[string key] => _source[key];
-
-        public bool Contains(string key)
-        {
-            return _source.Contains(key);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public IEnumerator<IGrouping<string, object>> GetEnumerator()
-        {
-            return _source.GetEnumerator();
+            return new QuerystringParameters(message.GetQueryNameValuePairs());
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Graphite.Actions
         public HttpResponseMessage HandleException(Exception exception, 
             ActionDescriptor actionDescriptor, HttpRequestMessage requestMessage)
         {
-            if (_configuration.ReturnErrorMessage)
+            if (_configuration.ReturnErrorMessage(requestMessage))
             {
                 var responseMessage = requestMessage.CreateResponse(HttpStatusCode.InternalServerError);
                 responseMessage.ReasonPhrase = _configuration.UnhandledExceptionStatusText;

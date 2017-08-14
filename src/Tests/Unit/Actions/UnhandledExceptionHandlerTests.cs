@@ -41,7 +41,7 @@ namespace Tests.Unit.Actions
         [Test]
         public void Should_return_exception_if_configured()
         {
-            _configuration.ReturnErrorMessage = true;
+            _configuration.ReturnErrorMessage = x => true;
             var exception = new Exception();
             var requestGraph = RequestGraph.Create();
             var requestMessage = new HttpRequestMessage();

@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Graphite.Extensions;
@@ -26,6 +27,11 @@ namespace TestHarness.Action
         public HttpResponseMessage GetWithResponseMessage()
         {
             return new HttpResponseMessage(HttpStatusCode.PaymentRequired);
+        }
+
+        public HttpResponseMessage GetException()
+        {
+            throw new Exception("fark");
         }
     }
 }

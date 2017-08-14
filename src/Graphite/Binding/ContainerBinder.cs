@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Graphite.DependencyInjection;
 using Graphite.Extensions;
+using Graphite.Linq;
 using Graphite.Routing;
 
 namespace Graphite.Binding

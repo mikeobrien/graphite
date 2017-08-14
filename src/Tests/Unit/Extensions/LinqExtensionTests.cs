@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.Linq;
 using Graphite.Extensions;
+using Graphite.Linq;
 using NUnit.Framework;
 using Should;
 using Tests.Common;

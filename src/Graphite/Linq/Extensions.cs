@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using Graphite.Extensions;
 
-namespace Graphite.Extensions
+namespace Graphite.Linq
 {
     public static class LinqExtensions
     {
@@ -75,6 +76,11 @@ namespace Graphite.Extensions
             if (source.Any()) return source;
             var @default = getDefault();
             return @default != null ? @default.AsList() : Enumerable.Empty<T>();
+        }
+
+        public static TValue GetValue<TKey, TValue>(this ILookup<TKey, TValue> lookup, TKey key)
+        {
+            return lookup[key].FirstOrDefault();
         }
 
         public static ILookup<string, object> ToLookup(this NameValueCollection source,

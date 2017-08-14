@@ -46,8 +46,8 @@ namespace Graphite.Behaviors
             container.Register(actionDescriptor.Route);
             container.Register(httpRequestContext);
             container.Register(new RequestCancellation(cancellationToken));
-            container.Register(UrlParameters.CreateFrom(httpRequestContext));
-            container.Register(QuerystringParameters.CreateFrom(requestMessage));
+            container.Register(requestMessage.UrlParameters());
+            container.Register(requestMessage.Querystring());
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Web.Http.Routing.Constraints;
 using Graphite.Actions;
 using Graphite.Extensibility;
 using Graphite.Extensions;
+using Graphite.Linq;
 using HttpMethod = System.Net.Http.HttpMethod;
 
 namespace Graphite.Routing

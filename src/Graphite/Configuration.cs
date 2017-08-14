@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Web.Http.Routing;
@@ -21,6 +22,7 @@ using Graphite.Reflection;
 using Graphite.Routing;
 using Graphite.Writers;
 using Newtonsoft.Json;
+using HttpMethod = Graphite.Http.HttpMethod;
 using JsonReader = Graphite.Readers.JsonReader;
 using JsonWriter = Graphite.Writers.JsonWriter;
 using XmlReader = Graphite.Readers.XmlReader;
@@ -36,9 +38,9 @@ namespace Graphite
         public Encoding DefaultEncoding { get; set; } = new UTF8Encoding(false);
 
         public string DiagnosticsUrl { get; set; } = "_graphite";
-        public bool ReturnErrorMessage { get; set; }
         public bool Diagnostics { get; set; }
         public bool Metrics { get; set; } = true;
+        public Func<HttpRequestMessage, bool> ReturnErrorMessage { get; set; } = x => false;
         public HttpStatusCode DefaultStatusCode = HttpStatusCode.NoContent;
         public string UnhandledExceptionStatusText { get; set; } =
             "There was a problem processing your request.";
@@ -46,7 +48,7 @@ namespace Graphite
         public int DownloadBufferSize { get; set; } = 1024 * 1024;
         public bool AutomaticallyConstrainUrlParameterByType { get; set; }
         public bool DisposeResponses { get; set; }
-
+       
         public XmlReaderSettings XmlReaderSettings { get; } = new XmlReaderSettings();
         public XmlWriterSettings XmlWriterSettings { get; } = new XmlWriterSettings();
         public JsonSerializerSettings JsonSerializerSettings { get; } = new JsonSerializerSettings();

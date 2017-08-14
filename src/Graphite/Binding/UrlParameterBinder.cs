@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Graphite.Extensions;
 using Graphite.Http;
+using Graphite.Linq;
 using Graphite.Routing;
 
 namespace Graphite.Binding

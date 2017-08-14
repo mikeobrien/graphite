@@ -2,6 +2,7 @@ using System;
 using Graphite.Actions;
 using Graphite.Extensibility;
 using Graphite.Extensions;
+using Graphite.Linq;
 using CorsSourcePluginDefinitions = Graphite.Extensibility.ConditionalPlugins<
     Graphite.Cors.ICorsPolicySource, Graphite.Actions.ActionConfigurationContext>;
 

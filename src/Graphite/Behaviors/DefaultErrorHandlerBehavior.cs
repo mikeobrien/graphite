@@ -37,7 +37,7 @@ namespace Graphite.Behaviors
                 _responseMessage.StatusCode = HttpStatusCode.InternalServerError;
                 _responseMessage.ReasonPhrase = _configuration.UnhandledExceptionStatusText;
 
-                if (_configuration.ReturnErrorMessage) _responseMessage
+                if (_configuration.ReturnErrorMessage(_requestMessage)) _responseMessage
                     .Content = new StringContent($"{_requestMessage}\r\n\r\n{exception}");
             }
             return _responseMessage;

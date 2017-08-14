@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Web.Http;
@@ -166,32 +167,75 @@ namespace Graphite
         }
 
         /// <summary>
-        /// Returns the stack trace of unhandled exceptions.
+        /// Returns the request headers, stack trace and 
+        /// container configuration of unhandled exceptions.
         /// </summary>
         public ConfigurationDsl ReturnErrorMessages()
         {
-            _configuration.ReturnErrorMessage = true;
+            ReturnErrorMessagesWhen(x => true);
             return this;
         }
 
         /// <summary>
-        /// Returns the stack trace of unhandled exceptions
+        /// Returns the request headers, stack trace and 
+        /// container configuration of unhandled exceptions
+        /// when the predicate is true.
+        /// </summary>
+        public ConfigurationDsl ReturnErrorMessagesWhen(Func<HttpRequestMessage, bool> predicate)
+        {
+            _configuration.ReturnErrorMessage = predicate;
+            return this;
+        }
+
+        /// <summary>
+        /// Returns the request headers, stack trace and 
+        /// container configuration of unhandled exceptions
         /// when calling assembly is in debug mode.
         /// </summary>
         public ConfigurationDsl ReturnErrorMessagesInDebugMode()
         {
-            _configuration.ReturnErrorMessage = Assembly
-                .GetCallingAssembly().IsInDebugMode();
+            var debugMode = Assembly.GetCallingAssembly().IsInDebugMode();
+            ReturnErrorMessagesWhen(x => debugMode);
             return this;
         }
 
         /// <summary>
-        /// Returns the stack trace of unhandled exceptions
+        /// Returns the request headers, stack trace and 
+        /// container configuration of unhandled exceptions
+        /// when calling assembly is in debug mode 
+        /// or the predicate is true.
+        /// </summary>
+        public ConfigurationDsl ReturnErrorMessagesInDebugModeOrWhen(
+            Func<HttpRequestMessage, bool> predicate)
+        {
+            var debugMode = Assembly.GetCallingAssembly().IsInDebugMode();
+            ReturnErrorMessagesWhen(x => debugMode || predicate(x));
+            return this;
+        }
+
+        /// <summary>
+        /// Returns the request headers, stack trace and 
+        /// container configuration of unhandled exceptions
         /// when type assembly is in debug mode.
         /// </summary>
         public ConfigurationDsl ReturnErrorMessagesInDebugMode<T>()
         {
-            _configuration.ReturnErrorMessage = typeof(T).Assembly.IsInDebugMode();
+            var debugMode = typeof(T).Assembly.IsInDebugMode();
+            ReturnErrorMessagesWhen(x => debugMode);
+            return this;
+        }
+
+        /// <summary>
+        /// Returns the request headers, stack trace and 
+        /// container configuration of unhandled exceptions
+        /// when type assembly is in debug mode
+        /// or the predicate is true.
+        /// </summary>
+        public ConfigurationDsl ReturnErrorMessagesInDebugModeOrWhen<T>(
+            Func<HttpRequestMessage, bool> predicate)
+        {
+            var debugMode = typeof(T).Assembly.IsInDebugMode();
+            ReturnErrorMessagesWhen(x => debugMode || predicate(x));
             return this;
         }
 
