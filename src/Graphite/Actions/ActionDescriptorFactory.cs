@@ -1,24 +1,25 @@
-﻿using Graphite.Routing;
+﻿using System.Web.Http;
+using Graphite.Routing;
 
 namespace Graphite.Actions
 {
     public class ActionDescriptorFactory
     {
         private readonly Configuration _configuration;
-        private readonly ConfigurationContext _configurationContext;
+        private readonly HttpConfiguration _httpConfiguration;
 
         public ActionDescriptorFactory(Configuration configuration,
-            ConfigurationContext configurationContext)
+            HttpConfiguration httpConfiguration)
         {
             _configuration = configuration;
-            _configurationContext = configurationContext;
+            _httpConfiguration = httpConfiguration;
         }
 
         public ActionDescriptor CreateDescriptor(ActionMethod actionMethod, 
             RouteDescriptor routeDescriptor)
         {
             var actionConfigurationContext = new ActionConfigurationContext(
-                _configurationContext, actionMethod, routeDescriptor);
+                _configuration, _httpConfiguration, actionMethod, routeDescriptor);
             return new ActionDescriptor(actionMethod, routeDescriptor,
                 _configuration.Authenticators.CloneAllThatApplyTo(actionConfigurationContext),
                 _configuration.RequestBinders.CloneAllThatApplyTo(actionConfigurationContext),

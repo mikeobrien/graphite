@@ -92,9 +92,9 @@ namespace Tests.Unit.Cors
 
             var policySource = policySources[0];
             policySource.AppliesTo(new ActionConfigurationContext(null,
-                getAction, null)).ShouldBeFalse();
+                null, getAction, null)).ShouldBeFalse();
             policySource.AppliesTo(new ActionConfigurationContext(null,
-                postAction, null)).ShouldBeTrue();
+                null, postAction, null)).ShouldBeTrue();
             Should_be_policy_source_type<CorsAttributePolicySource>(policySources[0]);
 
             Should_have_type_registration<ICorsPolicySource, CorsAttributePolicySource>();
@@ -139,9 +139,9 @@ namespace Tests.Unit.Cors
 
             behavior.Type.ShouldEqual(typeof(CorsBehavior));
             behavior.AppliesTo(new ActionConfigurationContext(null,
-                getAction, null)).ShouldBeFalse();
+                null, getAction, null)).ShouldBeFalse();
             behavior.AppliesTo(new ActionConfigurationContext(null,
-                postAction, null)).ShouldBeTrue();
+                null, postAction, null)).ShouldBeTrue();
         }
 
         [Test]
@@ -159,9 +159,9 @@ namespace Tests.Unit.Cors
 
             decorator.Type.ShouldEqual(typeof(OptionsRouteDecorator));
             decorator.AppliesTo(new ActionConfigurationContext(null,
-                getAction, null)).ShouldBeFalse();
+                null, getAction, null)).ShouldBeFalse();
             decorator.AppliesTo(new ActionConfigurationContext(null,
-                postAction, null)).ShouldBeTrue();
+                null, postAction, null)).ShouldBeTrue();
         }
 
         private CorsConfiguration GetCorsConfig()
@@ -192,7 +192,7 @@ namespace Tests.Unit.Cors
 
             var applies = sources.ThatApplies(corsConfiguration, new ActionDescriptor(
                 ActionMethod.From<Handler>(x => x.Post()), null, 
-                    null, null, null, null, null), null);
+                    null, null, null, null, null), null, null);
 
             applies.ShouldEqual(policy2);
         }

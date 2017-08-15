@@ -5,12 +5,12 @@ namespace Graphite.Routing
 {
     public class RouteConfigurationContext
     {
-        public RouteConfigurationContext(
-            ConfigurationContext configurationContext, 
+        public RouteConfigurationContext(Configuration configuration,
+            HttpConfiguration httpConfiguration,
             ActionMethod actionMethod)
         {
-            Configuration = configurationContext.Configuration;
-            HttpConfiguration = configurationContext.HttpConfiguration;
+            Configuration = configuration;
+            HttpConfiguration = httpConfiguration;
             ActionMethod = actionMethod;
         }
 

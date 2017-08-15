@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Cors;
+using System.Web.Http;
 using Graphite.Actions;
 using Graphite.Behaviors;
 using Graphite.Extensibility;
@@ -32,10 +33,11 @@ namespace Graphite.Cors
 
         public static ICorsPolicySource ThatApplies(
             this IEnumerable<ICorsPolicySource> sources, CorsConfiguration corsConfiguration,
-            ActionDescriptor actionDescriptor, ConfigurationContext configurationContext)
+            ActionDescriptor actionDescriptor, Configuration configuration,
+            HttpConfiguration httpConfiguration)
         {
             return corsConfiguration.PolicySources.ThatApply(sources,
-                new ActionConfigurationContext(configurationContext, 
+                new ActionConfigurationContext(configuration, httpConfiguration, 
                     actionDescriptor.Action, actionDescriptor.Route))
                 .FirstOrDefault();
         }

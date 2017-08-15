@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Graphite;
 using Graphite.Actions;
 using Graphite.Authentication;
 using Graphite.Behaviors;
@@ -79,11 +78,9 @@ namespace Tests.Unit.Actions
 
             _routeConvention1.AppliesToPredicate = x => true;
             _routeConvention2.AppliesToPredicate = x => true;
-
-            var configurationContext = new ConfigurationContext(_configuration, null);
-
+            
             _actionSource = new DefaultActionSource(
-                configurationContext, 
+                _configuration, null, 
                 new List<IActionMethodSource>
                 {
                     _actionMethodSource1, _actionMethodSource2
@@ -91,7 +88,7 @@ namespace Tests.Unit.Actions
                 new List<IRouteConvention>
                 {
                     _routeConvention1, _routeConvention2
-                }, new ActionDescriptorFactory(_configuration, configurationContext));
+                }, new ActionDescriptorFactory(_configuration, null));
         }
 
         [Test]

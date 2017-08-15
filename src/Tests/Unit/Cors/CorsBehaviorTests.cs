@@ -32,7 +32,6 @@ namespace Tests.Unit.Cors
         private ActionDescriptor _actionDescriptor;
         private HttpRequestMessage _requestMessage;
         private List<ICorsPolicySource> _policySources;
-        private ConfigurationContext _configurationContext;
         private CorsBehavior _behavior;
 
         public class Handler
@@ -55,9 +54,8 @@ namespace Tests.Unit.Cors
             _requestMessage.Headers.Host = "yourmom.com";
             _requestMessage.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
             _policySources = new List<ICorsPolicySource>();
-            _configurationContext = new ConfigurationContext(_configuration, null);
-            _behavior = new CorsBehavior(_configuration, _behaviorChain, _corsEngine, _corsConfiguration,
-                _actionDescriptor, _requestMessage, _policySources, _configurationContext);
+            _behavior = new CorsBehavior(_behaviorChain, _corsEngine, _corsConfiguration,
+                _actionDescriptor, _requestMessage, _policySources, _configuration, null);
         }
 
         [Test]

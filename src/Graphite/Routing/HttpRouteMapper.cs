@@ -22,18 +22,18 @@ namespace Graphite.Routing
         private readonly IContainer _container;
         private readonly IInlineConstraintResolver _constraintResolver;
         private readonly List<IHttpRouteDecorator> _routeDecorators;
-        private readonly ConfigurationContext _configurationContext;
+        private readonly Configuration _configuration;
 
-        public HttpRouteMapper(HttpConfiguration httpConfiguration,
+        public HttpRouteMapper(
             IContainer container, IInlineConstraintResolver constraintResolver,
-            List<IHttpRouteDecorator> routeDecorators,
-            ConfigurationContext configurationContext)
+            List<IHttpRouteDecorator> routeDecorators, Configuration configuration,
+            HttpConfiguration httpConfiguration)
         {
             _httpConfiguration = httpConfiguration;
             _container = container;
             _constraintResolver = constraintResolver;
             _routeDecorators = routeDecorators;
-            _configurationContext = configurationContext;
+            _configuration = configuration;
         }
 
         public void Map(ActionDescriptor actionDescriptor)
@@ -48,7 +48,7 @@ namespace Graphite.Routing
             };
 
             _routeDecorators.ThatApplyTo(actionDescriptor, routeConfiguration,
-                _configurationContext).Decorate(routeConfiguration);
+                _configuration, _httpConfiguration).Decorate(routeConfiguration);
 
             _httpConfiguration.Routes.MapHttpRoute(routeConfiguration.Name,
                 routeConfiguration.RouteTemplate, null,

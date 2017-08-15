@@ -25,8 +25,7 @@ namespace Tests.Unit.Actions
             _requestGraph = RequestGraph.Create();
             
             _actionDescriptorFactory = new ActionDescriptorFactory(
-                _requestGraph.Configuration, 
-                _requestGraph.GetConfigurationContext());
+                _requestGraph.Configuration, _requestGraph.HttpConfiguration);
         }
 
         [Test]

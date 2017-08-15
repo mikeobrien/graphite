@@ -239,7 +239,8 @@ namespace Tests.Unit.Readers
         private FormReader CreateReader(RequestGraph requestGraph)
         {
             return new FormReader(
-                requestGraph.GetConfigurationContext(),
+                requestGraph.Configuration,
+                requestGraph.HttpConfiguration,
                 requestGraph.ActionMethod,
                 requestGraph.GetRouteDescriptor(),
                 requestGraph.ValueMappers,

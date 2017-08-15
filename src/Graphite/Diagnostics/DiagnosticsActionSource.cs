@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
 using Graphite.Actions;
-using Graphite.Extensions;
 using Graphite.Linq;
 using Graphite.Reflection;
 using Graphite.Routing;
@@ -36,12 +35,11 @@ namespace Graphite.Diagnostics
         public List<ActionDescriptor> GetActions()
         {
             var configuration = new Configuration();
-            var configurationContext = new ConfigurationContext(configuration, _httpConfiguration);
             var actionMethodSource = new DefaultActionMethodSource(configuration, _typeCache);
             var urlConvention = new LambdaUrlConvention((a, s) => _configuration
                 .DiagnosticsUrl.Trim('/').JoinUrls(s.ToString()).AsArray());
-            var routeConvention = new DefaultRouteConvention(
-                configurationContext, urlConvention.AsList(), _constraintBuilder);
+            var routeConvention = new DefaultRouteConvention(configuration, 
+                _httpConfiguration, urlConvention.AsList(), _constraintBuilder);
 
             new ConfigurationDsl(configuration, _httpConfiguration)
                 .IncludeTypeAssembly<DiagnosticsActionSource>()
@@ -51,8 +49,9 @@ namespace Graphite.Diagnostics
                 .ConfigureUrlConventions(x => x.Clear().Append(urlConvention))
                 .ConfigureRouteConventions(x => x.Clear().Append(routeConvention));
             
-            return new DefaultActionSource(configurationContext, actionMethodSource.AsList(), 
-                routeConvention.AsList(), _actionDescriptorFactory).GetActions();
+            return new DefaultActionSource(configuration, _httpConfiguration, 
+                actionMethodSource.AsList(), routeConvention.AsList(), 
+                _actionDescriptorFactory).GetActions();
         }
     }
 }

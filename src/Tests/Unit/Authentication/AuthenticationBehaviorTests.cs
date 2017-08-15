@@ -7,7 +7,6 @@ using Graphite;
 using Graphite.Actions;
 using Graphite.Authentication;
 using Graphite.Behaviors;
-using Graphite.Extensibility;
 using Graphite.Extensions;
 using NSubstitute;
 using NUnit.Framework;
@@ -40,8 +39,8 @@ namespace Tests.Unit.Authentication
             _responseMessage = new HttpResponseMessage(HttpStatusCode.OK);
             _behaviorChain = Substitute.For<IBehaviorChain>();
             _behaviorChain.InvokeNext().Returns(_responseMessage);
-            _actionDescriptor = new ActionDescriptorFactory(_configuration, 
-                new ConfigurationContext(_configuration, null)).CreateDescriptor(null, null);
+            _actionDescriptor = new ActionDescriptorFactory(_configuration, null)
+                .CreateDescriptor(null, null);
             _behavior = new AuthenticationBehavior(_behaviorChain, _requestMessage, 
                 _responseMessage, _authenticators, _configuration, _actionDescriptor);
         }

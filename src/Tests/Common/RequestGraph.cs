@@ -203,8 +203,7 @@ namespace Tests.Common
 
         public ActionDescriptor GetActionDescriptor()
         {
-            return new ActionDescriptorFactory(Configuration,
-                new ConfigurationContext(Configuration, HttpConfiguration))
+            return new ActionDescriptorFactory(Configuration, HttpConfiguration)
                 .CreateDescriptor(ActionMethod, GetRouteDescriptor());
         }
 
@@ -319,20 +318,16 @@ namespace Tests.Common
         public ParameterBinder GetParameterBinder()
         {
             return new ParameterBinder(
-                GetConfigurationContext(),
+                Configuration,
+                HttpConfiguration,
                 ActionMethod,
                 GetRouteDescriptor(),
                 ValueMappers);
         }
-
-        public ConfigurationContext GetConfigurationContext()
-        {
-            return new ConfigurationContext(Configuration, HttpConfiguration);
-        }
-
+        
         public ActionConfigurationContext GetActionConfigurationContext()
         {
-            return new ActionConfigurationContext(GetConfigurationContext(), 
+            return new ActionConfigurationContext(Configuration, HttpConfiguration, 
                 ActionMethod, GetRouteDescriptor());
         }
 

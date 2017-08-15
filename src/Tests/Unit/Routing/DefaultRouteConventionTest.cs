@@ -30,7 +30,7 @@ namespace Tests.Unit.Routing
             _urlConventions = new List<IUrlConvention> { new DefaultUrlConvention(_configuration) };
             _configuration.UrlConventions.Configure(c => c.Append<DefaultUrlConvention>());
             _routeConvention = new DefaultRouteConvention(
-                new ConfigurationContext(_configuration, null), _urlConventions,
+                _configuration, null, _urlConventions,
                 new DefaultInlineConstraintBuilder(_configuration));
         }
 

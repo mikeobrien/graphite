@@ -10,24 +10,24 @@ namespace Graphite.Actions
 {
     public class ActionMessageHandler : HttpMessageHandler
     {
-        private readonly ConfigurationContext _configurationContext;
+        private readonly Configuration _configuration;
         private readonly ActionDescriptor _actionDescriptor;
         private readonly IUnhandledExceptionHandler _exceptionHandler;
         private readonly IBehaviorChainInvoker _behaviorChainInvoker;
         private readonly Metrics _metrics;
         private readonly ActionMetrics _actionMetrics;
 
-        public ActionMessageHandler(ConfigurationContext configurationContext,
+        public ActionMessageHandler(Configuration configuration,
             ActionDescriptor actionDescriptor,
             IUnhandledExceptionHandler exceptionHandler,
             IBehaviorChainInvoker behaviorChainInvoker,
             Metrics metrics)
         {
+            _configuration = configuration;
             _actionDescriptor = actionDescriptor;
             _exceptionHandler = exceptionHandler;
             _behaviorChainInvoker = behaviorChainInvoker;
             _metrics = metrics;
-            _configurationContext = configurationContext;
             _actionMetrics = metrics.AddAction(_actionDescriptor);
         }
 
@@ -49,7 +49,7 @@ namespace Graphite.Actions
             finally
             {
                 stopwatch.Stop();
-                if (_configurationContext.Configuration.Metrics)
+                if (_configuration.Metrics)
                 {
                     _metrics.IncrementRequests();
                     _actionMetrics.AddRequestTime(stopwatch.Elapsed);

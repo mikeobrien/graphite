@@ -54,12 +54,12 @@ namespace Tests.Unit.Cors
         [Test]
         public void Should_append_policy_source_plugin()
         {
-            var getActionContext = new ActionConfigurationContext(null, 
-                ActionMethod.From<Handler>(x => x.Get()), null);
+            var getActionContext = new ActionConfigurationContext(null,
+                null, ActionMethod.From<Handler>(x => x.Get()), null);
             var postActionContext = new ActionConfigurationContext(null,
-                ActionMethod.From<Handler>(x => x.Post()), null);
+                null, ActionMethod.From<Handler>(x => x.Post()), null);
             var overrideActionContext = new ActionConfigurationContext(null,
-                ActionMethod.From<Handler>(x => x.Override()), null);
+                null, ActionMethod.From<Handler>(x => x.Override()), null);
             var configuration = new CorsConfiguration();
 
             CorsPolicySource.AppendPolicy(configuration.PolicySources, x => x
@@ -89,11 +89,11 @@ namespace Tests.Unit.Cors
         public void Should_prepend_policy_source_plugin()
         {
             var getActionContext = new ActionConfigurationContext(null,
-                ActionMethod.From<Handler>(x => x.Get()), null);
+                null, ActionMethod.From<Handler>(x => x.Get()), null);
             var postActionContext = new ActionConfigurationContext(null,
-                ActionMethod.From<Handler>(x => x.Post()), null);
+                null, ActionMethod.From<Handler>(x => x.Post()), null);
             var overrideActionContext = new ActionConfigurationContext(null,
-                ActionMethod.From<Handler>(x => x.Override()), null);
+                null, ActionMethod.From<Handler>(x => x.Override()), null);
             var configuration = new CorsConfiguration();
 
             CorsPolicySource.PrependPolicy(configuration.PolicySources, x => x

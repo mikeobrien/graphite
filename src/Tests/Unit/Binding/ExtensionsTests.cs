@@ -16,13 +16,11 @@ namespace Tests.Unit.Binding
     public class ExtensionsTests
     {
         private Configuration _configuration;
-        private ConfigurationContext _configurationContext;
 
         [SetUp]
         public void Setup()
         {
             _configuration = new Configuration();
-            _configurationContext = new ConfigurationContext(_configuration, null);
         }
 
         [Test]
@@ -38,7 +36,7 @@ namespace Tests.Unit.Binding
                 .Append<TestValueMapper1>()
                 .Append<TestValueMapper2>());
 
-            var result = mappers.Map(null, null, null, new object[] { "value" }, _configurationContext);
+            var result = mappers.Map(null, null, null, new object[] { "value" }, _configuration, null);
 
             result.Mapped.ShouldBeTrue();
             result.Value.ShouldEqual("value2");
@@ -57,7 +55,7 @@ namespace Tests.Unit.Binding
                 .Append<TestValueMapper1>(x => false)
                 .Append<TestValueMapper2>(x => true));
 
-            var result = mappers.Map(null, null, null, new object[] { "value" }, _configurationContext);
+            var result = mappers.Map(null, null, null, new object[] { "value" }, _configuration, null);
 
             result.Mapped.ShouldBeTrue();
             result.Value.ShouldEqual("value2");
@@ -76,7 +74,7 @@ namespace Tests.Unit.Binding
                 .Append<TestValueMapper1>(x => false)
                 .Append<TestValueMapper2>(x => false, true));
 
-            var result = mappers.Map(null, null, null, new object[] { "value" }, _configurationContext);
+            var result = mappers.Map(null, null, null, new object[] { "value" }, _configuration, null);
 
             result.Mapped.ShouldBeTrue();
             result.Value.ShouldEqual("value2");
@@ -90,7 +88,7 @@ namespace Tests.Unit.Binding
                 new TestValueMapper { MapFunc = c => $"{c.Values.First()}1", AppliesToFunc = c => false }
             };
 
-            var result = mappers.Map(null, null, null, new object[] { "value" }, _configurationContext);
+            var result = mappers.Map(null, null, null, new object[] { "value" }, _configuration, null);
 
             result.Mapped.ShouldBeFalse();
             result.Value.ShouldBeNull();
@@ -109,7 +107,7 @@ namespace Tests.Unit.Binding
                 .Append<TestValueMapper1>(x => false)
                 .Append<TestValueMapper2>(x => true));
 
-            var result = mappers.Map(null, null, null, new object[] { "value" }, _configurationContext);
+            var result = mappers.Map(null, null, null, new object[] { "value" }, _configuration, null);
 
             result.Mapped.ShouldBeTrue();
             result.Value.ShouldEqual("value2");

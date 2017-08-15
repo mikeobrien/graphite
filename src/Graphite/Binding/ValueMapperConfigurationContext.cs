@@ -6,13 +6,14 @@ namespace Graphite.Binding
 {
     public class ValueMapperConfigurationContext : ValueMapperContext
     {
-        public ValueMapperConfigurationContext(ConfigurationContext configurationContext,
+        public ValueMapperConfigurationContext(Configuration configuration,
+            HttpConfiguration httpConfiguration,
             ActionMethod actionMethod, RouteDescriptor routeDescriptor, 
             ActionParameter parameter, object[] values)
             : base(parameter, values)
         {
-            Configuration = configurationContext.Configuration;
-            HttpConfiguration = configurationContext.HttpConfiguration;
+            Configuration = configuration;
+            HttpConfiguration = httpConfiguration;
             Action = actionMethod;
             Route = routeDescriptor;
         }

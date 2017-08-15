@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Web.Http;
 using Graphite.Extensibility;
-using Graphite.Extensions;
 using Graphite.Linq;
 using Graphite.Reflection;
 
@@ -10,10 +10,11 @@ namespace Graphite.Actions
     {
         public static IEnumerable<IActionDecorator> ThatApplyTo(
             this IEnumerable<IActionDecorator> actionDecorators,
-            ActionDescriptor actionDescriptor, ConfigurationContext configurationContext)
+            ActionDescriptor actionDescriptor, Configuration configuration,
+            HttpConfiguration httpConfiguration)
         {
-            return configurationContext.Configuration.ActionDecorators.ThatAppliesTo(actionDecorators,
-                new ActionConfigurationContext(configurationContext, 
+            return configuration.ActionDecorators.ThatAppliesTo(actionDecorators,
+                new ActionConfigurationContext(configuration, httpConfiguration, 
                     actionDescriptor.Action, actionDescriptor.Route), 
                 new ActionDecoratorContext(actionDescriptor));
         }

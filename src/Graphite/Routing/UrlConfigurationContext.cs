@@ -7,10 +7,11 @@ namespace Graphite.Routing
 {
     public class UrlConfigurationContext
     {
-        public UrlConfigurationContext(ConfigurationContext configurationContext, UrlContext urlContext)
+        public UrlConfigurationContext(Configuration configuration, 
+            HttpConfiguration httpConfiguration, UrlContext urlContext)
         {
-            Configuration = configurationContext.Configuration;
-            HttpConfiguration = configurationContext.HttpConfiguration;
+            Configuration = configuration;
+            HttpConfiguration = httpConfiguration;
             ActionMethod = urlContext.ActionMethod;
             HttpMethod = urlContext.HttpMethod;
             Url = urlContext.Url;

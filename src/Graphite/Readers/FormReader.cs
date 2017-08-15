@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Web.Http;
 using Graphite.Actions;
 using Graphite.Binding;
 using Graphite.Extensions;
@@ -12,20 +13,22 @@ namespace Graphite.Readers
 {
     public class FormReader : StringReaderBase
     {
+        private readonly Configuration _configuration;
+        private readonly HttpConfiguration _httpConfiguration;
         private readonly IEnumerable<IValueMapper> _mappers;
         private readonly ActionMethod _actionMethod;
         private readonly RouteDescriptor _routeDescriptor;
-        private readonly ConfigurationContext _configurationContext;
 
-        public FormReader(ConfigurationContext configurationContext,
+        public FormReader(Configuration configuration, HttpConfiguration httpConfiguration,
             ActionMethod actionMethod, RouteDescriptor routeDescriptor, 
             IEnumerable<IValueMapper> mappers, HttpRequestMessage requestMessage) 
             : base(requestMessage, MimeTypes.ApplicationFormUrlEncoded)
         {
+            _configuration = configuration;
+            _httpConfiguration = httpConfiguration;
             _mappers = mappers;
             _actionMethod = actionMethod;
             _routeDescriptor = routeDescriptor;
-            _configurationContext = configurationContext;
         }
 
         protected override object GetRequest(string data)
@@ -47,7 +50,7 @@ namespace Graphite.Readers
                 .ForEach(x =>
                 {
                     var result = _mappers.Map(_actionMethod, _routeDescriptor, 
-                        x.Parameter, x.Values, _configurationContext);
+                        x.Parameter, x.Values, _configuration, _httpConfiguration);
                     if (result.Mapped) x.Parameter.BindProperty(instance, result.Value);
                 });
 

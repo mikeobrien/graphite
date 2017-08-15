@@ -30,8 +30,8 @@ namespace Tests.Unit.Diagnostics
             var diagnosticsHandler = typeof(DiagnosticsHandler);
             var configuration = new Configuration();
             var actionSource = new DiagnosticsActionSource(
-                configuration, null, new TypeCache(), null, new ActionDescriptorFactory(
-                    configuration, new ConfigurationContext(configuration, null)));
+                configuration, null, new TypeCache(), null, 
+                    new ActionDescriptorFactory(configuration, null));
 
             var actions = actionSource.GetActions();
 

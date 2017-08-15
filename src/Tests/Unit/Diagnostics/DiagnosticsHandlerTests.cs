@@ -4,7 +4,6 @@ using System.Linq;
 using Graphite;
 using Graphite.Actions;
 using Graphite.Diagnostics;
-using Graphite.Extensions;
 using Graphite.Linq;
 using Graphite.Monitoring;
 using Graphite.Reflection;
@@ -49,7 +48,7 @@ namespace Tests.Unit.Diagnostics
                 new TypeCache().GetTypeDescriptor(typeof(OutputModel)));
             var actionDescriptors = new List<ActionDescriptor>
             {
-                new ActionDescriptorFactory(configuration, new ConfigurationContext(configuration, null))
+                new ActionDescriptorFactory(configuration, null)
                     .CreateDescriptor(actionMethod ,routeDescriptor)
             };
             var runtimeConfiguration = new RuntimeConfiguration(actionDescriptors);

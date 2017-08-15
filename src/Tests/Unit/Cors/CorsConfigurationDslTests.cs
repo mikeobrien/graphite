@@ -107,9 +107,9 @@ namespace Tests.Unit.Cors
         public void Should_append_policy_source()
         {
             var getActionContext = new ActionConfigurationContext(null,
-                ActionMethod.From<CorsPolicySourceTests.Handler>(x => x.Get()), null);
+                null, ActionMethod.From<CorsPolicySourceTests.Handler>(x => x.Get()), null);
             var postActionContext = new ActionConfigurationContext(null,
-                ActionMethod.From<CorsPolicySourceTests.Handler>(x => x.Post()), null);
+                null, ActionMethod.From<CorsPolicySourceTests.Handler>(x => x.Post()), null);
             var configuration = new CorsConfiguration();
             var policySource = new CorsPolicySource();
 
@@ -138,9 +138,9 @@ namespace Tests.Unit.Cors
         public void Should_prepend_policy_source()
         {
             var getActionContext = new ActionConfigurationContext(null,
-                ActionMethod.From<CorsPolicySourceTests.Handler>(x => x.Get()), null);
+                null, ActionMethod.From<CorsPolicySourceTests.Handler>(x => x.Get()), null);
             var postActionContext = new ActionConfigurationContext(null,
-                ActionMethod.From<CorsPolicySourceTests.Handler>(x => x.Post()), null);
+                null, ActionMethod.From<CorsPolicySourceTests.Handler>(x => x.Post()), null);
             var configuration = new CorsConfiguration();
             var policySource = new CorsPolicySource();
 
@@ -169,9 +169,9 @@ namespace Tests.Unit.Cors
         public void Should_append_attribute_policy_source()
         {
             var getActionContext = new ActionConfigurationContext(null,
-                ActionMethod.From<CorsPolicySourceTests.Handler>(x => x.Get()), null);
+                null, ActionMethod.From<CorsPolicySourceTests.Handler>(x => x.Get()), null);
             var postActionContext = new ActionConfigurationContext(null,
-                ActionMethod.From<CorsPolicySourceTests.Handler>(x => x.Post()), null);
+                null, ActionMethod.From<CorsPolicySourceTests.Handler>(x => x.Post()), null);
             var configuration = new CorsConfiguration();
 
             new CorsConfigurationDsl(configuration)
@@ -198,9 +198,9 @@ namespace Tests.Unit.Cors
         public void Should_prepend_attribute_policy_source()
         {
             var getActionContext = new ActionConfigurationContext(null,
-                ActionMethod.From<CorsPolicySourceTests.Handler>(x => x.Get()), null);
+                null, ActionMethod.From<CorsPolicySourceTests.Handler>(x => x.Get()), null);
             var postActionContext = new ActionConfigurationContext(null,
-                ActionMethod.From<CorsPolicySourceTests.Handler>(x => x.Post()), null);
+                null, ActionMethod.From<CorsPolicySourceTests.Handler>(x => x.Post()), null);
             var configuration = new CorsConfiguration();
 
             new CorsConfigurationDsl(configuration)

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Graphite.Extensibility;
 using NUnit.Framework;
 using Should;

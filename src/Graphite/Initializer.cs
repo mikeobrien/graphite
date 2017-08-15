@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Http;
 using Graphite.Actions;
 using Graphite.DependencyInjection;
 using Graphite.Routing;
@@ -18,18 +19,20 @@ namespace Graphite
         private readonly IEnumerable<IActionSource> _actionSources;
         private readonly IContainer _container;
         private readonly IEnumerable<IActionDecorator> _actionDecorators;
-        private readonly ConfigurationContext _configurationContext;
+        private readonly Configuration _configuration;
+        private readonly HttpConfiguration _httpConfiguration;
 
         public Initializer(IHttpRouteMapper routeMapper, 
             IEnumerable<IActionSource> actionSources, IContainer container,
-            IEnumerable<IActionDecorator> actionDecorators,
-            ConfigurationContext configurationContext)
+            IEnumerable<IActionDecorator> actionDecorators, 
+            Configuration configuration, HttpConfiguration httpConfiguration)
         {
             _routeMapper = routeMapper;
             _actionSources = actionSources;
             _container = container;
             _actionDecorators = actionDecorators;
-            _configurationContext = configurationContext;
+            _configuration = configuration;
+            _httpConfiguration = httpConfiguration;
         }
 
         public void Initialize()
@@ -44,7 +47,7 @@ namespace Graphite
             if (duplicates.Any()) throw new DuplicateRouteException(duplicates);
 
             actions.ForEach(a => _actionDecorators.ThatApplyTo(a, 
-                _configurationContext).Decorate(a));
+                _configuration, _httpConfiguration).Decorate(a));
             
             _container.Register(new RuntimeConfiguration(actions));
 

@@ -5,11 +5,12 @@ namespace Graphite.Actions
 {
     public class ActionConfigurationContext
     {
-        public ActionConfigurationContext(ConfigurationContext configurationContext,
-            ActionMethod actionMethodMethod, RouteDescriptor routeDescriptorDescriptor)
+        public ActionConfigurationContext(Configuration configuration, 
+            HttpConfiguration httpConfiguration, ActionMethod actionMethodMethod, 
+            RouteDescriptor routeDescriptorDescriptor)
         {
-            Configuration = configurationContext?.Configuration;
-            HttpConfiguration = configurationContext?.HttpConfiguration;
+            Configuration = configuration;
+            HttpConfiguration = httpConfiguration;
             ActionMethod = actionMethodMethod;
             RouteDescriptor = routeDescriptorDescriptor;
         }

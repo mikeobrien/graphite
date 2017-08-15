@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Web.Http;
 using Graphite.Actions;
 using Graphite.Extensibility;
 using Graphite.Extensions;
@@ -13,14 +14,16 @@ namespace Graphite.Binding
         public static MapResult Map(this IEnumerable<IValueMapper> mappers,
             ActionMethod actionMethod, RouteDescriptor route,
             ActionParameter parameter, object[] values, 
-            ConfigurationContext configurationContext)
+            Configuration configuration, HttpConfiguration httpConfiguration)
         {
             var mapperContext = new ValueMapperContext(parameter, values);
             var mapperConfigurationcontext = new ValueMapperConfigurationContext(
-                configurationContext, actionMethod, route, parameter, values);
-            var mapper = configurationContext.Configuration.ValueMappers
+                configuration, httpConfiguration, actionMethod, route, parameter, values);
+            var mapper = configuration.ValueMappers
                 .FirstThatAppliesToOrDefault(mappers, mapperConfigurationcontext, mapperContext);
-            return mapper == null ? MapResult.NotMapped() : MapResult.WasMapped(mapper.Map(mapperContext));
+            return mapper == null 
+                ? MapResult.NotMapped() 
+                : MapResult.WasMapped(mapper.Map(mapperContext));
         }
 
         public static void BindArgument(this ActionParameter parameter, object[] arguments, object value)

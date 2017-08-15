@@ -14,19 +14,20 @@ namespace Graphite.Routing
     public class DefaultRouteConvention : IRouteConvention
     {
         private readonly Configuration _configuration;
+        private readonly HttpConfiguration _httpConfiguration;
         private readonly IEnumerable<IUrlConvention> _urlConventions;
         private readonly IInlineConstraintBuilder _constraintBuilder;
-        private readonly ConfigurationContext _configurationContext;
 
         public DefaultRouteConvention(
-            ConfigurationContext configurationContext,
+            Configuration configuration, 
+            HttpConfiguration httpConfiguration,
             IEnumerable<IUrlConvention> urlConventions,
             IInlineConstraintBuilder constraintBuilder)
         {
-            _configuration = configurationContext.Configuration;
+            _configuration = configuration;
+            _httpConfiguration = httpConfiguration;
             _urlConventions = urlConventions;
             _constraintBuilder = constraintBuilder;
-            _configurationContext = configurationContext;
         }
 
         public virtual bool AppliesTo(RouteContext context)
@@ -52,7 +53,7 @@ namespace Graphite.Routing
             var urlContext = new UrlContext(action, httpMethod, url, 
                 urlParameters, parameters, requestParameter, responseBody);
 
-            return _urlConventions.ThatApplyTo(urlContext, _configurationContext)
+            return _urlConventions.ThatApplyTo(urlContext, _configuration, _httpConfiguration)
                 .SelectMany(uc => uc.GetUrls(urlContext))
                 .Select(u => new RouteDescriptor(httpMethod, u, urlParameters,
                     parameters, requestParameter, responseBody)).ToList();

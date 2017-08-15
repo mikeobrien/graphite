@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Web.Http;
 using System.Web.Http.Routing;
 using System.Web.Http.Routing.Constraints;
 using Graphite.Actions;
@@ -15,31 +16,36 @@ namespace Graphite.Routing
     {
         public static IEnumerable<IRouteConvention> ThatApplyTo(
             this IEnumerable<IRouteConvention> routeConventions,
-            ActionMethod actionMethod, ConfigurationContext configurationContext)
+            ActionMethod actionMethod, Configuration configuration,
+            HttpConfiguration httpConfiguration)
         {
-            return configurationContext.Configuration.RouteConventions.ThatAppliesTo(routeConventions,
-                new RouteConfigurationContext(configurationContext, actionMethod), 
+            return configuration.RouteConventions
+                .ThatAppliesTo(routeConventions, new RouteConfigurationContext(
+                    configuration, httpConfiguration, actionMethod), 
                         new RouteContext(actionMethod));
         }
 
         public static IEnumerable<IUrlConvention> ThatApplyTo(
             this IEnumerable<IUrlConvention> urlConventions,
-            UrlContext urlContext, ConfigurationContext configurationContext)
+            UrlContext urlContext, Configuration configuration, 
+            HttpConfiguration httpConfiguration)
         {
-            return configurationContext.Configuration.UrlConventions.ThatAppliesTo(urlConventions, 
-                new UrlConfigurationContext(configurationContext, urlContext), urlContext);
+            return configuration.UrlConventions.ThatAppliesTo(urlConventions, 
+                new UrlConfigurationContext(configuration, httpConfiguration, 
+                    urlContext), urlContext);
         }
 
 
         public static IEnumerable<IHttpRouteDecorator> ThatApplyTo(
             this IEnumerable<IHttpRouteDecorator> routeDecorators,
             ActionDescriptor actionDescriptor,
-            HttpRouteConfiguration routeConfiguration,
-            ConfigurationContext configurationContext)
+            HttpRouteConfiguration routeConfiguration, 
+            Configuration configuration, 
+            HttpConfiguration httpConfiguration)
         {
-            return configurationContext.Configuration.HttpRouteDecorators
+            return configuration.HttpRouteDecorators
                 .ThatAppliesTo(routeDecorators,
-                    new ActionConfigurationContext(configurationContext, 
+                    new ActionConfigurationContext(configuration, httpConfiguration, 
                         actionDescriptor.Action, actionDescriptor.Route),
                     new HttpRouteDecoratorContext(routeConfiguration));
         }

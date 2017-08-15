@@ -35,7 +35,7 @@ namespace Tests.Unit.Actions
             _response = new HttpResponseMessage();
             _invoker = Substitute.For<IBehaviorChainInvoker>();
             _unhandledExceptionHandler = Substitute.For<IUnhandledExceptionHandler>();
-            _messageHandler = new ActionMessageHandler(new ConfigurationContext(_configuration, null),
+            _messageHandler = new ActionMessageHandler(_configuration,
                 _descriptor, _unhandledExceptionHandler, _invoker, new Metrics());
         }
 

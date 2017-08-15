@@ -138,9 +138,8 @@ namespace Tests.Unit.Routing
         private void Map(RequestGraph requestGraph)
         {
             requestGraph.Container.Register(Substitute.For<IBehaviorChainInvoker>());
-            new HttpRouteMapper(requestGraph.HttpConfiguration, 
-                    requestGraph.Container, new DefaultInlineConstraintResolver(), 
-                    _routeDecorators, new ConfigurationContext(requestGraph.Configuration, null))
+            new HttpRouteMapper(requestGraph.Container, new DefaultInlineConstraintResolver(), 
+                    _routeDecorators, requestGraph.Configuration, requestGraph.HttpConfiguration)
                 .Map(requestGraph.GetActionDescriptor());
         }
     }

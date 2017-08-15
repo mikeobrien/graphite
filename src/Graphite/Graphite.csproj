@@ -91,7 +91,6 @@
     <Compile Include="Binding\RequestPropertiesBinder.cs" />
     <Compile Include="Binding\HeaderBinder.cs" />
     <Compile Include="Binding\CookieBinder.cs" />
-    <Compile Include="ConfigurationContext.cs" />
     <Compile Include="DependencyInjection\TrackingContainer.cs" />
     <Compile Include="Actions\IActionDecorator.cs" />
     <Compile Include="Extensibility\ConditionalPlugins.cs" />

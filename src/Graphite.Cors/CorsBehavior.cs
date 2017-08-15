@@ -1,48 +1,46 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web.Cors;
+using System.Web.Http;
 using Graphite.Actions;
 using Graphite.Behaviors;
 using Graphite.Extensions;
 using Graphite.Http;
-using Graphite.Writers;
 
 namespace Graphite.Cors
 {
     public class CorsBehavior : BehaviorBase
     {
         private readonly Configuration _configuration;
+        private readonly HttpConfiguration _httpConfiguration;
         private readonly ICorsEngine _corsEngine;
         private readonly CorsConfiguration _corsConfiguration;
         private readonly ActionDescriptor _actionDescriptor;
         private readonly HttpRequestMessage _requestMessage;
         private readonly IEnumerable<ICorsPolicySource> _policySources;
-        private readonly ConfigurationContext _configurationContext;
 
-        public CorsBehavior(Configuration configuration, IBehaviorChain behaviorChain, 
+        public CorsBehavior(IBehaviorChain behaviorChain, 
             ICorsEngine corsEngine, CorsConfiguration corsConfiguration, 
             ActionDescriptor actionDescriptor, HttpRequestMessage requestMessage, 
-            IEnumerable<ICorsPolicySource> policySources,
-            ConfigurationContext configurationContext) : base(behaviorChain)
+            IEnumerable<ICorsPolicySource> policySources, Configuration configuration,
+            HttpConfiguration httpConfiguration) : base(behaviorChain)
         {
             _configuration = configuration;
+            _httpConfiguration = httpConfiguration;
             _corsEngine = corsEngine;
             _corsConfiguration = corsConfiguration;
             _actionDescriptor = actionDescriptor;
             _requestMessage = requestMessage;
             _policySources = policySources;
-            _configurationContext = configurationContext;
         }
 
         public override async Task<HttpResponseMessage> Invoke()
         {
             var corsRequestContext = _requestMessage.GetCorsRequestContext();
             var corsPolicy = _policySources.ThatApplies(_corsConfiguration,
-                _actionDescriptor, _configurationContext)?.CreatePolicy();
+                _actionDescriptor, _configuration, _httpConfiguration)?.CreatePolicy();
 
             if (corsPolicy == null) return await BehaviorChain.InvokeNext();
 
