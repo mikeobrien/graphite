@@ -27,6 +27,7 @@ namespace Tests.Unit.Actions
             void Params(string param1, string param2);
             Task ParamsAsync(string param1, string param2);
             string Response();
+            void NoResponse();
             HttpResponseMessage HttpResponseMessageResponse();
             Task<string> ResponseAsync();
             string ParamsAndResponse(string param);
@@ -49,7 +50,9 @@ namespace Tests.Unit.Actions
         [TestCaseSource(nameof(ActionTestCases))]
         public async Task Should_call_action(ActionMethod actionMethod)
         {
-            var requestGraph = RequestGraph.CreateFor(actionMethod);
+            var requestGraph = RequestGraph
+                .CreateFor(actionMethod)
+                .AddDefaultResponseStatus();
             var routeDescriptor = requestGraph.GetRouteDescriptor();
 
             requestGraph.AddResponseWriter1(c => c.Response.ToString().CreateTextResponse().ToTaskResult());
@@ -79,7 +82,8 @@ namespace Tests.Unit.Actions
                 var responseText = await response.Content.ReadAsStringAsync();
                 responseText.ShouldEqual("response");
             }
-            else response.StatusCode.ShouldEqual(HttpStatusCode.NoContent);
+            else response.StatusCode.ShouldEqual(requestGraph
+                .Configuration.DefaultNoResponseStatusCode);
         }
 
         private static Task SetArguments(ActionMethod actionMethod, 
@@ -92,7 +96,9 @@ namespace Tests.Unit.Actions
         [Test]
         public async Task Should_not_run_binders_where_instance_does_not_apply()
         {
-            var requestGraph = RequestGraph.CreateFor<IHandler>(x => x.Params(null, null));
+            var requestGraph = RequestGraph
+                .CreateFor<IHandler>(x => x.Params(null, null))
+                .AddDefaultResponseStatus();
 
             requestGraph.AddRequestBinder1(c => SetArguments(requestGraph.ActionMethod,
                 c, (a, p) => a[0] = "binder1"));
@@ -121,7 +127,9 @@ namespace Tests.Unit.Actions
         [Test]
         public async Task Should_not_run_binders_that_do_not_apply_in_configuration()
         {
-            var requestGraph = RequestGraph.CreateFor<IHandler>(x => x.Params(null, null));
+            var requestGraph = RequestGraph
+                .CreateFor<IHandler>(x => x.Params(null, null))
+                .AddDefaultResponseStatus();
 
             requestGraph.AddRequestBinder1(c => SetArguments(requestGraph.ActionMethod,
                 c, (a, p) => a[0] = "binder1"));
@@ -149,7 +157,9 @@ namespace Tests.Unit.Actions
         [Test]
         public async Task Should_use_first_writer_that_applies()
         {
-            var requestGraph = RequestGraph.CreateFor<IHandler>(x => x.Response());
+            var requestGraph = RequestGraph
+                .CreateFor<IHandler>(x => x.Response())
+                .AddDefaultResponseStatus();
 
             requestGraph.AddResponseWriter1(x => $"{x.Response}1".CreateTextResponse()
                 .ToTaskResult(), instanceAppliesTo: x => false);
@@ -168,9 +178,60 @@ namespace Tests.Unit.Actions
         }
 
         [Test]
+        public async Task Should_set_default_response_status(
+            [Values(null, HttpStatusCode.Ambiguous)] HttpStatusCode? statusCode)
+        {
+            var requestGraph = RequestGraph
+                .CreateFor<IHandler>(x => x.Response())
+                .AddDefaultResponseStatus();
+            var responseMessage = requestGraph.GetHttpResponseMessage();
+
+            if (statusCode.HasValue) requestGraph.Configuration
+                .DefaultResponseStatusCode = statusCode.Value;
+
+            requestGraph.AddResponseWriter1(x => responseMessage.ToTaskResult());
+
+            var invoker = CreateInvoker(requestGraph, responseMessage);
+            var handler = Substitute.For<IHandler>();
+
+            handler.Response().ReturnsForAnyArgs(x => "response");
+
+            var response = await invoker.Invoke(handler);
+
+            response.StatusCode.ShouldEqual(requestGraph
+                .Configuration.DefaultResponseStatusCode);
+        }
+
+        [Test]
+        public async Task Should_set_default_no_response_status(
+            [Values(null, HttpStatusCode.Ambiguous)] HttpStatusCode? statusCode)
+        {
+            var requestGraph = RequestGraph
+                .CreateFor<IHandler>(x => x.NoResponse())
+                .AddDefaultResponseStatus();
+
+            if (statusCode.HasValue) requestGraph.Configuration
+                .DefaultNoResponseStatusCode = statusCode.Value;
+
+            requestGraph.AddResponseWriter1(x => null);
+
+            var invoker = CreateInvoker(requestGraph);
+            var handler = Substitute.For<IHandler>();
+
+            handler.Response().ReturnsForAnyArgs(x => "response");
+
+            var response = await invoker.Invoke(handler);
+
+            response.StatusCode.ShouldEqual(requestGraph
+                .Configuration.DefaultNoResponseStatusCode);
+        }
+
+        [Test]
         public async Task Should_use_default_writer_if_set_and_no_writers_apply()
         {
-            var requestGraph = RequestGraph.CreateFor<IHandler>(x => x.Response());
+            var requestGraph = RequestGraph
+                .CreateFor<IHandler>(x => x.Response())
+                .AddDefaultResponseStatus();
             
             requestGraph.AddResponseWriter1(x => $"{x.Response}1".CreateTextResponse()
                 .ToTaskResult(), instanceAppliesTo: x => false);
@@ -184,7 +245,8 @@ namespace Tests.Unit.Actions
 
             var response = await invoker.Invoke(handler);
 
-            response.StatusCode.ShouldEqual(HttpStatusCode.OK);
+            response.StatusCode.ShouldEqual(requestGraph
+                .Configuration.DefaultResponseStatusCode);
             var responseText = await response.Content.ReadAsStringAsync();
             responseText.ShouldEqual("response2");
         }
@@ -192,7 +254,9 @@ namespace Tests.Unit.Actions
         [Test]
         public async Task Should_directly_return_http_response_message()
         {
-            var requestGraph = RequestGraph.CreateFor<IHandler>(x => x.HttpResponseMessageResponse());
+            var requestGraph = RequestGraph
+                .CreateFor<IHandler>(x => x.HttpResponseMessageResponse())
+                .AddDefaultResponseStatus();
 
             var invoker = CreateInvoker(requestGraph);
             var handler = Substitute.For<IHandler>();
@@ -207,11 +271,14 @@ namespace Tests.Unit.Actions
 
         [Test]
         public async Task Should_return_empty_response_if_no_writers_apply(
-            [Values(null, HttpStatusCode.OK)] HttpStatusCode? statusCode)
+            [Values(null, HttpStatusCode.Ambiguous)] HttpStatusCode? statusCode)
         {
-            var requestGraph = RequestGraph.CreateFor<IHandler>(x => x.Response());
+            var requestGraph = RequestGraph
+                .CreateFor<IHandler>(x => x.Response())
+                .AddDefaultResponseStatus();
 
-            if (statusCode.HasValue) requestGraph.Configuration.DefaultStatusCode = statusCode.Value;
+            if (statusCode.HasValue) requestGraph.Configuration
+                .DefaultNoWriterStatusCode = statusCode.Value;
             var invoker = CreateInvoker(requestGraph);
 
             var handler = Substitute.For<IHandler>();
@@ -219,14 +286,16 @@ namespace Tests.Unit.Actions
 
             var response = await invoker.Invoke(handler);
 
-            response.StatusCode.ShouldEqual(requestGraph.Configuration.DefaultStatusCode);
+            response.StatusCode.ShouldEqual(requestGraph
+                .Configuration.DefaultNoWriterStatusCode);
         }
 
-        private ActionInvoker CreateInvoker(RequestGraph requestGraph)
+        private ActionInvoker CreateInvoker(RequestGraph requestGraph, 
+            HttpResponseMessage responseMessage = null)
         {
-            return new ActionInvoker(requestGraph.Configuration,
-                requestGraph.GetActionDescriptor(),
+            return new ActionInvoker(requestGraph.GetActionDescriptor(),
                 requestGraph.RequestBinders, requestGraph.ResponseWriters,
+                requestGraph.ResponseStatus, responseMessage ?? 
                 requestGraph.GetHttpResponseMessage());
         }
     }

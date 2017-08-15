@@ -526,5 +526,59 @@ namespace Tests.Common
             ResponseWriters.Add(writer);
             return writer;
         }
+
+        /* ---------------- Response Status--------------- */
+
+        public ResponseStatusContext GetResponseStatusContext(ResponseState responseState)
+        {
+            return new ResponseStatusContext(GetHttpResponseMessage(), responseState);
+        }
+
+        public List<IResponseStatus> ResponseStatus { get; } = new List<IResponseStatus>();
+        public TestResponseStatus1 ResponseStatus1 { get; private set; }
+        public TestResponseStatus2 ResponseStatus2 { get; private set; }
+
+        public RequestGraph AddDefaultResponseStatus()
+        {
+            ResponseStatus.Add(new DefaultResponseStatus(Configuration, ActionMethod));
+            return this;
+        }
+
+        public RequestGraph AddResponseStatus1(Action<ResponseStatusContext> setStatus,
+            Func<ActionConfigurationContext, bool> configAppliesTo = null,
+            Func<ResponseStatusContext, bool> instanceAppliesTo = null,
+            bool @default = false)
+        {
+            if (ResponseStatus1 != null) throw new Exception("Response status 1 already added.");
+            ResponseStatus1 = AddResponseStatus<TestResponseStatus1>(setStatus,
+                configAppliesTo, instanceAppliesTo, @default);
+            return this;
+        }
+
+        public RequestGraph AddResponseStatus2(Action<ResponseStatusContext> setStatus,
+            Func<ActionConfigurationContext, bool> configAppliesTo = null,
+            Func<ResponseStatusContext, bool> instanceAppliesTo = null,
+            bool @default = false)
+        {
+            if (ResponseStatus2 != null) throw new Exception("Response status 2 already added.");
+            ResponseStatus2 = AddResponseStatus<TestResponseStatus2>(setStatus,
+                configAppliesTo, instanceAppliesTo, @default);
+            return this;
+        }
+
+        private T AddResponseStatus<T>(Action<ResponseStatusContext> setStatus,
+            Func<ActionConfigurationContext, bool> configAppliesTo,
+            Func<ResponseStatusContext, bool> instanceAppliesTo, bool @default)
+            where T : TestResponseStatus, new()
+        {
+            Configuration.ResponseStatus.Configure(x => x.Append<T>(configAppliesTo, @default));
+            var status = new T
+            {
+                AppliesToFunc = instanceAppliesTo,
+                SetStatusFunc = setStatus
+            };
+            ResponseStatus.Add(status);
+            return status;
+        }
     }
 }

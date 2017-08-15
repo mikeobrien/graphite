@@ -60,6 +60,8 @@
     <Compile Include="Actions\ActionConfigurationContext.cs" />
     <Compile Include="Actions\ActionDescriptorFactory.cs" />
     <Compile Include="Actions\ActionInvoker.cs" />
+    <Compile Include="Actions\DefaultResponseStatus.cs" />
+    <Compile Include="Actions\IResponseStatus.cs" />
     <Compile Include="Actions\IUnhandledExceptionHandler.cs" />
     <Compile Include="Actions\UnhandledExceptionHandler.cs" />
     <Compile Include="Authentication\AuthenticationBehavior.cs" />

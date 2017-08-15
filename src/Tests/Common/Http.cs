@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Sockets;
+using System.Text;
 using System.Xml.Serialization;
 using Graphite.Extensions;
 using Graphite.Http;
@@ -345,6 +347,8 @@ namespace Tests.Common
 
             var response = _httpClient.SendAsync(request).Result;
             var responseStream = response.Content.ReadAsStreamAsync().Result;
+
+            Console.WriteLine(response.ToString());
 
             if ((int)response.StatusCode >= 300)
             {

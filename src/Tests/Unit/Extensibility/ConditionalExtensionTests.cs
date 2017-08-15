@@ -105,7 +105,7 @@ namespace Tests.Unit.Extensibility
         }
 
         [Test]
-        public void Should_return_default_instances_if_non_apply_to_instance_context()
+        public void Should_return_default_instances_if_none_apply_to_instance_context()
         {
             var plugin1 = new ContextConditionalPlugin3 { DoesApplyTo = x => x.Value == 2 };
             var plugin2 = new ContextConditionalPlugin2 { DoesApplyTo = x => x.Value == 2 };
@@ -121,6 +121,46 @@ namespace Tests.Unit.Extensibility
             var apply = plugins.ThatApplyToOrDefault(instances, context).ToList();
 
             apply.ShouldOnlyContain(plugin2);
+        }
+
+        [Test]
+        public void Should_return_first_instance_that_applies_to_instance_context()
+        {
+            var plugin1 = new ContextConditionalPlugin3 { DoesApplyTo = x => x.Value == 2 };
+            var plugin2 = new ContextConditionalPlugin2 { DoesApplyTo = x => x.Value == 1 };
+            var plugin3 = new ContextConditionalPlugin3 { DoesApplyTo = x => x.Value == 1 };
+
+            var instances = new IContextConditionalPluginType[] { plugin1, plugin3, plugin2 };
+
+            var plugins = new Plugins<IContextConditionalPluginType>(false)
+                .Configure(x => x
+                    .Append<ContextConditionalPlugin1>()
+                    .Append<ContextConditionalPlugin2>()
+                    .Append<ContextConditionalPlugin3>());
+
+            var context = new InstanceContext { Value = 1 };
+            var apply = plugins.ThatAppliesToOrDefault(instances, context);
+
+            apply.ShouldEqual(plugin2);
+        }
+
+        [Test]
+        public void Should_return_first_default_instances_if_none_apply_to_instance_context()
+        {
+            var plugin1 = new ContextConditionalPlugin3 { DoesApplyTo = x => x.Value == 2 };
+            var plugin2 = new ContextConditionalPlugin2 { DoesApplyTo = x => x.Value == 2 };
+
+            var instances = new IContextConditionalPluginType[] { plugin1, plugin2 };
+
+            var plugins = new Plugins<IContextConditionalPluginType>(false)
+                .Configure(x => x
+                    .Append<ContextConditionalPlugin1>()
+                    .Append<ContextConditionalPlugin2>(@default: true));
+
+            var context = new InstanceContext { Value = 1 };
+            var apply = plugins.ThatAppliesToOrDefault(instances, context);
+
+            apply.ShouldEqual(plugin2);
         }
 
         // Plugin context only

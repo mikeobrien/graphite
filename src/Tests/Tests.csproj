@@ -96,6 +96,7 @@
     <Compile Include="Common\Fakes\TestActionDescriptor.cs" />
     <Compile Include="Common\Fakes\TestAutenticator.cs" />
     <Compile Include="Common\Fakes\TestBehaviors.cs" />
+    <Compile Include="Common\Fakes\TestResponseStatus.cs" />
     <Compile Include="Common\Fakes\TestValueMapper.cs" />
     <Compile Include="Common\Fakes\TestRequestReader.cs" />
     <Compile Include="Common\Fakes\TestRequestBinder.cs" />
@@ -226,6 +227,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

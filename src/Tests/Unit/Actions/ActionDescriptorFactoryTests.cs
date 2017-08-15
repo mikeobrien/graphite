@@ -163,6 +163,37 @@ namespace Tests.Unit.Actions
         }
 
         [Test]
+        public void Should_only_configure_matching_response_statuses_on_action(
+            [Values(true, false)] bool applies)
+        {
+            _requestGraph.Configuration
+                .ResponseStatus.Configure(c => c.Clear()
+                    .Append<TestResponseStatus1>(x => applies)
+                    .Append<TestResponseStatus2>());
+
+            var descriptor = _actionDescriptorFactory
+                .CreateDescriptor(_requestGraph.ActionMethod,
+                    _requestGraph.GetRouteDescriptor());
+
+            var statuses = descriptor.ResponseStatus;
+
+            if (applies)
+            {
+                statuses.Count().ShouldEqual(2);
+                statuses.ShouldOnlyContain(
+                    Plugin<IResponseStatus>.Create<TestResponseStatus1>(),
+                    Plugin<IResponseStatus>.Create<TestResponseStatus2>());
+            }
+            else
+            {
+                statuses = descriptor.ResponseStatus;
+                statuses.Count().ShouldEqual(1);
+                statuses.ShouldOnlyContain(
+                    Plugin<IResponseStatus>.Create<TestResponseStatus2>());
+            }
+        }
+
+        [Test]
         public void Should_only_configure_matching_behaviors_on_action(
             [Values(true, false)] bool applies)
         {

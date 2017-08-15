@@ -5,30 +5,29 @@ using System.Threading.Tasks;
 using Graphite.Binding;
 using Graphite.Extensibility;
 using Graphite.Extensions;
-using Graphite.Routing;
 using Graphite.Writers;
 
 namespace Graphite.Actions
 {
     public class ActionInvoker : IActionInvoker
     {
-        private readonly Configuration _configuration;
         private readonly IEnumerable<IRequestBinder> _requestBinders;
         private readonly IEnumerable<IResponseWriter> _writers;
+        private readonly IEnumerable<IResponseStatus> _responseStatus;
         private readonly HttpResponseMessage _responseMessage;
         private readonly ActionDescriptor _actionDescriptor;
 
         public ActionInvoker(
-            Configuration configuration,
             ActionDescriptor actionDescriptor,
             IEnumerable<IRequestBinder> requestBinders, 
             IEnumerable<IResponseWriter> writers,
+            IEnumerable<IResponseStatus> responseStatus,
             HttpResponseMessage responseMessage)
         {
             _actionDescriptor = actionDescriptor;
-            _configuration = configuration;
             _requestBinders = requestBinders;
             _writers = writers;
+            _responseStatus = responseStatus;
             _responseMessage = responseMessage;
         }
 
@@ -54,10 +53,15 @@ namespace Graphite.Actions
             if (_actionDescriptor.Route.HasResponse)
             {
                 var writer = _writers.ThatApply(response, _actionDescriptor).FirstOrDefault();
-                if (writer != null) return await writer.Write(response);
+                if (writer != null)
+                {
+                    _responseMessage.SetStatus(_responseStatus, _actionDescriptor, ResponseState.Response);
+                    return await writer.Write(response);
+                }
+                _responseMessage.SetStatus(_responseStatus, _actionDescriptor, ResponseState.NoWriter);
             }
+            else _responseMessage.SetStatus(_responseStatus, _actionDescriptor, ResponseState.NoResponse);
 
-            _responseMessage.StatusCode = _configuration.DefaultStatusCode;
             return _responseMessage;
         }
     }

@@ -142,6 +142,10 @@ namespace Tests.Unit
             responseWriters[4].ShouldBeType<JsonWriter>();
             responseWriters[5].ShouldBeType<XmlWriter>();
 
+            var responseStatus = container.GetInstances<IResponseStatus>().ToList();
+            responseStatus.Count.ShouldEqual(1);
+            responseStatus[0].ShouldBeType<DefaultResponseStatus>();
+
             container.GetInstance<IContainer>().ShouldBeType<TrackingContainer>();
             container.GetInstance<Configuration>().ShouldEqual(configuration);
             container.GetInstance<IRouteConvention>().ShouldBeType<DefaultRouteConvention>();

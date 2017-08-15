@@ -174,7 +174,7 @@ namespace Tests.Unit
         {
             var descriptor = new ActionDescriptor(ActionMethod.From<Handler>(x => x.Get()),
                 new RouteDescriptor("GET", route, null, null, null, null), 
-                null, null, null, null, null);
+                null, null, null, null, null, null);
             actions.Add(descriptor);
             return descriptor;
         }

@@ -307,11 +307,46 @@ namespace Graphite
         }
 
         /// <summary>
-        /// Specifies the default status code, the default is 204 (no content).
+        /// Specifies the default response status code and text.
         /// </summary>
-        public ConfigurationDsl WithDefaultStatusCode(HttpStatusCode statusCode)
+        public ConfigurationDsl WithDefaultResponseStatus(
+            HttpStatusCode statusCode, string statusText = null)
         {
-            _configuration.DefaultStatusCode = statusCode;
+            _configuration.DefaultResponseStatusCode = statusCode;
+            if (statusText.IsNotNullOrEmpty())
+                _configuration.DefaultResponseStatusText = statusText;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the default no response status code and text.
+        /// </summary>
+        public ConfigurationDsl WithDefaultNoResponseStatus(
+            HttpStatusCode statusCode, string statusText = null)
+        {
+            _configuration.DefaultNoResponseStatusCode = statusCode;
+            if (statusText.IsNotNullOrEmpty())
+                _configuration.DefaultNoResponseStatusText = statusText;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the default status code when no writer applies.
+        /// </summary>
+        public ConfigurationDsl WithDefaultNoWriterStatus(HttpStatusCode statusCode)
+        {
+            _configuration.DefaultNoWriterStatusCode = statusCode;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the default status code and text when no writer applies.
+        /// </summary>
+        public ConfigurationDsl WithDefaultNoWriterStatus(
+            HttpStatusCode statusCode, string statusText)
+        {
+            _configuration.DefaultNoWriterStatusCode = statusCode;
+            _configuration.DefaultNoWriterStatusText = statusText;
             return this;
         }
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Web.Http;
 using Graphite.Extensibility;
 using Graphite.Linq;
@@ -8,6 +9,17 @@ namespace Graphite.Actions
 {
     public static class Extensions
     {
+        public static void SetStatus(
+            this HttpResponseMessage responseMessage,
+            IEnumerable<IResponseStatus> instances,
+            ActionDescriptor actionDescriptor, 
+            ResponseState responseState)
+        {
+            var context = new ResponseStatusContext(responseMessage, responseState);
+            actionDescriptor.ResponseStatus.ThatAppliesToOrDefault(
+                instances, context)?.SetStatus(context);
+        }
+
         public static IEnumerable<IActionDecorator> ThatApplyTo(
             this IEnumerable<IActionDecorator> actionDecorators,
             ActionDescriptor actionDescriptor, Configuration configuration,

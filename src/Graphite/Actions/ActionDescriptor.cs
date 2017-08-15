@@ -17,7 +17,8 @@ namespace Graphite.Actions
             Plugins<IAuthenticator> authenticators, 
             Plugins<IRequestBinder> requestBinders, 
             Plugins<IRequestReader> requestReaders, 
-            Plugins<IResponseWriter> responseWriters, 
+            Plugins<IResponseWriter> responseWriters,
+            Plugins<IResponseStatus> responseStatus,
             Plugins<IBehavior> behaviors)
         {
             Action = action;
@@ -26,6 +27,7 @@ namespace Graphite.Actions
             RequestBinders = requestBinders;
             RequestReaders = requestReaders;
             ResponseWriters = responseWriters;
+            ResponseStatus = responseStatus;
             Behaviors = behaviors;
             Registry = new Registry();
         }
@@ -38,6 +40,7 @@ namespace Graphite.Actions
         public Plugins<IRequestBinder> RequestBinders { get; }
         public Plugins<IRequestReader> RequestReaders { get; } 
         public Plugins<IResponseWriter> ResponseWriters { get; }
+        public Plugins<IResponseStatus> ResponseStatus { get; }
         public Plugins<IBehavior> Behaviors { get; }
 
         public override int GetHashCode()

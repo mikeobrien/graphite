@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Graphite.Actions;
 using Graphite.Extensions;
 
 namespace TestHarness.Action
@@ -32,6 +33,14 @@ namespace TestHarness.Action
         public HttpResponseMessage GetException()
         {
             throw new Exception("fark");
+        }
+
+        public void PostNoResponse() { }
+
+        [ResponseStatus(HttpStatusCode.Created, "farker")]
+        public string GetCustomStatus()
+        {
+            return "fark";
         }
     }
 }

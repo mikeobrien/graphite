@@ -41,7 +41,14 @@ namespace Graphite
         public bool Diagnostics { get; set; }
         public bool Metrics { get; set; } = true;
         public Func<HttpRequestMessage, bool> ReturnErrorMessage { get; set; } = x => false;
-        public HttpStatusCode DefaultStatusCode = HttpStatusCode.NoContent;
+
+        public HttpStatusCode DefaultResponseStatusCode { get; set; } = HttpStatusCode.OK;
+        public string DefaultResponseStatusText { get; set; }
+        public HttpStatusCode DefaultNoResponseStatusCode { get; set; } = HttpStatusCode.NoContent;
+        public string DefaultNoResponseStatusText { get; set; }
+        public HttpStatusCode DefaultNoWriterStatusCode { get; set; } = HttpStatusCode.BadRequest;
+        public string DefaultNoWriterStatusText { get; set; } = "Requested format not supported.";
+
         public string UnhandledExceptionStatusText { get; set; } =
             "There was a problem processing your request.";
         public bool DefaultErrorHandlerEnabled { get; set; } = true;
@@ -210,6 +217,11 @@ namespace Graphite
                 .Append<ByteWriter>()
                 .Append<JsonWriter>()
                 .Append<XmlWriter>());
+
+        public ConditionalPlugins<IResponseStatus, ActionConfigurationContext> ResponseStatus { get; } =
+            new ConditionalPlugins<IResponseStatus, ActionConfigurationContext>(false)
+                .Configure(x => x
+                    .Append<DefaultResponseStatus>(@default: true));
 
         public ConditionalPlugins<IBehavior, ActionConfigurationContext> Behaviors { get; } = 
             new ConditionalPlugins<IBehavior, ActionConfigurationContext>(false)

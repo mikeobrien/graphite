@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Graphite.Extensions;
 using Graphite.Linq;
 
 namespace Graphite.Extensibility
@@ -13,6 +12,13 @@ namespace Graphite.Extensibility
             where TPlugin : IConditional<TContext>
         {
             return plugins.ThatApplyOrDefault(instances, plugins.ThatApplyTo(instances, context));
+        }
+
+        public static TPlugin ThatAppliesToOrDefault<TPlugin, TContext>(
+            this Plugins<TPlugin> plugins, IEnumerable<TPlugin> instances, TContext context)
+            where TPlugin : IConditional<TContext>
+        {
+            return plugins.ThatApplyToOrDefault(instances, context).FirstOrDefault();
         }
 
         public static IEnumerable<TPlugin> ThatApplyOrDefault<TPlugin>(
@@ -53,10 +59,6 @@ namespace Graphite.Extensibility
                 .Where(x => predicate.Invoke(x.Instance))
                 .Select(x => x.Instance).ToList();
         }
-
-
-
-
 
         public static IEnumerable<TPlugin> ThatApply<TPlugin, TPluginContext>(
             this ConditionalPlugins<TPlugin, TPluginContext> plugins,

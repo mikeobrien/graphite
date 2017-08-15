@@ -192,7 +192,7 @@ namespace Tests.Unit.Cors
 
             var applies = sources.ThatApplies(corsConfiguration, new ActionDescriptor(
                 ActionMethod.From<Handler>(x => x.Post()), null, 
-                    null, null, null, null, null), null, null);
+                    null, null, null, null, null, null), null, null);
 
             applies.ShouldEqual(policy2);
         }
