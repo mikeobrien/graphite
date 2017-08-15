@@ -34,7 +34,7 @@ namespace Tests.Unit.Cors
         [Test]
         public void Should_register_cors_configuration()
         {
-            _dsl.ConfigureCors(x => x.WithEngine<SomeEngine>());
+            _dsl.EnableCors(x => x.WithEngine<SomeEngine>());
 
             Should_be_instance_registration<CorsConfiguration, CorsConfiguration>();
         }
@@ -42,7 +42,7 @@ namespace Tests.Unit.Cors
         [Test]
         public void Should_register_cors_engine_type()
         {
-            _dsl.ConfigureCors(x => x.WithEngine<SomeEngine>());
+            _dsl.EnableCors(x => x.WithEngine<SomeEngine>());
 
             Should_have_type_registration<ICorsEngine, SomeEngine>(true);
         }
@@ -52,7 +52,7 @@ namespace Tests.Unit.Cors
         {
             var corsEngine = new SomeEngine();
 
-            _dsl.ConfigureCors(x => x.WithEngine(corsEngine));
+            _dsl.EnableCors(x => x.WithEngine(corsEngine));
 
             Should_be_instance_registration<ICorsEngine, SomeEngine>(corsEngine);
         }
@@ -83,7 +83,7 @@ namespace Tests.Unit.Cors
             var getAction = ActionMethod.From<Handler>(x => x.Get());
             var postAction = ActionMethod.From<Handler>(x => x.Post());
 
-            _dsl.ConfigureCors(x => x.AppendAttributePolicySource(
+            _dsl.EnableCors(x => x.AppendAttributePolicySource(
                 p => p.ActionMethod.Name == "Post"));
 
             var policySources = GetCorsConfig().PolicySources.ToList();
@@ -127,7 +127,7 @@ namespace Tests.Unit.Cors
             var getAction = ActionMethod.From<Handler>(x => x.Get());
             var postAction = ActionMethod.From<Handler>(x => x.Post());
 
-            _dsl.ConfigureCors(x => x.AppendAttributePolicySource(
+            _dsl.EnableCors(x => x.AppendAttributePolicySource(
                 p => p.ActionMethod.Name == "Post"));
 
             _configuration.Behaviors.Count().ShouldEqual(2);
@@ -150,7 +150,7 @@ namespace Tests.Unit.Cors
             var getAction = ActionMethod.From<Handler>(x => x.Get());
             var postAction = ActionMethod.From<Handler>(x => x.Post());
 
-            _dsl.ConfigureCors(x => x.AppendAttributePolicySource(
+            _dsl.EnableCors(x => x.AppendAttributePolicySource(
                 p => p.ActionMethod.Name == "Post"));
 
             _configuration.HttpRouteDecorators.Count().ShouldEqual(1);

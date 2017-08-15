@@ -44,7 +44,7 @@ namespace TestHarness
                     .Append<AuthenticationBehavior>(a => a.ActionMethod.Name.EndsWith("Secure"))
                     .Append<Behavior1>()
                     .Append<Behavior2>())
-                .ConfigureCors(x => x
+                .EnableCors(x => x
                     .AppendPolicy(p => p
                         .AllowOrigins("http://fark.com")
                         .AllowAnyMethod()

@@ -14,7 +14,7 @@ namespace Graphite.Cors
 {
     public static class Extensions
     {
-        public static ConfigurationDsl ConfigureCors(
+        public static ConfigurationDsl EnableCors(
             this ConfigurationDsl configuration, Action<CorsConfigurationDsl> configure = null)
         {
             var corsConfiguration = new CorsConfiguration();
