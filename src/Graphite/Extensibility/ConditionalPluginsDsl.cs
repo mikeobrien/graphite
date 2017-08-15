@@ -63,28 +63,53 @@ namespace Graphite.Extensibility
                 _defaultPredicate = defaultPredicate;
             }
 
-            public ConditionalPluginsDsl<TPlugin, TContext> With<TReplacement>(
+            public ConditionalPluginsDsl<TPlugin, TContext> WithOrPrepend<TReplacement>(
                 Func<TContext, bool> predicate = null, bool @default = false)
                 where TReplacement : TPlugin
             {
-                return With(ConditionalPlugin<TPlugin, TContext>
+                return WithOrPrepend(ConditionalPlugin<TPlugin, TContext>
+                    .Create<TReplacement>(predicate ?? _defaultPredicate,
+                        _plugins.Singleton), @default);
+            }
+
+            public ConditionalPluginsDsl<TPlugin, TContext> WithOrPrepend<TReplacement>(
+                TReplacement instance, Func<TContext, bool> predicate = null,
+                bool dispose = false, bool @default = false)
+                where TReplacement : TPlugin
+            {
+                return WithOrPrepend(ConditionalPlugin<TPlugin, TContext>
+                    .Create(instance, predicate ?? _defaultPredicate, dispose), @default);
+            }
+
+            private ConditionalPluginsDsl<TPlugin, TContext> WithOrPrepend(
+                ConditionalPlugin<TPlugin, TContext> plugin, bool @default = false)
+            {
+                _plugins.ReplaceAllOfTypeWithOrPrepend<TReplace>(plugin, @default);
+                return _dsl;
+            }
+
+            public ConditionalPluginsDsl<TPlugin, TContext> WithOrAppend<TReplacement>(
+                Func<TContext, bool> predicate = null, bool @default = false)
+                where TReplacement : TPlugin
+            {
+                return WithOrAppend(ConditionalPlugin<TPlugin, TContext>
                     .Create<TReplacement>(predicate ?? _defaultPredicate, 
                         _plugins.Singleton), @default);
             }
 
-            public ConditionalPluginsDsl<TPlugin, TContext> With<TReplacement>(
+            public ConditionalPluginsDsl<TPlugin, TContext> WithOrAppend<TReplacement>(
                 TReplacement instance, Func<TContext, bool> predicate = null, 
                 bool dispose = false, bool @default = false)
                 where TReplacement : TPlugin
             {
-                return With(ConditionalPlugin<TPlugin, TContext>
+                return WithOrAppend(ConditionalPlugin<TPlugin, TContext>
                     .Create(instance, predicate ?? _defaultPredicate, dispose), @default);
             }
 
-            private ConditionalPluginsDsl<TPlugin, TContext> With(
+            private ConditionalPluginsDsl<TPlugin, TContext> WithOrAppend(
                 ConditionalPlugin<TPlugin, TContext> plugin, bool @default = false)
             {
-                _plugins.ReplaceAllOfTypeWith<TReplace>(plugin, @default);
+                _plugins.ReplaceAllOfTypeWithOrAppend<TReplace>(plugin, @default);
                 return _dsl;
             }
         }

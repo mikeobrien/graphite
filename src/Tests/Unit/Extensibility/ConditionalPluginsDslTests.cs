@@ -71,7 +71,7 @@ namespace Tests.Unit.Extensibility
         }
 
         [Test]
-        public void Should_replace_specified_type_with_type_plugin(
+        public void Should_replace_or_prepend_specified_type_with_type_plugin(
             [Values(true, false)] bool @default,
             [Values(true, false)] bool when)
         {
@@ -79,7 +79,7 @@ namespace Tests.Unit.Extensibility
             _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create<Plugin2>(x => false));
             _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create(new Plugin2(), x => false));
 
-            RunInScope(when, (dsl, p) => dsl.Replace<Plugin2>().With<Plugin3>(p, @default));
+            RunInScope(when, (dsl, p) => dsl.Replace<Plugin2>().WithOrPrepend<Plugin3>(p, @default));
 
             _plugins.Count().ShouldEqual(2);
             _plugins.First().Type.ShouldEqual(typeof(Plugin1));
@@ -95,7 +95,7 @@ namespace Tests.Unit.Extensibility
         }
 
         [Test]
-        public void Should_replace_specified_type_with_instance_plugin(
+        public void Should_replace_or_prepend_specified_type_with_instance_plugin(
             [Values(true, false)] bool @default,
             [Values(true, false)] bool dispose,
             [Values(true, false)] bool when)
@@ -105,7 +105,7 @@ namespace Tests.Unit.Extensibility
             _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create<Plugin2>(x => false));
             _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create(new Plugin2(), x => false));
             
-            RunInScope(when, (dsl, p) => dsl.Replace<Plugin2>().With(instance3, p, dispose, @default));
+            RunInScope(when, (dsl, p) => dsl.Replace<Plugin2>().WithOrPrepend(instance3, p, dispose, @default));
 
             _plugins.Count().ShouldEqual(2);
             _plugins.First().Type.ShouldEqual(typeof(Plugin1));
@@ -118,6 +118,57 @@ namespace Tests.Unit.Extensibility
 
             _plugins.IsDefault(ConditionalPlugin<IPluginType, Context>
                 .Create(instance3, x => false))
+                .ShouldEqual(@default);
+        }
+
+        [Test]
+        public void Should_replace_or_append_specified_type_with_type_plugin(
+            [Values(true, false)] bool @default,
+            [Values(true, false)] bool when)
+        {
+            _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create<Plugin1>(x => false));
+            _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create<Plugin2>(x => false));
+            _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create(new Plugin2(), x => false));
+
+            RunInScope(when, (dsl, p) => dsl.Replace<Plugin2>().WithOrAppend<Plugin3>(p, @default));
+
+            _plugins.Count().ShouldEqual(2);
+            _plugins.First().Type.ShouldEqual(typeof(Plugin1));
+
+            var replacement = _plugins.Second();
+            replacement.Type.ShouldEqual(typeof(Plugin3));
+            replacement.Singleton.ShouldBeTrue();
+            replacement.AppliesTo.ShouldEqual(_predicate);
+
+            _plugins.IsDefault(ConditionalPlugin<IPluginType, Context>
+                    .Create<Plugin3>(x => false))
+                .ShouldEqual(@default);
+        }
+
+        [Test]
+        public void Should_replace_or_append_specified_type_with_instance_plugin(
+            [Values(true, false)] bool @default,
+            [Values(true, false)] bool dispose,
+            [Values(true, false)] bool when)
+        {
+            var instance3 = new Plugin3();
+            _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create<Plugin1>(x => false));
+            _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create<Plugin2>(x => false));
+            _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create(new Plugin2(), x => false));
+
+            RunInScope(when, (dsl, p) => dsl.Replace<Plugin2>().WithOrAppend(instance3, p, dispose, @default));
+
+            _plugins.Count().ShouldEqual(2);
+            _plugins.First().Type.ShouldEqual(typeof(Plugin1));
+
+            var replacement = _plugins.Second();
+            replacement.Type.ShouldEqual(typeof(Plugin3));
+            replacement.Instance.ShouldEqual(instance3);
+            replacement.Dispose.ShouldEqual(dispose);
+            replacement.AppliesTo.ShouldEqual(_predicate);
+
+            _plugins.IsDefault(ConditionalPlugin<IPluginType, Context>
+                    .Create(instance3, x => false))
                 .ShouldEqual(@default);
         }
 

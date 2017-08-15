@@ -52,25 +52,47 @@
                 _plugins = plugins;
             }
 
-            public PluginsDsl<TPlugin> With<TReplacement>(bool @default = false)
+            public PluginsDsl<TPlugin> WithOrPrepend<TReplacement>(bool @default = false)
                 where TReplacement : TPlugin
             {
-                return With(Plugin<TPlugin>
+                return WithOrPrepend(Plugin<TPlugin>
                     .Create<TReplacement>(_plugins.Singleton), @default);
             }
 
-            public PluginsDsl<TPlugin> With<TReplacement>(
+            public PluginsDsl<TPlugin> WithOrPrepend<TReplacement>(
                 TReplacement instance, bool dispose = false, bool @default = false)
                 where TReplacement : TPlugin
             {
-                return With(Plugin<TPlugin>
+                return WithOrPrepend(Plugin<TPlugin>
                     .Create(instance, dispose), @default);
             }
 
-            private PluginsDsl<TPlugin> With(
+            private PluginsDsl<TPlugin> WithOrPrepend(
                 Plugin<TPlugin> plugin, bool @default = false)
             {
-                _plugins.ReplaceAllOfTypeWith<TReplace>(plugin, @default);
+                _plugins.ReplaceAllOfTypeWithOrPrepend<TReplace>(plugin, @default);
+                return _dsl;
+            }
+
+            public PluginsDsl<TPlugin> WithOrAppend<TReplacement>(bool @default = false)
+                where TReplacement : TPlugin
+            {
+                return WithOrAppend(Plugin<TPlugin>
+                    .Create<TReplacement>(_plugins.Singleton), @default);
+            }
+
+            public PluginsDsl<TPlugin> WithOrAppend<TReplacement>(
+                TReplacement instance, bool dispose = false, bool @default = false)
+                where TReplacement : TPlugin
+            {
+                return WithOrAppend(Plugin<TPlugin>
+                    .Create(instance, dispose), @default);
+            }
+
+            private PluginsDsl<TPlugin> WithOrAppend(
+                Plugin<TPlugin> plugin, bool @default = false)
+            {
+                _plugins.ReplaceAllOfTypeWithOrAppend<TReplace>(plugin, @default);
                 return _dsl;
             }
         }

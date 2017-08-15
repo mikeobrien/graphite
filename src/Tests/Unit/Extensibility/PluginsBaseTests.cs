@@ -524,7 +524,7 @@ namespace Tests.Unit.Extensibility
         }
 
         [Test]
-        public void Should_replace_all_type_plugins_of_the_specified_type(
+        public void Should_replace_all_type_plugins_of_the_specified_type_or_append(
             [Values(true, false)] bool @default)
         {
             var keep1 = Plugin<IPluginType>.Create(new Plugin2());
@@ -538,14 +538,35 @@ namespace Tests.Unit.Extensibility
             _plugins.Append(keep2);
             _plugins.Append(keep3);
 
-            _plugins.ReplaceTypePluginWith<Plugin1>(replace, @default)
+            _plugins.ReplaceTypePluginWithAppend<Plugin1>(replace, @default)
                 .ShouldOnlyContain(keep1, replace, keep2, keep3);
 
             _plugins.IsDefault(replace).ShouldEqual(@default);
         }
 
         [Test]
-        public void Should_replace_all_instance_plugins_of_the_specified_instance(
+        public void Should_replace_all_type_plugins_of_the_specified_type_or_prepend(
+            [Values(true, false)] bool @default)
+        {
+            var keep1 = Plugin<IPluginType>.Create(new Plugin2());
+            var keep2 = Plugin<IPluginType>.Create(new Plugin1());
+            var keep3 = Plugin<IPluginType>.Create<Plugin3>();
+
+            var replace = Plugin<IPluginType>.Create(new Plugin3());
+
+            _plugins.Append(keep1);
+            _plugins.Append(Plugin<IPluginType>.Create<Plugin1>());
+            _plugins.Append(keep2);
+            _plugins.Append(keep3);
+
+            _plugins.ReplaceTypePluginWithPrepend<Plugin1>(replace, @default)
+                .ShouldOnlyContain(keep1, replace, keep2, keep3);
+
+            _plugins.IsDefault(replace).ShouldEqual(@default);
+        }
+
+        [Test]
+        public void Should_replace_all_instance_plugins_of_the_specified_instance_or_append(
             [Values(true, false)] bool @default)
         {
             var keep1 = Plugin<IPluginType>.Create(new Plugin2());
@@ -560,14 +581,36 @@ namespace Tests.Unit.Extensibility
             _plugins.Append(Plugin<IPluginType>.Create(instance));
             _plugins.Append(keep3);
 
-            _plugins.ReplaceInstancePluginWith(instance, replaceWith, @default)
+            _plugins.ReplaceInstancePluginWithAppend(instance, replaceWith, @default)
                 .ShouldOnlyContain(keep1, keep2, replaceWith, keep3);
 
             _plugins.IsDefault(replaceWith).ShouldEqual(@default);
         }
 
         [Test]
-        public void Should_replace_all_of_the_specified_type_with(
+        public void Should_replace_all_instance_plugins_of_the_specified_instance_or_prepend(
+            [Values(true, false)] bool @default)
+        {
+            var keep1 = Plugin<IPluginType>.Create(new Plugin2());
+            var keep2 = Plugin<IPluginType>.Create<Plugin1>();
+            var keep3 = Plugin<IPluginType>.Create(new Plugin1());
+
+            var instance = new Plugin4();
+            var replaceWith = Plugin<IPluginType>.Create(new Plugin3());
+
+            _plugins.Append(keep1);
+            _plugins.Append(keep2);
+            _plugins.Append(Plugin<IPluginType>.Create(instance));
+            _plugins.Append(keep3);
+
+            _plugins.ReplaceInstancePluginWithPrepend(instance, replaceWith, @default)
+                .ShouldOnlyContain(keep1, keep2, replaceWith, keep3);
+
+            _plugins.IsDefault(replaceWith).ShouldEqual(@default);
+        }
+
+        [Test]
+        public void Should_replace_all_of_the_specified_type_with_or_append(
             [Values(true, false)] bool @default)
         {
             var keep1 = Plugin<IPluginType>.Create(new Plugin2());
@@ -581,14 +624,53 @@ namespace Tests.Unit.Extensibility
             _plugins.Append(keep2);
             _plugins.Append(Plugin<IPluginType>.Create(new Plugin1()));
 
-            _plugins.ReplaceAllOfTypeWith<Plugin1>(replaceWith, @default)
+            _plugins.ReplaceAllOfTypeWithOrAppend<Plugin1>(replaceWith, @default)
                 .ShouldOnlyContain(keep1, keep2, replaceWith);
 
             _plugins.IsDefault(replaceWith).ShouldEqual(@default);
         }
 
         [Test]
-        public void Should_replace_plugin(
+        public void Should_replace_all_of_the_specified_type_with_or_prepend(
+            [Values(true, false)] bool @default)
+        {
+            var keep1 = Plugin<IPluginType>.Create(new Plugin2());
+            var keep2 = Plugin<IPluginType>.Create<Plugin2>();
+
+            var replaceWith = Plugin<IPluginType>.Create(new Plugin3());
+
+            _plugins.Append(keep1);
+            _plugins.Append(Plugin<IPluginType>.Create<Plugin1>());
+            _plugins.Append(Plugin<IPluginType>.Create(new Plugin1()));
+            _plugins.Append(keep2);
+            _plugins.Append(Plugin<IPluginType>.Create(new Plugin1()));
+
+            _plugins.ReplaceAllOfTypeWithOrPrepend<Plugin1>(replaceWith, @default)
+                .ShouldOnlyContain(keep1, keep2, replaceWith);
+
+            _plugins.IsDefault(replaceWith).ShouldEqual(@default);
+        }
+
+        [Test]
+        public void Should_replace_or_append_all_of_the_specified_type_with_when_plugins_empty()
+        {
+            var replaceWith = Plugin<IPluginType>.Create(new Plugin3());
+            
+            _plugins.ReplaceAllOfTypeWithOrAppend<Plugin1>(replaceWith)
+                .ShouldOnlyContain(replaceWith);
+        }
+
+        [Test]
+        public void Should_replace_or_prepend_all_of_the_specified_type_with_when_plugins_empty()
+        {
+            var replaceWith = Plugin<IPluginType>.Create(new Plugin3());
+
+            _plugins.ReplaceAllOfTypeWithOrPrepend<Plugin1>(replaceWith)
+                .ShouldOnlyContain(replaceWith);
+        }
+
+        [Test]
+        public void Should_replace_plugin_or_append(
             [Values(true, false)] bool @default)
         {
             var keep1 = Plugin<IPluginType>.Create(new Plugin2());
@@ -601,8 +683,102 @@ namespace Tests.Unit.Extensibility
             _plugins.Append(replace);
             _plugins.Append(keep2);
 
-            _plugins.ReplaceWith(replace, replaceWith, @default)
+            _plugins.ReplaceWithOrAppend(replace, replaceWith, @default)
                 .ShouldOnlyContain(keep1, replaceWith, keep2);
+
+            _plugins.IsDefault(replaceWith).ShouldEqual(@default);
+        }
+
+        [Test]
+        public void Should_replace_plugin_or_prepend(
+            [Values(true, false)] bool @default)
+        {
+            var keep1 = Plugin<IPluginType>.Create(new Plugin2());
+            var keep2 = Plugin<IPluginType>.Create<Plugin2>();
+
+            var replace = Plugin<IPluginType>.Create<Plugin1>();
+            var replaceWith = Plugin<IPluginType>.Create(new Plugin3());
+
+            _plugins.Append(keep1);
+            _plugins.Append(replace);
+            _plugins.Append(keep2);
+
+            _plugins.ReplaceWithOrPrepend(replace, replaceWith, @default)
+                .ShouldOnlyContain(keep1, replaceWith, keep2);
+
+            _plugins.IsDefault(replaceWith).ShouldEqual(@default);
+        }
+
+        [Test]
+        public void Should_not_replace_plugin_and_append_if_not_found(
+            [Values(true, false)] bool @default)
+        {
+            var keep1 = Plugin<IPluginType>.Create(new Plugin2());
+            var keep2 = Plugin<IPluginType>.Create<Plugin2>();
+
+            var replace = Plugin<IPluginType>.Create<Plugin1>();
+            var replaceWith = Plugin<IPluginType>.Create(new Plugin3());
+
+            _plugins.Append(keep1);
+            _plugins.Append(keep2);
+
+            _plugins.ReplaceWithOrAppend(replace, replaceWith, @default)
+                .ShouldOnlyContain(keep1, keep2, replaceWith);
+
+            _plugins.IsDefault(replaceWith).ShouldEqual(@default);
+        }
+
+        [Test]
+        public void Should_not_replace_plugin_and_prepend_if_not_found(
+            [Values(true, false)] bool @default)
+        {
+            var keep1 = Plugin<IPluginType>.Create(new Plugin2());
+            var keep2 = Plugin<IPluginType>.Create<Plugin2>();
+
+            var replace = Plugin<IPluginType>.Create<Plugin1>();
+            var replaceWith = Plugin<IPluginType>.Create(new Plugin3());
+
+            _plugins.Append(keep1);
+            _plugins.Append(keep2);
+
+            _plugins.ReplaceWithOrPrepend(replace, replaceWith, @default)
+                .ShouldOnlyContain(replaceWith, keep1, keep2);
+
+            _plugins.IsDefault(replaceWith).ShouldEqual(@default);
+        }
+
+        [Test]
+        public void Should_not_replace_plugin_and_append_if_null(
+            [Values(true, false)] bool @default)
+        {
+            var keep1 = Plugin<IPluginType>.Create(new Plugin2());
+            var keep2 = Plugin<IPluginType>.Create<Plugin2>();
+            
+            var replaceWith = Plugin<IPluginType>.Create(new Plugin3());
+
+            _plugins.Append(keep1);
+            _plugins.Append(keep2);
+
+            _plugins.ReplaceWithOrAppend(null, replaceWith, @default)
+                .ShouldOnlyContain(keep1, keep2, replaceWith);
+
+            _plugins.IsDefault(replaceWith).ShouldEqual(@default);
+        }
+
+        [Test]
+        public void Should_not_replace_plugin_and_prepend_if_nnull(
+            [Values(true, false)] bool @default)
+        {
+            var keep1 = Plugin<IPluginType>.Create(new Plugin2());
+            var keep2 = Plugin<IPluginType>.Create<Plugin2>();
+            
+            var replaceWith = Plugin<IPluginType>.Create(new Plugin3());
+
+            _plugins.Append(keep1);
+            _plugins.Append(keep2);
+
+            _plugins.ReplaceWithOrPrepend(null, replaceWith, @default)
+                .ShouldOnlyContain(replaceWith, keep1, keep2);
 
             _plugins.IsDefault(replaceWith).ShouldEqual(@default);
         }

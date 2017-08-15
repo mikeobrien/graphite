@@ -67,14 +67,14 @@ namespace Tests.Unit.Extensibility
         }
 
         [Test]
-        public void Should_replace_specified_type_with_type_plugin(
+        public void Should_replace_or_prepend_specified_type_with_type_plugin(
             [Values(true, false)] bool @default)
         {
             _plugins.Append(Plugin<IPluginType>.Create<Plugin1>());
             _plugins.Append(Plugin<IPluginType>.Create<Plugin2>());
             _plugins.Append(Plugin<IPluginType>.Create(new Plugin2()));
 
-            _pluginsDsl.Replace<Plugin2>().With<Plugin3>(@default);
+            _pluginsDsl.Replace<Plugin2>().WithOrPrepend<Plugin3>(@default);
 
             _plugins.Count().ShouldEqual(2);
             _plugins.First().Type.ShouldEqual(typeof(Plugin1));
@@ -88,7 +88,7 @@ namespace Tests.Unit.Extensibility
         }
 
         [Test]
-        public void Should_replace_specified_type_with_instance_plugin(
+        public void Should_replace_or_prepend_specified_type_with_instance_plugin(
             [Values(true, false)] bool @default,
             [Values(true, false)] bool dispose)
         {
@@ -97,7 +97,52 @@ namespace Tests.Unit.Extensibility
             _plugins.Append(Plugin<IPluginType>.Create<Plugin2>());
             _plugins.Append(Plugin<IPluginType>.Create(new Plugin2()));
 
-            _pluginsDsl.Replace<Plugin2>().With(instance3, dispose, @default);
+            _pluginsDsl.Replace<Plugin2>().WithOrPrepend(instance3, dispose, @default);
+
+            _plugins.Count().ShouldEqual(2);
+            _plugins.First().Type.ShouldEqual(typeof(Plugin1));
+
+            var replacement = _plugins.Second();
+            replacement.Type.ShouldEqual(typeof(Plugin3));
+            replacement.Instance.ShouldEqual(instance3);
+            replacement.Dispose.ShouldEqual(dispose);
+
+            _plugins.IsDefault(Plugin<IPluginType>.Create(instance3))
+                .ShouldEqual(@default);
+        }
+
+        [Test]
+        public void Should_replace_or_append_specified_type_with_type_plugin(
+            [Values(true, false)] bool @default)
+        {
+            _plugins.Append(Plugin<IPluginType>.Create<Plugin1>());
+            _plugins.Append(Plugin<IPluginType>.Create<Plugin2>());
+            _plugins.Append(Plugin<IPluginType>.Create(new Plugin2()));
+
+            _pluginsDsl.Replace<Plugin2>().WithOrAppend<Plugin3>(@default);
+
+            _plugins.Count().ShouldEqual(2);
+            _plugins.First().Type.ShouldEqual(typeof(Plugin1));
+
+            var replacement = _plugins.Second();
+            replacement.Type.ShouldEqual(typeof(Plugin3));
+            replacement.Singleton.ShouldBeTrue();
+
+            _plugins.IsDefault(Plugin<IPluginType>.Create<Plugin3>())
+                .ShouldEqual(@default);
+        }
+
+        [Test]
+        public void Should_replace_or_append_specified_type_with_instance_plugin(
+            [Values(true, false)] bool @default,
+            [Values(true, false)] bool dispose)
+        {
+            var instance3 = new Plugin3();
+            _plugins.Append(Plugin<IPluginType>.Create<Plugin1>());
+            _plugins.Append(Plugin<IPluginType>.Create<Plugin2>());
+            _plugins.Append(Plugin<IPluginType>.Create(new Plugin2()));
+
+            _pluginsDsl.Replace<Plugin2>().WithOrAppend(instance3, dispose, @default);
 
             _plugins.Count().ShouldEqual(2);
             _plugins.First().Type.ShouldEqual(typeof(Plugin1));

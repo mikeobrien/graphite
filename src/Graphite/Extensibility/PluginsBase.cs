@@ -203,38 +203,82 @@ namespace Graphite.Extensibility
             return Remove(AllOfType<TConcrete>());
         }
 
-        public PluginsBase<TPlugin, T> ReplaceTypePluginWith<TReplace>(
+        public PluginsBase<TPlugin, T> ReplaceTypePluginWithPrepend<TReplace>(
             T pluging, bool @default = false)
             where TReplace : TPlugin
         {
-            return ReplaceWith(TypePluginFor<TReplace>(), pluging, @default);
+            return ReplaceWithOrPrepend(TypePluginFor<TReplace>(), pluging, @default);
         }
 
-        public PluginsBase<TPlugin, T> ReplaceInstancePluginWith(
+        public PluginsBase<TPlugin, T> ReplaceInstancePluginWithPrepend(
             object replace, T plugin, bool @default = false)
         {
-            return ReplaceWith(InstancePluginFor(replace), plugin, @default);
+            return ReplaceWithOrPrepend(InstancePluginFor(replace), plugin, @default);
         }
 
-        public PluginsBase<TPlugin, T> ReplaceAllOfTypeWith<TReplace>(
+        public PluginsBase<TPlugin, T> ReplaceAllOfTypeWithOrPrepend<TReplace>(
             T plugin, bool @default = false)
             where TReplace : TPlugin
         {
+            return ReplaceAllOfTypeWith<TReplace>(
+                r => ReplaceWithOrPrepend(r, plugin, @default));
+        }
+
+        public PluginsBase<TPlugin, T> ReplaceTypePluginWithAppend<TReplace>(
+            T pluging, bool @default = false)
+            where TReplace : TPlugin
+        {
+            return ReplaceWithOrAppend(TypePluginFor<TReplace>(), pluging, @default);
+        }
+
+        public PluginsBase<TPlugin, T> ReplaceInstancePluginWithAppend(
+            object replace, T plugin, bool @default = false)
+        {
+            return ReplaceWithOrAppend(InstancePluginFor(replace), plugin, @default);
+        }
+
+        public PluginsBase<TPlugin, T> ReplaceAllOfTypeWithOrAppend<TReplace>(
+            T plugin, bool @default = false)
+            where TReplace : TPlugin
+        {
+            return ReplaceAllOfTypeWith<TReplace>( 
+                r => ReplaceWithOrAppend(r, plugin, @default));
+        }
+
+        private PluginsBase<TPlugin, T> ReplaceAllOfTypeWith<TReplace>(Action<T> replace)
+            where TReplace : TPlugin
+        {
             var remove = AllOfType<TReplace>().ToList();
-            ReplaceWith(remove.Last(), plugin, @default);
+            replace(remove.LastOrDefault());
             Remove(remove);
             return this;
         }
 
-        public PluginsBase<TPlugin, T> ReplaceWith(
+        public PluginsBase<TPlugin, T> ReplaceWithOrPrepend(
             T replace, T plugin, bool @default = false)
+        {
+            return ReplaceWith(replace,
+                () => AppendAfterOrPrepend(plugin, replace, @default),
+                () => Prepend(plugin, @default));
+        }
+
+        public PluginsBase<TPlugin, T> ReplaceWithOrAppend(
+            T replace, T plugin, bool @default = false)
+        {
+            return ReplaceWith(replace,
+                () => AppendAfterOrAppend(plugin, replace, @default), 
+                () => Append(plugin, @default));
+        }
+
+        private PluginsBase<TPlugin, T> ReplaceWith(
+            T replace, Action add, Action defaultAction)
         {
             if (replace != null)
             {
-                AppendAfterOrAppend(plugin, replace, @default);
+                add();
                 Remove(replace);
             }
-            else Append(plugin, @default);
+            else defaultAction();
             return this;
         }
 
