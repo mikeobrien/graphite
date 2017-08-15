@@ -151,6 +151,11 @@ namespace Graphite.Reflection
             return method.DeclaringType.IsBclType();
         }
 
+        public static bool IsUnderNamespace(this Type type, string @namespace)
+        {
+            return type.Namespace == @namespace || type.Namespace.StartsWith($"{@namespace}.");
+        }
+
         public static bool IsUnderNamespace<T>(this Type type, string relativeNamespace = null)
         {
             var compareType = typeof(T);

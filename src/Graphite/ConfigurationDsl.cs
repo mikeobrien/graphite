@@ -839,6 +839,24 @@ namespace Graphite
         }
 
         /// <summary>
+        /// Allows actions with an authentication behavior but no authenticators that apply.
+        /// </summary>
+        public ConfigurationDsl AllowSecureActionsWithNoAuthenticators()
+        {
+            _configuration.FailIfNoAuthenticatorsApplyToAction = false;
+            return this;
+        }
+
+        /// <summary>
+        /// Excludes the diagnostics pages from authentication.
+        /// </summary>
+        public ConfigurationDsl ExcludeDiagnosticsFromAuthentication(string statusMessage)
+        {
+            _configuration.ExcludeDiagnosticsFromAuthentication = true;
+            return this;
+        }
+
+        /// <summary>
         /// Binds header values to action parameters.
         /// </summary>
         public ConfigurationDsl BindHeaders()

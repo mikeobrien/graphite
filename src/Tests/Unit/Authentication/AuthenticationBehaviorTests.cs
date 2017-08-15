@@ -13,6 +13,14 @@ using NUnit.Framework;
 using Should;
 using Tests.Common;
 
+namespace Graphite
+{
+    public class GraphiteHandler
+    {
+        public void Post() { }
+    }
+}
+
 namespace Tests.Unit.Authentication
 {
     [TestFixture]
@@ -46,11 +54,35 @@ namespace Tests.Unit.Authentication
         }
 
         [Test]
-        public async Task Should_thow_exception_if_no_authenticators_found()
+        public void Should_exclude_diagnostics_pages_if_configured(
+            [Values(true, false)] bool excludeDiagnostics)
+        {
+            var actionDescriptor = new ActionDescriptorFactory(_configuration, null)
+                .CreateDescriptor(ActionMethod.From<GraphiteHandler>(x => x.Post()), null);
+            var behavior = new AuthenticationBehavior(_behaviorChain, _requestMessage,
+                _responseMessage, _authenticators, _configuration, actionDescriptor);
+
+            _configuration.ExcludeDiagnosticsFromAuthentication = excludeDiagnostics;
+
+            behavior.ShouldRun().ShouldEqual(!excludeDiagnostics);
+        }
+
+        [Test]
+        public async Task Should_thow_exception_if_no_authenticators_found_and_configured()
         {
             await _behavior.Should().Throw<GraphiteException>(async x => await x.Invoke());
 
             await _behaviorChain.DidNotReceiveWithAnyArgs().InvokeNext();
+        }
+
+        [Test]
+        public async Task Should_not_thow_exception_if_no_authenticators_found_and_configured()
+        {
+            _configuration.FailIfNoAuthenticatorsApplyToAction = false;
+
+            await _behavior.Should().NotThrow(async x => await x.Invoke());
+
+            await _behaviorChain.ReceivedWithAnyArgs().InvokeNext();
         }
 
         [Test]

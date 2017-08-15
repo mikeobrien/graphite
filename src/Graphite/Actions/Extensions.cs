@@ -30,5 +30,10 @@ namespace Graphite.Actions
         {
             return actionMethod.HandlerTypeDescriptor.Type.IsUnderNamespace<T>(relativeNamespace);
         }
+
+        public static bool IsGraphiteAction(this ActionMethod actionMethod)
+        {
+            return actionMethod.HandlerTypeDescriptor.Type.IsUnderNamespace("Graphite");
+        }
     }
 }

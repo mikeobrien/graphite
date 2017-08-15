@@ -48,7 +48,9 @@ namespace Graphite
         public int DownloadBufferSize { get; set; } = 1024 * 1024;
         public bool AutomaticallyConstrainUrlParameterByType { get; set; }
         public bool DisposeResponses { get; set; }
-       
+        public bool FailIfNoAuthenticatorsApplyToAction { get; set; } = true;
+        public bool ExcludeDiagnosticsFromAuthentication { get; set; }
+
         public XmlReaderSettings XmlReaderSettings { get; } = new XmlReaderSettings();
         public XmlWriterSettings XmlWriterSettings { get; } = new XmlWriterSettings();
         public JsonSerializerSettings JsonSerializerSettings { get; } = new JsonSerializerSettings();

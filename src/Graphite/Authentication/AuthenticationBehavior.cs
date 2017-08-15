@@ -33,10 +33,21 @@ namespace Graphite.Authentication
             _actionDescriptor = actionDescriptor;
         }
 
+        public override bool ShouldRun()
+        {
+            return !_actionDescriptor.Action.IsGraphiteAction() ||
+                !_configuration.ExcludeDiagnosticsFromAuthentication;
+        }
+
         public override async Task<HttpResponseMessage> Invoke()
         {
             var authenticators = _actionDescriptor.Authenticators.ThatApply(_authenticators).ToList();
-            if (!authenticators.Any()) throw new GraphiteException("No authenticators registered.");
+            if (!authenticators.Any())
+            {
+                if (_configuration.FailIfNoAuthenticatorsApplyToAction)
+                    throw new GraphiteException("No authenticators registered.");
+                return await BehaviorChain.InvokeNext();
+            }
 
             var authorization = _requestMessage.Headers.Authorization;
             if (authorization == null) return GetUnauthorizedResponse(authenticators);
