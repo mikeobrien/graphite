@@ -81,8 +81,6 @@ namespace Tests.Acceptance
 
             result.Status.ShouldEqual(HttpStatusCode.Created);
             result.StatusText.ShouldEqual("farker");
-            // TODO: Figure out why status text is not being passed under OWIN
-            if (host == Host.IISExpress) result.StatusText.ShouldEqual("farker");
         }
     }
 }

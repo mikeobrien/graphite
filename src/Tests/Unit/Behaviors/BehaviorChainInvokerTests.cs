@@ -168,13 +168,15 @@ namespace Tests.Unit.Behaviors
                 x.For<Disposable>().Use<Disposable>();
                 x.For<Logger>().Use(log);
             });
+            var request = _requestGraph.GetHttpRequestMessage();
 
-            var response = await _invoker.Invoke(_requestGraph.GetActionDescriptor(), 
-                _requestGraph.GetHttpRequestMessage(),
-                _requestGraph.CancellationToken);
+            var response = await _invoker.Invoke(_requestGraph.GetActionDescriptor(),
+                request, _requestGraph.CancellationToken);
 
             response.StatusCode.ShouldEqual(HttpStatusCode.OK,
                 response.Content?.ReadAsStringAsync().Result);
+
+            request.DisposeRequestResources();
 
             log.ShouldContain(nameof(Disposable));
         }

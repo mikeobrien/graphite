@@ -21,13 +21,14 @@ namespace Graphite.Behaviors
         public virtual async Task<HttpResponseMessage> Invoke(ActionDescriptor actionDescriptor, 
             HttpRequestMessage requestMessage, CancellationToken cancellationToken)
         {
-            using (var container = _container.CreateScopedContainer())
-            {
-                Register(container, actionDescriptor, requestMessage, cancellationToken);
+            var container = _container.CreateScopedContainer();
 
-                return await container.GetInstance<IBehaviorChain>(
-                    _configuration.BehaviorChain).InvokeNext();
-            }
+            requestMessage.RegisterForDispose(container);
+
+            Register(container, actionDescriptor, requestMessage, cancellationToken);
+
+            return await container.GetInstance<IBehaviorChain>(
+                _configuration.BehaviorChain).InvokeNext();
         }
 
         public virtual void Register(IContainer container, ActionDescriptor actionDescriptor,
