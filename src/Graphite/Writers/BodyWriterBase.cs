@@ -46,7 +46,9 @@ namespace Graphite.Writers
 
         protected BodyWriterBase(ActionMethod actionMethod, 
             RouteDescriptor routeDescriptor, 
-            HttpResponseMessage responseMessage)
+            HttpResponseMessage responseMessage, 
+            Configuration configuration) :
+            base(configuration)
         {
             _routeDescriptor = routeDescriptor;
             _responseMessage = responseMessage;
@@ -62,7 +64,7 @@ namespace Graphite.Writers
         protected abstract HttpContent GetContent(T data, TOutputInfo outputInfo);
         protected abstract string GetContentType(T data);
 
-        public override Task<HttpResponseMessage> Write(ResponseWriterContext context)
+        public override Task<HttpResponseMessage> WriteResponse(ResponseWriterContext context)
         {
             var outputInfo = context.Response.As<TOutputInfo>() ?? 
                 _actionMethod.GetAttribute<TAttribute>();

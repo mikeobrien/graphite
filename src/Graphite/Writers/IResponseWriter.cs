@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Graphite.Extensibility;
 
@@ -23,6 +24,13 @@ namespace Graphite.Writers
 
     public abstract class ResponseWriterBase : IResponseWriter
     {
+        private readonly Configuration _configuration;
+
+        protected ResponseWriterBase(Configuration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public virtual bool IsWeighted => false;
         public virtual double Weight => 0;
 
@@ -31,6 +39,20 @@ namespace Graphite.Writers
             return true;
         }
 
-        public abstract Task<HttpResponseMessage> Write(ResponseWriterContext context);
+        public abstract Task<HttpResponseMessage> WriteResponse(
+            ResponseWriterContext context);
+
+        public Task<HttpResponseMessage> Write(ResponseWriterContext context)
+        {
+            try
+            {
+                return WriteResponse(context);
+            }
+            finally
+            {
+                if (_configuration.DisposeResponses)
+                    (context.Response as IDisposable)?.Dispose();
+            }
+        }
     }
 }

@@ -119,7 +119,8 @@ namespace Graphite.Writers
         private readonly HttpResponseMessage _responseMessage;
 
         public RedirectWriter(RouteDescriptor routeDescriptor,
-            HttpResponseMessage responseMessage)
+            HttpResponseMessage responseMessage, Configuration configuration) : 
+            base(configuration)
         {
             _routeDescriptor = routeDescriptor;
             _responseMessage = responseMessage;
@@ -133,7 +134,7 @@ namespace Graphite.Writers
             return redirect.RedirectStatus.HasValue;
         }
 
-        public override Task<HttpResponseMessage> Write(ResponseWriterContext context)
+        public override Task<HttpResponseMessage> WriteResponse(ResponseWriterContext context)
         {
             var redirect = context.Response.As<IRedirectable>();
             if (redirect.RedirectStatus.HasValue)

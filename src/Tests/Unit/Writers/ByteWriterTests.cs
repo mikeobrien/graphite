@@ -130,7 +130,8 @@ namespace Tests.Unit.Writers
             return new ByteWriter(
                 requestGraph.ActionMethod,
                 requestGraph.GetRouteDescriptor(),
-                requestGraph.GetHttpResponseMessage());
+                requestGraph.GetHttpResponseMessage(),
+                new Configuration());
         }
     }
 }

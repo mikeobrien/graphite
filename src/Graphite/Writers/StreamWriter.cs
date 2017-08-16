@@ -39,7 +39,8 @@ namespace Graphite.Writers
             ActionMethod actionMethod, 
             RouteDescriptor routeDescriptor, 
             HttpResponseMessage responseMessage) : 
-            base(actionMethod, routeDescriptor, responseMessage)
+            base(actionMethod, routeDescriptor, 
+                responseMessage, configuration)
         {
             _configuration = configuration;
         }

@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using System.Net.Http.Headers;
+using Graphite;
 using Graphite.Http;
 using Graphite.Writers;
 using NUnit.Framework;
@@ -13,8 +14,9 @@ namespace Tests.Unit.Writers
         public class DummyContentWriter : WeightedContentWriterBase
         {
             public DummyContentWriter(HttpRequestMessage requestMessage, 
-                HttpResponseMessage responseMessage, params string[] mimeTypes) : 
-                base(requestMessage, responseMessage, mimeTypes) { }
+                HttpResponseMessage responseMessage, Configuration configuration, 
+                params string[] mimeTypes) : 
+                base(requestMessage, responseMessage, configuration, mimeTypes) { }
 
             protected override HttpContent GetContent(ResponseWriterContext context)
             {
@@ -32,7 +34,8 @@ namespace Tests.Unit.Writers
             _requestMessage = new HttpRequestMessage();
             _responseMessage = new HttpResponseMessage();
             _writer = new DummyContentWriter(_requestMessage, 
-                _responseMessage, MimeTypes.ApplicationJson, MimeTypes.TextPlain);
+                _responseMessage, new Configuration(), 
+                MimeTypes.ApplicationJson, MimeTypes.TextPlain);
         }
 
         [TestCase(MimeTypes.ApplicationJson, true)]

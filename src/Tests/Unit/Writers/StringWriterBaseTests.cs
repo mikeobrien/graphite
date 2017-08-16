@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Text;
+using Graphite;
 using Graphite.Writers;
 using NUnit.Framework;
 using Should;
@@ -24,7 +25,8 @@ namespace Tests.Unit.Writers
         public class TestWriter : StringWriterBase
         {
             public TestWriter(string acceptHeader, params string[] mimeTypes) : 
-                base(CreateRequest(acceptHeader), new HttpResponseMessage(), Encoding.UTF8, mimeTypes) { }
+                base(CreateRequest(acceptHeader), new HttpResponseMessage(), 
+                    Encoding.UTF8, new Configuration(), mimeTypes) { }
 
             private static HttpRequestMessage CreateRequest(string acceptHeader)
             {

@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using Graphite;
 using Graphite.Writers;
 using NUnit.Framework;
 using Should;
@@ -111,7 +112,8 @@ namespace Tests.Unit.Writers
         {
             return new RedirectWriter(
                 requestGraph.GetRouteDescriptor(),
-                requestGraph.GetHttpResponseMessage());
+                requestGraph.GetHttpResponseMessage(),
+                new Configuration());
         }
     }
 }
