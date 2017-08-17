@@ -51,6 +51,15 @@ namespace Graphite.Setup
         }
 
         /// <summary>
+        /// Sets the exception handler.
+        /// </summary>
+        public WebApiDsl SetExceptionHandler<T>() where T : IExceptionHandler, new()
+        {
+            Configuration.Services.Replace<IExceptionHandler, T>();
+            return this;
+        }
+
+        /// <summary>
         /// Allows you to have a url that is the same as a physical path.
         /// </summary>
         public WebApiDsl RouteExistingFiles()
