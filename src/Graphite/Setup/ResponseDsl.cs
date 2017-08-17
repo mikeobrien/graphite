@@ -21,16 +21,6 @@ namespace Graphite.Setup
         }
 
         /// <summary>
-        /// Indicates that responses should be disposed 
-        /// if they implement IDisposable.
-        /// </summary>
-        public ConfigurationDsl DisposeResponses()
-        {
-            _configuration.DisposeResponses = true;
-            return this;
-        }
-
-        /// <summary>
         /// Specifies the download buffer size in bytes. The default is 1MB.
         /// </summary>
         public ConfigurationDsl WithDownloadBufferSizeOf(int length)

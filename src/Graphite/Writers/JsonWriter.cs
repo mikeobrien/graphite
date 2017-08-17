@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Graphite.Extensions;
 using Graphite.Http;
@@ -31,6 +32,8 @@ namespace Graphite.Writers
                 var jsonWriter = new JsonTextWriter(streamWriter);
                 _serializer.Serialize(jsonWriter, context.Response);
                 jsonWriter.Flush();
+                if (_configuration.DisposeSerializedObjects)
+                    context.Response.As<IDisposable>()?.Dispose();
                 return Task.CompletedTask;
             });
         }

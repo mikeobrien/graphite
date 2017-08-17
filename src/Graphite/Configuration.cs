@@ -55,7 +55,7 @@ namespace Graphite
         public int DownloadBufferSize { get; set; } = 1024 * 1024;
         public int? SerializerBufferSize { get; set; }
         public bool AutomaticallyConstrainUrlParameterByType { get; set; }
-        public bool DisposeResponses { get; set; }
+        public bool DisposeSerializedObjects { get; set; }
         public bool FailIfNoAuthenticatorsApplyToAction { get; set; } = true;
         public bool ExcludeDiagnosticsFromAuthentication { get; set; }
 

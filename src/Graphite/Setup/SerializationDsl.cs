@@ -51,6 +51,16 @@ namespace Graphite.Setup
             _configuration.SerializerBufferSize = length;
             return this;
         }
+
+        /// <summary>
+        /// Indicates that objects should be disposed after they
+        /// have been serialized, if they implement IDisposable.
+        /// </summary>
+        public SerializationDsl DisposeSerializedObjects()
+        {
+            _configuration.DisposeSerializedObjects = true;
+            return this;
+        }
     }
 
     public class XmlSerializationDsl

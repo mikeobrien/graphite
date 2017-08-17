@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
@@ -33,6 +34,8 @@ namespace Graphite.Writers
                 var writer = System.Xml.XmlWriter.Create(streamWriter, _xmlWriterSettings);
                 new XmlSerializer(context.Response.GetType())
                     .Serialize(writer, context.Response);
+                if (_configuration.DisposeSerializedObjects)
+                    context.Response.As<IDisposable>()?.Dispose();
                 return Task.CompletedTask;
             });
         }

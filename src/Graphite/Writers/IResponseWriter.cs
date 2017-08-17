@@ -44,15 +44,7 @@ namespace Graphite.Writers
 
         public Task<HttpResponseMessage> Write(ResponseWriterContext context)
         {
-            try
-            {
-                return WriteResponse(context);
-            }
-            finally
-            {
-                if (_configuration.DisposeResponses)
-                    (context.Response as IDisposable)?.Dispose();
-            }
+            return WriteResponse(context);
         }
     }
 }
