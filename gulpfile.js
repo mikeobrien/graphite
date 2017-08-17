@@ -49,7 +49,8 @@ gulp.task('test', ['build'], function () {
             teamcity: true,
             options: {
                 framework: 'net-4.5',
-                result: 'TestResults.xml'
+                result: 'TestResults.xml',
+                where: 'cat != Performance'
             }
         }));
 });

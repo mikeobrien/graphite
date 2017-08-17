@@ -105,6 +105,7 @@
     <Compile Include="Common\Fakes\TestUrlConvention.cs" />
     <Compile Include="Common\Fakes\TestResponseWriter.cs" />
     <Compile Include="Common\Logger.cs" />
+    <Compile Include="Common\PerformanceTestAttribute.cs" />
     <Compile Include="Common\PerformanceComparison.cs" />
     <Compile Include="Common\RequestGraph.cs" />
     <Compile Include="Common\TestCaseSource.cs" />

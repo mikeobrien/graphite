@@ -125,7 +125,7 @@ namespace Tests.Unit.Actions
             message.ShouldContain("Int32");
         }
 
-        [Test]
+        [Test, PerformanceTest]
         public void Should_invoke_method_faster_than_reflection()
         {
             var type = new TypeCache().GetTypeDescriptor(typeof(InvokerMethods));

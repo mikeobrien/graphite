@@ -72,7 +72,7 @@ namespace Tests.Unit.Binding
             result.CastTo<List<int>>().ShouldOnlyContain(1, 2, 3);
         }
 
-        [Test]
+        [Test, PerformanceTest]
         public void Should_set_properties_faster_than_reflection()
         {
             var mapper = new TestValueMapper();

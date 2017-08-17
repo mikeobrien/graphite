@@ -12,7 +12,7 @@ namespace Tests.Acceptance
     [TestFixture]
     public class PerformanceTests
     {
-        [Test]
+        [Test, PerformanceTest]
         [Ignore("Manually run")]
         public void Performance([Values(Host.Owin, Host.IISExpress)] Host host)
         {

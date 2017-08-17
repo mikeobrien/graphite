@@ -41,7 +41,7 @@ namespace Tests.Unit.Reflection
             else result.ShouldBeNull();
         }
 
-        [Test]
+        [Test, PerformanceTest]
         public void Should_be_faster_than_activator_create_object()
         {
             var comparison = PerformanceComparison.InTicks(10000, 1000);
@@ -73,7 +73,7 @@ namespace Tests.Unit.Reflection
             instance.Value.ShouldEqual("fark");
         }
 
-        [Test]
+        [Test, PerformanceTest]
         public void Should_be_faster_than_reflection_setting_property_value()
         {
             var comparison = PerformanceComparison.InTicks(10000, 1000);
@@ -104,7 +104,7 @@ namespace Tests.Unit.Reflection
                 .ShouldEqual("fark");
         }
 
-        [Test]
+        [Test, PerformanceTest]
         public void Should_be_faster_than_reflection_getting_property_value()
         {
             var comparison = PerformanceComparison.InTicks(10000, 1000);
