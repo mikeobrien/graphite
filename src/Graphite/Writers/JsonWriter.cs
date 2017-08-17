@@ -1,13 +1,12 @@
-﻿using System;
+﻿using System.IO;
 using System.Net.Http;
-using System.Threading.Tasks;
 using Graphite.Extensions;
 using Graphite.Http;
 using Newtonsoft.Json;
 
 namespace Graphite.Writers
 {
-    public class JsonWriter : WeightedContentWriterBase
+    public class JsonWriter : SerializerWriterBase
     {
         private readonly JsonSerializer _serializer;
         private readonly Configuration _configuration;
@@ -22,20 +21,14 @@ namespace Graphite.Writers
             _serializer = serializer;
             _configuration = configuration;
         }
-        
-        protected override HttpContent GetContent(ResponseWriterContext context)
+
+        protected override void WriteToStream(ResponseWriterContext context, Stream output)
         {
-            return new AsyncContent(output =>
-            {
-                var streamWriter = output.CreateWriter(_configuration.DefaultEncoding,
-                    _configuration.SerializerBufferSize);
-                var jsonWriter = new JsonTextWriter(streamWriter);
-                _serializer.Serialize(jsonWriter, context.Response);
-                jsonWriter.Flush();
-                if (_configuration.DisposeSerializedObjects)
-                    context.Response.As<IDisposable>()?.Dispose();
-                return Task.CompletedTask;
-            });
+            var streamWriter = output.CreateWriter(_configuration.DefaultEncoding,
+                _configuration.SerializerBufferSize);
+            var jsonWriter = new JsonTextWriter(streamWriter);
+            _serializer.Serialize(jsonWriter, context.Response);
+            jsonWriter.Flush();
         }
     }
 }

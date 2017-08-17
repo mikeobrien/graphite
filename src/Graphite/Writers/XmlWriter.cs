@@ -1,6 +1,5 @@
-﻿using System;
+﻿using System.IO;
 using System.Net.Http;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using Graphite.Extensions;
@@ -8,7 +7,7 @@ using Graphite.Http;
 
 namespace Graphite.Writers
 {
-    public class XmlWriter : WeightedContentWriterBase
+    public class XmlWriter : SerializerWriterBase
     {
         private readonly Configuration _configuration;
         private readonly XmlWriterSettings _xmlWriterSettings;
@@ -25,19 +24,13 @@ namespace Graphite.Writers
             _xmlWriterSettings = xmlWriterSettings;
         }
 
-        protected override HttpContent GetContent(ResponseWriterContext context)
+        protected override void WriteToStream(ResponseWriterContext context, Stream output)
         {
-            return new AsyncContent(output =>
-            {
-                var streamWriter = output.CreateWriter(_configuration.DefaultEncoding,
-                    _configuration.SerializerBufferSize);
-                var writer = System.Xml.XmlWriter.Create(streamWriter, _xmlWriterSettings);
-                new XmlSerializer(context.Response.GetType())
-                    .Serialize(writer, context.Response);
-                if (_configuration.DisposeSerializedObjects)
-                    context.Response.As<IDisposable>()?.Dispose();
-                return Task.CompletedTask;
-            });
+            var streamWriter = output.CreateWriter(_configuration.DefaultEncoding,
+                _configuration.SerializerBufferSize);
+            var writer = System.Xml.XmlWriter.Create(streamWriter, _xmlWriterSettings);
+            new XmlSerializer(context.Response.GetType())
+                .Serialize(writer, context.Response);
         }
     }
 }

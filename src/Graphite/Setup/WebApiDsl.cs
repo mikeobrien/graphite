@@ -42,11 +42,11 @@ namespace Graphite.Setup
         }
 
         /// <summary>
-        /// Specifies the exception handler.
+        /// Adds an exception logger.
         /// </summary>
-        public WebApiDsl SetErrorHandler<T>() where T : ExceptionHandler, new()
+        public WebApiDsl AddExceptionLogger<T>() where T : IExceptionLogger, new()
         {
-            Configuration.Services.Replace<IExceptionHandler, T>(); ;
+            Configuration.Services.Add<IExceptionLogger, T>();
             return this;
         }
 

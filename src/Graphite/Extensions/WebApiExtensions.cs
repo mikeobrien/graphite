@@ -6,9 +6,6 @@ using System.Net.Http.Headers;
 using System.Web;
 using System.Web.Http.Controllers;
 using System.Web.Http.Dependencies;
-using System.Web.Http.ExceptionHandling;
-using System.Web.Http.Hosting;
-using System.Web.Routing;
 using Graphite.Linq;
 
 namespace Graphite.Extensions
@@ -174,6 +171,12 @@ namespace Graphite.Extensions
             ServicesContainer container) where TReplacement : TService, new()
         {
             container.Replace<TService>(new TReplacement());
+        }
+
+        public static void Add<TService, TConcrete>(this
+            ServicesContainer container) where TConcrete : TService, new()
+        {
+            container.Replace<TService>(new TConcrete());
         }
     }
 }

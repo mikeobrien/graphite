@@ -181,6 +181,7 @@
     <Compile Include="Setup\ScanningDsl.cs" />
     <Compile Include="Setup\SerializationDsl.cs" />
     <Compile Include="Setup\WebApiDsl.cs" />
+    <Compile Include="Writers\SerializerWriterBase.cs" />
     <Compile Include="Writers\WeightedContentWriterBase.cs" />
     <Compile Include="Writers\BodyWriterBase.cs" />
     <Compile Include="Writers\Extensions.cs" />
