@@ -47,7 +47,7 @@ namespace Graphite.Setup
         /// <summary>
         /// Excludes the diagnostics pages from authentication.
         /// </summary>
-        public ConfigurationDsl ExcludeDiagnosticsFromAuthentication(string statusMessage)
+        public ConfigurationDsl ExcludeDiagnosticsFromAuthentication()
         {
             _configuration.ExcludeDiagnosticsFromAuthentication = true;
             return this;

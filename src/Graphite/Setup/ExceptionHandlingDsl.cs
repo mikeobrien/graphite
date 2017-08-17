@@ -32,7 +32,8 @@ namespace Graphite.Setup
         /// app and request error handling and logging. That should be done 
         /// at the app level (e.g. Global.asax) and with a behavior respectively.
         /// </summary>
-        public ConfigurationDsl WithUnhandledExceptionHandler<T>() where T : IUnhandledExceptionHandler
+        public ConfigurationDsl WithUnhandledExceptionHandler<T>() 
+            where T : IUnhandledExceptionHandler
         {
             _configuration.UnhandledExceptionHandler.Set<T>();
             return this;
@@ -44,7 +45,8 @@ namespace Graphite.Setup
         /// app and request error handling and logging. That should be done 
         /// at the app level (e.g. Global.asax) and with a behavior respectively.
         /// </summary>
-        public ConfigurationDsl WithUnhandledExceptionHandler<T>(T instance) where T : IUnhandledExceptionHandler
+        public ConfigurationDsl WithUnhandledExceptionHandler<T>(T instance) 
+            where T : IUnhandledExceptionHandler
         {
             _configuration.UnhandledExceptionHandler.Set(instance);
             return this;
@@ -65,7 +67,8 @@ namespace Graphite.Setup
         /// container configuration of unhandled exceptions
         /// when the predicate is true.
         /// </summary>
-        public ConfigurationDsl ReturnErrorMessagesWhen(Func<HttpRequestMessage, bool> predicate)
+        public ConfigurationDsl ReturnErrorMessagesWhen(
+            Func<HttpRequestMessage, bool> predicate)
         {
             _configuration.ReturnErrorMessage = predicate;
             return this;

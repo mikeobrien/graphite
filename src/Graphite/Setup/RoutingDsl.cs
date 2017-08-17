@@ -168,7 +168,8 @@ namespace Graphite.Setup
         /// <summary>
         /// Specifies the inline constraint resolver to use.
         /// </summary>
-        public ConfigurationDsl WithInlineConstraintResolver<T>() where T : IInlineConstraintResolver
+        public ConfigurationDsl WithInlineConstraintResolver<T>() 
+            where T : IInlineConstraintResolver
         {
             _configuration.InlineConstraintResolver.Set<T>();
             return this;
@@ -177,7 +178,8 @@ namespace Graphite.Setup
         /// <summary>
         /// Specifies the inline constraint resolver to use.
         /// </summary>
-        public ConfigurationDsl WithInlineConstraintResolver<T>(T instance) where T : IInlineConstraintResolver
+        public ConfigurationDsl WithInlineConstraintResolver<T>(T instance) 
+            where T : IInlineConstraintResolver
         {
             _configuration.InlineConstraintResolver.Set(instance);
             return this;
@@ -186,7 +188,8 @@ namespace Graphite.Setup
         /// <summary>
         /// Specifies the inline constraint builder to use.
         /// </summary>
-        public ConfigurationDsl WithInlineConstraintBuilder<T>() where T : IInlineConstraintBuilder
+        public ConfigurationDsl WithInlineConstraintBuilder<T>() 
+            where T : IInlineConstraintBuilder
         {
             _configuration.InlineConstraintBuilder.Set<T>();
             return this;
@@ -195,7 +198,8 @@ namespace Graphite.Setup
         /// <summary>
         /// Specifies the inline constraint builder to use.
         /// </summary>
-        public ConfigurationDsl WithInlineConstraintBuilder<T>(T instance) where T : IInlineConstraintBuilder
+        public ConfigurationDsl WithInlineConstraintBuilder<T>(T instance) 
+            where T : IInlineConstraintBuilder
         {
             _configuration.InlineConstraintBuilder.Set(instance);
             return this;
