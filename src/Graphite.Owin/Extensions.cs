@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Threading;
 using System.Web.Http;
+using Graphite.Setup;
 using Microsoft.Owin.BuilderProperties;
 using Owin;
 

@@ -52,7 +52,7 @@ namespace Graphite.Writers
         protected override HttpContent GetContent(string data, 
             IStringOutputInfo outputInfo)
         {
-            return new AsyncStringContent(data, outputInfo?.Encoding ??
+            return new AsyncContent(data, outputInfo?.Encoding ??
                 _configuration.DefaultEncoding);
         }
 

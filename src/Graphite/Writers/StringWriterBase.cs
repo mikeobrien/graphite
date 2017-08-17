@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using System.Text;
+using Graphite.Http;
 
 namespace Graphite.Writers
 {
@@ -19,7 +20,7 @@ namespace Graphite.Writers
 
         protected override HttpContent GetContent(ResponseWriterContext context)
         {
-            return new AsyncStringContent(GetResponse(context), _encoding);
+            return new AsyncContent(GetResponse(context), _encoding);
         }
     }
 }

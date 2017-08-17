@@ -6,6 +6,7 @@ using Graphite.DependencyInjection;
 using Graphite.Extensibility;
 using Graphite.Monitoring;
 using Graphite.Reflection;
+using Graphite.Setup;
 using Newtonsoft.Json;
 
 namespace Graphite

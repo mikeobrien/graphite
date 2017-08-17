@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Web.Hosting;
 using System.Web.Http;
+using Graphite.Setup;
 
 namespace Graphite.AspNet
 {

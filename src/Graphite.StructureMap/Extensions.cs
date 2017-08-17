@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Graphite.DependencyInjection;
+using Graphite.Setup;
 using StructureMap;
 using StructureMap.Configuration.DSL.Expressions;
 using StructureMap.Pipeline;
@@ -23,7 +24,8 @@ namespace Graphite.StructureMap
         {
             var container = configure == null ? new Container() : new Container(configure);
             if (isDependencyResolver)
-                configuration.ConfigureWebApi(x => x.DependencyResolver = container);
+                configuration.ConfigureWebApi(x => x.Configuration
+                    .DependencyResolver = container);
             return configuration.UseContainer(container);
         }
 
@@ -33,7 +35,8 @@ namespace Graphite.StructureMap
         {
             var graphiteContainer = new Container(container);
             if (isDependencyResolver)
-                configuration.ConfigureWebApi(x => x.DependencyResolver = graphiteContainer);
+                configuration.ConfigureWebApi(x => x.Configuration
+                    .DependencyResolver = graphiteContainer);
             return configuration.UseContainer(graphiteContainer);
         }
 

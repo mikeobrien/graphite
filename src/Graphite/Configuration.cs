@@ -53,6 +53,7 @@ namespace Graphite
             "There was a problem processing your request.";
         public bool DefaultErrorHandlerEnabled { get; set; } = true;
         public int DownloadBufferSize { get; set; } = 1024 * 1024;
+        public int? SerializerBufferSize { get; set; }
         public bool AutomaticallyConstrainUrlParameterByType { get; set; }
         public bool DisposeResponses { get; set; }
         public bool FailIfNoAuthenticatorsApplyToAction { get; set; } = true;

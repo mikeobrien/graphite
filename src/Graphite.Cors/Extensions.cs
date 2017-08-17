@@ -9,6 +9,7 @@ using Graphite.Behaviors;
 using Graphite.Extensibility;
 using Graphite.Extensions;
 using Graphite.Linq;
+using Graphite.Setup;
 
 namespace Graphite.Cors
 {

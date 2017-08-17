@@ -27,7 +27,7 @@ namespace Graphite.Writers
 
         protected override HttpContent GetContent(byte[] data, IOutputInfo outputInfo)
         {
-            return new AsyncByteContent(data);
+            return new AsyncContent(data);
         }
 
         protected override string GetContentType(byte[] data)

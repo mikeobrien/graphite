@@ -47,7 +47,7 @@ namespace Graphite.Writers
 
         protected override HttpContent GetContent(Stream data, IStreamOutputInfo outputInfo)
         {
-            return new AsyncStreamContent(data, outputInfo?.BufferSize ?? 
+            return new AsyncContent(data, outputInfo?.BufferSize ?? 
                 _configuration.DownloadBufferSize);
         }
 

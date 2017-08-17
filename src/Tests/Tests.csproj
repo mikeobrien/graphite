@@ -175,7 +175,6 @@
     <Compile Include="Unit\InitializerTests.cs" />
     <Compile Include="Unit\Owin\BootstrapTests.cs" />
     <Compile Include="Unit\Owin\RequestPropertyProviderTests.cs" />
-    <Compile Include="Unit\Writers\PushWriterBaseTests.cs" />
     <Compile Include="Unit\Writers\WeightedContentWriterBaseTests.cs" />
     <Compile Include="Unit\Writers\ExtensionTests.cs" />
     <Compile Include="Unit\Readers\StreamReaderTests.cs" />

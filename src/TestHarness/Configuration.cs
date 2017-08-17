@@ -6,6 +6,7 @@ using Graphite.Cors;
 using Graphite.Extensions;
 using Graphite.Http;
 using Graphite.Linq;
+using Graphite.Setup;
 using Graphite.StructureMap;
 using Newtonsoft.Json.Serialization;
 using TestHarness.Handlers;

@@ -4,7 +4,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web;
+using System.Web.Http.Controllers;
 using System.Web.Http.Dependencies;
+using System.Web.Http.ExceptionHandling;
+using System.Web.Http.Hosting;
+using System.Web.Routing;
 using Graphite.Linq;
 
 namespace Graphite.Extensions
@@ -159,6 +163,17 @@ namespace Graphite.Extensions
             IEnumerable<string> headerValues;
             request.Headers.TryGetValues(name, out headerValues);
             return headerValues ?? Enumerable.Empty<string>();
+        }
+
+        public static void Replace<T>(this ServicesContainer container, T instance)
+        {
+            container.Replace(typeof(T), instance);
+        }
+
+        public static void Replace<TService, TReplacement>(this 
+            ServicesContainer container) where TReplacement : TService, new()
+        {
+            container.Replace<TService>(new TReplacement());
         }
     }
 }

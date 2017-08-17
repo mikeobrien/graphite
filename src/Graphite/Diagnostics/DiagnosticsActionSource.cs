@@ -4,6 +4,7 @@ using Graphite.Actions;
 using Graphite.Linq;
 using Graphite.Reflection;
 using Graphite.Routing;
+using Graphite.Setup;
 
 namespace Graphite.Diagnostics
 {

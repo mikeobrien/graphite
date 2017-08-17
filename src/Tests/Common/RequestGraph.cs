@@ -21,6 +21,7 @@ using Graphite.Http;
 using Graphite.Linq;
 using Graphite.Readers;
 using Graphite.Reflection;
+using Graphite.Setup;
 using Graphite.StructureMap;
 using Graphite.Writers;
 using Tests.Common.Fakes;

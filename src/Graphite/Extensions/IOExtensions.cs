@@ -24,5 +24,12 @@ namespace Graphite.Extensions
                 return reader.ReadToEnd();
             }
         }
+
+        public static StreamWriter CreateWriter(this Stream stream, Encoding encoding, int? bufferSize)
+        {
+            return bufferSize.HasValue
+                ? new StreamWriter(stream, encoding, bufferSize.Value)
+                : new StreamWriter(stream, encoding);
+        }
     }
 }

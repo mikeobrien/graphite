@@ -9,6 +9,7 @@ using Graphite.Behaviors;
 using NUnit.Framework;
 using Graphite.Cors;
 using Graphite.Extensions;
+using Graphite.Setup;
 using Should;
 using Tests.Common;
 using PolicyPlugin = Graphite.Extensibility.ConditionalPlugin<Graphite.Cors
