@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Graphite.Extensions;
+using Graphite.Reflection;
 
 namespace Graphite.DependencyInjection
 {
@@ -33,15 +36,18 @@ namespace Graphite.DependencyInjection
             public bool Dispose { get; }
         }
 
+        private readonly ITypeCache _typeCache;
         private readonly IList<Registration> _registrations;
 
-        public Registry()
+        public Registry(ITypeCache typeCache)
         {
+            _typeCache = typeCache;
             _registrations = new List<Registration>();
         }
 
-        public Registry(Registry registry)
+        public Registry(Registry registry, ITypeCache typeCache)
         {
+            _typeCache = typeCache;
             _registrations = new List<Registration>(registry);
         }
 
@@ -86,6 +92,35 @@ namespace Graphite.DependencyInjection
         public IEnumerator<Registration> GetEnumerator()
         {
             return _registrations.GetEnumerator();
+        }
+
+        public override string ToString()
+        {
+            return _registrations.OrderBy(r => r.PluginType.FullName).Select(r =>
+            {
+                var pluginType = _typeCache.GetTypeDescriptor(r.PluginType);
+                var concreteType = r.ConcreteType != null ?
+                    _typeCache.GetTypeDescriptor(r.ConcreteType) : null;
+
+                return new
+                {
+                    PluginType = pluginType.FriendlyFullName,
+                    PluginAssembly = pluginType.Type.Assembly.GetFriendlyName(),
+                    r.Singleton,
+                    Instance = r.Instance?.GetType().GetFriendlyTypeName(true),
+                    ConcreteType = concreteType?.FriendlyFullName,
+                    ConcreteAssembly = concreteType?.Type.Assembly.GetFriendlyName()
+                };
+            })
+            .ToTable(x => new
+            {
+                Plugin_Type = x.PluginType,
+                Plugin_Assembly = x.PluginAssembly,
+                x.Singleton,
+                x.Instance,
+                Concrete_Type = x.ConcreteType,
+                Concrete_Assembly = x.ConcreteAssembly
+            });
         }
     }
 }

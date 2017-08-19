@@ -1,9 +1,12 @@
 using System;
 using System.Diagnostics;
 using System.Net.Http;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Graphite.Behaviors;
+using Graphite.DependencyInjection;
+using Graphite.Exceptions;
 using Graphite.Monitoring;
 
 namespace Graphite.Actions
@@ -12,21 +15,23 @@ namespace Graphite.Actions
     {
         private readonly Configuration _configuration;
         private readonly ActionDescriptor _actionDescriptor;
-        private readonly IUnhandledExceptionHandler _exceptionHandler;
+        private readonly IExceptionHandler _exceptionHandler;
         private readonly IBehaviorChainInvoker _behaviorChainInvoker;
+        private readonly IContainer _container;
         private readonly Metrics _metrics;
         private readonly ActionMetrics _actionMetrics;
 
         public ActionMessageHandler(Configuration configuration,
             ActionDescriptor actionDescriptor,
-            IUnhandledExceptionHandler exceptionHandler,
+            IExceptionHandler exceptionHandler,
             IBehaviorChainInvoker behaviorChainInvoker,
-            Metrics metrics)
+            IContainer container, Metrics metrics)
         {
             _configuration = configuration;
             _actionDescriptor = actionDescriptor;
             _exceptionHandler = exceptionHandler;
             _behaviorChainInvoker = behaviorChainInvoker;
+            _container = container;
             _metrics = metrics;
             _actionMetrics = metrics.AddAction(_actionDescriptor);
         }
@@ -43,8 +48,9 @@ namespace Graphite.Actions
             }
             catch (Exception exception)
             {
+                if (exception is UnhandledGraphiteException) throw;
                 return _exceptionHandler.HandleException(exception,
-                    _actionDescriptor, requestMessage);
+                    _actionDescriptor, requestMessage, _container);
             }
             finally
             {

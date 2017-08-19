@@ -19,9 +19,10 @@ namespace Graphite.StructureMap
             _container = new StructureMapContainer();
         }
 
-        public Container(StructureMapIContainer container)
+        public Container(StructureMapIContainer container, IContainer parent = null)
         {
             _container = container;
+            Parent = parent;
         }
 
         public Container(Action<ConfigurationExpression> configure)
@@ -29,9 +30,11 @@ namespace Graphite.StructureMap
             _container = new StructureMapContainer(configure);
         }
 
+        public IContainer Parent { get; }
+
         public IContainer CreateScopedContainer()
         {
-            return new Container(_container.GetNestedContainer());
+            return new Container(_container.GetNestedContainer(), this);
         }
 
         public object GetInstance(Type type, params Dependency[] dependencies)
@@ -64,7 +67,7 @@ namespace Graphite.StructureMap
         {
             return _container.WhatDoIHave();
         }
-
+        
         // Dependency Resolver
 
         IDependencyScope IDependencyResolver.BeginScope()

@@ -31,7 +31,7 @@ namespace Tests.Unit.Diagnostics
             var configuration = new Configuration();
             var actionSource = new DiagnosticsActionSource(
                 configuration, null, new TypeCache(), null, 
-                    new ActionDescriptorFactory(configuration, null));
+                    new ActionDescriptorFactory(configuration, null, new TypeCache()));
 
             var actions = actionSource.GetActions();
 

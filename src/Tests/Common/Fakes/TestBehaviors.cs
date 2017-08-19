@@ -20,7 +20,8 @@ namespace Tests.Common.Fakes
 
         public virtual Task<HttpResponseMessage> Invoke()
         {
-            return BehaviorChain?.InvokeNext();
+            return BehaviorChain?.InvokeNext() ?? 
+                Task.FromResult(new HttpResponseMessage());
         }
     }
 

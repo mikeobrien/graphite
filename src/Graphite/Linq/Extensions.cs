@@ -131,5 +131,15 @@ namespace Graphite.Linq
                 x => value?.Invoke(source[x]) ?? (TValue)(object)source[x], 
                 StringComparer.OrdinalIgnoreCase);
         }
+
+        public static IEnumerable<T> Enumerate<T>(this T source, Func<T, T> map) where T : class
+        {
+            var current = source;
+            while (current != null)
+            {
+                yield return current;
+                current = map(current);
+            }
+        }
     }
 }

@@ -9,6 +9,7 @@ using Graphite.Behaviors;
 using NUnit.Framework;
 using Graphite.Cors;
 using Graphite.Extensions;
+using Graphite.Reflection;
 using Graphite.Setup;
 using Should;
 using Tests.Common;
@@ -131,12 +132,9 @@ namespace Tests.Unit.Cors
             _dsl.EnableCors(x => x.AppendAttributePolicySource(
                 p => p.ActionMethod.Name == "Post"));
 
-            _configuration.Behaviors.Count().ShouldEqual(2);
+            _configuration.Behaviors.Count().ShouldEqual(1);
 
             var behavior = _configuration.Behaviors.First();
-            behavior.Type.ShouldEqual(typeof(DefaultErrorHandlerBehavior));
-
-            behavior = _configuration.Behaviors.Second();
 
             behavior.Type.ShouldEqual(typeof(CorsBehavior));
             behavior.AppliesTo(new ActionConfigurationContext(null,
@@ -192,8 +190,8 @@ namespace Tests.Unit.Cors
             };
 
             var applies = sources.ThatApplies(corsConfiguration, new ActionDescriptor(
-                ActionMethod.From<Handler>(x => x.Post()), null, 
-                    null, null, null, null, null, null), null, null);
+                ActionMethod.From<Handler>(x => x.Post()), null, null, null, 
+                    null, null, null, null, new TypeCache()), null, null);
 
             applies.ShouldEqual(policy2);
         }

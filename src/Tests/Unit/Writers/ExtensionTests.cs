@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Graphite;
 using Graphite.Actions;
+using Graphite.Reflection;
 using Graphite.Writers;
 using NUnit.Framework;
 using Tests.Common;
@@ -39,7 +40,7 @@ namespace Tests.Unit.Writers
                 .Append<NotWeightedWriter3>());
 
             var actionDescriptor = new ActionDescriptor(null, null, null, null, null, 
-                configuration.ResponseWriters.CloneAllThatApplyTo(null), null, null);
+                configuration.ResponseWriters.CloneAllThatApplyTo(null), null, null, new TypeCache());
 
             var results = writers.ThatApply(null, actionDescriptor);
 

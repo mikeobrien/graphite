@@ -125,7 +125,8 @@
     <Compile Include="Unit\Actions\DefaultActionSourceTests.cs" />
     <Compile Include="Unit\Actions\ActionInvokerTests.cs" />
     <Compile Include="Unit\Actions\InvokerBehaviorTests.cs" />
-    <Compile Include="Unit\Actions\UnhandledExceptionHandlerTests.cs" />
+    <Compile Include="Unit\Exceptions\ExceptionDebugResponseTests.cs" />
+    <Compile Include="Unit\Exceptions\ExceptionHandlerTests.cs" />
     <Compile Include="Unit\Authentication\ExtensionTests.cs" />
     <Compile Include="Unit\Authentication\BasicAuthenticatorBaseTests.cs" />
     <Compile Include="Unit\Authentication\AuthenticationBehaviorTests.cs" />
@@ -152,10 +153,11 @@
     <Compile Include="Unit\Cors\CorsConfigurationDslTests.cs" />
     <Compile Include="Unit\Cors\ExtensionTests.cs" />
     <Compile Include="Unit\DefaultConfigurationTests.cs" />
-    <Compile Include="Unit\DefaultErrorHandlerBehaviorTests.cs" />
+    <Compile Include="Unit\DependencyInjection\RegistryTests.cs" />
     <Compile Include="Unit\DependencyInjection\StructureMapTests.cs" />
     <Compile Include="Unit\Diagnostics\DiagnosticsActionSourceTests.cs" />
     <Compile Include="Unit\Diagnostics\DiagnosticsHandlerTests.cs" />
+    <Compile Include="Unit\Exceptions\ExtensionTests.cs" />
     <Compile Include="Unit\Extensibility\ConditionalPluginTests.cs" />
     <Compile Include="Unit\Extensibility\ConditionalPluginsTests.cs" />
     <Compile Include="Unit\Extensibility\ConditionalPluginsDslTests.cs" />
@@ -166,7 +168,7 @@
     <Compile Include="Unit\Extensibility\ConditionalExtensionTests.cs" />
     <Compile Include="Unit\Extensions\ExpressionTests.cs" />
     <Compile Include="Unit\Extensions\ExtensionTests.cs" />
-    <Compile Include="Unit\Extensions\LinqExtensionTests.cs" />
+    <Compile Include="Unit\Linq\ExtensionTests.cs" />
     <Compile Include="Unit\Extensions\MemoizeTests.cs" />
     <Compile Include="Unit\Extensions\StringExtensionTests.cs" />
     <Compile Include="Unit\Extensions\TaskExtensionTests.cs" />

@@ -204,7 +204,7 @@ namespace Tests.Common
 
         public ActionDescriptor GetActionDescriptor()
         {
-            return new ActionDescriptorFactory(Configuration, HttpConfiguration)
+            return new ActionDescriptorFactory(Configuration, HttpConfiguration, new TypeCache())
                 .CreateDescriptor(ActionMethod, GetRouteDescriptor());
         }
 

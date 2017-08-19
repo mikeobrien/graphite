@@ -48,7 +48,7 @@ namespace Tests.Unit.Diagnostics
                 new TypeCache().GetTypeDescriptor(typeof(OutputModel)));
             var actionDescriptors = new List<ActionDescriptor>
             {
-                new ActionDescriptorFactory(configuration, null)
+                new ActionDescriptorFactory(configuration, null, new TypeCache())
                     .CreateDescriptor(actionMethod ,routeDescriptor)
             };
             var runtimeConfiguration = new RuntimeConfiguration(actionDescriptors);

@@ -15,6 +15,7 @@ namespace TestHarness.Action
         {
             _headers = headers;
         }
+
         public void GetUpdateHeaders()
         {
             _headers.Add("fark", "farker");

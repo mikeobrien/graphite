@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Web.Http;
+using Graphite.DependencyInjection;
+using Graphite.Exceptions;
 using Graphite.Extensibility;
 using Graphite.Linq;
 using Graphite.Reflection;
@@ -46,6 +49,28 @@ namespace Graphite.Actions
         public static bool IsGraphiteAction(this ActionMethod actionMethod)
         {
             return actionMethod.HandlerTypeDescriptor.Type.IsUnderNamespace("Graphite");
+        }
+
+        public static HttpResponseMessage HandleException(
+            this IExceptionHandler handler, 
+            Exception exception,
+            ActionDescriptor actionDescriptor,
+            HttpRequestMessage requestMessage,
+            IContainer container)
+        {
+            return handler.HandleException(new ExceptionContext(exception,
+                actionDescriptor, requestMessage, container));
+        }
+
+        public static string GetResponse(
+            this IExceptionDebugResponse response,
+            Exception exception,
+            ActionDescriptor actionDescriptor,
+            HttpRequestMessage requestMessage,
+            IContainer container)
+        {
+            return response.GetResponse(new ExceptionContext(exception,
+                actionDescriptor, requestMessage, container));
         }
     }
 }

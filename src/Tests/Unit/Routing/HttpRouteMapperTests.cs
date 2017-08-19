@@ -6,6 +6,7 @@ using Graphite;
 using Graphite.Actions;
 using Graphite.Behaviors;
 using Graphite.DependencyInjection;
+using Graphite.Exceptions;
 using Graphite.Extensions;
 using Graphite.Routing;
 using NSubstitute;
@@ -37,7 +38,9 @@ namespace Tests.Unit.Routing
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(x => x.Get_Param(0))
                 .WithUrl("fark")
-                .ConfigureContainer(x => x.Register(Substitute.For<IUnhandledExceptionHandler>()));
+                .ConfigureContainer(x => x
+                    .Register(Substitute.For<IExceptionHandler>())
+                    .Register(x));
 
             Map(requestGraph);
 
@@ -51,7 +54,9 @@ namespace Tests.Unit.Routing
         {
             var requestGraph = RequestGraph.Create()
                 .WithUrl("fark/{param:range(4, 8)}/farker")
-                .ConfigureContainer(x => x.Register(Substitute.For<IUnhandledExceptionHandler>()));
+                .ConfigureContainer(x => x
+                    .Register(Substitute.For<IExceptionHandler>())
+                    .Register(x));
 
             Map(requestGraph);
 
@@ -65,7 +70,9 @@ namespace Tests.Unit.Routing
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(x => x.Get_Param(0))
                 .WithUrl("fark")
-                .ConfigureContainer(x => x.Register(Substitute.For<IUnhandledExceptionHandler>()));
+                .ConfigureContainer(x => x
+                    .Register(Substitute.For<IExceptionHandler>())
+                    .Register(x));
 
             Map(requestGraph);
 
@@ -81,7 +88,9 @@ namespace Tests.Unit.Routing
         {
             var requestGraph = RequestGraph.Create()
                 .WithUrl("fark/{param:range(4, 8)}/farker")
-                .ConfigureContainer(x => x.Register(Substitute.For<IUnhandledExceptionHandler>()));
+                .ConfigureContainer(x => x
+                    .Register(Substitute.For<IExceptionHandler>())
+                    .Register(x));
 
             Map(requestGraph);
 
@@ -108,7 +117,9 @@ namespace Tests.Unit.Routing
                     .Append<TestHttpRouteDecorator2>(c => false)
                     .Append<TestHttpRouteDecorator3>()
                     .Append<TestHttpRouteDecorator4>()))
-                .ConfigureContainer(x => x.Register(Substitute.For<IUnhandledExceptionHandler>()));
+                .ConfigureContainer(x => x
+                    .Register(Substitute.For<IExceptionHandler>())
+                    .Register(x));
 
             var decorator1 = new TestHttpRouteDecorator1();
             var decorator2 = new TestHttpRouteDecorator2 { AppliesToReturns = true };

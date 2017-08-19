@@ -70,5 +70,26 @@ namespace Tests.Unit.Extensions
         {
             base64.FromBase64(Encoding.UTF8).ShouldEqual(expected);
         }
+
+        [TestCase(null, 5, null)]
+        [TestCase("", 5, "")]
+        [TestCase("fark", 3, "fark")]
+        [TestCase("fark", 4, "fark")]
+        [TestCase("fark", 5, "*fark")]
+        [TestCase("fark", 6, "*fark*")]
+        [TestCase("fark", 7, "**fark*")]
+        public void Should_pad_center(string source, int width, string expected)
+        {
+            source.PadCenter(width, '*').ShouldEqual(expected);
+        }
+
+        [TestCase(null, null)]
+        [TestCase("fark", "fark")]
+        [TestCase("fark,farker", "fark\r\n└farker")]
+        [TestCase("fark,farker,mcfarker", "fark\r\n└farker\r\n └mcfarker")]
+        public void Should_create_hierarchy(string hierarchy, string expected)
+        {
+            (hierarchy?.Split(",")).ToHierarchy().ShouldEqual(expected);
+        }
     }
 }

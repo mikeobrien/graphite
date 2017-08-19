@@ -9,8 +9,11 @@ using System.Web.Http.Controllers;
 using Graphite.Actions;
 using Graphite.Behaviors;
 using Graphite.DependencyInjection;
+using Graphite.Exceptions;
 using Graphite.Http;
 using Graphite.Routing;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
@@ -28,15 +31,17 @@ namespace Tests.Unit.Behaviors
 
         private RequestGraph _requestGraph;
         private BehaviorChainInvoker _invoker;
+        private IExceptionHandler _exceptionHandler;
 
         [SetUp]
         public void Setup()
         {
             _requestGraph = RequestGraph.CreateFor<Handler>(x => x.Get(null, null));
             _requestGraph.Configure(x => x
-                .ReturnErrorMessages()
                 .WithDefaultBehavior<TestInvokerBehavior>());
-            _invoker = new BehaviorChainInvoker(_requestGraph.Configuration, _requestGraph.Container);
+            _exceptionHandler = new ExceptionHandler(_requestGraph.Configuration, new ExceptionDebugResponse());
+            _invoker = new BehaviorChainInvoker(_requestGraph.Configuration, _requestGraph.Container, 
+                _requestGraph.GetActionDescriptor(), _exceptionHandler);
         }
 
         public class RegistrationLoggingBehavior : TestBehavior
@@ -281,23 +286,28 @@ namespace Tests.Unit.Behaviors
             log.ShouldOnlyContain(typeof(Behavior1), typeof(Behavior2));
         }
 
+        [Test]
+        public async Task Should_handle_unhandled_exceptions()
+        {
+            _requestGraph.Configuration.Behaviors.Configure(x => x
+                .Append<ExceptionBehavior>());
+
+            var result = await _invoker.Should().Throw<UnhandledGraphiteException>(
+                x => x.Invoke(_requestGraph.GetActionDescriptor(),
+                    _requestGraph.GetHttpRequestMessage(),
+                    _requestGraph.CancellationToken));
+
+            result.ShouldBeType<UnhandledGraphiteException>();
+            result.InnerException.ShouldBeType<BehaviorException>();
+        }
+
         public class BehaviorException : Exception { }
 
-        public class InitFailureBehavior : IBehavior
+        public class ExceptionBehavior : TestBehavior
         {
-            public InitFailureBehavior()
+            public override Task<HttpResponseMessage> Invoke()
             {
                 throw new BehaviorException();
-            }
-
-            public bool ShouldRun()
-            {
-                throw new NotImplementedException();
-            }
-
-            public async Task<HttpResponseMessage> Invoke()
-            {
-                return new HttpResponseMessage();
             }
         }
     }

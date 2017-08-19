@@ -4,7 +4,10 @@ using System.Threading.Tasks;
 using Graphite;
 using Graphite.Actions;
 using Graphite.Behaviors;
+using Graphite.DependencyInjection;
+using Graphite.Exceptions;
 using Graphite.Monitoring;
+using Graphite.StructureMap;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
@@ -17,51 +20,70 @@ namespace Tests.Unit.Actions
     public class ActionMessageHandlerTests
     {
         private Configuration _configuration;
+        private IContainer _container;
         private RequestGraph _requestGraph;
         private HttpRequestMessage _request;
-        private ActionDescriptor _descriptor;
+        private ActionDescriptor _action;
         private HttpResponseMessage _response;
         private IBehaviorChainInvoker _invoker;
-        private IUnhandledExceptionHandler _unhandledExceptionHandler;
+        private IExceptionHandler _unhandledExceptionHandler;
+        private Metrics _metrics;
         private ActionMessageHandler _messageHandler;
 
         [SetUp]
         public void Setup()
         {
             _configuration = new Configuration();
+            _container = new Container();
             _requestGraph = RequestGraph.Create();
             _request = _requestGraph.GetHttpRequestMessage();
-            _descriptor = _requestGraph.GetActionDescriptor();
+            _action = _requestGraph.GetActionDescriptor();
             _response = new HttpResponseMessage();
+            _metrics = new Metrics();
             _invoker = Substitute.For<IBehaviorChainInvoker>();
-            _unhandledExceptionHandler = Substitute.For<IUnhandledExceptionHandler>();
-            _messageHandler = new ActionMessageHandler(_configuration,
-                _descriptor, _unhandledExceptionHandler, _invoker, new Metrics());
+            _unhandledExceptionHandler = new ExceptionHandler(_configuration, new ExceptionDebugResponse());
+            _messageHandler = new ActionMessageHandler(_configuration, _action,
+                _unhandledExceptionHandler, _invoker, _container, _metrics);
         }
 
         [Test]
         public async Task Should_call_invoker()
         {
-            _invoker.Invoke(_descriptor, _request, _requestGraph.CancellationToken).Returns(_response);
+            _invoker.Invoke(_action, _request, _requestGraph.CancellationToken).Returns(_response);
 
             var result = await _messageHandler.SendAsync(_request, _requestGraph.CancellationToken);
 
             result.ShouldEqual(_response);
+
+            _metrics.TotalRequests.ShouldEqual(1);
+            _metrics.GetAverageRequestTime(_action).ShouldBeGreaterThan(TimeSpan.Zero);
         }
 
         [Test]
         public async Task Should_call_unhandled_exception_handler_when_exception_is_thrown()
         {
-            var exceptionResponse = new HttpResponseMessage();
-            var innerException = new Exception();
-            _invoker.Invoke(_descriptor, _request, _requestGraph.CancellationToken)
-                .Throws(innerException);
-            _unhandledExceptionHandler.HandleException(innerException, _descriptor, _request)
-                .Returns(exceptionResponse);
+            var exception = new Exception();
+            _invoker.Invoke(_action, _request, _requestGraph.CancellationToken)
+                .Throws(exception);
 
-            var response = await _messageHandler.SendAsync(_request, _requestGraph.CancellationToken);
+            var response = await _messageHandler.Should().Throw<UnhandledGraphiteException>(
+                x => x.SendAsync(_request, _requestGraph.CancellationToken));
 
-            response.ShouldEqual(exceptionResponse);
+            response.ShouldBeType<UnhandledGraphiteException>();
+            response.InnerException.ShouldEqual(exception);
+        }
+
+        [Test]
+        public async Task Should_not_handle_unhandled_graphite_exceptions()
+        {
+            var exception = new UnhandledGraphiteException(null, null, null, new Exception());
+            _invoker.Invoke(_action, _request, _requestGraph.CancellationToken)
+                .Throws(exception);
+
+            var response = await _messageHandler.Should().Throw<UnhandledGraphiteException>(
+                x => x.SendAsync(_request, _requestGraph.CancellationToken));
+
+            response.ShouldEqual(exception);
         }
     }
 }

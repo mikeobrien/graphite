@@ -71,7 +71,7 @@ namespace Graphite.Diagnostics
                         <tr>
                             <td colspan=""2"" class=""panel"">
                                 <h3>Default Container</h3>
-                                {RenderRegistry(_container?.ParentRegistry)}
+                                {RenderRegistry(_container?.Parent?.As<TrackingContainer>()?.Registry)}
 
                                 <h3>Request Container</h3>
                                 {RenderRegistry(_container?.Registry)}
@@ -286,7 +286,6 @@ namespace Graphite.Diagnostics
                 <table class=""configuration row-seperator"">
                     <tr><td>Startup Time</td><td><code>{_metrics.StartupTime}</code></td></tr>
                     <tr><td>Total Requests</td><td><code>{_metrics.TotalRequests}</code></td></tr>
-                    <tr><td>Default error handler enabled</td><td>{YesNo(_configuration.DefaultErrorHandlerEnabled)}</td></tr>
                     <tr><td>Unhandled exception status text</td><td><code>{_configuration.UnhandledExceptionStatusText}</code></td></tr>
                     <tr><td>Handler Name Filter Regex</td><td><code>{_configuration.HandlerNameFilterRegex}</code></td></tr>
                     <tr><td>Handler Namespace Regex</td><td><code>{_configuration.HandlerNamespaceRegex}</code></td></tr>

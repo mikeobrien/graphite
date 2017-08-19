@@ -1,5 +1,6 @@
 ﻿using Graphite.Actions;
 using Graphite.Cors;
+using Graphite.Reflection;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
@@ -19,7 +20,7 @@ namespace Tests.Unit.Cors
         {
             new CorsAttributePolicySource(new ActionDescriptor(
                 ActionMethod.From<NoAttributesHandler>(x => x.Get()),
-                    null, null, null, null, null, null, null))
+                    null, null, null, null, null, null, null, new TypeCache()))
                 .Applies().ShouldBeFalse();
         }
 
@@ -28,7 +29,7 @@ namespace Tests.Unit.Cors
         {
             var policy = new CorsAttributePolicySource(new ActionDescriptor(
                 ActionMethod.From<NoAttributesHandler>(x => x.Get()),
-                null, null, null, null, null, null, null)).CreatePolicy();
+                null, null, null, null, null, null, null, new TypeCache())).CreatePolicy();
 
             policy.AllowOptionRequestsToPassThrough.ShouldBeFalse();
             policy.AllowRequestsWithoutOriginHeader.ShouldBeTrue();
@@ -59,7 +60,7 @@ namespace Tests.Unit.Cors
         {
             new CorsAttributePolicySource(new ActionDescriptor(
                     ActionMethod.From<ActionAttributesHandler>(x => x.Get()),
-                    null, null, null, null, null, null, null))
+                    null, null, null, null, null, null, null, new TypeCache()))
                 .Applies().ShouldBeTrue();
         }
 
@@ -68,7 +69,7 @@ namespace Tests.Unit.Cors
         {
             var policy = new CorsAttributePolicySource(new ActionDescriptor(
                 ActionMethod.From<ActionAttributesHandler>(x => x.Get()),
-                null, null, null, null, null, null, null)).CreatePolicy();
+                null, null, null, null, null, null, null, new TypeCache())).CreatePolicy();
 
             policy.AllowOptionRequestsToPassThrough.ShouldBeTrue();
             policy.AllowRequestsWithoutOriginHeader.ShouldBeFalse();
@@ -99,7 +100,7 @@ namespace Tests.Unit.Cors
         {
             new CorsAttributePolicySource(new ActionDescriptor(
                     ActionMethod.From<HandlerAttributesHandler>(x => x.Get()),
-                    null, null, null, null, null, null, null))
+                    null, null, null, null, null, null, null, new TypeCache()))
                 .Applies().ShouldBeTrue();
         }
 
@@ -108,7 +109,7 @@ namespace Tests.Unit.Cors
         {
             var policy = new CorsAttributePolicySource(new ActionDescriptor(
                 ActionMethod.From<HandlerAttributesHandler>(x => x.Get()),
-                null, null, null, null, null, null, null)).CreatePolicy();
+                null, null, null, null, null, null, null, new TypeCache())).CreatePolicy();
 
             policy.AllowOptionRequestsToPassThrough.ShouldBeTrue();
             policy.AllowRequestsWithoutOriginHeader.ShouldBeFalse();
@@ -147,7 +148,7 @@ namespace Tests.Unit.Cors
         {
             var policy = new CorsAttributePolicySource(new ActionDescriptor(
                 ActionMethod.From<OverrideAttributesHandler>(x => x.Get()),
-                null, null, null, null, null, null, null)).CreatePolicy();
+                null, null, null, null, null, null, null, new TypeCache())).CreatePolicy();
 
             policy.AllowOptionRequestsToPassThrough.ShouldBeTrue();
             policy.AllowRequestsWithoutOriginHeader.ShouldBeFalse();
@@ -168,7 +169,7 @@ namespace Tests.Unit.Cors
         {
             new CorsAttributePolicySource(new ActionDescriptor(
                     ActionMethod.From<OverrideAttributesHandler>(x => x.GetOverride()), 
-                    null, null, null, null, null, null, null))
+                    null, null, null, null, null, null, null, new TypeCache()))
                 .Applies().ShouldBeFalse();
         }
     }

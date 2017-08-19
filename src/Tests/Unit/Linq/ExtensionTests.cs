@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Specialized;
-using System.Linq;
-using Graphite.Extensions;
 using Graphite.Linq;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
 
-namespace Tests.Unit.Extensions
+namespace Tests.Unit.Linq
 {
     [TestFixture]
-    public class LinqExtensionTests
+    public class ExtensionTests
     {
         [Test]
         public void Should_convert_name_value_collection_to_string_lookup()
@@ -42,6 +40,16 @@ namespace Tests.Unit.Extensions
 
             lookup["key1"].ShouldOnlyContain("value1", "value2");
             lookup["key2"].ShouldOnlyContain("value3");
+        }
+
+        [Test]
+        public void Should_enumerate_nested_objects()
+        {
+            var innerInstance = new Exception();
+            var instance = new Exception("fark", innerInstance);
+
+            instance.Enumerate(x => x.InnerException)
+                .ShouldOnlyContain(instance, innerInstance);
         }
     }
 }

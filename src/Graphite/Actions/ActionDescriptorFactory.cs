@@ -1,4 +1,5 @@
 ﻿using System.Web.Http;
+using Graphite.Reflection;
 using Graphite.Routing;
 
 namespace Graphite.Actions
@@ -7,12 +8,14 @@ namespace Graphite.Actions
     {
         private readonly Configuration _configuration;
         private readonly HttpConfiguration _httpConfiguration;
+        private readonly ITypeCache _typeCache;
 
         public ActionDescriptorFactory(Configuration configuration,
-            HttpConfiguration httpConfiguration)
+            HttpConfiguration httpConfiguration, ITypeCache typeCache)
         {
             _configuration = configuration;
             _httpConfiguration = httpConfiguration;
+            _typeCache = typeCache;
         }
 
         public ActionDescriptor CreateDescriptor(ActionMethod actionMethod, 
@@ -26,7 +29,7 @@ namespace Graphite.Actions
                 _configuration.RequestReaders.CloneAllThatApplyTo(actionConfigurationContext),
                 _configuration.ResponseWriters.CloneAllThatApplyTo(actionConfigurationContext),
                 _configuration.ResponseStatus.CloneAllThatApplyTo(actionConfigurationContext),
-                _configuration.Behaviors.CloneAllThatApplyTo(actionConfigurationContext));
+                _configuration.Behaviors.CloneAllThatApplyTo(actionConfigurationContext), _typeCache);
         }
     }
 }

@@ -1,22 +1,13 @@
 ﻿using System;
 using System.Net.Http;
 using System.Reflection;
-using Graphite.Actions;
+using Graphite.Exceptions;
 using Graphite.Reflection;
 
 namespace Graphite.Setup
 {
     public partial class ConfigurationDsl
     {
-        /// <summary>
-        /// Disables the default error handler.
-        /// </summary>
-        public ConfigurationDsl DisableDefaultErrorHandler()
-        {
-            _configuration.DefaultErrorHandlerEnabled = false;
-            return this;
-        }
-
         /// <summary>
         /// Specifies the status text returned by an unhandled exception.
         /// </summary>
@@ -27,28 +18,50 @@ namespace Graphite.Setup
         }
 
         /// <summary>
-        /// Specifies the catch all exception handler. This is NOT something 
-        /// you would generally override and is NOT the appropriate place for 
-        /// app and request error handling and logging. That should be done 
-        /// at the app level (e.g. Global.asax) and with a behavior respectively.
+        /// Specifies the exception handler. This handler is not 
+        /// for general use and enables some Graphite features.
+        /// Logging and exception handling should be handled 
+        /// through the Web Api API.
         /// </summary>
-        public ConfigurationDsl WithUnhandledExceptionHandler<T>() 
-            where T : IUnhandledExceptionHandler
+        public ConfigurationDsl WithExceptionHandler<T>() 
+            where T : IExceptionHandler
         {
-            _configuration.UnhandledExceptionHandler.Set<T>();
+            _configuration.ExceptionHandler.Set<T>();
             return this;
         }
 
         /// <summary>
-        /// Specifies the catch all exception handler. This is NOT something 
-        /// you would generally override and is NOT the appropriate place for 
-        /// app and request error handling and logging. That should be done 
-        /// at the app level (e.g. Global.asax) and with a behavior respectively.
+        /// Specifies the exception handler. This handler is not 
+        /// for general use and enables some Graphite features.
+        /// Logging and exception handling should be handled 
+        /// through the Web Api API.
         /// </summary>
-        public ConfigurationDsl WithUnhandledExceptionHandler<T>(T instance) 
-            where T : IUnhandledExceptionHandler
+        public ConfigurationDsl WithExceptionHandler<T>(T instance) 
+            where T : IExceptionHandler
         {
-            _configuration.UnhandledExceptionHandler.Set(instance);
+            _configuration.ExceptionHandler.Set(instance);
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the debug response generator. This response is 
+        /// returned when debug response messages are enabled.
+        /// </summary>
+        public ConfigurationDsl WithExceptionDebugResponse<T>()
+            where T : IExceptionDebugResponse
+        {
+            _configuration.ExceptionDebugResponse.Set<T>();
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the debug response generator. This response is 
+        /// returned when debug response messages are enabled.
+        /// </summary>
+        public ConfigurationDsl WithExceptionDebugResponse<T>(T instance)
+            where T : IExceptionDebugResponse
+        {
+            _configuration.ExceptionDebugResponse.Set(instance);
             return this;
         }
 

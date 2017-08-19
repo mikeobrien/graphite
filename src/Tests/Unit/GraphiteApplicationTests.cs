@@ -9,6 +9,7 @@ using Graphite.Behaviors;
 using Graphite.Binding;
 using Graphite.DependencyInjection;
 using Graphite.Diagnostics;
+using Graphite.Exceptions;
 using Graphite.Http;
 using Graphite.Readers;
 using Graphite.Reflection;
@@ -154,7 +155,7 @@ namespace Tests.Unit
             container.GetInstance<IInitializer>().ShouldBeType<Initializer>();
             container.GetInstance<IHttpRouteMapper>().ShouldBeType<HttpRouteMapper>();
             container.GetInstance<IInlineConstraintResolver>().ShouldBeType<DefaultInlineConstraintResolver>();
-            container.GetInstance<IUnhandledExceptionHandler>().ShouldBeType<UnhandledExceptionHandler>();
+            container.GetInstance<IExceptionHandler>().ShouldBeType<ExceptionHandler>();
             container.GetInstance<IBehaviorChainInvoker>().ShouldBeType<BehaviorChainInvoker>();
             container.GetInstance<IActionInvoker>().ShouldBeType<ActionInvoker>();
         }

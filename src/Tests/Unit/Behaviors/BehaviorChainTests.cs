@@ -7,6 +7,7 @@ using Graphite.Actions;
 using Graphite.Behaviors;
 using Graphite.DependencyInjection;
 using Graphite.Extensibility;
+using Graphite.Reflection;
 using Graphite.StructureMap;
 using NUnit.Framework;
 using Should;
@@ -31,7 +32,7 @@ namespace Tests.Unit.Behaviors
             _configuration = new Configuration();
             _behaviors = new Plugins<IBehavior>(false);
             _actionDescriptor = new ActionDescriptor(null, null, 
-                null, null, null, null, null, _behaviors);
+                null, null, null, null, null, _behaviors, new TypeCache());
             _container = new Container();
             _container.Register(_logger);
         }
@@ -55,6 +56,45 @@ namespace Tests.Unit.Behaviors
                 typeof(TestBehavior1), 
                 typeof(TestBehavior2), 
                 typeof(TestDefaultBehavior));
+        }
+
+        public class BehaviorInstance : IBehavior
+        {
+            private readonly HttpResponseMessage _response;
+            private readonly Logger _logger;
+
+            public BehaviorInstance(HttpResponseMessage response, Logger logger)
+            {
+                _response = response;
+                _logger = logger;
+            }
+
+            public bool ShouldRun() => true;
+
+            public Task<HttpResponseMessage> Invoke()
+            {
+                _logger.Write(GetType());
+                return Task.FromResult(_response);
+            }
+        }
+
+        [Test]
+        public async Task Should_invoke_behavior_instance()
+        {
+            _configuration.DefaultBehavior = typeof(TestDefaultBehavior);
+            var response = new HttpResponseMessage();
+
+            _behaviors.Configure(x => x
+                .Append<TestBehavior1>()
+                .Append(new BehaviorInstance(response, _logger)));
+
+            var behaviorChain = new BehaviorChain(_configuration, _actionDescriptor, _container);
+
+            var result = await behaviorChain.InvokeNext();
+
+            result.ShouldEqual(response);
+
+            _logger.ShouldOnlyContain(typeof(TestBehavior1), typeof(BehaviorInstance));
         }
 
         [Test]
@@ -85,7 +125,7 @@ namespace Tests.Unit.Behaviors
 
             public override async Task<HttpResponseMessage> Invoke()
             {
-                base.Invoke();
+                await base.Invoke();
                 return new HttpResponseMessage(HttpStatusCode.Accepted);
             }
         }
@@ -101,7 +141,7 @@ namespace Tests.Unit.Behaviors
 
             public override async Task<HttpResponseMessage> Invoke()
             {
-                base.Invoke();
+                await base.Invoke();
                 return await _behaviorChain.InvokeNext();
             }
         }

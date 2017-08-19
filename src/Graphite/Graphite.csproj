@@ -61,9 +61,13 @@
     <Compile Include="Actions\ActionDescriptorFactory.cs" />
     <Compile Include="Actions\ActionInvoker.cs" />
     <Compile Include="Actions\DefaultResponseStatus.cs" />
+    <Compile Include="Exceptions\ExceptionContext.cs" />
+    <Compile Include="Exceptions\ExceptionDebugResponse.cs" />
     <Compile Include="Actions\IResponseStatus.cs" />
-    <Compile Include="Actions\IUnhandledExceptionHandler.cs" />
-    <Compile Include="Actions\UnhandledExceptionHandler.cs" />
+    <Compile Include="Exceptions\Extensions.cs" />
+    <Compile Include="Exceptions\IExceptionHandler.cs" />
+    <Compile Include="Exceptions\IExceptionDebugResponse.cs" />
+    <Compile Include="Exceptions\ExceptionHandler.cs" />
     <Compile Include="Authentication\AuthenticationBehavior.cs" />
     <Compile Include="Authentication\AuthenticatorBase.cs" />
     <Compile Include="Authentication\BasicAuthenticatorBase.cs" />
@@ -93,6 +97,7 @@
     <Compile Include="Binding\RequestPropertiesBinder.cs" />
     <Compile Include="Binding\HeaderBinder.cs" />
     <Compile Include="Binding\CookieBinder.cs" />
+    <Compile Include="Exceptions\UnhandledGraphiteException.cs" />
     <Compile Include="Http\BufferPolicySelector.cs" />
     <Compile Include="DependencyInjection\TrackingContainer.cs" />
     <Compile Include="Actions\IActionDecorator.cs" />
@@ -118,7 +123,6 @@
     <Compile Include="Routing\IHttpRouteDecorator.cs" />
     <Compile Include="Routing\IHttpRouteMapper.cs" />
     <Compile Include="Monitoring\Metrics.cs" />
-    <Compile Include="Behaviors\DefaultErrorHandlerBehavior.cs" />
     <Compile Include="Binding\MapResult.cs" />
     <Compile Include="Binding\FormBinder.cs" />
     <Compile Include="Binding\ValueMapperBase.cs" />
@@ -126,7 +130,6 @@
     <Compile Include="Actions\AsyncInvoker.cs" />
     <Compile Include="Http\QuerystringParameters.cs" />
     <Compile Include="Http\RequestCancellation.cs" />
-    <Compile Include="Actions\UnhandledGraphiteRequestException.cs" />
     <Compile Include="Http\UrlParameters.cs" />
     <Compile Include="Binding\Extensions.cs" />
     <Compile Include="Binding\IValueMapper.cs" />

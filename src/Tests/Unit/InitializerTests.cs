@@ -6,7 +6,9 @@ using Graphite;
 using Graphite.Actions;
 using Graphite.Behaviors;
 using Graphite.DependencyInjection;
+using Graphite.Exceptions;
 using Graphite.Extensions;
+using Graphite.Reflection;
 using Graphite.Routing;
 using Graphite.StructureMap;
 using NSubstitute;
@@ -35,12 +37,13 @@ namespace Tests.Unit
             _actionSources = new List<IActionSource>();
             _actionDecorators = new List<IActionDecorator>();
             var behaviorChainInvoker = Substitute.For<IBehaviorChainInvoker>();
-            var unhandledExceptionHandler = Substitute.For<IUnhandledExceptionHandler>();
+            var unhandledExceptionHandler = Substitute.For<IExceptionHandler>();
             _container = new Container(x =>
             {
                 x.For<IBehaviorChainInvoker>().Use(behaviorChainInvoker);
-                x.For<IUnhandledExceptionHandler>().Use(unhandledExceptionHandler);
+                x.For<IExceptionHandler>().Use(unhandledExceptionHandler);
             });
+            _container.Register(_container);
             _configuration = new Configuration();
             _httpConfiguration = new HttpConfiguration(_routes);
             _initializer = new Initializer(new HttpRouteMapper(_container,  
@@ -174,7 +177,7 @@ namespace Tests.Unit
         {
             var descriptor = new ActionDescriptor(ActionMethod.From<Handler>(x => x.Get()),
                 new RouteDescriptor("GET", route, null, null, null, null), 
-                null, null, null, null, null, null);
+                null, null, null, null, null, null, new TypeCache());
             actions.Add(descriptor);
             return descriptor;
         }

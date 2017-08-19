@@ -21,5 +21,15 @@ namespace Graphite.Extensions
             return value is string && int.TryParse(
                 value.ToString(), out intValue) ? intValue : 0;
         }
+
+        public static int KB(this int value)
+        {
+            return value * 1024;
+        }
+
+        public static int MB(this int value)
+        {
+            return value * 1024 * 1024;
+        }
     }
 }

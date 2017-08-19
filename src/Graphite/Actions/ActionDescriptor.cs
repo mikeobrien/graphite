@@ -6,6 +6,7 @@ using Graphite.Extensibility;
 using Graphite.Routing;
 using Graphite.Extensions;
 using Graphite.Readers;
+using Graphite.Reflection;
 using Graphite.Writers;
 
 namespace Graphite.Actions
@@ -19,7 +20,8 @@ namespace Graphite.Actions
             Plugins<IRequestReader> requestReaders, 
             Plugins<IResponseWriter> responseWriters,
             Plugins<IResponseStatus> responseStatus,
-            Plugins<IBehavior> behaviors)
+            Plugins<IBehavior> behaviors,
+            ITypeCache typeCache)
         {
             Action = action;
             Route = route;
@@ -29,7 +31,7 @@ namespace Graphite.Actions
             ResponseWriters = responseWriters;
             ResponseStatus = responseStatus;
             Behaviors = behaviors;
-            Registry = new Registry();
+            Registry = new Registry(typeCache);
         }
 
         public virtual ActionMethod Action { get; }

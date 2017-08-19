@@ -36,6 +36,12 @@ namespace Graphite.Extensions
 
     public static class WebApiExtensions
     {
+        public static string RawHeaders(this HttpRequestMessage request)
+        {
+            return $"{request.Method} {request.RequestUri?.AbsolutePath} HTTP/{request.Version}\r\n" +
+                request.Headers.Select(x => $"{x.Key}: {x.Value.Join("; ")}").Join("\r\n");
+        }
+
         public static bool IsPost(this string method)
         {
             return method.EqualsIgnoreCase("POST");

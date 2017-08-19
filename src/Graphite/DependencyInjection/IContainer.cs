@@ -11,5 +11,6 @@ namespace Graphite.DependencyInjection
         void Register(Type plugin, Type concrete, bool singleton);
         void Register(Type plugin, object instance, bool dispose);
         string GetConfiguration();
+        IContainer Parent { get; }
     }
 }

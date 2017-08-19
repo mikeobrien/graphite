@@ -1,8 +1,10 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Graphite.Actions;
 using Graphite.DependencyInjection;
+using Graphite.Exceptions;
 using Graphite.Http;
 
 namespace Graphite.Behaviors
@@ -11,24 +13,37 @@ namespace Graphite.Behaviors
     {
         private readonly Configuration _configuration;
         private readonly IContainer _container;
+        private readonly ActionDescriptor _actionDescriptor;
+        private readonly IExceptionHandler _exceptionHandler;
 
-        public BehaviorChainInvoker(Configuration configuration, IContainer container)
+        public BehaviorChainInvoker(Configuration configuration, IContainer container,
+            ActionDescriptor actionDescriptor, IExceptionHandler exceptionHandler)
         {
             _configuration = configuration;
             _container = container;
+            _actionDescriptor = actionDescriptor;
+            _exceptionHandler = exceptionHandler;
         }
 
         public virtual async Task<HttpResponseMessage> Invoke(ActionDescriptor actionDescriptor, 
             HttpRequestMessage requestMessage, CancellationToken cancellationToken)
         {
-            var container = _container.CreateScopedContainer();
+            var requestContainer = _container.CreateScopedContainer();
 
-            requestMessage.RegisterForDispose(container);
+            try
+            {
+                requestMessage.RegisterForDispose(requestContainer);
 
-            Register(container, actionDescriptor, requestMessage, cancellationToken);
+                Register(requestContainer, actionDescriptor, requestMessage, cancellationToken);
 
-            return await container.GetInstance<IBehaviorChain>(
-                _configuration.BehaviorChain).InvokeNext();
+                return await requestContainer.GetInstance<IBehaviorChain>(
+                    _configuration.BehaviorChain).InvokeNext();
+            }
+            catch (Exception exception)
+            {
+                return _exceptionHandler.HandleException(exception,
+                    _actionDescriptor, requestMessage, _container);
+            }
         }
 
         public virtual void Register(IContainer container, ActionDescriptor actionDescriptor,

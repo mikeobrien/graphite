@@ -46,13 +46,15 @@ namespace Graphite
                 Metrics = new Metrics();
                 Metrics.BeginStartup();
                 
-                Container = new TrackingContainer(configuration.Container);
+                configuration.Container.RegisterPlugin(configuration.TypeCache);
+
+                Container = new TrackingContainer(configuration.Container, 
+                    configuration.Container.GetInstance<ITypeCache>());
 
                 Container.Register(Container);
                 Container.Register(Metrics);
                 Container.Register(configuration);
                 Container.Register(_httpConfiguration);
-                configuration.Container.RegisterPlugin(configuration.TypeCache);
                 Container.RegisterPlugins(configuration.ActionMethodSources);
                 Container.RegisterPlugins(configuration.ActionSources);
                 Container.RegisterPlugins(configuration.ActionDecorators);
@@ -66,7 +68,8 @@ namespace Graphite
                 Container.RegisterPlugin(configuration.PathProvider);
                 Container.RegisterPlugins(configuration.HttpRouteDecorators);
                 Container.RegisterPlugin(configuration.InlineConstraintResolver);
-                Container.RegisterPlugin(configuration.UnhandledExceptionHandler);
+                Container.RegisterPlugin(configuration.ExceptionHandler);
+                Container.RegisterPlugin(configuration.ExceptionDebugResponse);
                 Container.RegisterPlugin(configuration.BehaviorChainInvoker);
                 Container.RegisterPlugins(configuration.Authenticators);
                 Container.RegisterPlugin(configuration.ActionInvoker);

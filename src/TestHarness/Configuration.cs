@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Net.Http;
+using System.Web.Http;
 using Graphite;
 using Graphite.Authentication;
 using Graphite.Cors;
@@ -22,6 +23,8 @@ namespace TestHarness
                 .ClearAssemblies()
                 .IncludeThisAssembly()
                 .EnableDiagnosticsInDebugMode()
+                .ConfigureWebApi(x => x
+                    .Configuration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Never)
                 //.ConfigureSerialization(s => s
                 //    .Json(j => j.UseCamelCaseNaming())
                 //    .Xml(x => x

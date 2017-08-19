@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Graphite.DependencyInjection;
 using Graphite.Extensibility;
+using Graphite.Reflection;
 using Graphite.StructureMap;
 using NUnit.Framework;
 using Should;
@@ -82,7 +83,7 @@ namespace Tests.Unit.Extensibility
         public void Should_register_plugins_with_registry()
         {
             var instance = new Plugin1();
-            var registry = new Registry();
+            var registry = new Registry(new TypeCache());
             var plugin1 = Plugin<IPluginType>.Create(instance, true);
             var plugin2 = Plugin<IPluginType>.Create<Plugin2>(true);
             var plugins = new Plugins<IPluginType>(true);
@@ -101,7 +102,7 @@ namespace Tests.Unit.Extensibility
         public void Should_register_conditional_plugins_with_registry()
         {
             var instance = new Plugin1();
-            var registry = new Registry();
+            var registry = new Registry(new TypeCache());
             var plugin1 = ConditionalPlugin<IPluginType, Context>.Create(instance, x => false, true);
             var plugin2 = ConditionalPlugin<IPluginType, Context>.Create<Plugin2>(x => false, true);
             var plugins = new ConditionalPlugins<IPluginType, Context>(true);
@@ -120,7 +121,7 @@ namespace Tests.Unit.Extensibility
         public void Should_register_plugin_instance_with_registry()
         {
             var instance = new Plugin();
-            var registry = new Registry();
+            var registry = new Registry(new TypeCache());
             var plugin = Plugin<IPluginType>.Create(instance, true);
 
             registry.RegisterPlugin(plugin);
@@ -133,7 +134,7 @@ namespace Tests.Unit.Extensibility
         [Test]
         public void Should_register_plugin_type_with_registry()
         {
-            var registry = new Registry();
+            var registry = new Registry(new TypeCache());
             var plugin = Plugin<IPluginType>.Create<Plugin>(true);
 
             registry.RegisterPlugin(plugin);

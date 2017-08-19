@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
+﻿using System.Net;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
@@ -61,7 +54,7 @@ namespace Tests.Acceptance
             var result = Http.ForHost(host).Get($"{BaseUrl}Exception?_error=false");
 
             result.Status.ShouldEqual(HttpStatusCode.InternalServerError);
-            result.Error.ShouldBeEmpty();
+            result.Error.ShouldEqual("{\"Message\":\"An error has occurred.\"}");
         }
 
         [Test]

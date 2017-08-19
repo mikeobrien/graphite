@@ -16,10 +16,29 @@ namespace Graphite.Extensions
             return Regex.Escape(source);
         }
 
+        public static string[] Split(this string source, params string[] delmiter)
+        {
+            return source.Split(delmiter, StringSplitOptions.None);
+        }
+
+        public static StringBuilder AppendLine(this StringBuilder source, object value)
+        {
+            source.AppendLine(value.ToString());
+            return source;
+        }
+
         public static string InitialCap(this string source)
         {
             return source.IsNotNullOrEmpty() ? (source.Substring(0, 1).ToUpper() + 
                 (source.Length > 1 ? source.Substring(1).ToLower() : "")) : source;
+        }
+
+        public static string PadCenter(this string value, int width, char padChar)
+        {
+            if (value.IsNullOrEmpty() || value.Length >= width) return value;
+            var padding = new string(padChar, (int)Math
+                .Ceiling((width - value.Length) / 2d));
+            return $"{padding}{value}{padding}".Substring(0, width);
         }
 
         public static bool EqualsIgnoreCase(this string source, string compare)
@@ -111,8 +130,10 @@ namespace Graphite.Extensions
             var sourceProperties = map.Arguments.Cast<MemberExpression>()
                 .Select(x => x.Member).Cast<PropertyInfo>().ToArray();
             var columns = map.Members.Select(x => x.Name.Replace("_", " ")).ToArray();
-            var data = source.Select(x => sourceProperties.Select(y => y.GetValue(x)?.ToString() ?? "").ToArray()).ToArray();
-            var columnWidths = columns.Select((x, i) => Math.Max(data.Max(y => y[i].Length), x.Length)).ToArray();
+            var data = source.Select(x => sourceProperties
+                .Select(y => y.GetValue(x)?.ToString() ?? "").ToArray()).ToArray();
+            var columnWidths = columns.Select((x, i) => 
+                Math.Max(data.Any() ? data.Max(y => y[i].Length) : 0, x.Length)).ToArray();
             return columns.Concat(data).Select((x, r) => x.Select((y, i) => 
                 y.PadRight(columnWidths[i], r % 2 == 0 ? '·' : ' ')).Join(" ")).Join("\r\n");
         }
@@ -137,6 +158,24 @@ namespace Graphite.Extensions
                 return "";
             }
             return encoding.GetString(bytes);
+        }
+
+        public static string Repeat(this char value, int length)
+        {
+            return new string(value, Math.Max(length, 0));
+        }
+
+        public static string ToHierarchy(this IEnumerable<string> source)
+        {
+            return source.IsNullOrEmpty() ? null : 
+                source.Select((x, i) => ' '.Repeat(i - 1) + 
+                    (i > 0 ? "└" : "") + x.Trim())
+                    .Join(Environment.NewLine);
+        }
+
+        public static IEnumerable<string> Trim(this IEnumerable<string> source)
+        {
+            return source.Select(x => x?.Trim());
         }
     }
 }

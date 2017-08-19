@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Web.Cors;
 using System.Web.Http;
 using Graphite.Actions;
-using Graphite.Behaviors;
 using Graphite.Extensibility;
 using Graphite.Extensions;
 using Graphite.Linq;
@@ -24,8 +23,7 @@ namespace Graphite.Cors
                 .ConfigureHttpRouteDecorators(x => x
                     .Append<OptionsRouteDecorator>(a => corsConfiguration.PolicySources.ThatApplyTo(a).Any()))
                 .ConfigureBehaviors(x => x
-                    .Append<CorsBehavior>(a => corsConfiguration.PolicySources.ThatApplyTo(a).Any())
-                        .AfterOrPrepend<DefaultErrorHandlerBehavior>())
+                    .Prepend<CorsBehavior>(a => corsConfiguration.PolicySources.ThatApplyTo(a).Any()))
                 .ConfigureRegistry(x => x
                     .Register(corsConfiguration)
                     .RegisterPlugin(corsConfiguration.CorsEngine)

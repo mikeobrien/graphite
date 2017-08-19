@@ -8,6 +8,7 @@ using Graphite.Actions;
 using Graphite.Authentication;
 using Graphite.Behaviors;
 using Graphite.Extensions;
+using Graphite.Reflection;
 using NSubstitute;
 using NUnit.Framework;
 using Should;
@@ -47,7 +48,7 @@ namespace Tests.Unit.Authentication
             _responseMessage = new HttpResponseMessage(HttpStatusCode.OK);
             _behaviorChain = Substitute.For<IBehaviorChain>();
             _behaviorChain.InvokeNext().Returns(_responseMessage);
-            _actionDescriptor = new ActionDescriptorFactory(_configuration, null)
+            _actionDescriptor = new ActionDescriptorFactory(_configuration, null, new TypeCache())
                 .CreateDescriptor(null, null);
             _behavior = new AuthenticationBehavior(_behaviorChain, _requestMessage, 
                 _responseMessage, _authenticators, _configuration, _actionDescriptor);
@@ -57,7 +58,7 @@ namespace Tests.Unit.Authentication
         public void Should_exclude_diagnostics_pages_if_configured(
             [Values(true, false)] bool excludeDiagnostics)
         {
-            var actionDescriptor = new ActionDescriptorFactory(_configuration, null)
+            var actionDescriptor = new ActionDescriptorFactory(_configuration, null, new TypeCache())
                 .CreateDescriptor(ActionMethod.From<GraphiteHandler>(x => x.Post()), null);
             var behavior = new AuthenticationBehavior(_behaviorChain, _requestMessage,
                 _responseMessage, _authenticators, _configuration, actionDescriptor);

@@ -13,6 +13,7 @@ using Graphite.Behaviors;
 using Graphite.Binding;
 using Graphite.DependencyInjection;
 using Graphite.Diagnostics;
+using Graphite.Exceptions;
 using Graphite.Extensibility;
 using Graphite.Extensions;
 using Graphite.Hosting;
@@ -33,7 +34,7 @@ namespace Graphite
     public class Configuration
     {
         public IContainer Container { get; set; }
-        public Registry Registry { get; set; } = new Registry();
+        public Registry Registry { get; set; } = new Registry(new TypeCache());
         public List<Assembly> Assemblies { get; } = new List<Assembly>();
         public Encoding DefaultEncoding { get; set; } = new UTF8Encoding(false);
 
@@ -49,10 +50,7 @@ namespace Graphite
         public HttpStatusCode DefaultNoWriterStatusCode { get; set; } = HttpStatusCode.BadRequest;
         public string DefaultNoWriterStatusText { get; set; } = "Requested format not supported.";
 
-        public string UnhandledExceptionStatusText { get; set; } =
-            "There was a problem processing your request.";
-        public bool DefaultErrorHandlerEnabled { get; set; } = true;
-        public int DownloadBufferSize { get; set; } = 1024 * 1024;
+        public int DownloadBufferSize { get; set; } = 1.MB();
         public int? SerializerBufferSize { get; set; }
         public bool AutomaticallyConstrainUrlParameterByType { get; set; }
         public bool DisposeSerializedObjects { get; set; }
@@ -156,10 +154,15 @@ namespace Graphite
         public Plugin<IActionInvoker> ActionInvoker { get; } =
             Plugin<IActionInvoker>
                 .Create<ActionInvoker>();
-        
-        public Plugin<IUnhandledExceptionHandler> UnhandledExceptionHandler { get; } =
-            Plugin<IUnhandledExceptionHandler>
-                .Create<UnhandledExceptionHandler>();
+
+        public string UnhandledExceptionStatusText { get; set; } =
+            "There was a problem processing your request.";
+        public Plugin<IExceptionHandler> ExceptionHandler { get; } =
+            Plugin<IExceptionHandler>
+                .Create<ExceptionHandler>();
+        public Plugin<IExceptionDebugResponse> ExceptionDebugResponse { get; } =
+            Plugin<IExceptionDebugResponse>
+                .Create<ExceptionDebugResponse>();
 
         public Plugin<IRequestPropertiesProvider> RequestPropertiesProvider { get; } =
             Plugin<IRequestPropertiesProvider>.Create();
@@ -225,9 +228,6 @@ namespace Graphite
                     .Append<DefaultResponseStatus>(@default: true));
 
         public ConditionalPlugins<IBehavior, ActionConfigurationContext> Behaviors { get; } = 
-            new ConditionalPlugins<IBehavior, ActionConfigurationContext>(false)
-            .Configure(x => x
-                .Append<DefaultErrorHandlerBehavior>(y => y
-                    .Configuration.DefaultErrorHandlerEnabled));
+            new ConditionalPlugins<IBehavior, ActionConfigurationContext>(false);
     }
 }

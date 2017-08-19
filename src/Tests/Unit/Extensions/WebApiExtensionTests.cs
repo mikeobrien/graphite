@@ -89,5 +89,16 @@ namespace Tests.Unit.Extensions
         {
             new AcceptTypeMatch(matchType, null, null, 1).GetWeight().ShouldEqual(expected);
         }
+
+        [Test]
+        public void Should_rebuild_raw_request()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Delete, "http://fark/farker");
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("fark/farker"));
+
+            request.RawHeaders().ShouldEqual(
+                "DELETE /farker HTTP/1.1\r\n" +
+                "Accept: fark/farker");
+        }
     }
 }

@@ -109,6 +109,11 @@ namespace Tests.Common
             type.ShouldEqual(typeof(T));
         }
 
+        public static string ShouldContainAll(this string actual, IEnumerable<string> expected)
+        {
+            return actual.ShouldContainAll(StringComparison.Ordinal, expected);
+        }
+
         public static string ShouldContainAll(this string actual, params string[] expected)
         {
             return actual.ShouldContainAll(StringComparison.Ordinal, expected);
@@ -120,7 +125,7 @@ namespace Tests.Common
         }
 
         private static string ShouldContainAll(this string actual,
-            StringComparison comparison, params string[] expected)
+            StringComparison comparison, IEnumerable<string> expected)
         {
             expected.Where(x => x != null)
                 .ForEach(x => actual.Contains(x, comparison)
@@ -156,7 +161,6 @@ namespace Tests.Common
                 try
                 {
                     await action(_source);
-                    throw new AssertException($"Expected to throw {typeof(TException).Name} but none was thrown.");
                 }
                 catch (Exception exception)
                 {
@@ -169,6 +173,7 @@ namespace Tests.Common
                     if (message != null) exception.Message.ShouldEqual(message);
                     return (TException)actualException;
                 }
+                throw new AssertException($"Expected to throw {typeof(TException).Name} but none was thrown.");
             }
 
             public void NotThrow(Action<T> action)

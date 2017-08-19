@@ -5,6 +5,7 @@ using Graphite.Behaviors;
 using Graphite.Binding;
 using Graphite.Extensibility;
 using Graphite.Readers;
+using Graphite.Reflection;
 using Graphite.Writers;
 using NUnit.Framework;
 using Should;
@@ -25,7 +26,8 @@ namespace Tests.Unit.Actions
             _requestGraph = RequestGraph.Create();
             
             _actionDescriptorFactory = new ActionDescriptorFactory(
-                _requestGraph.Configuration, _requestGraph.HttpConfiguration);
+                _requestGraph.Configuration, _requestGraph.HttpConfiguration, 
+                new TypeCache());
         }
 
         [Test]

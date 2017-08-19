@@ -6,6 +6,7 @@ using Graphite.Behaviors;
 using Graphite.Binding;
 using Graphite.Extensibility;
 using Graphite.Readers;
+using Graphite.Reflection;
 using Graphite.Routing;
 using Graphite.Writers;
 using NUnit.Framework;
@@ -88,7 +89,7 @@ namespace Tests.Unit.Actions
                 new List<IRouteConvention>
                 {
                     _routeConvention1, _routeConvention2
-                }, new ActionDescriptorFactory(_configuration, null));
+                }, new ActionDescriptorFactory(_configuration, null, new TypeCache()));
         }
 
         [Test]
