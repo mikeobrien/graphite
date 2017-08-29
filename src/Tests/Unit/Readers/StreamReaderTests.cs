@@ -63,8 +63,9 @@ namespace Tests.Unit.Readers
 
             var result = await CreateStreamReader(requestGraph).Read();
 
-            result.ShouldBeType<MemoryStream>();
-            result.As<Stream>().ReadAllText().ShouldEqual("fark");
+            result.Status.ShouldEqual(ReadStatus.Success);
+            result.Value.ShouldBeType<MemoryStream>();
+            result.Value.As<Stream>().ReadAllText().ShouldEqual("fark");
         }
 
         [TestCase(null, null)]
@@ -81,8 +82,9 @@ namespace Tests.Unit.Readers
 
             var result = await CreateStreamReader(requestGraph).Read();
 
-            result.ShouldBeType<InputStream>();
-            var inputStream = result.As<InputStream>();
+            result.Status.ShouldEqual(ReadStatus.Success);
+            result.Value.ShouldBeType<InputStream>();
+            var inputStream = result.Value.As<InputStream>();
             inputStream.Data.ReadAllText().ShouldEqual("fark");
             inputStream.Length.ShouldEqual(4);
             inputStream.MimeType.ShouldEqual(mimeType);

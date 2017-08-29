@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Graphite.Extensions;
 using Graphite.Http;
 using Graphite.Routing;
 
@@ -8,14 +9,14 @@ namespace Graphite.Binding
     public class QuerystringBinder : IRequestBinder
     {
         private readonly RouteDescriptor _routeDescriptor;
-        private readonly ParameterBinder _parameterBinder;
+        private readonly ArgumentBinder _argumentBinder;
         private readonly QuerystringParameters _querystringParameters;
 
         public QuerystringBinder(RouteDescriptor routeDescriptor,
-            ParameterBinder parameterBinder,
+            ArgumentBinder argumentBinder,
             QuerystringParameters querystringParameters)
         {
-            _parameterBinder = parameterBinder;
+            _argumentBinder = argumentBinder;
             _routeDescriptor = routeDescriptor;
             _querystringParameters = querystringParameters;
         }
@@ -25,11 +26,11 @@ namespace Graphite.Binding
             return _routeDescriptor.Parameters.Any();
         }
 
-        public Task Bind(RequestBinderContext context)
+        public Task<BindResult> Bind(RequestBinderContext context)
         {
-            _parameterBinder.Bind(_querystringParameters, 
-                context.ActionArguments, _routeDescriptor.Parameters);
-            return Task.CompletedTask;
+            return _argumentBinder.Bind(_querystringParameters, 
+                context.ActionArguments, _routeDescriptor.Parameters)
+                .ToTaskResult();
         }
     }
 }

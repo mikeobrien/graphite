@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using Graphite.Http;
 using NUnit.Framework;
@@ -81,6 +83,21 @@ namespace Tests.Acceptance
             result.Data.Filename.ShouldEqual(filename);
             result.Data.MimeType.ShouldEqual(mimetype);
             result.Data.Length.ShouldEqual(length);
+        }
+
+        [Test]
+        public void Should_return_400_if_no_reader_applies_to_request(
+            [Values(Host.Owin, Host.IISExpress)] Host host)
+        {
+            var result = Http.ForHost(host).Post($"{BaseUrl}NoReader",
+                contentHeaders: x =>
+                {
+                    x.Clear();
+                    x.ContentType = new MediaTypeWithQualityHeaderValue("fark/farker");
+                });
+
+            result.Status.ShouldEqual(HttpStatusCode.BadRequest);
+            result.StatusText.ShouldEqual("Request format not supported.");
         }
     }
 }

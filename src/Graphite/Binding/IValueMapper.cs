@@ -1,4 +1,5 @@
 using System;
+using Graphite.Actions;
 using Graphite.Extensibility;
 using Graphite.Reflection;
 using Graphite.Routing;
@@ -16,6 +17,7 @@ namespace Graphite.Binding
         }
         
         public virtual string Name => _parameter.Name;
+        public virtual ActionMethod Action => _parameter.Action;
         public virtual TypeDescriptor Type => _parameter.TypeDescriptor;
         public virtual bool ForParameter => _parameter.IsParameter;
         public virtual ParameterDescriptor Parameter => _parameter.ParameterDescriptor;
@@ -34,6 +36,6 @@ namespace Graphite.Binding
 
     public interface IValueMapper : IConditional<ValueMapperContext>
     {
-        object Map(ValueMapperContext context);
+        MapResult Map(ValueMapperContext context);
     }
 }

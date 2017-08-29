@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Graphite;
+using Graphite.Actions;
 using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Linq;
@@ -16,6 +18,18 @@ namespace Tests.Unit.Binding
     [TestFixture]
     public class SimpleTypeMapperTests
     {
+        public class Handler { public void Post() { } }
+
+        private ActionMethod _actionMethod;
+        private Configuration _configuration;
+
+        [SetUp]
+        public void Setup()
+        {
+            _configuration = new Configuration();
+            _actionMethod = ActionMethod.From<Handler>(x => x.Post());
+        }
+
         public void SimpleParameterTypes(string stringValue,
             AttributeTargets enumValue, char charValue, bool boolValue, sbyte sbyteValue,
             byte byteValue, short shortValue, ushort ushortValue, int intValue, uint uintValue,
@@ -41,8 +55,8 @@ namespace Tests.Unit.Binding
         [TestCaseSource(nameof(SimpleTypeParameterTestCases))]
         public void Should_apply_to_simple_types(ParameterDescriptor parameter)
         {
-            new SimpleTypeMapper().AppliesTo(new ValueMapperContext(
-                new ActionParameter(parameter), null)).ShouldBeTrue();
+            new SimpleTypeMapper(_configuration).AppliesTo(new ValueMapperContext(
+                new ActionParameter(_actionMethod, parameter), null)).ShouldBeTrue();
         }
 
         public class ComplexClass { }
@@ -57,8 +71,8 @@ namespace Tests.Unit.Binding
         [TestCaseSource(nameof(ComplexParameterTypeTestCases))]
         public void Should_not_apply_to_complex_types(ParameterDescriptor parameter)
         {
-            new SimpleTypeMapper().AppliesTo(new ValueMapperContext(
-                new ActionParameter(parameter), null)).ShouldBeFalse();
+            new SimpleTypeMapper(_configuration).AppliesTo(new ValueMapperContext(
+                new ActionParameter(_actionMethod, parameter), null)).ShouldBeFalse();
         }
 
         private static DateTime _datetime = DateTime.Parse(DateTime.MaxValue.ToString());
@@ -116,24 +130,26 @@ namespace Tests.Unit.Binding
         public void Should_map_simple_types(Type type, object expected, object value)
         {
             var parameter = SimpleTypeParameters.FirstOrDefault(x => x.ParameterType.Type == type);
-            var result = new SimpleTypeMapper().Map(new ValueMapperContext(
-                new ActionParameter(parameter), value.AsArray()));
-            result?.GetType().ShouldEqual(type.GetUnderlyingNullableType());
-            result.ShouldEqual(expected);
+            var result = new SimpleTypeMapper(_configuration).Map(new ValueMapperContext(
+                new ActionParameter(_actionMethod, parameter), value.AsArray()));
+
+            result.Status.ShouldEqual(MappingStatus.Success);
+            result.Value?.GetType().ShouldEqual(type.GetUnderlyingNullableType());
+            result.Value.ShouldEqual(expected);
         }
 
         [TestCaseSource(nameof(SimpleTypeParameterParsingTestCases))]
-        public void Should_return_bad_request_exception_when_format_incorrect(
+        public void Should_return_failure_when_format_incorrect(
             Type type, object expected, object value)
         {
             if (type == typeof(string)) return;
             var parameter = SimpleTypeParameters.FirstOrDefault(x => x.ParameterType.Type == type);
-            var message = new SimpleTypeMapper().Should().Throw<BadRequestException>(x => x
-                .Map(new ValueMapperContext(new ActionParameter(parameter), 
-                    "fark".AsArray()))).Message;
+            var result = new SimpleTypeMapper(_configuration).Map(new ValueMapperContext(
+                new ActionParameter(_actionMethod, parameter), "fark".AsArray()));
 
-            message.ShouldContain("fark");
-            message.ShouldContain(parameter.Name);
+            result.Status.ShouldEqual(MappingStatus.Failure);
+            result.ErrorMessage.ShouldContain("fark");
+            result.ErrorMessage.ShouldContain(parameter.Name);
         }
 
         private static readonly ParameterDescriptor[] SimpleTypeParameterArrays =
@@ -160,10 +176,12 @@ namespace Tests.Unit.Binding
         {
             var parameter = SimpleTypeParameterArrays.FirstOrDefault(
                 x => x.ParameterType.ElementType.Type == type);
-            var result = new SimpleTypeMapper().Map(new ValueMapperContext(
-                new ActionParameter(parameter), new[] { value, value }));
-            result?.GetType().ShouldEqual(type.MakeArrayType());
-            result.As<IEnumerable>().Cast<object>().ShouldOnlyContain(expected, expected);
+            var result = new SimpleTypeMapper(_configuration).Map(new ValueMapperContext(
+                new ActionParameter(_actionMethod, parameter), new[] { value, value }));
+
+            result.Status.ShouldEqual(MappingStatus.Success);
+            result.Value?.GetType().ShouldEqual(type.MakeArrayType());
+            result.Value.As<IEnumerable>().Cast<object>().ShouldOnlyContain(expected, expected);
         }
 
         private static readonly ParameterDescriptor[] SimpleTypeParameterLists =
@@ -190,10 +208,12 @@ namespace Tests.Unit.Binding
         {
             var parameter = SimpleTypeParameterLists.FirstOrDefault(
                 x => x.ParameterType.ElementType.Type == type);
-            var result = new SimpleTypeMapper().Map(new ValueMapperContext(
-                new ActionParameter(parameter), new[] { value, value }));
-            result?.GetType().ShouldEqual(typeof(List<>).MakeGenericType(type));
-            result.As<IEnumerable>().Cast<object>().ShouldOnlyContain(expected, expected);
+            var result = new SimpleTypeMapper(_configuration).Map(new ValueMapperContext(
+                new ActionParameter(_actionMethod, parameter), new[] { value, value }));
+
+            result.Status.ShouldEqual(MappingStatus.Success);
+            result.Value?.GetType().ShouldEqual(typeof(List<>).MakeGenericType(type));
+            result.Value.As<IEnumerable>().Cast<object>().ShouldOnlyContain(expected, expected);
         }
 
         private static readonly ParameterDescriptor[] SimpleTypeParameterListInterface =
@@ -220,10 +240,12 @@ namespace Tests.Unit.Binding
         {
             var parameter = SimpleTypeParameterListInterface.FirstOrDefault(
                 x => x.ParameterType.ElementType.Type == type);
-            var result = new SimpleTypeMapper().Map(new ValueMapperContext(
-                new ActionParameter(parameter), new[] { value, value }));
-            result?.GetType().ShouldEqual(typeof(List<>).MakeGenericType(type));
-            result.As<IEnumerable>().Cast<object>().ShouldOnlyContain(expected, expected);
+            var result = new SimpleTypeMapper(_configuration).Map(new ValueMapperContext(
+                new ActionParameter(_actionMethod, parameter), new[] { value, value }));
+
+            result.Status.ShouldEqual(MappingStatus.Success);
+            result.Value?.GetType().ShouldEqual(typeof(List<>).MakeGenericType(type));
+            result.Value.As<IEnumerable>().Cast<object>().ShouldOnlyContain(expected, expected);
         }
     }
 }

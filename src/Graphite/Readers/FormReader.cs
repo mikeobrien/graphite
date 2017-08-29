@@ -1,60 +1,49 @@
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Net.Http;
-using System.Web.Http;
 using Graphite.Actions;
 using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Http;
-using Graphite.Linq;
 using Graphite.Routing;
 
 namespace Graphite.Readers
 {
     public class FormReader : StringReaderBase
     {
-        private readonly Configuration _configuration;
-        private readonly HttpConfiguration _httpConfiguration;
-        private readonly IEnumerable<IValueMapper> _mappers;
+        private readonly ParameterBinder<ReadResult> _parameterBinder;
         private readonly ActionMethod _actionMethod;
         private readonly RouteDescriptor _routeDescriptor;
 
-        public FormReader(Configuration configuration, HttpConfiguration httpConfiguration,
+        public FormReader(
+            ParameterBinder<ReadResult> parameterBinder,
             ActionMethod actionMethod, RouteDescriptor routeDescriptor, 
-            IEnumerable<IValueMapper> mappers, HttpRequestMessage requestMessage) 
+            HttpRequestMessage requestMessage) 
             : base(requestMessage, MimeTypes.ApplicationFormUrlEncoded)
         {
-            _configuration = configuration;
-            _httpConfiguration = httpConfiguration;
-            _mappers = mappers;
+            _parameterBinder = parameterBinder;
             _actionMethod = actionMethod;
             _routeDescriptor = routeDescriptor;
         }
 
-        protected override object GetRequest(string data)
+        protected override ReadResult GetRequest(string data)
         {
             var requestParameter = _routeDescriptor.RequestParameter;
             var parameterType = requestParameter.ParameterType;
             var instance = parameterType.TryCreate();
 
-            if (instance == null) return null;
+            if (instance == null)
+                throw new RequestParameterCreationException(
+                    requestParameter, _actionMethod);
 
-            data.ParseQueryString()
-                .Where(x => x.Any())
-                .JoinIgnoreCase(parameterType.Properties, x => x.Key, x => x.Name, 
-                    (param, prop) => new
-                    {
-                        Parameter = new ActionParameter(requestParameter, prop),
-                        Values = param.ToArray()
-                    })
-                .ForEach(x =>
-                {
-                    var result = _mappers.Map(_actionMethod, _routeDescriptor, 
-                        x.Parameter, x.Values, _configuration, _httpConfiguration);
-                    if (result.Mapped) x.Parameter.BindProperty(instance, result.Value);
-                });
+            var actionParameters = parameterType.Properties.Select(x =>
+                new ActionParameter(_actionMethod, requestParameter, x));
+            var values = data.ParseQueryString();
 
-            return instance;
+            return _parameterBinder.Bind(values, actionParameters,
+                (p, v) => p.BindProperty(instance, v),
+                () => ReadResult.Success(instance),
+                ReadResult.Failure);
         }
     }
 }

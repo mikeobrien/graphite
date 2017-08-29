@@ -112,8 +112,7 @@ namespace Tests.Unit.Writers
         {
             return new RedirectWriter(
                 requestGraph.GetRouteDescriptor(),
-                requestGraph.GetHttpResponseMessage(),
-                new Configuration());
+                requestGraph.GetHttpResponseMessage());
         }
     }
 }

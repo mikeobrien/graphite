@@ -39,14 +39,56 @@ namespace Graphite.Setup
         }
 
         /// <summary>
+        /// Specifies the default status code when binding fails.
+        /// </summary>
+        public ConfigurationDsl WithDefaultBindingFailureStatus(HttpStatusCode statusCode,
+            Func<string, string> statusText = null)
+        {
+            _configuration.DefaultBindingFailureStatusCode = statusCode;
+            if (statusText != null)
+                _configuration.DefaultBindingFailureStatusText = statusText;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the default status text when binding fails.
+        /// </summary>
+        public ConfigurationDsl WithDefaultBindingFailureStatusText(
+            Func<string, string> statusText)
+        {
+            _configuration.DefaultBindingFailureStatusText = statusText;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the default status code when no reader applies.
+        /// </summary>
+        public ConfigurationDsl WithDefaultNoReaderStatus(HttpStatusCode statusCode)
+        {
+            _configuration.DefaultNoReaderStatusCode = statusCode;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the default status code and text when no reader applies.
+        /// </summary>
+        public ConfigurationDsl WithDefaultNoReaderStatus(
+            HttpStatusCode statusCode, string statusText)
+        {
+            _configuration.DefaultNoReaderStatusCode = statusCode;
+            _configuration.DefaultNoReaderStatusText = statusText;
+            return this;
+        }
+
+        /// <summary>
         /// Specifies the default response status code and text.
         /// </summary>
         public ConfigurationDsl WithDefaultResponseStatus(
             HttpStatusCode statusCode, string statusText = null)
         {
-            _configuration.DefaultResponseStatusCode = statusCode;
+            _configuration.DefaultHasResponseStatusCode = statusCode;
             if (statusText.IsNotNullOrEmpty())
-                _configuration.DefaultResponseStatusText = statusText;
+                _configuration.DefaultHasResponseStatusText = statusText;
             return this;
         }
 

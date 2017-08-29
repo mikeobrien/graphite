@@ -18,6 +18,16 @@ namespace Graphite.Setup
         }
 
         /// <summary>
+        /// Indicates that the request should fail if no 
+        /// value mapper found for a request value.
+        /// </summary>
+        public ConfigurationDsl FailIfNoMapperFound()
+        {
+            _configuration.FailIfNoMapperFound = true;
+            return this;
+        }
+
+        /// <summary>
         /// Binds header values to action parameters.
         /// </summary>
         public ConfigurationDsl BindHeaders()

@@ -101,5 +101,12 @@ namespace TestHarness.Writer
         {
             return Redirect.None(HttpStatusCode.NotFound);
         }
+
+        public class NoWriterModel { }
+
+        public NoWriterModel GetNoWriter()
+        {
+            return new NoWriterModel();
+        }
     }
 }

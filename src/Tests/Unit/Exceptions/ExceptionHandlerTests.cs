@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Http;
 using Graphite;
 using Graphite.Actions;
-using Graphite.Binding;
 using Graphite.DependencyInjection;
 using Graphite.Exceptions;
 using Graphite.Http;
@@ -46,18 +45,6 @@ namespace Tests.Unit.Exceptions
                     _requestMessage, _container));
 
             result.InnerException.ShouldEqual(exception);
-        }
-
-        [Test]
-        public void Should_return_400_if_bad_request_exception_thrown()
-        {
-            var exception = new BadRequestException("fark");
-
-            var result = _exceptionHandler.HandleException(exception,
-                _actionDescriptor, _requestMessage, _container);
-
-            result.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
-            result.ReasonPhrase.ShouldEqual("fark");
         }
 
         [Test]

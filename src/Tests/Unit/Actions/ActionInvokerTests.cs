@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Graphite.Actions;
 using Graphite.Binding;
 using Graphite.Extensions;
+using Graphite.Http;
 using Graphite.Linq;
 using Graphite.Reflection;
 using NSubstitute;
@@ -18,6 +19,8 @@ namespace Tests.Unit.Actions
     [TestFixture]
     public class ActionInvokerTests
     {
+        public class Model { }
+
         public interface IHandler
         {
             void NoParamsOrResponse();
@@ -32,6 +35,7 @@ namespace Tests.Unit.Actions
             Task<string> ResponseAsync();
             string ParamsAndResponse(string param);
             Task<string> ParamsAndResponseAsync(string param);
+            void Request(Model request);
         }
 
         public static object[][] ActionTestCases = TestCaseSource
@@ -86,11 +90,11 @@ namespace Tests.Unit.Actions
                 .Configuration.DefaultNoResponseStatusCode);
         }
 
-        private static Task SetArguments(ActionMethod actionMethod, 
+        private static Task<BindResult> SetArguments(ActionMethod actionMethod, 
             RequestBinderContext context, Action<object[], ParameterDescriptor> set)
         {
             actionMethod.MethodDescriptor.Parameters.ForEach(pi => set(context.ActionArguments, pi));
-            return Task.CompletedTask;
+            return BindResult.Success().ToTaskResult();
         }
 
         [Test]
@@ -179,7 +183,7 @@ namespace Tests.Unit.Actions
 
         [Test]
         public async Task Should_set_default_response_status(
-            [Values(null, HttpStatusCode.Ambiguous)] HttpStatusCode? statusCode)
+            [Values(null, HttpStatusCode.Created)] HttpStatusCode? statusCode)
         {
             var requestGraph = RequestGraph
                 .CreateFor<IHandler>(x => x.Response())
@@ -187,7 +191,7 @@ namespace Tests.Unit.Actions
             var responseMessage = requestGraph.GetHttpResponseMessage();
 
             if (statusCode.HasValue) requestGraph.Configuration
-                .DefaultResponseStatusCode = statusCode.Value;
+                .DefaultHasResponseStatusCode = statusCode.Value;
 
             requestGraph.AddResponseWriter1(x => responseMessage.ToTaskResult());
 
@@ -199,12 +203,12 @@ namespace Tests.Unit.Actions
             var response = await invoker.Invoke(handler);
 
             response.StatusCode.ShouldEqual(requestGraph
-                .Configuration.DefaultResponseStatusCode);
+                .Configuration.DefaultHasResponseStatusCode);
         }
 
         [Test]
         public async Task Should_set_default_no_response_status(
-            [Values(null, HttpStatusCode.Ambiguous)] HttpStatusCode? statusCode)
+            [Values(null, HttpStatusCode.Created)] HttpStatusCode? statusCode)
         {
             var requestGraph = RequestGraph
                 .CreateFor<IHandler>(x => x.NoResponse())
@@ -246,7 +250,7 @@ namespace Tests.Unit.Actions
             var response = await invoker.Invoke(handler);
 
             response.StatusCode.ShouldEqual(requestGraph
-                .Configuration.DefaultResponseStatusCode);
+                .Configuration.DefaultHasResponseStatusCode);
             var responseText = await response.Content.ReadAsStringAsync();
             responseText.ShouldEqual("response2");
         }
@@ -271,7 +275,7 @@ namespace Tests.Unit.Actions
 
         [Test]
         public async Task Should_return_empty_response_if_no_writers_apply(
-            [Values(null, HttpStatusCode.Ambiguous)] HttpStatusCode? statusCode)
+            [Values(null, HttpStatusCode.Created)] HttpStatusCode? statusCode)
         {
             var requestGraph = RequestGraph
                 .CreateFor<IHandler>(x => x.Response())
@@ -288,6 +292,56 @@ namespace Tests.Unit.Actions
 
             response.StatusCode.ShouldEqual(requestGraph
                 .Configuration.DefaultNoWriterStatusCode);
+        }
+
+        [Test]
+        public async Task Should_return_reader_failure(
+            [Values(null, HttpStatusCode.Created)] HttpStatusCode? statusCode)
+        {
+            var requestGraph = RequestGraph
+                .CreateFor<IHandler>(x => x.Request(null))
+                    .AddDefaultResponseStatus()
+                    .WithContentType(MimeTypes.ApplicationJson)
+                    .WithRequestParameter("request")
+                    .WithRequestData("{");
+
+            requestGraph.AddReaderBinder(requestGraph.GetJsonReader());
+
+            if (statusCode.HasValue) requestGraph.Configuration
+                .DefaultBindingFailureStatusCode = statusCode.Value;
+            var invoker = CreateInvoker(requestGraph);
+
+            var handler = Substitute.For<IHandler>();
+            handler.Response().ReturnsForAnyArgs(x => "response");
+
+            var response = await invoker.Invoke(handler);
+
+            response.StatusCode.ShouldEqual(requestGraph
+                .Configuration.DefaultBindingFailureStatusCode);
+        }
+
+        [Test]
+        public async Task Should_return_no_reader_status(
+            [Values(null, HttpStatusCode.Created)] HttpStatusCode? statusCode)
+        {
+            var requestGraph = RequestGraph
+                .CreateFor<IHandler>(x => x.Request(null))
+                    .AddDefaultResponseStatus()
+                    .WithContentType("fark/farker")
+                    .WithRequestParameter("request")
+                    .AddReaderBinder();
+
+            if (statusCode.HasValue) requestGraph.Configuration
+                .DefaultNoReaderStatusCode = statusCode.Value;
+            var invoker = CreateInvoker(requestGraph);
+
+            var handler = Substitute.For<IHandler>();
+            handler.Response().ReturnsForAnyArgs(x => "response");
+
+            var response = await invoker.Invoke(handler);
+
+            response.StatusCode.ShouldEqual(requestGraph
+                .Configuration.DefaultNoReaderStatusCode);
         }
 
         private ActionInvoker CreateInvoker(RequestGraph requestGraph, 

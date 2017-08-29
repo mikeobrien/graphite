@@ -119,8 +119,7 @@ namespace Graphite.Writers
         private readonly HttpResponseMessage _responseMessage;
 
         public RedirectWriter(RouteDescriptor routeDescriptor,
-            HttpResponseMessage responseMessage, Configuration configuration) : 
-            base(configuration)
+            HttpResponseMessage responseMessage)
         {
             _routeDescriptor = routeDescriptor;
             _responseMessage = responseMessage;

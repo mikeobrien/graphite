@@ -12,8 +12,7 @@ namespace Graphite.Writers
         private readonly Lazy<AcceptTypeMatch> _acceptType;
 
         protected WeightedContentWriterBase(HttpRequestMessage requestMessage,
-            HttpResponseMessage responseMessage, Configuration configuration, 
-            params string[] mimeTypes) : base(configuration)
+            HttpResponseMessage responseMessage, params string[] mimeTypes)
         {
             _responseMessage = responseMessage;
             _acceptType = requestMessage.ToLazy(x => x

@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
+using System.Net.Http.Headers;
 using Graphite.Http;
 using NUnit.Framework;
 using Should;
@@ -86,7 +88,7 @@ namespace Tests.Acceptance
         }
 
         [Test]
-        public void Should_not_redirect_and_set_Status_when_status_specified(
+        public void Should_not_redirect_and_set_status_when_status_specified(
             [Values(Host.Owin, Host.IISExpress)] Host host)
         {
             var result = Http.ForHost(host).GetJson<WriterTestHandler.RedirectModel>(
@@ -95,6 +97,21 @@ namespace Tests.Acceptance
             result.Status.ShouldEqual(HttpStatusCode.NotFound);
             result.RedirectUrl.ShouldBeNull();
             result.Data.ShouldBeNull();
+        }
+
+        [Test]
+        public void Should_return_400_if_no_writer_applies_to_request(
+            [Values(Host.Owin, Host.IISExpress)] Host host)
+        {
+            var result = Http.ForHost(host).Get($"{BaseUrl}NoWriter",
+                requestHeaders: x =>
+                {
+                    x.Clear();
+                    x.Accept.Add(new MediaTypeWithQualityHeaderValue("fark/farker"));
+                });
+
+            result.Status.ShouldEqual(HttpStatusCode.BadRequest);
+            result.StatusText.ShouldEqual("Response format not supported.");
         }
     }
 }

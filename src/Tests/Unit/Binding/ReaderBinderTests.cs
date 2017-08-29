@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Graphite.Binding;
 using Graphite.Extensions;
+using Graphite.Readers;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
@@ -22,11 +23,13 @@ namespace Tests.Unit.Binding
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Get(null))
                 .WithRequestParameter("request")
-                .AddRequestReader1(() => "reader1".ToTaskResult<object>())
-                .AddRequestReader2(() => "reader2".ToTaskResult<object>());
+                .AddRequestReader1(() => ReadResult.Success("reader1").ToTaskResult())
+                .AddRequestReader2(() => ReadResult.Success("reader2").ToTaskResult());
             var requestReaderContext = requestGraph.GetRequestBinderContext();
 
-            await CreateBinder(requestGraph).Bind(requestReaderContext);
+            var result = await CreateBinder(requestGraph).Bind(requestReaderContext);
+
+            result.Status.ShouldEqual(BindingStatus.Success);
 
             requestGraph.ActionArguments.ShouldOnlyContain("reader1");
 
@@ -52,12 +55,14 @@ namespace Tests.Unit.Binding
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Get(null))
                 .WithRequestParameter("request")
-                .AddRequestReader1(() => "reader1".ToTaskResult<object>(),
+                .AddRequestReader1(() => ReadResult.Success("reader1").ToTaskResult(),
                     configAppliesTo: x => false)
-                .AddRequestReader2(() => "reader2".ToTaskResult<object>())
-                .AddValueMapper1(x => x.Values.First());
+                .AddRequestReader2(() => ReadResult.Success("reader2").ToTaskResult())
+                .AddValueMapper1(x => MapResult.Success(x.Values.First()));
 
-            await CreateBinder(requestGraph).Bind(requestGraph.GetRequestBinderContext());
+            var result = await CreateBinder(requestGraph).Bind(requestGraph.GetRequestBinderContext());
+
+            result.Status.ShouldEqual(BindingStatus.Success);
 
             requestGraph.ActionArguments.ShouldOnlyContain("reader2");
 
@@ -74,14 +79,16 @@ namespace Tests.Unit.Binding
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Get(null))
                 .WithRequestParameter("request")
-                .AddRequestReader1(() => "reader1".ToTaskResult<object>(),
+                .AddRequestReader1(() => ReadResult.Success("reader1").ToTaskResult(),
                     instanceAppliesTo: () => false)
-                .AddRequestReader2(() => "reader2".ToTaskResult<object>())
-                .AddValueMapper1(x => x.Values.First());
+                .AddRequestReader2(() => ReadResult.Success("reader2").ToTaskResult())
+                .AddValueMapper1(x => MapResult.Success(x.Values.First()));
 
             var binder = CreateBinder(requestGraph);
 
-            await binder.Bind(requestGraph.GetRequestBinderContext());
+            var result = await binder.Bind(requestGraph.GetRequestBinderContext());
+
+            result.Status.ShouldEqual(BindingStatus.Success);
 
             requestGraph.ActionArguments.ShouldOnlyContain("reader2");
 
@@ -98,15 +105,17 @@ namespace Tests.Unit.Binding
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Get(null))
                 .WithRequestParameter("request")
-                .AddRequestReader1(() => "reader1".ToTaskResult<object>(),
+                .AddRequestReader1(() => ReadResult.Success("reader1").ToTaskResult(),
                     instanceAppliesTo: () => false)
-                .AddRequestReader2(() => "reader2".ToTaskResult<object>(),
+                .AddRequestReader2(() => ReadResult.Success("reader2").ToTaskResult(),
                     instanceAppliesTo: () => false, @default: true)
-                .AddValueMapper1(x => x.Values.First());
+                .AddValueMapper1(x => MapResult.Success(x.Values.First()));
 
             var binder = CreateBinder(requestGraph);
 
-            await binder.Bind(requestGraph.GetRequestBinderContext());
+            var result = await binder.Bind(requestGraph.GetRequestBinderContext());
+
+            result.Status.ShouldEqual(BindingStatus.Success);
 
             requestGraph.ActionArguments.ShouldOnlyContain("reader2");
 
@@ -123,10 +132,12 @@ namespace Tests.Unit.Binding
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Get(null))
                 .WithRequestParameter("request")
-                .AddValueMapper1(x => $"{x.Values.First()}mapper");
+                .AddValueMapper1(x => MapResult.Success($"{x.Values.First()}mapper"));
             var binder = CreateBinder(requestGraph);
 
-            await binder.Bind(requestGraph.GetRequestBinderContext());
+            var result = await binder.Bind(requestGraph.GetRequestBinderContext());
+
+            result.Status.ShouldEqual(BindingStatus.NoReader);
 
             requestGraph.ActionArguments.ShouldOnlyContain(null);
 

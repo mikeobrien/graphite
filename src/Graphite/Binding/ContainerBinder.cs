@@ -33,7 +33,7 @@ namespace Graphite.Binding
             return GetParameters().Any();
         }
 
-        public Task Bind(RequestBinderContext context)
+        public Task<BindResult> Bind(RequestBinderContext context)
         {
             GetParameters().ForEach(x =>
             {
@@ -41,7 +41,7 @@ namespace Graphite.Binding
                     x.BindArgument(context.ActionArguments, _container
                         .GetInstance(x.TypeDescriptor.Type));
             });
-            return Task.CompletedTask;
+            return BindResult.Success().ToTaskResult();
         }
 
         private IEnumerable<ActionParameter> GetParameters()

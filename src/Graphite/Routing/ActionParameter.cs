@@ -1,4 +1,5 @@
 ﻿using System;
+using Graphite.Actions;
 using Graphite.Reflection;
 using Graphite.Extensions;
 
@@ -8,31 +9,34 @@ namespace Graphite.Routing
     {
         private readonly DescriptorBase _descriptor;
 
-        public ActionParameter(ParameterDescriptor parameter)
+        public ActionParameter(ActionMethod action, ParameterDescriptor parameter)
         {
             _descriptor = parameter;
             Name = parameter.Name;
             IsParameter = true;
+            Action = action;
             ParameterDescriptor = parameter;
             TypeDescriptor = parameter?.ParameterType;
         }
 
-        public ActionParameter(ParameterDescriptor parameter, 
+        public ActionParameter(ActionMethod action, ParameterDescriptor parameter, 
             PropertyDescriptor property)
         {
             _descriptor = property;
             Name = property.Name;
             IsPropertyOfParameter = true;
+            Action = action;
             ParameterDescriptor = parameter;
             PropertyDescriptor = property;
             TypeDescriptor = property?.PropertyType;
         }
 
-        public ActionParameter(PropertyDescriptor property)
+        public ActionParameter(ActionMethod action, PropertyDescriptor property)
         {
             _descriptor = property;
             Name = property.Name;
             IsProperty = true;
+            Action = action;
             PropertyDescriptor = property;
             TypeDescriptor = property?.PropertyType;
         }
@@ -41,6 +45,7 @@ namespace Graphite.Routing
         {
             _descriptor = actionParameter._descriptor;
             Name = actionParameter.Name;
+            Action = actionParameter.Action;
             TypeDescriptor = actionParameter.TypeDescriptor;
             IsParameter = actionParameter.IsParameter;
             ParameterDescriptor = actionParameter.ParameterDescriptor;
@@ -49,6 +54,7 @@ namespace Graphite.Routing
         }
 
         public string Name { get; }
+        public ActionMethod Action { get; set; }
         public virtual TypeDescriptor TypeDescriptor { get; }
         public virtual bool IsParameter { get; }
         public virtual ParameterDescriptor ParameterDescriptor { get; }

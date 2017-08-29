@@ -38,7 +38,7 @@ namespace TestHarness.Action
 
         public void PostNoResponse() { }
 
-        [ResponseStatus(HttpStatusCode.Created, "farker")]
+        [HasResponseStatus(HttpStatusCode.Created, "farker")]
         public string GetCustomStatus()
         {
             return "fark";

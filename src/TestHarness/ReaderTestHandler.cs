@@ -82,5 +82,11 @@ namespace TestHarness.Reader
                 Data = Encoding.UTF8.GetString(byteInfo.Data)
             };
         }
+
+        public class NoReaderModel { }
+
+        public void PostNoReader(NoReaderModel model)
+        {
+        }
     }
 }

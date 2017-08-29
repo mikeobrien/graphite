@@ -41,9 +41,9 @@ namespace Tests.Unit.Diagnostics
             var actionMethod = ActionMethod.From<Handler>(x => x.Get(null, 0, DateTime.MaxValue));
             var routeDescriptor = new RouteDescriptor("GET", "some/url", 
                 parameters.Where(x => x.Name == "urlParam")
-                    .Select(x => new UrlParameter(x, false)).ToArray(), 
+                    .Select(x => new UrlParameter(actionMethod, x, false)).ToArray(), 
                 parameters.Where(x => x.Name == "queryParam")
-                    .Select(x => new ActionParameter(x)).ToArray(), 
+                    .Select(x => new ActionParameter(actionMethod, x)).ToArray(), 
                 parameters.First(x => x.Name == "request"),
                 new TypeCache().GetTypeDescriptor(typeof(OutputModel)));
             var actionDescriptors = new List<ActionDescriptor>

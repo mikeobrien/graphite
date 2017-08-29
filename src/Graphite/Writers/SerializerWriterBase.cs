@@ -16,8 +16,7 @@ namespace Graphite.Writers
             HttpResponseMessage responseMessage,
             Configuration configuration,
             params string[] mimeTypes) :
-            base(requestMessage, responseMessage,
-                configuration, mimeTypes)
+            base(requestMessage, responseMessage, mimeTypes)
         {
             _configuration = configuration;
         }

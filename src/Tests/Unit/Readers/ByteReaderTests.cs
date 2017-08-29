@@ -62,8 +62,9 @@ namespace Tests.Unit.Readers
 
             var result = await CreateByteReader(requestGraph).Read();
 
-            result.ShouldBeType<byte[]>();
-            result.As<byte[]>().ShouldOnlyContain<byte>(102, 97, 114, 107);
+            result.Status.ShouldEqual(ReadStatus.Success);
+            result.Value.ShouldBeType<byte[]>();
+            result.Value.As<byte[]>().ShouldOnlyContain<byte>(102, 97, 114, 107);
         }
 
         [TestCase(null, null)]
@@ -80,8 +81,9 @@ namespace Tests.Unit.Readers
 
             var result = await CreateByteReader(requestGraph).Read();
 
-            result.ShouldBeType<InputBytes>();
-            var inputBytes = result.As<InputBytes>();
+            result.Status.ShouldEqual(ReadStatus.Success);
+            result.Value.ShouldBeType<InputBytes>();
+            var inputBytes = result.Value.As<InputBytes>();
             inputBytes.Data.ShouldOnlyContain<byte>(102, 97, 114, 107);
             inputBytes.Length.ShouldEqual(4);
             inputBytes.MimeType.ShouldEqual(mimeType);

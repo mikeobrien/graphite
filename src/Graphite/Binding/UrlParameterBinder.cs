@@ -10,16 +10,16 @@ namespace Graphite.Binding
 {
     public class UrlParameterBinder : IRequestBinder
     {
-        private readonly ParameterBinder _parameterBinder;
+        private readonly ArgumentBinder _argumentBinder;
         private readonly RouteDescriptor _routeDescriptor;
         private readonly UrlParameters _urlParameters;
 
         public UrlParameterBinder(
             RouteDescriptor routeDescriptor,
-            ParameterBinder parameterBinder,
+            ArgumentBinder argumentBinder,
             UrlParameters urlParameters)
         {
-            _parameterBinder = parameterBinder;
+            _argumentBinder = argumentBinder;
             _routeDescriptor = routeDescriptor;
             _urlParameters = urlParameters;
         }
@@ -29,15 +29,15 @@ namespace Graphite.Binding
             return _routeDescriptor.UrlParameters.Any();
         }
 
-        public Task Bind(RequestBinderContext context)
+        public Task<BindResult> Bind(RequestBinderContext context)
         {
             var values = _urlParameters.SelectMany(x =>
                 ExpandWildcardParameters(x, _routeDescriptor
                     .UrlParameters)).ToLookup();
             var parameters = _routeDescriptor.UrlParameters
                 .Concat(_routeDescriptor.Parameters).ToArray();
-            _parameterBinder.Bind(values, context.ActionArguments, parameters);
-            return Task.CompletedTask;
+            return _argumentBinder.Bind(values, context.ActionArguments, 
+                parameters).ToTaskResult();
         }
 
         private IEnumerable<KeyValuePair<string, object>> ExpandWildcardParameters

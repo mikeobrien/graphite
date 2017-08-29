@@ -20,10 +20,8 @@ namespace Graphite.Writers
     {
         public ByteWriter(ActionMethod actionMethod, 
             RouteDescriptor routeDescriptor,
-            HttpResponseMessage responseMessage,
-            Configuration configuration) : 
-            base(actionMethod, routeDescriptor, 
-                responseMessage, configuration) { }
+            HttpResponseMessage responseMessage) : 
+            base(actionMethod, routeDescriptor, responseMessage) { }
 
         protected override HttpContent GetContent(byte[] data, IOutputInfo outputInfo)
         {

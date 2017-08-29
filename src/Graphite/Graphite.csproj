@@ -61,6 +61,9 @@
     <Compile Include="Actions\ActionDescriptorFactory.cs" />
     <Compile Include="Actions\ActionInvoker.cs" />
     <Compile Include="Actions\DefaultResponseStatus.cs" />
+    <Compile Include="Binding\BindResult.cs" />
+    <Compile Include="Binding\MapperNotFoundException.cs" />
+    <Compile Include="Binding\ParameterBinder.cs" />
     <Compile Include="Exceptions\ExceptionContext.cs" />
     <Compile Include="Exceptions\ExceptionDebugResponse.cs" />
     <Compile Include="Actions\IResponseStatus.cs" />
@@ -87,9 +90,8 @@
     <Compile Include="Actions\IActionMethodSource.cs" />
     <Compile Include="Actions\IActionSource.cs" />
     <Compile Include="Actions\InvokerBehavior.cs" />
-    <Compile Include="Binding\BadRequestException.cs" />
     <Compile Include="Binding\BindingMode.cs" />
-    <Compile Include="Binding\ParameterBinder.cs" />
+    <Compile Include="Binding\ArgumentBinder.cs" />
     <Compile Include="Binding\ContainerBinder.cs" />
     <Compile Include="Binding\ValueMapperConfigurationContext.cs" />
     <Compile Include="Binding\XmlBinder.cs" />
@@ -120,6 +122,8 @@
     <Compile Include="Http\IRequestPropertiesProvider.cs" />
     <Compile Include="Linq\LookupWrapper.cs" />
     <Compile Include="Http\RemoteHost.cs" />
+    <Compile Include="Readers\ReadResult.cs" />
+    <Compile Include="Readers\RequestParameterCreationException.cs" />
     <Compile Include="Routing\IHttpRouteDecorator.cs" />
     <Compile Include="Routing\IHttpRouteMapper.cs" />
     <Compile Include="Monitoring\Metrics.cs" />

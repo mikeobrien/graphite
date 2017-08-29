@@ -10,8 +10,8 @@ namespace Graphite.Writers
 
         protected StringWriterBase(HttpRequestMessage requestMessage,
             HttpResponseMessage responseMessage, Encoding encoding, 
-            Configuration configuration, params string[] mimeTypes)
-            : base(requestMessage, responseMessage, configuration, mimeTypes)
+            params string[] mimeTypes)
+            : base(requestMessage, responseMessage, mimeTypes)
         {
             _encoding = encoding;
         }

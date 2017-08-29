@@ -28,8 +28,15 @@ namespace Tests.Unit.Binding
         {
             var mappers = new List<IValueMapper>
             {
-                new TestValueMapper1 { MapFunc = c => $"{c.Values.First()}1", AppliesToFunc = c => false },
-                new TestValueMapper2 { MapFunc = c => $"{c.Values.First()}2" }
+                new TestValueMapper1
+                {
+                    MapFunc = c => MapResult.Success($"{c.Values.First()}1"),
+                    AppliesToFunc = c => false
+                },
+                new TestValueMapper2
+                {
+                    MapFunc = c => MapResult.Success($"{c.Values.First()}2")
+                }
             };
 
             _configuration.ValueMappers.Configure(c => c
@@ -38,7 +45,7 @@ namespace Tests.Unit.Binding
 
             var result = mappers.Map(null, null, null, new object[] { "value" }, _configuration, null);
 
-            result.Mapped.ShouldBeTrue();
+            result.Status.ShouldEqual(MappingStatus.Success);
             result.Value.ShouldEqual("value2");
         }
 
@@ -47,8 +54,14 @@ namespace Tests.Unit.Binding
         {
             var mappers = new List<IValueMapper>
             {
-                new TestValueMapper1 { MapFunc = c => $"{c.Values.First()}1" },
-                new TestValueMapper2 { MapFunc = c => $"{c.Values.First()}2" }
+                new TestValueMapper1
+                {
+                    MapFunc = c => MapResult.Success($"{c.Values.First()}1")
+                },
+                new TestValueMapper2
+                {
+                    MapFunc = c => MapResult.Success($"{c.Values.First()}2")
+                }
             };
 
             _configuration.ValueMappers.Configure(c => c
@@ -57,7 +70,7 @@ namespace Tests.Unit.Binding
 
             var result = mappers.Map(null, null, null, new object[] { "value" }, _configuration, null);
 
-            result.Mapped.ShouldBeTrue();
+            result.Status.ShouldEqual(MappingStatus.Success);
             result.Value.ShouldEqual("value2");
         }
 
@@ -66,8 +79,14 @@ namespace Tests.Unit.Binding
         {
             var mappers = new List<IValueMapper>
             {
-                new TestValueMapper1 { MapFunc = c => $"{c.Values.First()}1" },
-                new TestValueMapper2 { MapFunc = c => $"{c.Values.First()}2" }
+                new TestValueMapper1
+                {
+                    MapFunc = c => MapResult.Success($"{c.Values.First()}1")
+                },
+                new TestValueMapper2
+                {
+                    MapFunc = c => MapResult.Success($"{c.Values.First()}2")
+                }
             };
 
             _configuration.ValueMappers.Configure(c => c
@@ -76,7 +95,7 @@ namespace Tests.Unit.Binding
 
             var result = mappers.Map(null, null, null, new object[] { "value" }, _configuration, null);
 
-            result.Mapped.ShouldBeTrue();
+            result.Status.ShouldEqual(MappingStatus.Success);
             result.Value.ShouldEqual("value2");
         }
 
@@ -85,12 +104,15 @@ namespace Tests.Unit.Binding
         {
             var mappers = new List<IValueMapper>
             {
-                new TestValueMapper { MapFunc = c => $"{c.Values.First()}1", AppliesToFunc = c => false }
+                new TestValueMapper
+                {
+                    MapFunc = c => MapResult.Success($"{c.Values.First()}1"), AppliesToFunc = c => false
+                }
             };
 
             var result = mappers.Map(null, null, null, new object[] { "value" }, _configuration, null);
 
-            result.Mapped.ShouldBeFalse();
+            result.Status.ShouldEqual(MappingStatus.NoMapper);
             result.Value.ShouldBeNull();
         }
 
@@ -99,8 +121,14 @@ namespace Tests.Unit.Binding
         {
             var mappers = new List<IValueMapper>
             {
-                new TestValueMapper1 { MapFunc = c => $"{c.Values.First()}1" },
-                new TestValueMapper2 { MapFunc = c => $"{c.Values.First()}2" }
+                new TestValueMapper1
+                {
+                    MapFunc = c => MapResult.Success($"{c.Values.First()}1")
+                },
+                new TestValueMapper2
+                {
+                    MapFunc = c => MapResult.Success($"{c.Values.First()}2")
+                }
             };
 
             _configuration.ValueMappers.Configure(c => c
@@ -109,7 +137,7 @@ namespace Tests.Unit.Binding
 
             var result = mappers.Map(null, null, null, new object[] { "value" }, _configuration, null);
 
-            result.Mapped.ShouldBeTrue();
+            result.Status.ShouldEqual(MappingStatus.Success);
             result.Value.ShouldEqual("value2");
         }
 
@@ -123,10 +151,10 @@ namespace Tests.Unit.Binding
         [Test]
         public void Should_get_value_from_argument()
         {
-            var parameter = ActionMethod.From<ArgumentHandler>(x => x
-                    .Action(null, null)).MethodDescriptor.Parameters
+            var action = ActionMethod.From<ArgumentHandler>(x => x.Action(null, null));
+            var parameter = action.MethodDescriptor.Parameters
                 .First(x => x.Name == "value");
-            var actionParameter = new ActionParameter(parameter);
+            var actionParameter = new ActionParameter(action, parameter);
             var arguments = new object[] { null, "fark" };
 
             actionParameter.GetArgument(arguments).ShouldEqual("fark");
@@ -135,11 +163,11 @@ namespace Tests.Unit.Binding
         [Test]
         public void Should_get_value_from_argument_property()
         {
-            var parameter = ActionMethod.From<ArgumentHandler>(x => x
-                    .Action(null, null)).MethodDescriptor.Parameters
+            var action = ActionMethod.From<ArgumentHandler>(x => x.Action(null, null));
+            var parameter = action.MethodDescriptor.Parameters
                 .First(x => x.Name == "model");
             var property = parameter.ParameterType.Properties.First();
-            var actionParameter = new ActionParameter(parameter, property);
+            var actionParameter = new ActionParameter(action, parameter, property);
             var arguments = new object[] { new ArgumentHandler.Model { Value = "fark" }, null };
 
             actionParameter.GetArgument(arguments).ShouldEqual("fark");
@@ -148,11 +176,11 @@ namespace Tests.Unit.Binding
         [Test]
         public void Should_return_null_if_property_argument_is_null()
         {
-            var parameter = ActionMethod.From<ArgumentHandler>(x => x
-                    .Action(null, null)).MethodDescriptor.Parameters
+            var action = ActionMethod.From<ArgumentHandler>(x => x.Action(null, null));
+            var parameter = action.MethodDescriptor.Parameters
                 .First(x => x.Name == "value");
             var property = parameter.ParameterType.Properties.First();
-            var actionParameter = new ActionParameter(parameter, property);
+            var actionParameter = new ActionParameter(action, parameter, property);
             var arguments = new object[2];
 
             actionParameter.GetArgument(arguments).ShouldBeNull();
@@ -161,10 +189,10 @@ namespace Tests.Unit.Binding
         [Test]
         public void Should_bind_parameter_to_arguments()
         {
-            var parameter = ActionMethod.From<ArgumentHandler>(x => x
-                    .Action(null, null)).MethodDescriptor.Parameters
+            var action = ActionMethod.From<ArgumentHandler>(x => x.Action(null, null));
+            var parameter = action.MethodDescriptor.Parameters
                 .First(x => x.Name == "value");
-            var actionParameter = new ActionParameter(parameter);
+            var actionParameter = new ActionParameter(action, parameter);
             var arguments = new object[2];
 
             actionParameter.BindArgument(arguments, "fark");
@@ -175,11 +203,11 @@ namespace Tests.Unit.Binding
         [Test]
         public void Should_bind_new_parameter_property_to_arguments()
         {
-            var parameter = ActionMethod.From<ArgumentHandler>(x => x
-                .Action(null, null)).MethodDescriptor.Parameters
+            var action = ActionMethod.From<ArgumentHandler>(x => x.Action(null, null));
+            var parameter = action.MethodDescriptor.Parameters
                 .First(x => x.Name == "model");
             var property = parameter.ParameterType.Properties.First();
-            var actionParameter = new ActionParameter(parameter, property);
+            var actionParameter = new ActionParameter(action, parameter, property);
             var arguments = new object[2];
 
             actionParameter.BindArgument(arguments, "fark");
@@ -194,11 +222,11 @@ namespace Tests.Unit.Binding
         [Test]
         public void Should_bind_existing_parameter_property_to_arguments()
         {
-            var parameter = ActionMethod.From<ArgumentHandler>(x => x
-                    .Action(null, null)).MethodDescriptor.Parameters
+            var action = ActionMethod.From<ArgumentHandler>(x => x.Action(null, null));
+            var parameter = action.MethodDescriptor.Parameters
                 .First(x => x.Name == "model");
             var property = parameter.ParameterType.Properties.First();
-            var actionParameter = new ActionParameter(parameter, property);
+            var actionParameter = new ActionParameter(action, parameter, property);
             var arguments = new object[2];
             var existingModel = new ArgumentHandler.Model { Value = "farker" };
             arguments[0] = existingModel;
@@ -216,10 +244,10 @@ namespace Tests.Unit.Binding
         [Test]
         public void Should_fail_to_bind_property_to_arguments()
         {
-            var property = ActionMethod.From<ArgumentHandler>(x => x
-                    .Action(null, null)).MethodDescriptor.Parameters
+            var action = ActionMethod.From<ArgumentHandler>(x => x.Action(null, null));
+            var property = action.MethodDescriptor.Parameters
                 .First(x => x.Name == "model").ParameterType.Properties.First();
-            var actionParameter = new ActionParameter(property);
+            var actionParameter = new ActionParameter(action, property);
             var arguments = new object[2];
             
             actionParameter.Should().Throw<InvalidOperationException>(
@@ -236,10 +264,10 @@ namespace Tests.Unit.Binding
         [Test]
         public void Should_bind_property()
         {
-            var property = ActionMethod.From<PropertyBinderHandler>(x => 
-                x.Action(null)).MethodDescriptor.Parameters.First()
+            var action = ActionMethod.From<PropertyBinderHandler>(x => x.Action(null));
+            var property = action.MethodDescriptor.Parameters.First()
                 .ParameterType.Properties.First();
-            var actionParameter = new ActionParameter(property);
+            var actionParameter = new ActionParameter(action, property);
             var model = new PropertyBinderHandler.Model();
 
             actionParameter.BindProperty(model, "fark");
@@ -250,10 +278,10 @@ namespace Tests.Unit.Binding
         [Test]
         public void Should_bind_parameter_property()
         {
-            var parameter = ActionMethod.From<PropertyBinderHandler>(x =>
-                x.Action(null)).MethodDescriptor.Parameters.First();
+            var action = ActionMethod.From<PropertyBinderHandler>(x => x.Action(null));
+            var parameter = action.MethodDescriptor.Parameters.First();
             var property = parameter.ParameterType.Properties.First();
-            var actionParameter = new ActionParameter(parameter, property);
+            var actionParameter = new ActionParameter(action, parameter, property);
             var model = new PropertyBinderHandler.Model();
 
             actionParameter.BindProperty(model, "fark");
@@ -264,9 +292,9 @@ namespace Tests.Unit.Binding
         [Test]
         public void Should_fail_to_bind_parameter()
         {
-            var parameter = ActionMethod.From<PropertyBinderHandler>(x =>
-                    x.Action(null)).MethodDescriptor.Parameters.First();
-            var actionParameter = new ActionParameter(parameter);
+            var action = ActionMethod.From<PropertyBinderHandler>(x => x.Action(null));
+            var parameter = action.MethodDescriptor.Parameters.First();
+            var actionParameter = new ActionParameter(action, parameter);
             var model = new PropertyBinderHandler.Model();
 
             actionParameter.Should().Throw<InvalidOperationException>(

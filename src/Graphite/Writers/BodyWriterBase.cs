@@ -46,9 +46,7 @@ namespace Graphite.Writers
 
         protected BodyWriterBase(ActionMethod actionMethod, 
             RouteDescriptor routeDescriptor, 
-            HttpResponseMessage responseMessage, 
-            Configuration configuration) :
-            base(configuration)
+            HttpResponseMessage responseMessage)
         {
             _routeDescriptor = routeDescriptor;
             _responseMessage = responseMessage;

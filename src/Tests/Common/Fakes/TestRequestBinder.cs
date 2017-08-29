@@ -11,11 +11,11 @@ namespace Tests.Common.Fakes
     {
         public TestRequestBinder()
         {
-            BindFunc = c => Task.FromResult<object>(null);
+            BindFunc = c => Task.FromResult(BindResult.Success());
         }
 
         public Func<RequestBinderContext, bool> AppliesToFunc { get; set; }
-        public Func<RequestBinderContext, Task> BindFunc { get; set; }
+        public Func<RequestBinderContext, Task<BindResult>> BindFunc { get; set; }
         public RequestBinderContext AppliesToContext { get; set; }
         public RequestBinderContext BindContext { get; set; }
         public bool AppliesToCalled { get; set; }
@@ -28,7 +28,7 @@ namespace Tests.Common.Fakes
             return AppliesToFunc?.Invoke(context) ?? true;
         }
 
-        public Task Bind(RequestBinderContext context)
+        public Task<BindResult> Bind(RequestBinderContext context)
         {
             BindCalled = true;
             BindContext = context;

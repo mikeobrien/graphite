@@ -25,17 +25,17 @@ namespace Graphite.Binding
     {
         public const string HeaderPostfix = "Header";
 
-        private readonly ParameterBinder _parameterBinder;
+        private readonly ArgumentBinder _argumentBinder;
         private readonly RouteDescriptor _routeDescriptor;
         private readonly Configuration _configuration;
         private readonly HttpRequestMessage _requestMessage;
 
         public HeaderBinder(Configuration configuration, 
             RouteDescriptor routeDescriptor, 
-            ParameterBinder parameterBinder, 
+            ArgumentBinder argumentBinder, 
             HttpRequestMessage requestMessage)
         {
-            _parameterBinder = parameterBinder;
+            _argumentBinder = argumentBinder;
             _routeDescriptor = routeDescriptor;
             _configuration = configuration;
             _requestMessage = requestMessage;
@@ -47,13 +47,13 @@ namespace Graphite.Binding
                    _configuration.HeadersBindingMode != BindingMode.None;
         }
 
-        public Task Bind(RequestBinderContext context)
+        public Task<BindResult> Bind(RequestBinderContext context)
         {
             var values = _requestMessage.Headers.ToLookup();
             var parameters = _routeDescriptor.Parameters
                 .Where(x => IncludeParameter(x, _configuration.HeadersBindingMode)).ToArray();
-            _parameterBinder.Bind(values, context.ActionArguments, parameters, MapParameterName);
-            return Task.CompletedTask;
+            return _argumentBinder.Bind(values, context.ActionArguments, 
+                parameters, MapParameterName).ToTaskResult();
         }
 
         private string MapParameterName(ActionParameter parameter)

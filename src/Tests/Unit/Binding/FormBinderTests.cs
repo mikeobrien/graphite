@@ -26,7 +26,7 @@ namespace Tests.Unit.Binding
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                 .WithRequestData("param1=value1&param2=value2")
                 .WithContentType(MimeTypes.ApplicationFormUrlEncoded)
-                .AddValueMapper1(x => x.Values);
+                .AddValueMapper1(x => MapResult.Success(x.Values));
 
             if (hasParameters)
             {
@@ -47,7 +47,7 @@ namespace Tests.Unit.Binding
                 .WithRequestData("param1=value1&param2=value2")
                 .AddParameters("param1", "param2")
                 .WithContentType(MimeTypes.ApplicationFormUrlEncoded)
-                .AddValueMapper1(x => x.Values);
+                .AddValueMapper1(x => MapResult.Success(x.Values));
 
             if (hasRequest)
             {
@@ -67,7 +67,7 @@ namespace Tests.Unit.Binding
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                 .WithRequestData("param1=value1&param2=value2")
                 .AddParameters("param1", "param2")
-                .AddValueMapper1(x => x.Values);
+                .AddValueMapper1(x => MapResult.Success(x.Values));
 
             if (isFormUrlEncoded)
             {
@@ -86,7 +86,7 @@ namespace Tests.Unit.Binding
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                 .WithRequestData("param1=value1&param2=value2")
                 .AddParameters("param1", "param2")
-                .AddValueMapper1(x => x.Values.First());
+                .AddValueMapper1(x => MapResult.Success(x.Values.First()));
 
             var binder = CreateBinder(requestGraph);
 
@@ -108,7 +108,7 @@ namespace Tests.Unit.Binding
                 .CreateFor<Handler>(h => h.MultiParams(null))
                 .WithRequestData("param1=value1&param1=value2")
                 .AddParameters("param1")
-                .AddValueMapper1(x => x.Values);
+                .AddValueMapper1(x => MapResult.Success(x.Values));
 
             var binder = CreateBinder(requestGraph);
 
@@ -125,7 +125,7 @@ namespace Tests.Unit.Binding
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                 .WithRequestData("param1=value1")
                 .AddParameters("param1")
-                .AddValueMapper1(x => x.Values.First());
+                .AddValueMapper1(x => MapResult.Success(x.Values.First()));
 
             var binder = CreateBinder(requestGraph);
 
@@ -141,8 +141,8 @@ namespace Tests.Unit.Binding
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                 .WithRequestData("param1=value1&param2=value2")
                 .AddParameters("param1", "param2")
-                .AddValueMapper1(x => x.Values.First() + "mapper1")
-                .AddValueMapper2(x => x.Values.First() + "mapper2");
+                .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"))
+                .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
 
             var binder = CreateBinder(requestGraph);
 
@@ -164,8 +164,9 @@ namespace Tests.Unit.Binding
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                 .WithRequestData("param1=value1&param2=value2")
                 .AddParameters("param1", "param2")
-                .AddValueMapper1(x => x.Values.First() + "mapper1", configAppliesTo: x => false)
-                .AddValueMapper2(x => x.Values.First() + "mapper2");
+                .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"), 
+                    configAppliesTo: x => false)
+                .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
 
             var binder = CreateBinder(requestGraph);
 
@@ -187,8 +188,9 @@ namespace Tests.Unit.Binding
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                 .WithRequestData("param1=value1&param2=value2")
                 .AddParameters("param1", "param2")
-                .AddValueMapper1(x => x.Values.First() + "mapper1", instanceAppliesTo: x => false)
-                .AddValueMapper2(x => x.Values.First() + "mapper2");
+                .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"), 
+                    instanceAppliesTo: x => false)
+                .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
 
             var binder = CreateBinder(requestGraph);
 
@@ -237,7 +239,7 @@ namespace Tests.Unit.Binding
         {
             return new FormBinder(
                 requestGraph.GetRouteDescriptor(),
-                requestGraph.GetParameterBinder(),
+                requestGraph.GetArgumentBinder(),
                 requestGraph.GetHttpRequestMessage());
         }
     }

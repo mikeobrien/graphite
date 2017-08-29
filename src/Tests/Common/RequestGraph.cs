@@ -24,8 +24,10 @@ using Graphite.Reflection;
 using Graphite.Setup;
 using Graphite.StructureMap;
 using Graphite.Writers;
+using Newtonsoft.Json;
 using Tests.Common.Fakes;
 using HttpMethod = System.Net.Http.HttpMethod;
+using JsonReader = Graphite.Readers.JsonReader;
 
 namespace Tests.Common
 {
@@ -115,7 +117,8 @@ namespace Tests.Common
                         IsWildcard = x.Groups[1].Value.StartsWith("*")
                     }).ToList();
 
-                UrlParameters.AddRange(parameters.Select(x => new UrlParameter(x.Parameter, x.IsWildcard)));
+                UrlParameters.AddRange(parameters.Select(x => new UrlParameter(
+                    ActionMethod, x.Parameter, x.IsWildcard)));
             }
         }
 
@@ -246,7 +249,7 @@ namespace Tests.Common
 
         public RequestGraph AddUrlParameter(string name, bool wildcard = false)
         {
-            UrlParameters.Add(new UrlParameter(GetParameter(name), wildcard));
+            UrlParameters.Add(new UrlParameter(ActionMethod, GetParameter(name), wildcard));
             return this;
         }
 
@@ -265,19 +268,20 @@ namespace Tests.Common
         public RequestGraph AddAllActionParameters(bool includeComplexTypeProperties = false)
         {
             _parameters.AddRange(ActionMethod.MethodDescriptor.Parameters
-                .Select(x => new ActionParameter(x)));
+                .Select(x => new ActionParameter(ActionMethod, x)));
             if (includeComplexTypeProperties)
                 _parameters
                     .AddRange(ActionMethod.MethodDescriptor.Parameters
                         .Where(x => x.ParameterType.IsComplexType)
                         .SelectMany(x => x.ParameterType.Properties
-                            .Select(y => new ActionParameter(x, y))));
+                            .Select(y => new ActionParameter(ActionMethod, x, y))));
             return this;
         }
 
         public RequestGraph AddParameters(params string[] names)
         {
-            _parameters.AddRange(names.Select(name => new ActionParameter(GetParameter(name))));
+            _parameters.AddRange(names.Select(name => 
+                new ActionParameter(ActionMethod, GetParameter(name))));
             return this;
         }
 
@@ -292,9 +296,9 @@ namespace Tests.Common
         {
             var parameter = ActionMethod.MethodDescriptor.Parameters
                 .FirstOrDefault(x => x.Name.EqualsIgnoreCase(name));
-            if (parameter == null) throw new Exception($"Could not find parameter {name} " +
+            if (parameter == null) throw new Exception($"Could not find parameter '{name}', " +
                 $@"should be {ActionMethod.MethodDescriptor.Parameters.Select(x => 
-                    x.Name).Join(", ")}.");
+                    $"'{x.Name}'").Join(", ")}.");
             return parameter;
         }
 
@@ -302,7 +306,7 @@ namespace Tests.Common
         {
             var parameter = GetParameter(parameterName);
             _parameters.AddRange(names.Select(name => new ActionParameter(
-                parameter, GetProperty(parameter, name))));
+                ActionMethod, parameter, GetProperty(parameter, name))));
             return this;
         }
 
@@ -316,16 +320,21 @@ namespace Tests.Common
             return property;
         }
 
-        public ParameterBinder GetParameterBinder()
+        public ArgumentBinder GetArgumentBinder()
         {
-            return new ParameterBinder(
+            return new ArgumentBinder(GetParameterBinder<BindResult>());
+        }
+
+        public ParameterBinder<TStatus> GetParameterBinder<TStatus>()
+        {
+            return new ParameterBinder<TStatus>(
                 Configuration,
                 HttpConfiguration,
                 ActionMethod,
                 GetRouteDescriptor(),
                 ValueMappers);
         }
-        
+
         public ActionConfigurationContext GetActionConfigurationContext()
         {
             return new ActionConfigurationContext(Configuration, HttpConfiguration, 
@@ -353,7 +362,7 @@ namespace Tests.Common
             return this;
         }
 
-        public RequestGraph AddValueMapper1(Func<ValueMapperContext, object> map, 
+        public RequestGraph AddValueMapper1(Func<ValueMapperContext, MapResult> map, 
             Func<ValueMapperContext, bool> configAppliesTo = null, 
             Func<ValueMapperContext, bool> instanceAppliesTo = null)
         {
@@ -362,7 +371,7 @@ namespace Tests.Common
             return this;
         }
 
-        public RequestGraph AddValueMapper2(Func<ValueMapperContext, object> map,
+        public RequestGraph AddValueMapper2(Func<ValueMapperContext, MapResult> map,
             Func<ValueMapperContext, bool> configAppliesTo = null,
             Func<ValueMapperContext, bool> instanceAppliesTo = null)
         {
@@ -371,7 +380,7 @@ namespace Tests.Common
             return this;
         }
 
-        private T AddValueMapper<T>(Func<ValueMapperContext, object> map,
+        private T AddValueMapper<T>(Func<ValueMapperContext, MapResult> map,
             Func<ValueMapperContext, bool> configAppliesTo,
             Func<ValueMapperContext, bool> instanceAppliesTo)
             where T : TestValueMapper, new()
@@ -389,8 +398,14 @@ namespace Tests.Common
         public RequestGraph AppendValueMapper<T>(Func<ValueMapperContext, bool> configAppliesTo = null)
             where T : IValueMapper, new()
         {
+            return AppendValueMapper(new T(), configAppliesTo);
+        }
+
+        public RequestGraph AppendValueMapper<T>(T mapper, 
+            Func<ValueMapperContext, bool> configAppliesTo = null)
+            where T : IValueMapper
+        {
             Configuration.ValueMappers.Configure(x => x.Append<T>(configAppliesTo));
-            var mapper = new T();
             ValueMappers.Add(mapper);
             return this;
         }
@@ -401,7 +416,7 @@ namespace Tests.Common
         public TestRequestReader1 RequestReader1 { get; private set; }
         public TestRequestReader2 RequestReader2 { get; private set; }
 
-        public RequestGraph AddRequestReader1(Func<Task<object>> read,
+        public RequestGraph AddRequestReader1(Func<Task<ReadResult>> read,
             Func<ActionConfigurationContext, bool> configAppliesTo = null,
             Func<bool> instanceAppliesTo = null, bool @default = false)
         {
@@ -411,7 +426,7 @@ namespace Tests.Common
             return this;
         }
 
-        public RequestGraph AddRequestReader2(Func<Task<object>> read,
+        public RequestGraph AddRequestReader2(Func<Task<ReadResult>> read,
             Func<ActionConfigurationContext, bool> configAppliesTo = null,
             Func<bool> instanceAppliesTo = null, bool @default = false)
         {
@@ -421,7 +436,7 @@ namespace Tests.Common
             return this;
         }
 
-        private T AddRequestReader<T>(Func<Task<object>> read,
+        private T AddRequestReader<T>(Func<Task<ReadResult>> read,
             Func<ActionConfigurationContext, bool> configAppliesTo,
             Func<bool> instanceAppliesTo, bool @default)
             where T : TestRequestReader, new()
@@ -436,6 +451,18 @@ namespace Tests.Common
             return reader;
         }
 
+        public JsonReader GetJsonReader()
+        {
+            return new JsonReader(new JsonSerializer(), 
+                GetRouteDescriptor(), GetHttpRequestMessage());
+        }
+
+        public RequestGraph AddReaderBinder(params IRequestReader[] readers)
+        {
+            RequestBinders.Add(new ReaderBinder(GetActionDescriptor(), readers));
+            return this;
+        }
+
         /* ---------------- Request Binders --------------- */
 
         public RequestBinderContext GetRequestBinderContext()
@@ -447,7 +474,7 @@ namespace Tests.Common
         public TestRequestBinder1 RequestBinder1 { get; private set; }
         public TestRequestBinder2 RequestBinder2 { get; private set; }
 
-        public RequestGraph AddRequestBinder1(Func<RequestBinderContext, Task> bind,
+        public RequestGraph AddRequestBinder1(Func<RequestBinderContext, Task<BindResult>> bind,
             Func<ActionConfigurationContext, bool> configAppliesTo = null,
             Func<RequestBinderContext, bool> instanceAppliesTo = null)
         {
@@ -456,7 +483,7 @@ namespace Tests.Common
             return this;
         }
 
-        public RequestGraph AddRequestBinder2(Func<RequestBinderContext, Task> bind,
+        public RequestGraph AddRequestBinder2(Func<RequestBinderContext, Task<BindResult>> bind,
             Func<ActionConfigurationContext, bool> configAppliesTo = null,
             Func<RequestBinderContext, bool> instanceAppliesTo = null)
         {
@@ -465,7 +492,7 @@ namespace Tests.Common
             return this;
         }
 
-        private T AddRequestBinder<T>(Func<RequestBinderContext, Task> bind,
+        public T AddRequestBinder<T>(Func<RequestBinderContext, Task<BindResult>> bind,
             Func<ActionConfigurationContext, bool> configAppliesTo,
             Func<RequestBinderContext, bool> instanceAppliesTo)
             where T : TestRequestBinder, new()
@@ -530,9 +557,10 @@ namespace Tests.Common
 
         /* ---------------- Response Status--------------- */
 
-        public ResponseStatusContext GetResponseStatusContext(ResponseState responseState)
+        public ResponseStatusContext GetResponseStatusContext(
+            ResponseState responseState, string errorMessage = null)
         {
-            return new ResponseStatusContext(GetHttpResponseMessage(), responseState);
+            return new ResponseStatusContext(GetHttpResponseMessage(), responseState, errorMessage);
         }
 
         public List<IResponseStatus> ResponseStatus { get; } = new List<IResponseStatus>();

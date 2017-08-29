@@ -7,12 +7,14 @@ namespace Graphite.Binding
 {
     public class SimpleTypeMapper : ValueMapperBase
     {
+        public SimpleTypeMapper(Configuration configuration) : base(configuration) { }
+
         public override bool AppliesTo(ValueMapperContext context)
         {
             return (context.Type.ElementType ?? context.Type).Type.IsSimpleType();
         }
         
-        public override object Map<T>(ValueMapperContext context)
+        public override MapResult Map<T>(ValueMapperContext context)
         {
             try
             {
@@ -20,16 +22,19 @@ namespace Graphite.Binding
                 var result = context.Values.Select(x => (T)(x is string
                     ? x.ToString().ParseSimpleType(type) : x));
 
-                return context.Type.IsArray
+                var value = context.Type.IsArray
                     ? result.ToArray()
                     : (context.Type.IsGenericListCastable
                         ? (object)result.ToList()
                         : result.FirstOrDefault());
+
+                return MapResult.Success(value);
             }
             catch (FormatException exception)
             {
-                throw new BadRequestException($@"Parameter {context.Parameter.Name} value {context.Values
-                    .Select(x => $"'{x}'").Join(",")} is not formatted correctly. {exception.Message}", exception);
+                return MapResult.Failure($"Parameter {context.Parameter.Name} " + 
+                    $"value {context.Values.Select(x => $"'{x}'").Join(",")} " +
+                    $"is not formatted correctly. {exception.Message}");
             }
         }
     }

@@ -3,7 +3,6 @@ using System.IO;
 using System.Net.Http;
 using System.Xml;
 using System.Xml.Serialization;
-using Graphite.Binding;
 using Graphite.Http;
 using Graphite.Routing;
 
@@ -26,20 +25,20 @@ namespace Graphite.Readers
             _xmlReaderSettings = xmlReaderSettings;
         }
 
-        protected override object GetRequest(string data)
+        protected override ReadResult GetRequest(string data)
         {
             try
             {
                 using (var stream = new MemoryStream(_configuration.DefaultEncoding.GetBytes(data)))
                 {
                     var reader = System.Xml.XmlReader.Create(stream, _xmlReaderSettings);
-                    return new XmlSerializer(_routeDescriptor.RequestParameter
-                        .ParameterType.Type).Deserialize(reader);
+                    return ReadResult.Success(new XmlSerializer(_routeDescriptor.RequestParameter
+                        .ParameterType.Type).Deserialize(reader));
                 }
             }
             catch (InvalidOperationException exception)
             {
-                throw new BadRequestException(exception.Message, exception);
+                return ReadResult.Failure(exception.Message);
             }
         }
     }

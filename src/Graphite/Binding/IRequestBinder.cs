@@ -14,6 +14,6 @@ namespace Graphite.Binding
 
     public interface IRequestBinder : IConditional<RequestBinderContext>
     {
-        Task Bind(RequestBinderContext context);
+        Task<BindResult> Bind(RequestBinderContext context);
     }
 }

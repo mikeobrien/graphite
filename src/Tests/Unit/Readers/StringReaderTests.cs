@@ -64,8 +64,9 @@ namespace Tests.Unit.Readers
 
             var result = await CreateStringReader(requestGraph).Read();
 
-            result.ShouldBeType<string>();
-            result.As<string>().ShouldEqual("fark");
+            result.Status.ShouldEqual(ReadStatus.Success);
+            result.Value.ShouldBeType<string>();
+            result.Value.As<string>().ShouldEqual("fark");
         }
 
         [TestCase(null, null)]
@@ -82,8 +83,9 @@ namespace Tests.Unit.Readers
 
             var result = await CreateStringReader(requestGraph).Read();
 
-            result.ShouldBeType<InputString>();
-            var inputString = result.As<InputString>();
+            result.Status.ShouldEqual(ReadStatus.Success);
+            result.Value.ShouldBeType<InputString>();
+            var inputString = result.Value.As<InputString>();
             inputString.Data.ShouldEqual("fark");
             inputString.Length.ShouldEqual(4);
             inputString.MimeType.ShouldEqual(mimeType);

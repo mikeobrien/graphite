@@ -12,15 +12,17 @@ namespace Graphite.Actions
 {
     public static class Extensions
     {
-        public static void SetStatus(
+        public static HttpResponseMessage SetStatus(
             this HttpResponseMessage responseMessage,
-            IEnumerable<IResponseStatus> instances,
+            IEnumerable<IResponseStatus> responseStatus,
             ActionDescriptor actionDescriptor, 
-            ResponseState responseState)
+            ResponseState responseState,
+            string errorMessage)
         {
-            var context = new ResponseStatusContext(responseMessage, responseState);
+            var context = new ResponseStatusContext(responseMessage, responseState, errorMessage);
             actionDescriptor.ResponseStatus.ThatAppliesToOrDefault(
-                instances, context)?.SetStatus(context);
+                responseStatus, context)?.SetStatus(context);
+            return responseMessage;
         }
 
         public static IEnumerable<IActionDecorator> ThatApplyTo(

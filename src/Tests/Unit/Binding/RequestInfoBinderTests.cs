@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Graphite;
 using Graphite.Actions;
 using Graphite.Binding;
 using Graphite.Http;
@@ -35,6 +36,14 @@ namespace Tests.Unit.Binding
             public void ByAttributeName([FromRequestProperties(RemoteAddress)] string sourceIp) { }
             public void ByNameWithFromUriAttribute([FromUri] string remoteAddress) { }
             public void ByNameWithFromBodyAttribute([FromBody] string remoteAddress) { }
+        }
+
+        private Configuration _configuration;
+
+        [SetUp]
+        public void Setup()
+        {
+            _configuration = new Configuration();
         }
 
         public static object[][] BindingCases = TestCaseSource
@@ -87,7 +96,7 @@ namespace Tests.Unit.Binding
             var requestGraph = RequestGraph
                 .CreateFor(action)
                 .AddParameters(parameter)
-                .AddValueMapper(new SimpleTypeMapper());
+                .AddValueMapper(new SimpleTypeMapper(_configuration));
 
             var properties = new Dictionary<string, object>
             {
@@ -120,8 +129,8 @@ namespace Tests.Unit.Binding
                 .CreateFor<MappingHandler>(h => h.Action(null, null, null))
                     .AddAllActionParameters()
                     .Configure(x => x.BindRequestInfo())
-                    .AddValueMapper1(x => x.Values.First() + "mapper1")
-                    .AddValueMapper2(x => x.Values.First() + "mapper2");
+                    .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"))
+                    .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
 
             var properties = new Dictionary<string, object>
             {
@@ -149,8 +158,9 @@ namespace Tests.Unit.Binding
                 .CreateFor<MappingHandler>(h => h.Action(null, null, null))
                 .AddAllActionParameters()
                 .Configure(x => x.BindRequestInfo())
-                    .AddValueMapper1(x => x.Values.First() + "mapper1", configAppliesTo: x => false)
-                    .AddValueMapper2(x => x.Values.First() + "mapper2");
+                    .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"), 
+                        configAppliesTo: x => false)
+                    .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
 
             var properties = new Dictionary<string, object>
             {
@@ -178,8 +188,9 @@ namespace Tests.Unit.Binding
                 .CreateFor<MappingHandler>(h => h.Action(null, null, null))
                 .AddAllActionParameters()
                 .Configure(x => x.BindRequestInfo())
-                    .AddValueMapper1(x => x.Values.First() + "mapper1", instanceAppliesTo: x => false)
-                    .AddValueMapper2(x => x.Values.First() + "mapper2");
+                    .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"), 
+                        instanceAppliesTo: x => false)
+                    .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
 
             var properties = new Dictionary<string, object>
             {
@@ -249,7 +260,7 @@ namespace Tests.Unit.Binding
             return new RequestPropertiesBinder(
                 requestGraph.Configuration,
                 requestGraph.GetRouteDescriptor(),
-                requestGraph.GetParameterBinder(),
+                requestGraph.GetArgumentBinder(),
                 propertyProvider);
         }
     }

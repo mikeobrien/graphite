@@ -8,7 +8,7 @@ using Graphite.Routing;
 
 namespace Graphite.Binding
 {
-    public class ParameterBinder
+    public class ParameterBinder<TStatus>
     {
         private readonly Configuration _configuration;
         private readonly HttpConfiguration _httpConfiguration;
@@ -16,9 +16,9 @@ namespace Graphite.Binding
         private readonly ActionMethod _actionMethod;
         private readonly RouteDescriptor _routeDescriptor;
 
-        public ParameterBinder(Configuration configuration, 
+        public ParameterBinder(Configuration configuration,
             HttpConfiguration httpConfiguration,
-            ActionMethod actionMethod, 
+            ActionMethod actionMethod,
             RouteDescriptor routeDescriptor,
             IEnumerable<IValueMapper> mappers)
         {
@@ -29,30 +29,42 @@ namespace Graphite.Binding
             _routeDescriptor = routeDescriptor;
         }
 
-        public void Bind(ILookup<string, object> values, object[] actionArguments, 
-            IEnumerable<ActionParameter> parameters, Func<ActionParameter, string> mapName = null)
+        public virtual TStatus Bind(ILookup<string, object> values,
+            IEnumerable<ActionParameter> actionParameters,
+            Action<ActionParameter, object> bind,
+            Func<TStatus> successStatus, Func<string, TStatus> failureStatus,
+            Func<ActionParameter, string> mapName = null)
         {
-            if (values == null || !values.Any()) return;
-
-            var actionParameters = parameters.Where(x => x.IsParameter || x.IsPropertyOfParameter);
-
-            values.Where(x => x.Any())
+            var parameterValues = values
+                .Where(x => x.Any())
                 .JoinIgnoreCase(actionParameters, x => x.Key,
                     x => mapName?.Invoke(x) ?? x.Name,
                     (p, ap) => new
                     {
-                        ActionParameter = ap,
+                        Parameter = ap,
                         Values = p.ToArray()
-                    })
-                .ForEach(x =>
+                    });
+
+            foreach (var parameterValue in parameterValues)
+            {
+                var result = _mappers.Map(_actionMethod, _routeDescriptor,
+                    parameterValue.Parameter, parameterValue.Values,
+                    _configuration, _httpConfiguration);
+
+                switch (result.Status)
                 {
-                    var result = _mappers.Map(_actionMethod, _routeDescriptor, 
-                        x.ActionParameter, x.Values, _configuration, _httpConfiguration);
-
-                    if (!result.Mapped) return;
-
-                    x.ActionParameter.BindArgument(actionArguments, result.Value);
-                });
+                    case MappingStatus.Failure: return failureStatus(result.ErrorMessage);
+                    case MappingStatus.NoMapper:
+                        if (_configuration.FailIfNoMapperFound)
+                            throw new MapperNotFoundException(
+                                parameterValue.Values, parameterValue.Parameter);
+                        break;
+                    case MappingStatus.Success:
+                        bind(parameterValue.Parameter, result.Value);
+                        break;
+                }
+            }
+            return successStatus();
         }
     }
 }

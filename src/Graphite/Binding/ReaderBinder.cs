@@ -24,12 +24,19 @@ namespace Graphite.Binding
             return _actionDescriptor.Route.HasRequest;
         }
 
-        public virtual async Task Bind(RequestBinderContext context)
+        public virtual async Task<BindResult> Bind(RequestBinderContext context)
         {
             var position = _actionDescriptor.Route.RequestParameter.Position;
             var reader = _actionDescriptor.RequestReaders
                 .ThatApplyOrDefault(_readers).FirstOrDefault();
-            if (reader != null) context.ActionArguments[position] = await reader.Read();
+            if (reader == null) return BindResult.NoReader();
+            var result = await reader.Read();
+
+            if (result.Status == ReadStatus.Failure)
+                return BindResult.Failure(result.ErrorMessage);
+
+            context.ActionArguments[position] = result.Value;
+            return BindResult.Success();
         }
     }
 }

@@ -16,14 +16,14 @@ namespace Graphite.Readers
             _mimeTypes = mimeTypes;
         }
 
-        protected abstract object GetRequest(string data);
+        protected abstract ReadResult GetRequest(string data);
 
         public bool Applies()
         {
             return _requestMessage.ContentTypeIs(_mimeTypes);
         }
 
-        public async Task<object> Read()
+        public async Task<ReadResult> Read()
         {
             var data = await _requestMessage.Content.ReadAsStringAsync();
             return GetRequest(data);

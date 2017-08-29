@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Graphite;
 using Graphite.Binding;
 using Graphite.Extensions;
 using NUnit.Framework;
@@ -24,6 +25,14 @@ namespace Tests.Unit.Binding
             public void WildcardIEnumerable(object request, string param1, IEnumerable<int> param2) { }
             public void WildcardICollection(object request, string param1, ICollection<int> param2) { }
         }
+        
+        private Configuration _configuration;
+
+        [SetUp]
+        public void Setup()
+        {
+            _configuration = new Configuration();
+        }
 
         [TestCase("{param1}/segment/{param2}", "http://fark.com/value1/segment/value2", "value2")]
         [TestCase("{param1}/segment/{*param2}", "http://fark.com/value1/segment/value2/value3", "value2/value3")]
@@ -33,7 +42,7 @@ namespace Tests.Unit.Binding
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                     .WithUrl(url)
                     .WithUrlTemplate(urlTemplate)
-                    .AddValueMapper1(x => x.Values.First());
+                    .AddValueMapper1(x => MapResult.Success(x.Values.First()));
 
             var binder = CreateBinder(requestGraph);
 
@@ -65,7 +74,7 @@ namespace Tests.Unit.Binding
                 .CreateFor(action)
                     .WithUrl("http://fark.com/value1/segment/1/2/3")
                     .WithUrlTemplate("{param1}/segment/{*param2}")
-                    .AddValueMapper(new SimpleTypeMapper());
+                    .AddValueMapper(new SimpleTypeMapper(_configuration));
 
             var binder = CreateBinder(requestGraph);
 
@@ -84,8 +93,8 @@ namespace Tests.Unit.Binding
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                     .WithUrl("http://fark.com/value1/segment/value2")
                     .WithUrlTemplate("{param1}/segment/{param2}")
-                    .AddValueMapper1(x => x.Values.First() + "mapper1")
-                    .AddValueMapper2(x => x.Values.First() + "mapper2");
+                    .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"))
+                    .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
 
             var binder = CreateBinder(requestGraph);
 
@@ -107,8 +116,9 @@ namespace Tests.Unit.Binding
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                     .WithUrl("http://fark.com/value1/segment/value2")
                     .WithUrlTemplate("{param1}/segment/{param2}")
-                    .AddValueMapper1(x => x.Values.First() + "mapper1", configAppliesTo: x => false)
-                    .AddValueMapper2(x => x.Values.First() + "mapper2");
+                    .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"), 
+                        configAppliesTo: x => false)
+                    .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
 
             var binder = CreateBinder(requestGraph);
 
@@ -130,8 +140,9 @@ namespace Tests.Unit.Binding
                 .CreateFor<Handler>(h => h.Params(null, null, null))
                     .WithUrl("http://fark.com/value1/segment/value2")
                     .WithUrlTemplate("{param1}/segment/{param2}")
-                    .AddValueMapper1(x => x.Values.First() + "mapper1", instanceAppliesTo: x => false)
-                    .AddValueMapper2(x => x.Values.First() + "mapper2");
+                    .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"), 
+                        instanceAppliesTo: x => false)
+                    .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
 
             var binder = CreateBinder(requestGraph);
 
@@ -180,7 +191,7 @@ namespace Tests.Unit.Binding
         {
             return new UrlParameterBinder(
                 requestGraph.GetRouteDescriptor(),
-                requestGraph.GetParameterBinder(),
+                requestGraph.GetArgumentBinder(),
                 requestGraph.GetUrlParameters());
         }
     }

@@ -11,11 +11,11 @@ namespace Tests.Common.Fakes
     {
         public TestRequestReader()
         {
-            ReadFunc = () => Task.FromResult<object>(null);
+            ReadFunc = () => Task.FromResult(ReadResult.Success(null));
         }
 
         public Func<bool> AppliesFunc { get; set; }
-        public Func<Task<object>> ReadFunc { get; set; }
+        public Func<Task<ReadResult>> ReadFunc { get; set; }
         public bool AppliesCalled { get; set; }
         public bool ReadCalled { get; set; }
 
@@ -25,7 +25,7 @@ namespace Tests.Common.Fakes
             return AppliesFunc?.Invoke() ?? true;
         }
 
-        public Task<object> Read()
+        public Task<ReadResult> Read()
         {
             ReadCalled = true;
             return ReadFunc();

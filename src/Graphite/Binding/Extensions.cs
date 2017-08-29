@@ -22,8 +22,8 @@ namespace Graphite.Binding
             var mapper = configuration.ValueMappers
                 .FirstThatAppliesToOrDefault(mappers, mapperConfigurationcontext, mapperContext);
             return mapper == null 
-                ? MapResult.NotMapped() 
-                : MapResult.WasMapped(mapper.Map(mapperContext));
+                ? MapResult.NoMapper() 
+                : mapper.Map(mapperContext);
         }
 
         public static void BindArgument(this ActionParameter parameter, object[] arguments, object value)

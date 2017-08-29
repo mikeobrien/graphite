@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Graphite;
 using Graphite.Binding;
 using NUnit.Framework;
 using Should;
@@ -24,6 +25,14 @@ namespace Tests.Unit.Binding
             public void ByAttributeName([FromHeaders("value")] string someValue) { }
             public void ByNameWithFromUriAttribute([FromUri] string value) { }
             public void ByNameWithFromBodyAttribute([FromBody] string value) { }
+        }
+
+        private Configuration _configuration;
+
+        [SetUp]
+        public void Setup()
+        {
+            _configuration = new Configuration();
         }
 
         public static object[][] BindingCases = TestCaseSource
@@ -68,7 +77,7 @@ namespace Tests.Unit.Binding
                 .CreateFor(action)
                 .AddParameters(parameter)
                 .AddHeader("value", HeaderValue)
-                .AddValueMapper(new SimpleTypeMapper());
+                .AddValueMapper(new SimpleTypeMapper(_configuration));
 
             requestGraph.Configuration.HeadersBindingMode = bindingMode;
 
@@ -92,8 +101,8 @@ namespace Tests.Unit.Binding
                 .AddHeader("param2", "value2")
                 .AddHeader("param3", "value3")
                 .Configure(x => x.BindHeaders())
-                .AddValueMapper1(x => x.Values.First() + "mapper1")
-                .AddValueMapper2(x => x.Values.First() + "mapper2");
+                .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"))
+                .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
 
             var binder = CreateBinder(requestGraph);
 
@@ -117,8 +126,9 @@ namespace Tests.Unit.Binding
                 .AddHeader("param2", "value2")
                 .AddHeader("param3", "value3")
                 .Configure(x => x.BindHeaders())
-                .AddValueMapper1(x => x.Values.First() + "mapper1", configAppliesTo: x => false)
-                .AddValueMapper2(x => x.Values.First() + "mapper2");
+                .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"), 
+                    configAppliesTo: x => false)
+                .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
 
             var binder = CreateBinder(requestGraph);
 
@@ -142,8 +152,8 @@ namespace Tests.Unit.Binding
                 .AddHeader("param2", "value2")
                 .AddHeader("param3", "value3")
                 .Configure(x => x.BindHeaders())
-                .AddValueMapper1(x => x.Values.First() + "mapper1", instanceAppliesTo: x => false)
-                .AddValueMapper2(x => x.Values.First() + "mapper2");
+                .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"), instanceAppliesTo: x => false)
+                .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
 
             var binder = CreateBinder(requestGraph);
 
@@ -196,7 +206,7 @@ namespace Tests.Unit.Binding
             return new HeaderBinder(
                 requestGraph.Configuration,
                 requestGraph.GetRouteDescriptor(),
-                requestGraph.GetParameterBinder(),
+                requestGraph.GetArgumentBinder(),
                 requestGraph.GetHttpRequestMessage());
         }
     }

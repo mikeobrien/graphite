@@ -85,19 +85,19 @@ namespace Graphite.Routing
                         (x.IsComplexTypeOrHasComplexElementType && !x.FromUri))?.Type;
         }
 
-        protected virtual IEnumerable<ActionParameter> GetActionParameters(ActionMethod action, 
-            ParameterDescriptor requestParameter)
+        protected virtual IEnumerable<ActionParameter> GetActionParameters(
+            ActionMethod action, ParameterDescriptor requestParameter)
         {
             var actionParameters = action.MethodDescriptor.Parameters
                 .Where(x => x != requestParameter)
-                .Select(x => new ActionParameter(x)).ToList();
+                .Select(x => new ActionParameter(action, x)).ToList();
 
             if (_configuration.BindComplexTypeProperties)
                 actionParameters.AddRange(action.MethodDescriptor.Parameters
                     .Where(x => x.ParameterType.IsComplexType)
                     .SelectMany(param => param.ParameterType.Properties
                         .Where(x => x.PropertyInfo.CanWrite && x.PropertyType.IsSimpleType)
-                        .Select(prop => new ActionParameter(param, prop))));
+                        .Select(prop => new ActionParameter(action, param, prop))));
 
             return actionParameters;
         }

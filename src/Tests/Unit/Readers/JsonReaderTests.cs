@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Http;
+using Graphite.Readers;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Should;
@@ -54,9 +54,10 @@ namespace Tests.Unit.Readers
 
             var result = await CreateReader(requestGraph).Read();
 
-            result.ShouldNotBeNull();
-            result.ShouldBeType<InputModel>();
-            result.CastTo<InputModel>().Value.ShouldEqual("fark");
+            result.Status.ShouldEqual(ReadStatus.Success);
+            result.Value.ShouldNotBeNull();
+            result.Value.ShouldBeType<InputModel>();
+            result.Value.CastTo<InputModel>().Value.ShouldEqual("fark");
         }
 
         //JsonReaderException
@@ -74,10 +75,10 @@ namespace Tests.Unit.Readers
                 .WithRequestParameter("request")
                 .WithContentType(MimeTypes.ApplicationJson);
 
-            var exception = await CreateReader(requestGraph).Should()
-                .Throw<BadRequestException>(async x => await x.Read());
+            var result = await CreateReader(requestGraph).Read();
 
-            exception.Message.ShouldEqual(message);
+            result.Status.ShouldEqual(ReadStatus.Failure);
+            result.ErrorMessage.ShouldEqual(message);
         }
 
         private JsonReader CreateReader(RequestGraph requestGraph)

@@ -12,15 +12,15 @@ namespace Graphite.Binding
 {
     public class JsonBinder : IRequestBinder
     {
-        private readonly ParameterBinder _parameterBinder;
+        private readonly ArgumentBinder _argumentBinder;
         private readonly RouteDescriptor _routeDescriptor;
         private readonly HttpRequestMessage _requestMessage;
 
         public JsonBinder(RouteDescriptor routeDescriptor,
-            ParameterBinder parameterBinder,
+            ArgumentBinder argumentBinder,
             HttpRequestMessage requestMessage)
         {
-            _parameterBinder = parameterBinder;
+            _argumentBinder = argumentBinder;
             _routeDescriptor = routeDescriptor;
             _requestMessage = requestMessage;
         }
@@ -31,11 +31,11 @@ namespace Graphite.Binding
                    _requestMessage.ContentTypeIs(MimeTypes.ApplicationJson);
         }
 
-        public async Task Bind(RequestBinderContext context)
+        public async Task<BindResult> Bind(RequestBinderContext context)
         {
             var data = await _requestMessage.Content.ReadAsStringAsync();
             var values = JsonConvert.DeserializeObject<Dictionary<string, object>>(data).ToLookup();
-            _parameterBinder.Bind(values, context.ActionArguments, _routeDescriptor.Parameters);
+            return _argumentBinder.Bind(values, context.ActionArguments, _routeDescriptor.Parameters);
         }
     }
 }

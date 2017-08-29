@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using System.Xml;
 using Graphite;
-using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Http;
+using Graphite.Readers;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
@@ -53,9 +53,10 @@ namespace Tests.Unit.Readers
 
             var result = await CreateReader(requestGraph).Read();
 
-            result.ShouldNotBeNull();
-            result.ShouldBeType<InputModel>();
-            result.CastTo<InputModel>().Value.ShouldEqual("fark");
+            result.Status.ShouldEqual(ReadStatus.Success);
+            result.Value.ShouldNotBeNull();
+            result.Value.ShouldBeType<InputModel>();
+            result.Value.CastTo<InputModel>().Value.ShouldEqual("fark");
         }
         
         [TestCase("<InputModel fark", "There is an error in XML document (1, 17).")]
@@ -71,10 +72,10 @@ namespace Tests.Unit.Readers
                 .WithRequestParameter("request")
                 .WithContentType(MimeTypes.ApplicationJson);
 
-            var exception = await CreateReader(requestGraph).Should()
-                .Throw<BadRequestException>(async x => await x.Read());
+            var result = await CreateReader(requestGraph).Read();
 
-            exception.Message.ShouldEqual(message);
+            result.Status.ShouldEqual(ReadStatus.Failure);
+            result.ErrorMessage.ShouldEqual(message);
         }
 
         private XmlReader CreateReader(RequestGraph requestGraph)

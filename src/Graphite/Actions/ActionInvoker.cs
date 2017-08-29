@@ -42,27 +42,36 @@ namespace Graphite.Actions
                 foreach (var binder in _actionDescriptor.RequestBinders
                     .ThatApplyTo(_requestBinders, requestBinderContext))
                 {
-                    await binder.Bind(requestBinderContext);
+                    var result = await binder.Bind(requestBinderContext);
+                    switch (result.Status)
+                    {
+                        case BindingStatus.Failure:
+                            return SetStatus(ResponseState.BindingFailure, result.ErrorMessage);
+                        case BindingStatus.NoReader:
+                            return SetStatus(ResponseState.NoReader);
+                    }
                 }
             }
 
             var response = await _actionDescriptor.Action.Invoke(handler, actionArguments);
 
-            if (response is HttpResponseMessage) return response.As<HttpResponseMessage>();
+            if (response is HttpResponseMessage)
+                return response.As<HttpResponseMessage>();
 
-            if (_actionDescriptor.Route.HasResponse)
-            {
-                var writer = _writers.ThatApply(response, _actionDescriptor).FirstOrDefault();
-                if (writer != null)
-                {
-                    _responseMessage.SetStatus(_responseStatus, _actionDescriptor, ResponseState.Response);
-                    return await writer.Write(response);
-                }
-                _responseMessage.SetStatus(_responseStatus, _actionDescriptor, ResponseState.NoWriter);
-            }
-            else _responseMessage.SetStatus(_responseStatus, _actionDescriptor, ResponseState.NoResponse);
+            if (!_actionDescriptor.Route.HasResponse)
+                return SetStatus(ResponseState.NoResponse);
 
-            return _responseMessage;
+            var writer = _writers.ThatApply(response, _actionDescriptor).FirstOrDefault();
+            if (writer == null) return SetStatus(ResponseState.NoWriter);
+            SetStatus(ResponseState.HasResponse);
+            return await writer.Write(response);
+        }
+
+        protected virtual HttpResponseMessage SetStatus(
+            ResponseState responseState, string errorMessage = null)
+        {
+            return _responseMessage.SetStatus(_responseStatus, 
+                _actionDescriptor, responseState, errorMessage);
         }
     }
 }

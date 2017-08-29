@@ -76,7 +76,7 @@ namespace Tests.Common
                 Assembly.GetExecutingAssembly().IsInDebugMode() ? "debug" : "release",
                 "TestHarness.Owin.exe"));
             _owin = Process.Start(serverPath, $"http://localhost:{OwinPort}");
-
+            Thread.Sleep(3000);
             return OwinHttpClient;
         }
 

@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Net.Http;
-using Graphite.Extensions;
 
 namespace Graphite.Actions
 {
@@ -24,10 +23,21 @@ namespace Graphite.Actions
         {
             switch (context.ResponseState)
             {
-                case ResponseState.Response:
-                    SetStatus<ResponseStatusAttribute>(context.ResponseMessage,
-                        _configuration.DefaultResponseStatusCode,
-                        _configuration.DefaultResponseStatusText);
+                case ResponseState.NoReader:
+                    SetStatus<NoReaderStatusAttribute>(context.ResponseMessage,
+                        _configuration.DefaultNoReaderStatusCode,
+                        _configuration.DefaultNoReaderStatusText);
+                    break;
+                case ResponseState.BindingFailure:
+                    SetStatus<BindingFailureStatusAttribute>(context.ResponseMessage,
+                        _configuration.DefaultBindingFailureStatusCode,
+                        _configuration.DefaultBindingFailureStatusText?
+                            .Invoke(context.ErrorMessage));
+                    break;
+                case ResponseState.HasResponse:
+                    SetStatus<HasResponseStatusAttribute>(context.ResponseMessage,
+                        _configuration.DefaultHasResponseStatusCode,
+                        _configuration.DefaultHasResponseStatusText);
                     break;
                 case ResponseState.NoResponse:
                     SetStatus<NoResponseStatusAttribute>(context.ResponseMessage, 
@@ -48,10 +58,9 @@ namespace Graphite.Actions
         {
             var statusAttribute = _actionMethod.GetActionOrHandlerAttribute<T>();
             responseMessage.StatusCode = statusAttribute?.StatusCode ?? defaultStatus;
-            if ((statusAttribute?.StatusText).IsNotNullOrEmpty())
-                responseMessage.ReasonPhrase = statusAttribute.StatusText;
-            else if (defaultStatusText.IsNotNullOrEmpty())
-                responseMessage.ReasonPhrase = defaultStatusText;
+
+            var statusText = statusAttribute?.StatusText ?? defaultStatusText;
+            if (statusText != null) responseMessage.ReasonPhrase = statusText;
         }
     }
 }

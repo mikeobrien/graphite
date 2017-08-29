@@ -10,15 +10,15 @@ namespace Graphite.Binding
     public class FormBinder : IRequestBinder
     {
         private readonly RouteDescriptor _routeDescriptor;
-        private readonly ParameterBinder _parameterBinder;
+        private readonly ArgumentBinder _argumentBinder;
         private readonly HttpRequestMessage _requestMessage;
 
         public FormBinder(
             RouteDescriptor routeDescriptor,
-            ParameterBinder parameterBinder,
+            ArgumentBinder argumentBinder,
             HttpRequestMessage requestMessage)
         {
-            _parameterBinder = parameterBinder;
+            _argumentBinder = argumentBinder;
             _routeDescriptor = routeDescriptor;
             _requestMessage = requestMessage;
         }
@@ -29,10 +29,10 @@ namespace Graphite.Binding
                 _requestMessage.ContentTypeIs(MimeTypes.ApplicationFormUrlEncoded);
         }
 
-        public async Task Bind(RequestBinderContext context)
+        public async Task<BindResult> Bind(RequestBinderContext context)
         {
             var data = await _requestMessage.Content.ReadAsStringAsync();
-            _parameterBinder.Bind(data.ParseQueryString(), context.ActionArguments, 
+            return _argumentBinder.Bind(data.ParseQueryString(), context.ActionArguments, 
                 _routeDescriptor.Parameters);
         }
     }

@@ -10,16 +10,16 @@ namespace Graphite.Binding
 {
     public class XmlBinder : IRequestBinder
     {
-        private readonly ParameterBinder _parameterBinder;
+        private readonly ArgumentBinder _argumentBinder;
         private readonly RouteDescriptor _routeDescriptor;
         private readonly HttpRequestMessage _requestMessage;
 
         public XmlBinder(
             RouteDescriptor routeDescriptor, 
-            ParameterBinder parameterBinder,
+            ArgumentBinder argumentBinder,
             HttpRequestMessage requestMessage)
         {
-            _parameterBinder = parameterBinder;
+            _argumentBinder = argumentBinder;
             _routeDescriptor = routeDescriptor;
             _requestMessage = requestMessage;
         }
@@ -31,10 +31,10 @@ namespace Graphite.Binding
                    _requestMessage.ContentTypeIs(MimeTypes.ApplicationXml);
         }
 
-        public async Task Bind(RequestBinderContext context)
+        public async Task<BindResult> Bind(RequestBinderContext context)
         {
             var values = await GetValues();
-            _parameterBinder.Bind(values, context.ActionArguments, _routeDescriptor.Parameters);
+            return _argumentBinder.Bind(values, context.ActionArguments, _routeDescriptor.Parameters);
         }
 
         private async Task<ILookup<string, object>> GetValues()

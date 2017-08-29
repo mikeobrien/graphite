@@ -25,17 +25,17 @@ namespace Graphite.Binding
     {
         public const string CookiePostfix = "Cookie";
 
-        private readonly ParameterBinder _parameterBinder;
+        private readonly ArgumentBinder _argumentBinder;
         private readonly RouteDescriptor _routeDescriptor;
         private readonly Configuration _configuration;
         private readonly HttpRequestMessage _requestMessage;
 
         public CookieBinder(Configuration configuration,
             RouteDescriptor routeDescriptor, 
-            ParameterBinder parameterBinder,
+            ArgumentBinder argumentBinder,
             HttpRequestMessage requestMessage)
         {
-            _parameterBinder = parameterBinder;
+            _argumentBinder = argumentBinder;
             _routeDescriptor = routeDescriptor;
             _configuration = configuration;
             _requestMessage = requestMessage;
@@ -47,13 +47,13 @@ namespace Graphite.Binding
                 _configuration.CookiesBindingMode != BindingMode.None;
         }
 
-        public Task Bind(RequestBinderContext context)
+        public Task<BindResult> Bind(RequestBinderContext context)
         {
             var values = _requestMessage.Headers.GetCookies().ToLookup();
             var parameters = _routeDescriptor.Parameters.Where(x => 
                 IncludeParameter(x, _configuration.CookiesBindingMode)).ToArray();
-            _parameterBinder.Bind(values, context.ActionArguments, parameters, MapParameterName);
-            return Task.CompletedTask;
+            return _argumentBinder.Bind(values, context.ActionArguments, 
+                parameters, MapParameterName).ToTaskResult();
         }
 
         private bool IncludeParameter(ActionParameter parameter, BindingMode bindingMode)

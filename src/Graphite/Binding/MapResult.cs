@@ -1,24 +1,41 @@
 namespace Graphite.Binding
 {
+    public enum MappingStatus
+    {
+        Success, Failure, NoMapper
+    }
+
     public class MapResult
     {
-        public MapResult(bool mapped, object value)
+        public MapResult(object value)
         {
-            Mapped = mapped;
+            Status = MappingStatus.Success;
             Value = value;
         }
 
-        public static MapResult NotMapped()
+        public MapResult(MappingStatus status, string errorMessage = null)
         {
-            return new MapResult(false, null);
+            Status = status;
+            ErrorMessage = errorMessage;
         }
 
-        public static MapResult WasMapped(object value)
+        public MappingStatus Status { get; }
+        public string ErrorMessage { get; }
+        public object Value { get; set; }
+
+        public static MapResult Success(object value)
         {
-            return new MapResult(true, value);
+            return new MapResult(value);
         }
 
-        public bool Mapped { get; }
-        public object Value { get; }
+        public static MapResult Failure(string errorMessage)
+        {
+            return new MapResult(MappingStatus.Failure, errorMessage);
+        }
+
+        public static MapResult NoMapper()
+        {
+            return new MapResult(MappingStatus.NoMapper);
+        }
     }
 }

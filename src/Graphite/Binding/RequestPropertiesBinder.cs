@@ -24,17 +24,17 @@ namespace Graphite.Binding
 
     public class RequestPropertiesBinder : IRequestBinder
     {
-        private readonly ParameterBinder _parameterBinder;
+        private readonly ArgumentBinder _argumentBinder;
         private readonly IRequestPropertiesProvider _requestProperties;
         private readonly RouteDescriptor _routeDescriptor;
         private readonly Configuration _configuration;
 
         public RequestPropertiesBinder(Configuration configuration,
             RouteDescriptor routeDescriptor, 
-            ParameterBinder parameterBinder,
+            ArgumentBinder argumentBinder,
             IRequestPropertiesProvider requestProperties)
         {
-            _parameterBinder = parameterBinder;
+            _argumentBinder = argumentBinder;
             _requestProperties = requestProperties;
             _routeDescriptor = routeDescriptor;
             _configuration = configuration;
@@ -46,13 +46,12 @@ namespace Graphite.Binding
                    _configuration.RequestInfoBindingMode != BindingMode.None;
         }
 
-        public Task Bind(RequestBinderContext context)
+        public Task<BindResult> Bind(RequestBinderContext context)
         {
             var parameters = _routeDescriptor.Parameters
                 .Where(x => IncludeParameter(x, _configuration.RequestInfoBindingMode)).ToArray();
-            _parameterBinder.Bind(_requestProperties.GetProperties().ToLookup(), 
-                context.ActionArguments, parameters, MapParameterName);
-            return Task.CompletedTask;
+            return _argumentBinder.Bind(_requestProperties.GetProperties().ToLookup(), 
+                context.ActionArguments, parameters, MapParameterName).ToTaskResult();
         }
 
         private string MapParameterName(ActionParameter parameter)

@@ -7,20 +7,22 @@ namespace Graphite.Actions
 {
     public enum ResponseState
     {
-        Response, NoResponse, NoWriter
+        BindingFailure, NoReader, HasResponse, NoResponse, NoWriter
     }
 
     public class ResponseStatusContext
     {
         public ResponseStatusContext(HttpResponseMessage responseMessage, 
-            ResponseState responseState)
+            ResponseState responseState, string errorMessage)
         {
             ResponseMessage = responseMessage;
             ResponseState = responseState;
+            ErrorMessage = errorMessage;
         }
         
-        public HttpResponseMessage ResponseMessage { get; }
+        public virtual HttpResponseMessage ResponseMessage { get; }
         public virtual ResponseState ResponseState { get; }
+        public virtual string ErrorMessage { get; }
     }
 
     public interface IResponseStatus : IConditional<ResponseStatusContext>
@@ -45,12 +47,27 @@ namespace Graphite.Actions
         public string StatusText { get; }
     }
 
-    public class ResponseStatusAttribute : ResponseStatusAttributeBase
+    public class BindingFailureStatusAttribute : ResponseStatusAttributeBase
     {
-        public ResponseStatusAttribute(HttpStatusCode statusCode, 
+        public BindingFailureStatusAttribute(HttpStatusCode statusCode) : base(statusCode) { }
+
+        public BindingFailureStatusAttribute(string statusText) : base(statusText) { }
+    }
+
+    public class NoReaderStatusAttribute : ResponseStatusAttributeBase
+    {
+        public NoReaderStatusAttribute(HttpStatusCode statusCode,
             string statusText = null) : base(statusCode, statusText) { }
 
-        public ResponseStatusAttribute(string statusText) : base(statusText) { }
+        public NoReaderStatusAttribute(string statusText) : base(statusText) { }
+    }
+
+    public class HasResponseStatusAttribute : ResponseStatusAttributeBase
+    {
+        public HasResponseStatusAttribute(HttpStatusCode statusCode, 
+            string statusText = null) : base(statusCode, statusText) { }
+
+        public HasResponseStatusAttribute(string statusText) : base(statusText) { }
     }
 
     public class NoResponseStatusAttribute : ResponseStatusAttributeBase

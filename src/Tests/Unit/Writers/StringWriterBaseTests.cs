@@ -26,7 +26,7 @@ namespace Tests.Unit.Writers
         {
             public TestWriter(string acceptHeader, params string[] mimeTypes) : 
                 base(CreateRequest(acceptHeader), new HttpResponseMessage(), 
-                    Encoding.UTF8, new Configuration(), mimeTypes) { }
+                    Encoding.UTF8, mimeTypes) { }
 
             private static HttpRequestMessage CreateRequest(string acceptHeader)
             {

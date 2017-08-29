@@ -5,6 +5,6 @@ namespace Graphite.Readers
 {
     public interface IRequestReader : IConditional
     {
-        Task<object> Read();
+        Task<ReadResult> Read();
     }
 }

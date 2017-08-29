@@ -71,6 +71,11 @@ namespace Graphite.Extensions
             return !string.IsNullOrWhiteSpace(value);
         }
 
+        public static string Join(this IEnumerable<object> parts, string seperator = "")
+        {
+            return Join(parts.Select(x => x?.ToString()), seperator);
+        }
+
         public static string Join(this IEnumerable<string> parts, string seperator = "")
         {
             return string.Join(seperator, parts);

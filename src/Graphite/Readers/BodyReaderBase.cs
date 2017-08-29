@@ -32,19 +32,19 @@ namespace Graphite.Readers
 
         protected abstract Task<T> GetData(HttpContent content);
 
-        public async Task<object> Read()
+        public async Task<ReadResult> Read()
         {
             var requestType = _routeDescriptor.RequestParameter?.ParameterType.Type;
             var data = await GetData(_requestMessage.Content);
-            if (requestType == typeof(T)) return data;
+            if (requestType == typeof(T)) return ReadResult.Success(data);
             var headers = _requestMessage.Content.Headers;
-            return new TWrapper
+            return ReadResult.Success(new TWrapper
             {
                 Filename = headers.ContentDisposition?.FileName.Trim('"'),
                 MimeType = headers.ContentType?.MediaType,
                 Length = headers.ContentLength,
                 Data = data
-            };
+            });
         }
     }
 }

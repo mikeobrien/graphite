@@ -24,13 +24,6 @@ namespace Graphite.Writers
 
     public abstract class ResponseWriterBase : IResponseWriter
     {
-        private readonly Configuration _configuration;
-
-        protected ResponseWriterBase(Configuration configuration)
-        {
-            _configuration = configuration;
-        }
-
         public virtual bool IsWeighted => false;
         public virtual double Weight => 0;
 

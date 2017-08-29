@@ -43,12 +43,16 @@ namespace Graphite
         public bool Metrics { get; set; } = true;
         public Func<HttpRequestMessage, bool> ReturnErrorMessage { get; set; } = x => false;
 
-        public HttpStatusCode DefaultResponseStatusCode { get; set; } = HttpStatusCode.OK;
-        public string DefaultResponseStatusText { get; set; }
+        public HttpStatusCode DefaultBindingFailureStatusCode { get; set; } = HttpStatusCode.BadRequest;
+        public Func<string, string> DefaultBindingFailureStatusText { get; set; } = x => x;
+        public HttpStatusCode DefaultNoReaderStatusCode { get; set; } = HttpStatusCode.BadRequest;
+        public string DefaultNoReaderStatusText { get; set; } = "Request format not supported.";
+        public HttpStatusCode DefaultHasResponseStatusCode { get; set; } = HttpStatusCode.OK;
+        public string DefaultHasResponseStatusText { get; set; }
         public HttpStatusCode DefaultNoResponseStatusCode { get; set; } = HttpStatusCode.NoContent;
         public string DefaultNoResponseStatusText { get; set; }
         public HttpStatusCode DefaultNoWriterStatusCode { get; set; } = HttpStatusCode.BadRequest;
-        public string DefaultNoWriterStatusText { get; set; } = "Requested format not supported.";
+        public string DefaultNoWriterStatusText { get; set; } = "Response format not supported.";
 
         public int DownloadBufferSize { get; set; } = 1.MB();
         public int? SerializerBufferSize { get; set; }
@@ -56,6 +60,7 @@ namespace Graphite
         public bool DisposeSerializedObjects { get; set; }
         public bool FailIfNoAuthenticatorsApplyToAction { get; set; } = true;
         public bool ExcludeDiagnosticsFromAuthentication { get; set; }
+        public bool FailIfNoMapperFound { get; set; }
 
         public XmlReaderSettings XmlReaderSettings { get; } = new XmlReaderSettings();
         public XmlWriterSettings XmlWriterSettings { get; } = new XmlWriterSettings();

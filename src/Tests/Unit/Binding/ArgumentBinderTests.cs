@@ -2,7 +2,6 @@
 using System.Linq;
 using Graphite.Binding;
 using Graphite.Http;
-using Graphite.Readers;
 using Graphite.Routing;
 using NUnit.Framework;
 using Should;
@@ -11,7 +10,7 @@ using Tests.Common;
 namespace Tests.Unit.Binding
 {
     [TestFixture]
-    public class ParameterBinderTests
+    public class ArgumentBinderTests
     {
         public class Model
         {
@@ -21,14 +20,14 @@ namespace Tests.Unit.Binding
 
         public class Handler
         {
-            public void Params(Model model, string param1, int param2) { }
+            public void Params(Model model, string param1, string param2, int param3) { }
         }
 
         [Test]
         public void Should_bind_values_to_parameters()
         {
             var requestGraph = RequestGraph
-                .CreateFor<Handler>(h => h.Params(null, null, 0))
+                .CreateFor<Handler>(h => h.Params(null, null, null, 0))
                 .WithUrl("http://fark.com?param1=value1&param2=value2")
                 .AddParameters("param1", "param2")
                 .AddValueMapper1(x => MapResult.Success(x.Values.First()));
@@ -37,7 +36,7 @@ namespace Tests.Unit.Binding
 
             result.Status.ShouldEqual(BindingStatus.Success);
 
-            requestGraph.ActionArguments.ShouldOnlyContain(null, "value1", "value2");
+            requestGraph.ActionArguments.ShouldOnlyContain(null, "value1", "value2", null);
 
             requestGraph.ValueMapper1.AppliesToContext.Parameter.ShouldNotBeNull();
             requestGraph.ValueMapper1.AppliesToContext.Values.ShouldNotBeNull();
@@ -50,7 +49,7 @@ namespace Tests.Unit.Binding
         public void Should_bind_values_to_properties()
         {
             var requestGraph = RequestGraph
-                .CreateFor<Handler>(h => h.Params(null, null, 0))
+                .CreateFor<Handler>(h => h.Params(null, null, null, 0))
                 .WithUrl("http://fark.com?param1=value1&param2=value2")
                 .AddModelParameters("model", "param1", "param2")
                 .AddValueMapper1(x => MapResult.Success(x.Values.First()));
@@ -78,7 +77,7 @@ namespace Tests.Unit.Binding
         public void Should_not_map_parameters_that_dont_match_any_action_parameters()
         {
             var requestGraph = RequestGraph
-                .CreateFor<Handler>(h => h.Params(null, null, 0))
+                .CreateFor<Handler>(h => h.Params(null, null, null, 0))
                 .WithUrl("http://fark.com?param1=value1&param3=value3")
                 .AddParameters("param1", "param2")
                 .AddValueMapper1(x => MapResult.Success(x.Values.First()));
@@ -87,34 +86,31 @@ namespace Tests.Unit.Binding
 
             result.Status.ShouldEqual(BindingStatus.Success);
 
-            requestGraph.ActionArguments.ShouldOnlyContain(null, "value1", null);
+            requestGraph.ActionArguments.ShouldOnlyContain(null, "value1", null, null);
         }
 
         [Test]
         public void Should_not_map_parameter_names()
         {
             var requestGraph = RequestGraph
-                .CreateFor<Handler>(h => h.Params(null, null, 0))
+                .CreateFor<Handler>(h => h.Params(null, null, null, 0))
                 .WithUrl("http://fark.com?param1=value1&param3=value3")
                 .AddParameters("param1", "param2")
                 .AddValueMapper1(x => MapResult.Success(x.Values.First()));
 
-            var binder = requestGraph.GetParameterBinder<BindResult>();
-
-            var result = Bind(requestGraph,
-                x => x.Name.EndsWith("2") ? x.Name.Replace("2", "3") : x.Name);
-
+            var result = Bind(requestGraph, x => x.Name.EndsWith("2") ?
+                x.Name.Replace("2", "3") : x.Name);
 
             result.Status.ShouldEqual(BindingStatus.Success);
 
-            requestGraph.ActionArguments.ShouldOnlyContain(null, "value1", "value3");
+            requestGraph.ActionArguments.ShouldOnlyContain(null, "value1", "value3", null);
         }
 
         [Test]
         public void Should_not_map_parameters_that_arent_passed()
         {
             var requestGraph = RequestGraph
-                .CreateFor<Handler>(h => h.Params(null, null, 0))
+                .CreateFor<Handler>(h => h.Params(null, null, null, 0))
                 .WithUrl("http://fark.com?param1=value1")
                 .AddParameters("param1", "param2")
                 .AddValueMapper1(x => MapResult.Success(x.Values.First()));
@@ -123,14 +119,14 @@ namespace Tests.Unit.Binding
 
             result.Status.ShouldEqual(BindingStatus.Success);
 
-            requestGraph.ActionArguments.ShouldOnlyContain(null, "value1", null);
+            requestGraph.ActionArguments.ShouldOnlyContain(null, "value1", null, null);
         }
 
         [Test]
         public void Should_use_the_first_mapper_that_applies()
         {
             var requestGraph = RequestGraph
-                .CreateFor<Handler>(h => h.Params(null, null, 0))
+                .CreateFor<Handler>(h => h.Params(null, null, null, 0))
                 .WithUrl("http://fark.com?param1=value1&param2=value2")
                 .AddParameters("param1", "param2")
                 .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"))
@@ -140,7 +136,7 @@ namespace Tests.Unit.Binding
 
             result.Status.ShouldEqual(BindingStatus.Success);
 
-            requestGraph.ActionArguments.ShouldOnlyContain(null, "value1mapper1", "value2mapper1");
+            requestGraph.ActionArguments.ShouldOnlyContain(null, "value1mapper1", "value2mapper1", null);
 
             requestGraph.ValueMapper1.AppliesToCalled.ShouldBeTrue();
             requestGraph.ValueMapper1.MapCalled.ShouldBeTrue();
@@ -153,7 +149,7 @@ namespace Tests.Unit.Binding
         public void Should_not_use_a_mapper_that_doesnt_apply_in_configuration()
         {
             var requestGraph = RequestGraph
-                .CreateFor<Handler>(h => h.Params(null, null, 0))
+                .CreateFor<Handler>(h => h.Params(null, null, null, 0))
                 .WithUrl("http://fark.com?param1=value1&param2=value2")
                 .AddParameters("param1", "param2")
                 .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"), 
@@ -164,7 +160,7 @@ namespace Tests.Unit.Binding
 
             result.Status.ShouldEqual(BindingStatus.Success);
 
-            requestGraph.ActionArguments.ShouldOnlyContain(null, "value1mapper2", "value2mapper2");
+            requestGraph.ActionArguments.ShouldOnlyContain(null, "value1mapper2", "value2mapper2", null);
 
             requestGraph.ValueMapper1.AppliesToCalled.ShouldBeFalse();
             requestGraph.ValueMapper1.MapCalled.ShouldBeFalse();
@@ -177,7 +173,7 @@ namespace Tests.Unit.Binding
         public void Should_not_use_a_mapper_that_doesnt_apply_at_runtime()
         {
             var requestGraph = RequestGraph
-                .CreateFor<Handler>(h => h.Params(null, null, 0))
+                .CreateFor<Handler>(h => h.Params(null, null, null, 0))
                 .WithUrl("http://fark.com?param1=value1&param2=value2")
                 .AddParameters("param1", "param2")
                 .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"), instanceAppliesTo: x => false)
@@ -187,7 +183,7 @@ namespace Tests.Unit.Binding
 
             result.Status.ShouldEqual(BindingStatus.Success);
 
-            requestGraph.ActionArguments.ShouldOnlyContain(null, "value1mapper2", "value2mapper2");
+            requestGraph.ActionArguments.ShouldOnlyContain(null, "value1mapper2", "value2mapper2", null);
 
             requestGraph.ValueMapper1.AppliesToCalled.ShouldBeTrue();
             requestGraph.ValueMapper1.MapCalled.ShouldBeFalse();
@@ -200,7 +196,7 @@ namespace Tests.Unit.Binding
         public void Should_skip_mapping_if_no_mappers_apply()
         {
             var requestGraph = RequestGraph
-                .CreateFor<Handler>(h => h.Params(null, null, 0))
+                .CreateFor<Handler>(h => h.Params(null, null, null, 0))
                 .WithUrl("http://fark.com?param1=value1")
                 .AddParameters("param1", "param2")
                 .WithRequestParameter("model");
@@ -209,14 +205,14 @@ namespace Tests.Unit.Binding
 
             result.Status.ShouldEqual(BindingStatus.Success);
 
-            requestGraph.ActionArguments.ShouldOnlyContain(null, null, null);
+            requestGraph.ActionArguments.ShouldOnlyContain(null, null, null, null);
         }
 
         [Test]
         public void Should_throw_exception_if_configured_no_mappers_apply()
         {
             var requestGraph = RequestGraph
-                .CreateFor<Handler>(h => h.Params(null, null, 0))
+                .CreateFor<Handler>(h => h.Params(null, null, null, 0))
                 .WithUrl("http://fark.com?param1=value1")
                 .AddParameters("param1", "param2")
                 .WithRequestParameter("model");
@@ -226,16 +222,16 @@ namespace Tests.Unit.Binding
             var exception = Assert.Throws<MapperNotFoundException>(() => Bind(requestGraph));
 
             exception.Message.ShouldEqual("Unable to map 'value1' to type string for 'param1' " +
-                "parameter on action Tests.Unit.Binding.ParameterBinderTests.Handler.Params.");
+                "parameter on action Tests.Unit.Binding.ArgumentBinderTests.Handler.Params.");
         }
 
         [Test]
         public void Should_return_failure_result_if_mapping_fails()
         {
             var requestGraph = RequestGraph
-                .CreateFor<Handler>(h => h.Params(null, null, 0))
-                .WithUrl("http://fark.com?param2=fark")
-                .AddParameters("param2")
+                .CreateFor<Handler>(h => h.Params(null, null, null, 0))
+                .WithUrl("http://fark.com?param3=fark")
+                .AddParameters("param3")
                 .WithRequestParameter("model")
                 .WithContentType(MimeTypes.ApplicationFormUrlEncoded);
             requestGraph.AppendValueMapper(new SimpleTypeMapper(requestGraph.Configuration));
@@ -243,18 +239,18 @@ namespace Tests.Unit.Binding
             var result = Bind(requestGraph);
 
             result.Status.ShouldEqual(BindingStatus.Failure);
-            result.ErrorMessage.ShouldEqual("Parameter param2 value 'fark' is not formatted correctly. " +
+            result.ErrorMessage.ShouldEqual("Parameter param3 value 'fark' is not formatted correctly. " +
                                             "Input string was not in a correct format.");
         }
 
         private BindResult Bind(RequestGraph requestGraph,
             Func<ActionParameter, string> mapName = null)
         {
-            return requestGraph.GetParameterBinder<BindResult>()
+            return requestGraph.GetArgumentBinder()
                 .Bind(requestGraph.GetQuerystringParameters(),
+                    requestGraph.ActionArguments,
                     requestGraph.GetActionParameters(),
-                    (p, v) => p.BindArgument(requestGraph.ActionArguments, v),
-                    BindResult.Success, BindResult.Failure, mapName ?? (x => x.Name));
+                    mapName ?? (x => x.Name));
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Tests.Common.Fakes
     public class TestValueMapper : IValueMapper
     {
         public Func<ValueMapperContext, bool> AppliesToFunc { get; set; }
-        public Func<ValueMapperContext, object> MapFunc { get; set; }
+        public Func<ValueMapperContext, MapResult> MapFunc { get; set; }
         public ValueMapperContext AppliesToContext { get; set; }
         public ValueMapperContext MapContext { get; set; }
         public bool AppliesToCalled { get; set; }
@@ -22,7 +22,7 @@ namespace Tests.Common.Fakes
             return AppliesToFunc?.Invoke(context) ?? true;
         }
 
-        public object Map(ValueMapperContext context)
+        public MapResult Map(ValueMapperContext context)
         {
             MapCalled = true;
             MapContext = context;

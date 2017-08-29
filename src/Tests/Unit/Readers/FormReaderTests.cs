@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Graphite;
 using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Http;
@@ -33,8 +35,8 @@ namespace Tests.Unit.Readers
                 .CreateFor<Handler>(h => h.Post(null, null))
                     .WithRequestData("Param1=value1&Param2=value2")
                     .WithRequestParameter("request")
-                    .AddParameters("param")
-                    .AppendValueMapper<SimpleTypeMapper>();
+                    .AddParameters("param");
+            requestGraph.AppendValueMapper(new SimpleTypeMapper(requestGraph.Configuration));
 
             if (isForm)
             {
@@ -54,14 +56,15 @@ namespace Tests.Unit.Readers
                     .WithRequestData("Param1=value1&Param2=5")
                     .WithRequestParameter("request")
                     .WithContentType(MimeTypes.ApplicationFormUrlEncoded)
-                    .AddParameters("param")
-                    .AppendValueMapper<SimpleTypeMapper>();
+                    .AddParameters("param");
+            requestGraph.AppendValueMapper(new SimpleTypeMapper(requestGraph.Configuration));
 
             var result = await CreateReader(requestGraph).Read();
 
-            result.ShouldNotBeNull();
-            result.ShouldBeType<InputModel>();
-            var inputModel = result.CastTo<InputModel>();
+            result.Status.ShouldEqual(ReadStatus.Success);
+            result.Value.ShouldNotBeNull();
+            result.Value.ShouldBeType<InputModel>();
+            var inputModel = result.Value.CastTo<InputModel>();
             inputModel.Param1.ShouldEqual("value1");
             inputModel.Param2.ShouldEqual(5);
         }
@@ -74,14 +77,15 @@ namespace Tests.Unit.Readers
                     .WithRequestData("Param1=value1&Param1=value2&Param2=5&Param2=6")
                     .WithRequestParameter("request")
                     .WithContentType(MimeTypes.ApplicationFormUrlEncoded)
-                    .AddParameters("param")
-                    .AppendValueMapper<SimpleTypeMapper>();
+                    .AddParameters("param");
+            requestGraph.AppendValueMapper(new SimpleTypeMapper(requestGraph.Configuration));
 
             var result = await CreateReader(requestGraph).Read();
 
-            result.ShouldNotBeNull();
-            result.ShouldBeType<InputModel>();
-            var inputModel = result.CastTo<InputModel>();
+            result.Status.ShouldEqual(ReadStatus.Success);
+            result.Value.ShouldNotBeNull();
+            result.Value.ShouldBeType<InputModel>();
+            var inputModel = result.Value.CastTo<InputModel>();
             inputModel.Param1.ShouldEqual("value1");
             inputModel.Param2.ShouldEqual(5);
         }
@@ -105,14 +109,15 @@ namespace Tests.Unit.Readers
                     .WithRequestData("ParamArray=value1&ParamArray=value2&ParamList=3&ParamList=4")
                     .WithRequestParameter("request")
                     .WithContentType(MimeTypes.ApplicationFormUrlEncoded)
-                    .AddParameters("param")
-                    .AppendValueMapper<SimpleTypeMapper>();
+                    .AddParameters("param");
+            requestGraph.AppendValueMapper(new SimpleTypeMapper(requestGraph.Configuration));
 
             var result = await CreateReader(requestGraph).Read();
 
-            result.ShouldNotBeNull();
-            result.ShouldBeType<MultiInputModel>();
-            var inputModel = result.CastTo<MultiInputModel>();
+            result.Status.ShouldEqual(ReadStatus.Success);
+            result.Value.ShouldNotBeNull();
+            result.Value.ShouldBeType<MultiInputModel>();
+            var inputModel = result.Value.CastTo<MultiInputModel>();
             inputModel.ParamArray.ShouldOnlyContain("value1", "value2");
             inputModel.ParamList.ShouldOnlyContain(3, 4);
         }
@@ -124,16 +129,17 @@ namespace Tests.Unit.Readers
                 .CreateFor<Handler>(h => h.Post(null, null))
                     .WithRequestData("param1=value1")
                     .WithRequestParameter("request")
-                    .AddValueMapper1(x => x.Values.First() + "mapper1")
-                    .AddValueMapper2(x => x.Values.First() + "mapper2");
+                    .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"))
+                    .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
 
             var reader = CreateReader(requestGraph);
 
             var result = await reader.Read();
 
-            result.ShouldNotBeNull();
-            result.ShouldBeType<InputModel>();
-            var inputModel = result.CastTo<InputModel>();
+            result.Status.ShouldEqual(ReadStatus.Success);
+            result.Value.ShouldNotBeNull();
+            result.Value.ShouldBeType<InputModel>();
+            var inputModel = result.Value.CastTo<InputModel>();
             inputModel.Param1.ShouldEqual("value1mapper1");
             inputModel.Param2.ShouldEqual(0);
 
@@ -151,16 +157,17 @@ namespace Tests.Unit.Readers
                 .CreateFor<Handler>(h => h.Post(null, null))
                     .WithRequestData("param1=value1")
                     .WithRequestParameter("request")
-                    .AddValueMapper1(x => x.Values.First() + "mapper1", configAppliesTo: x => false)
-                    .AddValueMapper2(x => x.Values.First() + "mapper2");
+                    .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"), configAppliesTo: x => false)
+                    .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
 
             var reader = CreateReader(requestGraph);
 
             var result = await reader.Read();
 
-            result.ShouldNotBeNull();
-            result.ShouldBeType<InputModel>();
-            var inputModel = result.CastTo<InputModel>();
+            result.Status.ShouldEqual(ReadStatus.Success);
+            result.Value.ShouldNotBeNull();
+            result.Value.ShouldBeType<InputModel>();
+            var inputModel = result.Value.CastTo<InputModel>();
             inputModel.Param1.ShouldEqual("value1mapper2");
             inputModel.Param2.ShouldEqual(0);
 
@@ -178,16 +185,17 @@ namespace Tests.Unit.Readers
                 .CreateFor<Handler>(h => h.Post(null, null))
                     .WithRequestData("param1=value1")
                     .WithRequestParameter("request")
-                    .AddValueMapper1(x => x.Values.First() + "mapper1", instanceAppliesTo: x => false)
-                    .AddValueMapper2(x => x.Values.First() + "mapper2");
+                    .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"), instanceAppliesTo: x => false)
+                    .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
 
             var reader = CreateReader(requestGraph);
 
             var result = await reader.Read();
 
-            result.ShouldNotBeNull();
-            result.ShouldBeType<InputModel>();
-            var inputModel = result.CastTo<InputModel>();
+            result.Status.ShouldEqual(ReadStatus.Success);
+            result.Value.ShouldNotBeNull();
+            result.Value.ShouldBeType<InputModel>();
+            var inputModel = result.Value.CastTo<InputModel>();
             inputModel.Param1.ShouldEqual("value1mapper2");
             inputModel.Param2.ShouldEqual(0);
 
@@ -199,7 +207,7 @@ namespace Tests.Unit.Readers
         }
 
         [Test]
-        public async Task Should_bind_the_original_value_if_no_mappers_apply()
+        public async Task Should_skip_mapping_if_no_mappers_apply()
         {
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Post(null, null))
@@ -210,40 +218,88 @@ namespace Tests.Unit.Readers
 
             var result = await reader.Read();
 
-            result.ShouldNotBeNull();
-            result.ShouldBeType<InputModel>();
-            var inputModel = result.CastTo<InputModel>();
+            result.Status.ShouldEqual(ReadStatus.Success);
+            result.Value.ShouldNotBeNull();
+            result.Value.ShouldBeType<InputModel>();
+            var inputModel = result.Value.CastTo<InputModel>();
             inputModel.Param1.ShouldBeNull();
             inputModel.Param2.ShouldEqual(0);
         }
 
         [Test]
-        public async Task Should_map_null_if_there_are_no_parameters()
+        public async Task Should_throw_exception_if_configured_no_mappers_apply()
         {
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Post(null, null))
-                    .WithRequestData("")
+                    .WithRequestData("param1=value1")
                     .WithRequestParameter("request");
+
+            requestGraph.Configuration.FailIfNoMapperFound = true;
 
             var reader = CreateReader(requestGraph);
 
-            var result = await reader.Read();
+            var exception = await reader.Should().Throw<MapperNotFoundException>(x => x.Read());
 
-            result.ShouldNotBeNull();
-            result.ShouldBeType<InputModel>();
-            var inputModel = result.CastTo<InputModel>();
-            inputModel.Param1.ShouldBeNull();
-            inputModel.Param2.ShouldEqual(0);
+            exception.Message.ShouldEqual("Unable to map 'value1' to type string for 'Param1' " +
+                "parameter on action Tests.Unit.Readers.FormReaderTests.Handler.Post.");
+        }
+
+        [Test]
+        public async Task Should_return_failure_result_if_mapping_fails()
+        {
+            var requestGraph = RequestGraph
+                .CreateFor<Handler>(h => h.Post(null, null))
+                .WithRequestData("Param2=fark")
+                .WithRequestParameter("request")
+                .WithContentType(MimeTypes.ApplicationFormUrlEncoded);
+            requestGraph.AppendValueMapper(new SimpleTypeMapper(requestGraph.Configuration));
+
+            var result = await CreateReader(requestGraph).Read();
+
+            result.Status.ShouldEqual(ReadStatus.Failure);
+            result.ErrorMessage.ShouldEqual("Parameter request value 'fark' is not formatted correctly. " +
+                                            "Input string was not in a correct format.");
+        }
+
+        public class CtorInputModel
+        {
+            public CtorInputModel(string fark) { }
+        }
+
+        public class CtorHandler
+        {
+            public void Post(CtorInputModel request) { }
+        }
+
+        [Test]
+        public async Task Should_throw_exception_if_parameter_type_does_not_have_a_parameterless_ctor()
+        {
+            var requestGraph = RequestGraph
+                .CreateFor<CtorHandler>(h => h.Post(null))
+                .WithRequestData("param=value")
+                .WithRequestParameter("request");
+
+            var reader = CreateReader(requestGraph);
+
+            var exception = await reader.Should().Throw<RequestParameterCreationException>(x => x.Read());
+
+            exception.Message.ShouldEqual("Unable to instantiate type Tests.Unit.Readers.FormReaderTests" +
+                ".CtorInputModel for 'request' parameter on action Tests.Unit.Readers.FormReaderTests" +
+                ".CtorHandler.Post. Type must have a parameterless constructor.");
         }
 
         private FormReader CreateReader(RequestGraph requestGraph)
         {
-            return new FormReader(
+            var parameterBinder = new ParameterBinder<ReadResult>(
                 requestGraph.Configuration,
                 requestGraph.HttpConfiguration,
                 requestGraph.ActionMethod,
                 requestGraph.GetRouteDescriptor(),
-                requestGraph.ValueMappers,
+                requestGraph.ValueMappers);
+            return new FormReader(
+                parameterBinder,
+                requestGraph.ActionMethod,
+                requestGraph.GetRouteDescriptor(),
                 requestGraph.GetHttpRequestMessage());
         }
     }
