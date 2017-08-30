@@ -155,7 +155,6 @@ namespace Tests.Unit
             container.GetInstance<IInitializer>().ShouldBeType<Initializer>();
             container.GetInstance<IHttpRouteMapper>().ShouldBeType<HttpRouteMapper>();
             container.GetInstance<IInlineConstraintResolver>().ShouldBeType<DefaultInlineConstraintResolver>();
-            container.GetInstance<IExceptionHandler>().ShouldBeType<ExceptionHandler>();
             container.GetInstance<IBehaviorChainInvoker>().ShouldBeType<BehaviorChainInvoker>();
             container.GetInstance<IActionInvoker>().ShouldBeType<ActionInvoker>();
         }

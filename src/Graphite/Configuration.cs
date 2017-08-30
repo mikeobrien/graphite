@@ -41,7 +41,6 @@ namespace Graphite
         public string DiagnosticsUrl { get; set; } = "_graphite";
         public bool Diagnostics { get; set; }
         public bool Metrics { get; set; } = true;
-        public Func<HttpRequestMessage, bool> ReturnErrorMessage { get; set; } = x => false;
 
         public HttpStatusCode DefaultBindingFailureStatusCode { get; set; } = HttpStatusCode.BadRequest;
         public Func<string, string> DefaultBindingFailureStatusText { get; set; } = x => x;
@@ -159,15 +158,6 @@ namespace Graphite
         public Plugin<IActionInvoker> ActionInvoker { get; } =
             Plugin<IActionInvoker>
                 .Create<ActionInvoker>();
-
-        public string UnhandledExceptionStatusText { get; set; } =
-            "There was a problem processing your request.";
-        public Plugin<IExceptionHandler> ExceptionHandler { get; } =
-            Plugin<IExceptionHandler>
-                .Create<ExceptionHandler>();
-        public Plugin<IExceptionDebugResponse> ExceptionDebugResponse { get; } =
-            Plugin<IExceptionDebugResponse>
-                .Create<ExceptionDebugResponse>();
 
         public Plugin<IRequestPropertiesProvider> RequestPropertiesProvider { get; } =
             Plugin<IRequestPropertiesProvider>.Create();

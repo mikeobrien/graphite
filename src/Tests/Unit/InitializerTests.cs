@@ -37,11 +37,9 @@ namespace Tests.Unit
             _actionSources = new List<IActionSource>();
             _actionDecorators = new List<IActionDecorator>();
             var behaviorChainInvoker = Substitute.For<IBehaviorChainInvoker>();
-            var unhandledExceptionHandler = Substitute.For<IExceptionHandler>();
             _container = new Container(x =>
             {
                 x.For<IBehaviorChainInvoker>().Use(behaviorChainInvoker);
-                x.For<IExceptionHandler>().Use(unhandledExceptionHandler);
             });
             _container.Register(_container);
             _configuration = new Configuration();

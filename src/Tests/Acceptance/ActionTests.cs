@@ -38,16 +38,6 @@ namespace Tests.Acceptance
         }
 
         [Test]
-        public void Should_get_exception_details(
-            [Values(Host.Owin, Host.IISExpress)] Host host)
-        {
-            var result = Http.ForHost(host).Get($"{BaseUrl}Exception");
-
-            result.Status.ShouldEqual(HttpStatusCode.InternalServerError);
-            result.Error.ShouldContainAll("fark", "System.Exception");
-        }
-
-        [Test]
         public void Should_not_get_exception_details(
             [Values(Host.Owin, Host.IISExpress)] Host host)
         {

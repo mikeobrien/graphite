@@ -68,8 +68,6 @@ namespace Graphite
                 Container.RegisterPlugin(configuration.PathProvider);
                 Container.RegisterPlugins(configuration.HttpRouteDecorators);
                 Container.RegisterPlugin(configuration.InlineConstraintResolver);
-                Container.RegisterPlugin(configuration.ExceptionHandler);
-                Container.RegisterPlugin(configuration.ExceptionDebugResponse);
                 Container.RegisterPlugin(configuration.BehaviorChainInvoker);
                 Container.RegisterPlugins(configuration.Authenticators);
                 Container.RegisterPlugin(configuration.ActionInvoker);

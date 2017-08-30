@@ -57,7 +57,6 @@ namespace Tests.Unit.Diagnostics
 
             var result = handler.Get();
 
-            result.ShouldContain(configuration.UnhandledExceptionStatusText);
             result.ShouldContain(configuration.HandlerNameFilterRegex);
             result.ShouldContain(configuration.HandlerNamespaceRegex);
 

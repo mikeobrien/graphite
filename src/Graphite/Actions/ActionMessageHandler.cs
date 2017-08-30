@@ -15,7 +15,6 @@ namespace Graphite.Actions
     {
         private readonly Configuration _configuration;
         private readonly ActionDescriptor _actionDescriptor;
-        private readonly IExceptionHandler _exceptionHandler;
         private readonly IBehaviorChainInvoker _behaviorChainInvoker;
         private readonly IContainer _container;
         private readonly Metrics _metrics;
@@ -23,13 +22,11 @@ namespace Graphite.Actions
 
         public ActionMessageHandler(Configuration configuration,
             ActionDescriptor actionDescriptor,
-            IExceptionHandler exceptionHandler,
             IBehaviorChainInvoker behaviorChainInvoker,
             IContainer container, Metrics metrics)
         {
             _configuration = configuration;
             _actionDescriptor = actionDescriptor;
-            _exceptionHandler = exceptionHandler;
             _behaviorChainInvoker = behaviorChainInvoker;
             _container = container;
             _metrics = metrics;
@@ -49,8 +46,8 @@ namespace Graphite.Actions
             catch (Exception exception)
             {
                 if (exception is UnhandledGraphiteException) throw;
-                return _exceptionHandler.HandleException(exception,
-                    _actionDescriptor, requestMessage, _container);
+                throw new UnhandledGraphiteException(_actionDescriptor, 
+                    _container, exception);
             }
             finally
             {

@@ -2,11 +2,9 @@
 using System.Linq;
 using System.Web.Http.Routing;
 using System.Web.Http.Routing.Constraints;
-using Graphite;
 using Graphite.Actions;
 using Graphite.Behaviors;
 using Graphite.DependencyInjection;
-using Graphite.Exceptions;
 using Graphite.Extensions;
 using Graphite.Routing;
 using NSubstitute;
@@ -39,7 +37,6 @@ namespace Tests.Unit.Routing
                 .CreateFor<Handler>(x => x.Get_Param(0))
                 .WithUrl("fark")
                 .ConfigureContainer(x => x
-                    .Register(Substitute.For<IExceptionHandler>())
                     .Register(x));
 
             Map(requestGraph);
@@ -55,7 +52,6 @@ namespace Tests.Unit.Routing
             var requestGraph = RequestGraph.Create()
                 .WithUrl("fark/{param:range(4, 8)}/farker")
                 .ConfigureContainer(x => x
-                    .Register(Substitute.For<IExceptionHandler>())
                     .Register(x));
 
             Map(requestGraph);
@@ -71,7 +67,6 @@ namespace Tests.Unit.Routing
                 .CreateFor<Handler>(x => x.Get_Param(0))
                 .WithUrl("fark")
                 .ConfigureContainer(x => x
-                    .Register(Substitute.For<IExceptionHandler>())
                     .Register(x));
 
             Map(requestGraph);
@@ -89,7 +84,6 @@ namespace Tests.Unit.Routing
             var requestGraph = RequestGraph.Create()
                 .WithUrl("fark/{param:range(4, 8)}/farker")
                 .ConfigureContainer(x => x
-                    .Register(Substitute.For<IExceptionHandler>())
                     .Register(x));
 
             Map(requestGraph);
@@ -118,7 +112,6 @@ namespace Tests.Unit.Routing
                     .Append<TestHttpRouteDecorator3>()
                     .Append<TestHttpRouteDecorator4>()))
                 .ConfigureContainer(x => x
-                    .Register(Substitute.For<IExceptionHandler>())
                     .Register(x));
 
             var decorator1 = new TestHttpRouteDecorator1();

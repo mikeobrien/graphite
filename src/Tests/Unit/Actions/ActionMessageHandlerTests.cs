@@ -26,7 +26,6 @@ namespace Tests.Unit.Actions
         private ActionDescriptor _action;
         private HttpResponseMessage _response;
         private IBehaviorChainInvoker _invoker;
-        private IExceptionHandler _unhandledExceptionHandler;
         private Metrics _metrics;
         private ActionMessageHandler _messageHandler;
 
@@ -41,9 +40,8 @@ namespace Tests.Unit.Actions
             _response = new HttpResponseMessage();
             _metrics = new Metrics();
             _invoker = Substitute.For<IBehaviorChainInvoker>();
-            _unhandledExceptionHandler = new ExceptionHandler(_configuration, new ExceptionDebugResponse());
-            _messageHandler = new ActionMessageHandler(_configuration, _action,
-                _unhandledExceptionHandler, _invoker, _container, _metrics);
+            _messageHandler = new ActionMessageHandler(_configuration, 
+                _action, _invoker, _container, _metrics);
         }
 
         [Test]
@@ -76,7 +74,7 @@ namespace Tests.Unit.Actions
         [Test]
         public async Task Should_not_handle_unhandled_graphite_exceptions()
         {
-            var exception = new UnhandledGraphiteException(null, null, null, new Exception());
+            var exception = new UnhandledGraphiteException(null, null, new Exception());
             _invoker.Invoke(_action, _request, _requestGraph.CancellationToken)
                 .Throws(exception);
 

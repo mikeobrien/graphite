@@ -52,27 +52,5 @@ namespace Graphite.Actions
         {
             return actionMethod.HandlerTypeDescriptor.Type.IsUnderNamespace("Graphite");
         }
-
-        public static HttpResponseMessage HandleException(
-            this IExceptionHandler handler, 
-            Exception exception,
-            ActionDescriptor actionDescriptor,
-            HttpRequestMessage requestMessage,
-            IContainer container)
-        {
-            return handler.HandleException(new ExceptionContext(exception,
-                actionDescriptor, requestMessage, container));
-        }
-
-        public static string GetResponse(
-            this IExceptionDebugResponse response,
-            Exception exception,
-            ActionDescriptor actionDescriptor,
-            HttpRequestMessage requestMessage,
-            IContainer container)
-        {
-            return response.GetResponse(new ExceptionContext(exception,
-                actionDescriptor, requestMessage, container));
-        }
     }
 }

@@ -14,15 +14,13 @@ namespace Graphite.Behaviors
         private readonly Configuration _configuration;
         private readonly IContainer _container;
         private readonly ActionDescriptor _actionDescriptor;
-        private readonly IExceptionHandler _exceptionHandler;
 
         public BehaviorChainInvoker(Configuration configuration, IContainer container,
-            ActionDescriptor actionDescriptor, IExceptionHandler exceptionHandler)
+            ActionDescriptor actionDescriptor)
         {
             _configuration = configuration;
             _container = container;
             _actionDescriptor = actionDescriptor;
-            _exceptionHandler = exceptionHandler;
         }
 
         public virtual async Task<HttpResponseMessage> Invoke(ActionDescriptor actionDescriptor, 
@@ -41,8 +39,7 @@ namespace Graphite.Behaviors
             }
             catch (Exception exception)
             {
-                return _exceptionHandler.HandleException(exception,
-                    _actionDescriptor, requestMessage, _container);
+                throw new UnhandledGraphiteException(_actionDescriptor, _container, exception);
             }
         }
 

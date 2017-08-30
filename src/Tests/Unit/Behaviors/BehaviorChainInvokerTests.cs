@@ -12,8 +12,6 @@ using Graphite.DependencyInjection;
 using Graphite.Exceptions;
 using Graphite.Http;
 using Graphite.Routing;
-using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
@@ -31,7 +29,6 @@ namespace Tests.Unit.Behaviors
 
         private RequestGraph _requestGraph;
         private BehaviorChainInvoker _invoker;
-        private IExceptionHandler _exceptionHandler;
 
         [SetUp]
         public void Setup()
@@ -39,9 +36,8 @@ namespace Tests.Unit.Behaviors
             _requestGraph = RequestGraph.CreateFor<Handler>(x => x.Get(null, null));
             _requestGraph.Configure(x => x
                 .WithDefaultBehavior<TestInvokerBehavior>());
-            _exceptionHandler = new ExceptionHandler(_requestGraph.Configuration, new ExceptionDebugResponse());
             _invoker = new BehaviorChainInvoker(_requestGraph.Configuration, _requestGraph.Container, 
-                _requestGraph.GetActionDescriptor(), _exceptionHandler);
+                _requestGraph.GetActionDescriptor());
         }
 
         public class RegistrationLoggingBehavior : TestBehavior

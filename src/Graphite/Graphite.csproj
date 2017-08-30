@@ -64,13 +64,8 @@
     <Compile Include="Binding\BindResult.cs" />
     <Compile Include="Binding\MapperNotFoundException.cs" />
     <Compile Include="Binding\ParameterBinder.cs" />
-    <Compile Include="Exceptions\ExceptionContext.cs" />
-    <Compile Include="Exceptions\ExceptionDebugResponse.cs" />
     <Compile Include="Actions\IResponseStatus.cs" />
     <Compile Include="Exceptions\Extensions.cs" />
-    <Compile Include="Exceptions\IExceptionHandler.cs" />
-    <Compile Include="Exceptions\IExceptionDebugResponse.cs" />
-    <Compile Include="Exceptions\ExceptionHandler.cs" />
     <Compile Include="Authentication\AuthenticationBehavior.cs" />
     <Compile Include="Authentication\AuthenticatorBase.cs" />
     <Compile Include="Authentication\BasicAuthenticatorBase.cs" />
@@ -181,7 +176,6 @@
     <Compile Include="Setup\BindingDsl.cs" />
     <Compile Include="Setup\ContainerDsl.cs" />
     <Compile Include="Setup\DiagnosticsDsl.cs" />
-    <Compile Include="Setup\ExceptionHandlingDsl.cs" />
     <Compile Include="Setup\HostDsl.cs" />
     <Compile Include="Setup\ResponseDsl.cs" />
     <Compile Include="Setup\RoutingDsl.cs" />
