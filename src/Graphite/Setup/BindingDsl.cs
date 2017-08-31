@@ -126,5 +126,15 @@ namespace Graphite.Setup
             _configuration.BindComplexTypeProperties = true;
             return this;
         }
+
+        /// <summary>
+        /// Specifies that the parameter of an empty request 
+        /// should be left null and not set to a new instance.
+        /// </summary>
+        public ConfigurationDsl IgnoreEmptyRequestParameterValues()
+        {
+            _configuration.CreateEmptyRequestParameterValue = false;
+            return this;
+        }
     }
 }

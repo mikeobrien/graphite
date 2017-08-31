@@ -1,8 +1,10 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Web.Http;
 using Graphite.Extensions;
 using Graphite.Readers;
+using Should;
 
 namespace TestHarness.Reader
 {
@@ -87,6 +89,13 @@ namespace TestHarness.Reader
 
         public void PostNoReader(NoReaderModel model)
         {
+        }
+
+        public class NoRequestBodyModel { }
+
+        public void PostNoRequestBody(NoRequestBodyModel request)
+        {
+            request.ShouldNotBeNull();
         }
     }
 }

@@ -216,9 +216,8 @@ namespace Tests.Common
             var message = new HttpRequestMessage(new HttpMethod(HttpMethod), Url);
             message.SetRequestContext(GetHttpRequestContext(message));
             if (RequestData != null) message.Content = new ByteArrayContent(RequestData);
-            else message.Content = new HttpMessageContent(message);
-            if (ContentType.IsNotNullOrEmpty()) message.Content.Headers
-                .ContentType = new MediaTypeHeaderValue(ContentType);
+            if (ContentType.IsNotNullOrEmpty() && message.Content != null)
+                message.Content.Headers.ContentType = new MediaTypeHeaderValue(ContentType);
             if (Accept.IsNotNullOrEmpty()) message.Headers.Add("Accept", Accept);
             if (AttachmentFilename.IsNotNullOrEmpty())
                 message.Content.Headers.ContentDisposition =
@@ -459,7 +458,8 @@ namespace Tests.Common
 
         public RequestGraph AddReaderBinder(params IRequestReader[] readers)
         {
-            RequestBinders.Add(new ReaderBinder(GetActionDescriptor(), readers));
+            RequestBinders.Add(new ReaderBinder(GetActionDescriptor(), 
+                readers, GetHttpRequestMessage(), Configuration));
             return this;
         }
 

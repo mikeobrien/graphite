@@ -89,15 +89,29 @@ namespace Tests.Acceptance
         public void Should_return_400_if_no_reader_applies_to_request(
             [Values(Host.Owin, Host.IISExpress)] Host host)
         {
-            var result = Http.ForHost(host).Post($"{BaseUrl}NoReader",
+            var result = Http.ForHost(host).PostString($"{BaseUrl}NoReader",
+                contentHeaders: x =>
+                {
+                    x.Clear();
+                    x.ContentType = new MediaTypeWithQualityHeaderValue("fark/farker");
+                }, data: "fark");
+
+            result.Status.ShouldEqual(HttpStatusCode.BadRequest);
+            result.StatusText.ShouldEqual("Request format not supported.");
+        }
+
+        [Test]
+        public void Should_not_return_400_if_request_has_no_content(
+            [Values(Host.Owin, Host.IISExpress)] Host host)
+        {
+            var result = Http.ForHost(host).Post($"{BaseUrl}NoRequestBody",
                 contentHeaders: x =>
                 {
                     x.Clear();
                     x.ContentType = new MediaTypeWithQualityHeaderValue("fark/farker");
                 });
 
-            result.Status.ShouldEqual(HttpStatusCode.BadRequest);
-            result.StatusText.ShouldEqual("Request format not supported.");
+            result.Status.ShouldEqual(HttpStatusCode.NoContent);
         }
     }
 }

@@ -321,7 +321,7 @@ namespace Tests.Unit.Actions
         }
 
         [Test]
-        public async Task Should_return_no_reader_status(
+        public async Task Should_return_no_reader_status_when_there_is_a_request_body_and_no_reader(
             [Values(null, HttpStatusCode.Created)] HttpStatusCode? statusCode)
         {
             var requestGraph = RequestGraph
@@ -329,6 +329,7 @@ namespace Tests.Unit.Actions
                     .AddDefaultResponseStatus()
                     .WithContentType("fark/farker")
                     .WithRequestParameter("request")
+                    .WithRequestData("fark")
                     .AddReaderBinder();
 
             if (statusCode.HasValue) requestGraph.Configuration

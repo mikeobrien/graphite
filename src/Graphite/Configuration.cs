@@ -172,6 +172,7 @@ namespace Graphite
         public BindingMode RequestInfoBindingMode { get; set; } = BindingMode.None;
         public BindingMode ContinerBindingMode { get; set; } = BindingMode.None;
         public bool BindComplexTypeProperties { get; set; }
+        public bool CreateEmptyRequestParameterValue { get; set; } = true;
 
         public ConditionalPlugins<IValueMapper, ValueMapperConfigurationContext> ValueMappers { get; } = 
             new ConditionalPlugins<IValueMapper, ValueMapperConfigurationContext>(false)
