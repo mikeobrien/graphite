@@ -4,6 +4,7 @@ using System.Web.Http;
 using System.Web.Http.ExceptionHandling;
 using System.Web.Http.Hosting;
 using System.Web.Routing;
+using Graphite.Exceptions;
 using Graphite.Extensions;
 using Graphite.Http;
 
@@ -42,20 +43,20 @@ namespace Graphite.Setup
         }
 
         /// <summary>
-        /// Adds an exception logger.
+        /// Adds a request scoped exception logger.
         /// </summary>
-        public WebApiDsl AddExceptionLogger<T>() where T : IExceptionLogger, new()
+        public WebApiDsl AddExceptionLogger<T>() where T : class, IExceptionLogger
         {
-            Configuration.Services.Add<IExceptionLogger, T>();
+            Configuration.Services.Add<IExceptionLogger, ExceptionLoggerWrapper<T>>();
             return this;
         }
 
         /// <summary>
-        /// Sets the exception handler.
+        /// Sets a request scoped exception handler.
         /// </summary>
-        public WebApiDsl SetExceptionHandler<T>() where T : IExceptionHandler, new()
+        public WebApiDsl SetExceptionHandler<T>() where T : class, IExceptionHandler
         {
-            Configuration.Services.Replace<IExceptionHandler, T>();
+            Configuration.Services.Replace<IExceptionHandler, ExceptionHandlerWrapper<T>>();
             return this;
         }
 

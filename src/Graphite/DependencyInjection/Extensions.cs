@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using Graphite.Extensions;
 using Graphite.Linq;
 
@@ -77,6 +78,18 @@ namespace Graphite.DependencyInjection
                     container.Register(x.PluginType, x.ConcreteType, x.Singleton);
             });
             return container;
+        }
+
+        private static readonly string ContainerProperty = typeof(IContainer).FullName;
+
+        public static IContainer GetGraphiteContainer(this HttpRequestMessage request)
+        {
+            return request.Properties[ContainerProperty] as IContainer;
+        }
+
+        public static void SetGraphiteContainer(this HttpRequestMessage request, IContainer container)
+        {
+            request.Properties[ContainerProperty] = container;
         }
     }
 }

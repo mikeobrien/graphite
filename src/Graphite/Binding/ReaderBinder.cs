@@ -30,9 +30,10 @@ namespace Graphite.Binding
         {
             return _actionDescriptor.Route.HasRequest;
         }
-
+        
         public virtual async Task<BindResult> Bind(RequestBinderContext context)
         {
+
             var position = _actionDescriptor.Route.RequestParameter.Position;
 
             if ((_requestMessage.Content?.Headers.ContentLength ?? 0) == 0)

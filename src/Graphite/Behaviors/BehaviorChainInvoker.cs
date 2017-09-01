@@ -31,6 +31,7 @@ namespace Graphite.Behaviors
             try
             {
                 requestMessage.RegisterForDispose(requestContainer);
+                requestMessage.SetGraphiteContainer(requestContainer);
 
                 Register(requestContainer, actionDescriptor, requestMessage, cancellationToken);
 

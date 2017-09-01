@@ -65,6 +65,8 @@
     <Compile Include="Binding\MapperNotFoundException.cs" />
     <Compile Include="Binding\ParameterBinder.cs" />
     <Compile Include="Actions\IResponseStatus.cs" />
+    <Compile Include="Exceptions\ExceptionHandlerWrapper.cs" />
+    <Compile Include="Exceptions\ExceptionLoggerWrapper.cs" />
     <Compile Include="Exceptions\Extensions.cs" />
     <Compile Include="Authentication\AuthenticationBehavior.cs" />
     <Compile Include="Authentication\AuthenticatorBase.cs" />
