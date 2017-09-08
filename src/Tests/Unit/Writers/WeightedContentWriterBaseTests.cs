@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using System.Net.Http.Headers;
+using Graphite.Extensions;
 using Graphite.Http;
 using Graphite.Writers;
 using NUnit.Framework;
@@ -36,14 +37,17 @@ namespace Tests.Unit.Writers
                 MimeTypes.TextPlain);
         }
 
+        [TestCase(null, false)]
+        [TestCase("", false)]
+        [TestCase(MimeTypes.TextCsv, false)]
         [TestCase(MimeTypes.ApplicationJson, true)]
         [TestCase(MimeTypes.TextPlain, true)]
-        [TestCase(MimeTypes.TextCsv, false)]
         [TestCase("application/*", true)]
         [TestCase("*/*", true)]
         public void Should_apply_when_accept_matches(string acceptType, bool applies)
         {
-            _requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(acceptType));
+            if (acceptType.IsNotNullOrEmpty())
+                _requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(acceptType));
 
             _writer.AppliesTo(new ResponseWriterContext("")).ShouldEqual(applies);
         }
@@ -60,7 +64,9 @@ namespace Tests.Unit.Writers
             _writer.IsWeighted.ShouldBeTrue();
             _writer.Weight.ShouldEqual(weight);
         }
-        
+
+        [TestCase(null, MimeTypes.ApplicationJson)]
+        [TestCase("", MimeTypes.ApplicationJson)]
         [TestCase("*/*", MimeTypes.ApplicationJson)]
         [TestCase("application/*", MimeTypes.ApplicationJson)]
         [TestCase("text/*", MimeTypes.TextPlain)]
@@ -68,7 +74,8 @@ namespace Tests.Unit.Writers
         [TestCase(MimeTypes.TextPlain, MimeTypes.TextPlain)]
         public void Should_write_content(string acceptType, string contentType)
         {
-            _requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(acceptType));
+            if (acceptType.IsNotNullOrEmpty())
+                _requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(acceptType));
 
             var result = _writer.Write(new ResponseWriterContext("fark")).Result;
             var content = result.Content.ReadAsStringAsync().Result;

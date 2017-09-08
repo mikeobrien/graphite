@@ -97,7 +97,7 @@ namespace Tests.Acceptance
                 }, data: "fark");
 
             result.Status.ShouldEqual(HttpStatusCode.BadRequest);
-            result.StatusText.ShouldEqual("Request format not supported.");
+            result.StatusText.ShouldEqual("Request format not supported or not specified.");
         }
 
         [Test]

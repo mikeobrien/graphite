@@ -8,6 +8,11 @@ namespace Graphite.Linq
 {
     public static class LinqExtensions
     {
+        public static IEnumerable<T> OrEmpty<T>(this IEnumerable<T> source)
+        {
+            return source ?? Enumerable.Empty<T>();
+        }
+
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> source)
         {
             return source == null || !source.Any();

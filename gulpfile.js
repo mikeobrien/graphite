@@ -46,11 +46,10 @@ gulp.task('test', ['build'], function () {
         .src(['**/bin/**/*Tests.dll'], { read: false })
         .pipe(nunit({
             executable: 'nunit3-console.exe',
-            teamcity: true,
             options: {
                 framework: 'net-4.5',
-                result: 'TestResults.xml',
-                where: 'cat != Performance'
+                where: 'cat != Performance',
+                teamcity: true
             }
         }));
 });

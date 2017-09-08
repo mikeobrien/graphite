@@ -111,7 +111,7 @@ namespace Tests.Acceptance
                 });
 
             result.Status.ShouldEqual(HttpStatusCode.BadRequest);
-            result.StatusText.ShouldEqual("Response format not supported.");
+            result.StatusText.ShouldEqual("Response format not supported or not specified.");
         }
     }
 }

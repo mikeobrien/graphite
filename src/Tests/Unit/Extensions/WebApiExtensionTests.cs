@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using Graphite.Extensions;
 using NUnit.Framework;
 using Should;
@@ -99,6 +100,19 @@ namespace Tests.Unit.Extensions
             request.RawHeaders().ShouldEqual(
                 "DELETE /farker HTTP/1.1\r\n" +
                 "Accept: fark/farker");
+        }
+
+        [Test]
+        public void Should_rebuild_raw_request_with_content_headers()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Delete, "http://fark/farker");
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("fark/farker"));
+            request.Content = new StringContent("fark", Encoding.UTF8, "oh/hai");
+
+            request.RawHeaders().ShouldEqual(
+                "DELETE /farker HTTP/1.1\r\n" +
+                "Accept: fark/farker\r\n" +
+                "Content-Type: oh/hai; charset=utf-8");
         }
     }
 }

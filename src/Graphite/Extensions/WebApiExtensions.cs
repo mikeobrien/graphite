@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web;
@@ -39,7 +40,8 @@ namespace Graphite.Extensions
         public static string RawHeaders(this HttpRequestMessage request)
         {
             return $"{request.Method} {request.RequestUri?.AbsolutePath} HTTP/{request.Version}\r\n" +
-                request.Headers.Select(x => $"{x.Key}: {x.Value.Join("; ")}").Join("\r\n");
+                request.Headers.Concat((request.Content?.Headers).OrEmpty())
+                    .Select(x => $"{x.Key}: {x.Value.Join("; ")}").Join("\r\n");
         }
 
         public static bool IsPost(this string method)
@@ -77,15 +79,11 @@ namespace Graphite.Extensions
             return match.Quality - ((int)match.MatchType - 1).Max(0) * .0001;
         }
 
-        public static AcceptTypeMatch GetFirstMatchingAcceptTypeOrDefault(
-            this HttpRequestMessage request, params string[] mimeTypes)
-        {
-            return request.GetMatchingAcceptTypes(mimeTypes).FirstOrDefault();
-        }
-
         public static List<AcceptTypeMatch> GetMatchingAcceptTypes(this HttpRequestMessage request, 
             params string[] mimeTypes)
         {
+            if (!mimeTypes.Any())
+                throw new GraphiteException("No mime types specified.");
             return request.Headers.Accept?
                 .SelectMany(x => mimeTypes.Select(m => new
                 {

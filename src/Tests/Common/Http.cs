@@ -102,9 +102,10 @@ namespace Tests.Common
 
         public Result Get(string relativeUrl,
             IDictionary<string, string> cookies = null,
-            Action<HttpRequestHeaders> requestHeaders = null)
+            Action<HttpRequestHeaders> requestHeaders = null,
+            string accept = null)
         {
-            return Get<object>(relativeUrl, MimeTypes.ApplicationJson, 
+            return Get<object>(relativeUrl, accept, 
                 x => null, cookies, requestHeaders);
         }
 
@@ -149,10 +150,11 @@ namespace Tests.Common
         public Result PostJson<TRequest>(string relativeUrl, TRequest data,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
-            Action<HttpContentHeaders> contentHeaders = null)
+            Action<HttpContentHeaders> contentHeaders = null,
+            string accept = null)
         {
-            return Send<object>(HttpMethod.Post, relativeUrl, MimeTypes.ApplicationJson, 
-                MimeTypes.TextPlain, x => SerializeJson(data, x), x => null,
+            return Send<object>(HttpMethod.Post, relativeUrl, MimeTypes.ApplicationJson,
+                accept, x => SerializeJson(data, x), x => null,
                 cookies, requestHeaders, contentHeaders);
         }
 
@@ -245,10 +247,11 @@ namespace Tests.Common
         public Result<TResponse> PostJson<TRequest, TResponse>(string relativeUrl, TRequest data,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
-            Action<HttpContentHeaders> contentHeaders = null) where TResponse : class
+            Action<HttpContentHeaders> contentHeaders = null,
+            string accept = null) where TResponse : class
         {
-            return Send(HttpMethod.Post, relativeUrl, MimeTypes.ApplicationJson, 
-                MimeTypes.ApplicationJson, x => SerializeJson(data, x), 
+            return Send(HttpMethod.Post, relativeUrl, MimeTypes.ApplicationJson,
+                accept ?? MimeTypes.ApplicationJson, x => SerializeJson(data, x), 
                 DeserializeJson<TResponse>, cookies, requestHeaders, contentHeaders);
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -10,13 +11,15 @@ namespace Graphite.Writers
     {
         private readonly HttpResponseMessage _responseMessage;
         private readonly Lazy<AcceptTypeMatch> _acceptType;
+        private readonly string[] _mimeTypes;
 
         protected WeightedContentWriterBase(HttpRequestMessage requestMessage,
             HttpResponseMessage responseMessage, params string[] mimeTypes)
         {
             _responseMessage = responseMessage;
+            _mimeTypes = mimeTypes;
             _acceptType = requestMessage.ToLazy(x => x
-                .GetFirstMatchingAcceptTypeOrDefault(mimeTypes));
+                .GetMatchingAcceptTypes(mimeTypes).FirstOrDefault());
         }
 
         protected abstract HttpContent GetContent(ResponseWriterContext context);
@@ -33,8 +36,12 @@ namespace Graphite.Writers
         {
             _responseMessage.Content = GetContent(context);
             if (_responseMessage.Content != null)
-                _responseMessage.Content.Headers.ContentType = new
-                    MediaTypeHeaderValue(_acceptType.Value.ContentType);
+            {
+                var contentType = _acceptType.Value?.ContentType ?? _mimeTypes.First();
+                if (contentType.IsNotNullOrEmpty())
+                    _responseMessage.Content.Headers.ContentType = new
+                        MediaTypeHeaderValue(contentType);
+            }
             return _responseMessage.ToTaskResult();
         }
     }
