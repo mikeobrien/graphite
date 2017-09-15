@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Web.Http.Routing;
@@ -13,7 +12,6 @@ using Graphite.Behaviors;
 using Graphite.Binding;
 using Graphite.DependencyInjection;
 using Graphite.Diagnostics;
-using Graphite.Exceptions;
 using Graphite.Extensibility;
 using Graphite.Extensions;
 using Graphite.Hosting;

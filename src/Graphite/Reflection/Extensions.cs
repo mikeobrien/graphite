@@ -62,7 +62,7 @@ namespace Graphite.Reflection
         public static bool IsInDebugMode(this Assembly assembly)
         {
             return assembly.GetCustomAttributes(typeof(DebuggableAttribute), false)
-                .Cast<DebuggableAttribute>().Any(x => x.IsJITTrackingEnabled);
+                .Cast<DebuggableAttribute>().Any(x => x.IsJITTrackingEnabled && x.IsJITOptimizerDisabled);
         }
 
         public static string GetGenericTypeBaseName(this Type type)

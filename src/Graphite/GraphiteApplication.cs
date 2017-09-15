@@ -24,13 +24,9 @@ namespace Graphite
         public bool Initialized => Container != null;
         public Metrics Metrics { get; private set; }
 
-        public void Initialize(Action<ConfigurationDsl> configure, 
-            params Assembly[] defaultAssemblies)
+        public void Initialize(Action<ConfigurationDsl> configure)
         {
             var configuration = new Configuration();
-
-            configuration.Assemblies.AddRange(defaultAssemblies
-                .Where(x => !x.IsSystemAssembly()));
 
             configure?.Invoke(new ConfigurationDsl(configuration, _httpConfiguration));
 
@@ -40,6 +36,9 @@ namespace Graphite
         public void Initialize(Configuration configuration)
         {
             if (Initialized) return;
+
+            if (!configuration.Assemblies.Any())
+                throw new GraphiteException("No handler assemblies specified.");
 
             try
             {

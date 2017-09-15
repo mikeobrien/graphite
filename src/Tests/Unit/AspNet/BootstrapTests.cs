@@ -35,6 +35,7 @@ namespace Tests.Unit.AspNet
         {
             GlobalConfiguration.Configuration.InitializeGraphite(config =>
                 config
+                    .IncludeThisAssembly()
                     .UseContainer(_container)
                     .FilterHandlersBy((c, t) => false)
                     .ConfigureActionDecorators(x => x.Append<TestActionDecorator>())

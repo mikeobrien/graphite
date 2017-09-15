@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Web.Hosting;
 using System.Web.Http;
 using Graphite.Setup;
@@ -13,8 +12,7 @@ namespace Graphite.AspNet
             Action<ConfigurationDsl> configure = null)
         {
             var graphiteApplication = new GraphiteApplication(httpConfiguration);
-            graphiteApplication.Initialize(x => Configure(x, configure), 
-                Assembly.GetCallingAssembly());
+            graphiteApplication.Initialize(x => Configure(x, configure));
             HostingEnvironment.StopListening += (s, e) => graphiteApplication.Dispose();
             return httpConfiguration;
         }

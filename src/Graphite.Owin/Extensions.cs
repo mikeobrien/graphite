@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Threading;
 using System.Web.Http;
 using Graphite.Setup;
@@ -16,7 +15,7 @@ namespace Graphite.Owin
         {
             builder.UseWebApi(server);
             return builder.InitializeGraphite(server.Configuration,
-                configure, Assembly.GetCallingAssembly());
+                configure);
         }
 
         public static IAppBuilder InitializeGraphite(
@@ -26,23 +25,15 @@ namespace Graphite.Owin
             var httpConfiguration = new HttpConfiguration();
             builder.UseWebApi(httpConfiguration);
             return builder.InitializeGraphite(httpConfiguration, 
-                configure, Assembly.GetCallingAssembly());
+                configure);
         }
 
         public static IAppBuilder InitializeGraphite(
             this IAppBuilder builder, HttpConfiguration httpConfiguration,
             Action<ConfigurationDsl> configure = null)
         {
-            return builder.InitializeGraphite(httpConfiguration, 
-                configure, Assembly.GetCallingAssembly());
-        }
-
-        private static IAppBuilder InitializeGraphite(
-            this IAppBuilder builder, HttpConfiguration httpConfiguration,
-            Action<ConfigurationDsl> configure, Assembly defaultAssembly)
-        {
             var graphiteApplication = new GraphiteApplication(httpConfiguration);
-            graphiteApplication.Initialize(x => Configure(x, configure), defaultAssembly);
+            graphiteApplication.Initialize(x => Configure(x, configure));
             builder.OnAppDisposing(() => graphiteApplication.Dispose());
             return builder;
         }

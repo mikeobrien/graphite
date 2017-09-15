@@ -45,6 +45,7 @@ namespace Tests.Unit
             var initializer = Substitute.For<IInitializer>();
 
             _application.Initialize(c => c
+                .IncludeThisAssembly()
                 .UseContainer(_container)
                 .FilterHandlersBy((a, t) => false)
                 .WithInitializer(initializer)
@@ -69,6 +70,13 @@ namespace Tests.Unit
             _application.Metrics.ShouldNotBeNull();
 
             Should_be_configured_with_graphite_defaults(_container);
+        }
+
+        [Test]
+        public void Should_fail_if_no_assemblies_specified()
+        {
+            _application.Should().Throw<GraphiteException>(
+                x => x.Initialize(c => c.UseContainer(_container)));
         }
 
         public static void RegisterRequestObjects(Container container)
