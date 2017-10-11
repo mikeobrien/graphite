@@ -168,6 +168,7 @@
     <Compile Include="Unit\Extensibility\ConditionalExtensionTests.cs" />
     <Compile Include="Unit\Extensions\ExpressionTests.cs" />
     <Compile Include="Unit\Extensions\ExtensionTests.cs" />
+    <Compile Include="Unit\Http\AsyncContentTests.cs" />
     <Compile Include="Unit\Linq\ExtensionTests.cs" />
     <Compile Include="Unit\Extensions\MemoizeTests.cs" />
     <Compile Include="Unit\Extensions\StringExtensionTests.cs" />

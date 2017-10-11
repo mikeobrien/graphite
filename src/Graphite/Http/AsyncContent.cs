@@ -19,7 +19,13 @@ namespace Graphite.Http
 
         public AsyncContent(Stream stream, int bufferSize)
         {
-            _writeToStream = output => stream.CopyToAsync(output, bufferSize);
+            _writeToStream = async output =>
+            {
+                using (stream)
+                {
+                    await stream.CopyToAsync(output, bufferSize);
+                }
+            };
         }
 
         public AsyncContent(string data, Encoding encoding)

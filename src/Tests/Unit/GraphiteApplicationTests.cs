@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Web.Http;
@@ -9,7 +8,6 @@ using Graphite.Behaviors;
 using Graphite.Binding;
 using Graphite.DependencyInjection;
 using Graphite.Diagnostics;
-using Graphite.Exceptions;
 using Graphite.Http;
 using Graphite.Readers;
 using Graphite.Reflection;
