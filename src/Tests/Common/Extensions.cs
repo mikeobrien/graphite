@@ -27,6 +27,11 @@ namespace Tests.Common
 
     public static class Extensions
     {
+        public static DateTime SubtractUtcOffset(this DateTime date)
+        {
+            return date.AddHours(TimeZone.CurrentTimeZone.GetUtcOffset(date).Hours);
+        }
+
         public static bool IsType<T>(this Type type)
         {
             return type == typeof(T);
