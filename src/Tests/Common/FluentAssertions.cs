@@ -25,6 +25,17 @@ namespace Tests.Common
     
     public static class FluentAssertions
     {
+        public static void ShouldBeWithinSeconds(this DateTime datetime, DateTime expected)
+        {
+            datetime.ShouldBeInRange(expected.AddSeconds(-5), expected.AddSeconds(5));
+        }
+
+        public static void ShouldBeWithinSeconds(this DateTime? datetime, DateTime expected)
+        {
+            datetime.ShouldNotEqual(null);
+            datetime.Value.ShouldBeWithinSeconds(expected);
+        }
+
         public static void ShouldBeInteger(this string value)
         {
             int output;

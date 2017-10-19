@@ -1,6 +1,6 @@
 ![Graphite](https://github.com/mikeobrien/graphite/raw/master/misc/header.png)
 
-[![Nuget](http://img.shields.io/nuget/v/GraphiteWeb.Core.svg?style=flat)](http://www.nuget.org/packages/GraphiteWebCore/) [![TeamCity Build Status](https://img.shields.io/teamcity/http/build.mikeobrien.net/s/Graphite.svg?style=flat)](http://build.mikeobrien.net/viewType.html?buildTypeId=Graphite&guest=1) [![Join the chat at https://gitter.im/Graphite-Web-Framework/GraphiteWeb](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Graphite-Web-Framework/GraphiteWeb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Nuget](http://img.shields.io/nuget/v/GraphiteWeb.Core.svg?style=flat)](http://www.nuget.org/packages/GraphiteWeb.Core/) [![TeamCity Build Status](https://img.shields.io/teamcity/http/build.mikeobrien.net/s/Graphite.svg?style=flat)](http://build.mikeobrien.net/viewType.html?buildTypeId=Graphite&guest=1) [![Join the chat at https://gitter.im/Graphite-Web-Framework/GraphiteWeb](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Graphite-Web-Framework/GraphiteWeb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 *...taking the friction out of Web Api.*
 

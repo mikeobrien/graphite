@@ -39,25 +39,27 @@ namespace Graphite.Extensions
 
         public class GraphiteIsoDateTimeConverter : IsoDateTimeConverter
         {
+            private bool _adjustToLocal;
+
             /// <summary>
             /// Converts to local time after deserialization.
             /// </summary>
-            public bool AdjustToLocalAfterDeserializing { get; set; }
+            public bool AdjustToLocalAfterDeserializing() => _adjustToLocal = true;
 
             public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
             {
                 var result = base.ReadJson(reader, objectType, existingValue, serializer);
-                if (AdjustToLocalAfterDeserializing && result is DateTime)
+                if (_adjustToLocal && result is DateTime)
                     return ((DateTime) result).ToLocalTime();
                 return result;
             }
         }
 
         public static JsonSerializerSettings ConfigureIsoDateTimeConverter(this JsonSerializerSettings settings, 
-            Action<GraphiteIsoDateTimeConverter> configure)
+            Action<GraphiteIsoDateTimeConverter> configure = null)
         {
             settings.RemoveConverters<IsoDateTimeConverter>();
-            configure(settings.GetOrAddConverter<GraphiteIsoDateTimeConverter>());
+            configure?.Invoke(settings.GetOrAddConverter<GraphiteIsoDateTimeConverter>());
             return settings;
         }
 
@@ -71,6 +73,12 @@ namespace Graphite.Extensions
             return converter;
         }
 
+        public static void AddConverter<T>(this JsonSerializerSettings settings)
+            where T : JsonConverter, new()
+        {
+            settings.Converters.Add(new T());
+        }
+
         public static JsonSerializerSettings RemoveConverters<T>(this JsonSerializerSettings settings) 
             where T : JsonConverter
         {
@@ -79,9 +87,50 @@ namespace Graphite.Extensions
             return settings;
         }
 
-        public static JsonSerializerSettings WriteMicrosoftJsonDateTime(this JsonSerializerSettings settings)
+        public class GraphiteMicrosoftJsonDateTimeConverter : JsonConverter
+        {
+            private bool _adjustToLocal;
+            private bool _adjustToUtc;
+
+            /// <summary>
+            /// Converts to local time after deserialization.
+            /// </summary>
+            public bool AdjustToLocalAfterDeserializing() => _adjustToLocal = true;
+
+            /// <summary>
+            /// Converts to local time after deserialization.
+            /// </summary>
+            public bool AdjustToUtcBeforeSerializing() => _adjustToUtc = true;
+
+            public override bool CanConvert(Type objectType)
+            {
+                return objectType == typeof(DateTime) || objectType == typeof(DateTime?);
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                var datetime = value as DateTime?;
+                if (datetime != null && _adjustToUtc)
+                    datetime = datetime.Value.ToUniversalTime();
+                writer.WriteValue(datetime ?? value);
+            }
+
+            public override object ReadJson(JsonReader reader, Type objectType,
+                object existingValue, JsonSerializer serializer)
+            {
+                var datetime = reader.Value as DateTime?;
+                if (datetime != null && _adjustToLocal)
+                    return datetime.Value.ToLocalTime();
+                return datetime;
+            }
+        }
+
+        public static JsonSerializerSettings WriteMicrosoftJsonDateTime(this JsonSerializerSettings settings,
+            Action<GraphiteMicrosoftJsonDateTimeConverter> configure = null)
         {
             settings.DateFormatHandling = DateFormatHandling.MicrosoftDateFormat;
+            settings.RemoveConverters<GraphiteMicrosoftJsonDateTimeConverter>();
+            configure?.Invoke(settings.GetOrAddConverter<GraphiteMicrosoftJsonDateTimeConverter>());
             return settings;
         }
 
