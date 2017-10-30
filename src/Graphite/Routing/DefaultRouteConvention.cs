@@ -61,7 +61,7 @@ namespace Graphite.Routing
 
         protected virtual string GetHttpMethod(ActionMethod action)
         {
-            return _configuration.GetHttpMethod(_configuration, action)
+            return _configuration.HttpMethodConvention(_configuration, action)
                 .AssertNotEmptyOrWhitespace("Http method not found on " +
                     $"action {action.HandlerTypeDescriptor.Type.FullName}.{action.MethodDescriptor.Name}.")
                 .Trim().ToUpper();
@@ -105,8 +105,10 @@ namespace Graphite.Routing
         protected virtual IEnumerable<Segment> GetMethodSegments(ActionMethod action, 
             List<ActionParameter> actionParameters)
         {
-            return _configuration.GetActionMethodName(_configuration, action)
-                .Split('_').Where(x => x.IsNotNullOrWhiteSpace())
+            var segments = _configuration.ActionSegmentsConvention(_configuration, action);
+            if (segments == null || !segments.Any()) return Enumerable.Empty<Segment>();
+            return segments
+                .Where(x => x.IsNotNullOrWhiteSpace())
                 .Select(x => GetSegment(x, actionParameters));
         }
 
@@ -143,7 +145,7 @@ namespace Graphite.Routing
 
         protected virtual Url GetUrl(ActionMethod action, List<Segment> methodSegments)
         {
-            return _configuration.GetHandlerNamespace(_configuration, action)
+            return _configuration.HandlerNamespaceParser(_configuration, action)
                 .Split('.').Where(x => x.IsNotNullOrWhiteSpace())
                 .Select(x => new Segment(x))
                 .Concat(methodSegments.Select(x => x)).ToUrl();

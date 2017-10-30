@@ -8,10 +8,9 @@ namespace Graphite.Http
 {
     public class HttpMethods : List<HttpMethod>
     {
-        public HttpMethods Add(string method, string actionRegex,
-            bool allowRequestbody, bool allowResponsebody)
+        public HttpMethods Add(string method, bool allowRequestbody, bool allowResponsebody)
         {
-            Add(new HttpMethod(actionRegex, method, allowRequestbody, allowResponsebody));
+            Add(new HttpMethod(method, allowRequestbody, allowResponsebody));
             return this;
         }
         
@@ -19,7 +18,7 @@ namespace Graphite.Http
         {
             methods.ForEach(method =>
             {
-                var remove = this.FirstOrDefault(x => StringExtensions.EqualsIgnoreCase(x.Method, method));
+                var remove = this.FirstOrDefault(x => x.Method.EqualsIgnoreCase(method));
                 if (remove != null) Remove(remove);
             });
             return this;
@@ -28,12 +27,6 @@ namespace Graphite.Http
         public HttpMethods RemoveHttpMethod(params HttpMethod[] methods)
         {
             methods.ForEach(method => Remove(method));
-            return this;
-        }
-
-        public HttpMethods WithRegex(Func<HttpMethod, string> regex)
-        {
-            this.ToList().ForEach(m => Configure(m, x => x.WithActionRegex(regex(m))) );
             return this;
         }
 
@@ -82,10 +75,8 @@ namespace Graphite.Http
             return Configure(HttpMethod.Connect, configure);
         }
 
-        public HttpMethod MatchAny(IEnumerable<string> search)
-        {
-            return this.FirstOrDefault(x => search.ContainsIgnoreCase(x.Method));
-        }
+        public HttpMethod this[string method] => this.FirstOrDefault(
+            x => method?.EqualsIgnoreCase(x.Method) ?? false);
 
         public bool Contains(string method)
         {

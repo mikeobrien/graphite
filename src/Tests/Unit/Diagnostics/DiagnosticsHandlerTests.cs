@@ -57,8 +57,8 @@ namespace Tests.Unit.Diagnostics
 
             var result = handler.Get();
 
-            result.ShouldContain(configuration.HandlerNameFilterRegex);
-            result.ShouldContain(configuration.HandlerNamespaceRegex);
+            result.ShouldContain(configuration.HandlerNameConvention.ToString());
+            result.ShouldContain(configuration.HandlerNamespaceConvention.ToString());
 
             result.ShouldContain(typeof(GraphiteApplication).Assembly.GetFriendlyName());
             result.ShouldContain(typeof(GraphiteApplication).Assembly.GetName().Version.ToString());

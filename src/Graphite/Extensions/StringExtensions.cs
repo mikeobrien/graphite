@@ -81,25 +81,18 @@ namespace Graphite.Extensions
             return string.Join(seperator, parts);
         }
 
-        public static string Remove(this string source, params string[] regex)
+        public static bool MatchesGroup(this string source, Regex regex, string name)
         {
-            return source.Remove((IEnumerable<string>)regex);
+            return regex.Match(source).Groups[name].Success;
         }
 
-        public static string Remove(this string source, IEnumerable<string> regex)
+        public static string MatchGroupValue(this string source, Regex regex, string name)
         {
-            return regex.Aggregate(source, (a, i) => Regex.Replace(a, i, ""));
-        }
-
-        public static bool IsMatch(this string source, string regex)
-        {
-            return Regex.IsMatch(source, regex);
-        }
-
-        public static List<string> MatchGroups(this string source, string regex)
-        {
-            return Regex.Match(source, regex).Groups.Cast<Group>()
-                .Skip(1).Select(x => x.Value).ToList();
+            if (!regex.GetGroupNames().Contains(name))
+                throw new GraphiteException(
+                    $"Regex '{regex}' does not contain capture group '{name}'.");
+            var match = regex.Match(source);
+            return match.Success ? match.Groups[name].Value : null;
         }
 
         public static bool Contains(this string source, 

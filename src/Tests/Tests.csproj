@@ -176,7 +176,6 @@
     <Compile Include="Unit\Extensions\TaskExtensionTests.cs" />
     <Compile Include="Unit\Extensions\WebApiExtensionTests.cs" />
     <Compile Include="Unit\GraphiteApplicationTests.cs" />
-    <Compile Include="Unit\Http\HttpMethodTests.cs" />
     <Compile Include="Unit\InitializerTests.cs" />
     <Compile Include="Unit\Owin\BootstrapTests.cs" />
     <Compile Include="Unit\Owin\RequestPropertyProviderTests.cs" />

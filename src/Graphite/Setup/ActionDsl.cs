@@ -42,9 +42,7 @@ namespace Graphite.Setup
         /// </summary>
         public ConfigurationDsl OnlyIncludeHandlersUnder<T>()
         {
-            _configuration.HandlerFilter = (c, t) =>
-                t.Type.IsUnderNamespace<T>() &&
-                t.Name.IsMatch(c.HandlerNameFilterRegex);
+            _configuration.HandlerFilter = (c, t) =>  t.Type.IsUnderNamespace<T>();
             return this;
         }
 

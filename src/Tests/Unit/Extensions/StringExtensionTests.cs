@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using Graphite;
 using Graphite.Extensions;
 using NUnit.Framework;
 using Should;
@@ -10,20 +12,20 @@ namespace Tests.Unit.Extensions
     [TestFixture]
     public class StringExtensionTests
     {
-        [Test]
-        public void Should_remove_by_regex()
-        {
-            "OneTwoOneThreeThree".Remove("^One", "Three").ShouldEqual("TwoOne");
-        }
-
-        [TestCase("", "", null)]
-        [TestCase("FarkFarker", "^(Fark)", "Fark")]
-        [TestCase("Fark", "^(Farker)", null)]
+        [TestCase("FarkFarker", "^(?<name>Fark?)", "Fark")]
+        [TestCase("Fark", "^(?<name>Farker?)", null)]
         public void Should_return_matched_groups(
             string source, string regex, string expected)
         {
-            source.MatchGroups(regex).ShouldOnlyContain(
-                expected?.Split(',') ?? new string[] {});
+            source.MatchGroupValue(new Regex(regex), "name")
+                .ShouldEqual(expected);
+        }
+
+        [Test]
+        public void Should_fail_if_regex_does_not_contain_capture_group()
+        {
+            "".Should().Throw<GraphiteException>(x => x
+                .MatchGroupValue(new Regex(""), "name"));
         }
 
         [Test]

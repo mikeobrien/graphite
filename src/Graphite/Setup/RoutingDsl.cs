@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using System.Web.Http.Routing;
 using Graphite.Actions;
 using Graphite.Extensibility;
@@ -59,12 +60,23 @@ namespace Graphite.Setup
         }
 
         /// <summary>
-        /// Specifies the regex used to parse the handler namespace. The namespace is 
-        /// pulled from the first capture group by default e.g. "MyApp\.Handlers\.(.*)".
+        /// Specifies the regex used to parse the handler namespace. 
+        /// The namespace is pulled from the "namespace" capture 
+        /// group e.g. "MyApp\.Handlers\.(?&lt;namespace&gt;.*)".
         /// </summary>
-        public ConfigurationDsl WithHandlerNamespaceRegex(string regex)
+        public ConfigurationDsl WithHandlerNamespaceConvention(string regex)
         {
-            _configuration.HandlerNamespaceRegex = regex;
+            _configuration.HandlerNamespaceConvention = new Regex(regex);
+            return this;
+        }
+
+        /// <summary>
+        /// Parses the handler namespace.
+        /// </summary>
+        public ConfigurationDsl WithHandlerNamespaceParser(
+            Func<Configuration, ActionMethod, string> parser)
+        {
+            _configuration.HandlerNamespaceParser = parser;
             return this;
         }
 
@@ -97,44 +109,49 @@ namespace Graphite.Setup
         /// </summary>
         public ConfigurationDsl ExcludeNamespaceFromUrl(string @namespace)
         {
-            _configuration.HandlerNamespaceRegex = $"{@namespace.RegexEscape()}\\.?(.*)";
+            WithHandlerNamespaceConvention($"{@namespace.RegexEscape()}\\.?" + 
+                Configuration.DefaultHandlerNamespaceConventionRegex);
             return this;
         }
 
         /// <summary>
-        /// Gets the portion of the action method name used for routing.
+        /// Gets action segments.
         /// </summary>
-        public ConfigurationDsl GetActionMethodNameWith(Func<Configuration, ActionMethod, string> getName)
+        public ConfigurationDsl WithActionSegmentsConvention(
+            Func<Configuration, ActionMethod, string[]> segments)
         {
-            _configuration.GetActionMethodName = getName;
+            _configuration.ActionSegmentsConvention = segments;
             return this;
         }
 
         /// <summary>
-        /// Gets the http method from the action method name.
+        /// Gets the http method of the action.
         /// </summary>
-        public ConfigurationDsl GetHttpMethodWith(Func<Configuration, ActionMethod, string> getMethod)
+        public ConfigurationDsl WithHttpMethodConvention(Func<Configuration, 
+            ActionMethod, string> method)
         {
-            _configuration.GetHttpMethod = getMethod;
+            _configuration.HttpMethodConvention = method;
             return this;
         }
 
         /// <summary>
         /// Specifies the regex used to identify handlers e.g. "Handler$".
         /// </summary>
-        public ConfigurationDsl WithHandlerNameRegex(string regex)
+        public ConfigurationDsl WithHandlerNameConvention(string regex)
         {
-            _configuration.HandlerNameFilterRegex = regex;
+            _configuration.HandlerNameConvention = new Regex(regex);
             return this;
         }
 
         /// <summary>
-        /// Specifies the regex used to identify actions. The http method is 
-        /// pulled from the first capture group by default e.g. "^(Get|Post|...)".
+        /// Specifies the regex used to identify actions and parse action names. 
+        /// By default the http method is pulled from the "method" capture group, 
+        /// the segements from from the "segment" capture group e.g. 
+        /// "^(?&lt;method&gt;{methods}?)(?&lt;segments&gt;.*)". 
         /// </summary>
-        public ConfigurationDsl WithActionRegex(Func<Configuration, string> regex)
+        public ConfigurationDsl WithActionNameConvention(Func<Configuration, string> regex)
         {
-            _configuration.ActionRegex = regex;
+            _configuration.ActionNameConvention = x => new Regex(regex(x));
             return this;
         }
 

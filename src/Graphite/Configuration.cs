@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web.Http.Routing;
 using System.Xml;
 using Graphite.Actions;
@@ -86,16 +87,49 @@ namespace Graphite
             Plugin<ITypeCache>
                 .Create<TypeCache>(singleton: true);
 
-        public string HandlerNameFilterRegex { get; set; } = "Handler$";
+        public const string HandlerNamespaceGroupName = "namespace";
+        public static readonly string DefaultHandlerNamespaceConventionRegex = $"(?<{HandlerNamespaceGroupName}>.*)";
 
-        public Func<Configuration, TypeDescriptor, bool> HandlerFilter { get; set; } =
-            (c, t) => t.Name.IsMatch(c.HandlerNameFilterRegex);
+        public Regex HandlerNamespaceConvention { get; set; } = new Regex(DefaultHandlerNamespaceConventionRegex);
 
-        public Func<Configuration, string> ActionRegex { get; set; } =
-            c => $"({c.SupportedHttpMethods.Select(m => m.ActionRegex).Join("|")})";
+        public Func<Configuration, ActionMethod, string> HandlerNamespaceParser { get; set; } =
+            (c, a) => a.HandlerTypeDescriptor.Type.Namespace
+                .MatchGroupValue(c.HandlerNamespaceConvention, HandlerNamespaceGroupName);
 
-        public Func<Configuration, MethodDescriptor, bool> ActionFilter { get; set; } =
-            (c, a) => a.Name.IsMatch(c.ActionRegex(c));
+        public const string DefaultHandlerNameConventionRegex = "Handler$";
+
+        public Regex HandlerNameConvention { get; set; } = new Regex(DefaultHandlerNameConventionRegex);
+
+        public Func<Configuration, TypeDescriptor, bool> HandlerFilter { get; set; } = (c, t) => true;
+
+        public static readonly string HttpMethodGroupName = "method";
+        public static readonly string ActionSegmentsGroupName = "segments";
+
+        public static Func<Configuration, string> DefaultActionNameConventionRegex = c =>
+        {
+            var methods = c.SupportedHttpMethods.Select(m => m.Method.InitialCap()).Join("|");
+            return $"^(?<{HttpMethodGroupName}>{methods})" +
+                   $"(?<{ActionSegmentsGroupName}>.*)";
+        };
+
+        public Func<Configuration, Regex> ActionNameConvention { get; set; } = 
+            c => new Regex(DefaultActionNameConventionRegex(c));
+
+        public Func<Configuration, MethodDescriptor, bool> ActionFilter { get; set; } = (c, a) => true;
+
+        public Func<Configuration, ActionMethod, string[]> ActionSegmentsConvention { get; set; } =
+            (c, a) =>
+            {
+                var segments = a.MethodDescriptor.Name.MatchGroupValue(
+                    c.ActionNameConvention(c), ActionSegmentsGroupName);
+                return segments.IsNotNullOrEmpty() 
+                    ? segments.Split('_') 
+                    : null;
+            };
+
+        public Func<Configuration, ActionMethod, string> HttpMethodConvention { get; set; } =
+            (c, a) => c.SupportedHttpMethods[a.MethodDescriptor.Name
+                .MatchGroupValue(c.ActionNameConvention(c), HttpMethodGroupName)]?.Method;
 
         public Plugins<IActionMethodSource> ActionMethodSources { get; } = 
             new Plugins<IActionMethodSource>(true)
@@ -112,18 +146,6 @@ namespace Graphite
             new ConditionalPlugins<IRouteConvention, RouteConfigurationContext>(true)
                 .Configure(x => x
                     .Append<DefaultRouteConvention>());
-
-        public string HandlerNamespaceRegex { get; set; } = "(.*)";
-
-        public Func<Configuration, ActionMethod, string> GetHandlerNamespace { get; set; } =
-            (c, a) => a.HandlerTypeDescriptor.Type.Namespace.MatchGroups(c.HandlerNamespaceRegex).FirstOrDefault();
-
-        public Func<Configuration, ActionMethod, string> GetActionMethodName { get; set; } =
-            (c, a) => a.MethodDescriptor.Name.Remove(c.ActionRegex(c));
-
-        public Func<Configuration, ActionMethod, string> GetHttpMethod { get; set; } =
-            (c, a) => c.SupportedHttpMethods.MatchAny(a.MethodDescriptor
-                .Name.MatchGroups(c.ActionRegex(c)))?.Method;
 
         public Plugin<IInlineConstraintBuilder> ConstraintBuilder { get; } =
             Plugin<IInlineConstraintBuilder>

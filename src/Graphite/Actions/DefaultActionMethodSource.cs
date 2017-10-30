@@ -24,10 +24,13 @@ namespace Graphite.Actions
         {
             return _configuration.Assemblies
                 .SelectMany(x => _typeCache.GetTypeDescriptors(x))
-                .Where(x => _configuration.HandlerFilter(_configuration, x))
+                .Where(x => 
+                    _configuration.HandlerNameConvention.IsMatch(x.Name) && 
+                    _configuration.HandlerFilter(_configuration, x))
                 .SelectMany(t => t.Methods
-                    .Where(m => !m.MethodInfo.IsGenericMethodDefinition &&
-                        !m.IsBclMethod && _configuration.ActionFilter(_configuration, m))
+                    .Where(m => !m.MethodInfo.IsGenericMethodDefinition && !m.IsBclMethod &&
+                        _configuration.ActionNameConvention(_configuration).IsMatch(m.Name) && 
+                        _configuration.ActionFilter(_configuration, m))
                     .Select(m => new ActionMethod(t, m)));
         }
     }

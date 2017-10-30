@@ -84,6 +84,11 @@ namespace Graphite.Actions
             return From(method.GetMethodInfo(), typeCache);
         }
 
+        public static ActionMethod From<T>(string name, ITypeCache typeCache = null)
+        {
+            return From(typeof(T).GetMethod(name), typeCache);
+        }
+
         public static ActionMethod From(MethodInfo method, ITypeCache typeCache = null)
         {
             typeCache = typeCache ?? new TypeCache();

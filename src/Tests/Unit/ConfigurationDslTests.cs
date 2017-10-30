@@ -31,10 +31,11 @@ namespace Tests.Unit
         public void Should_exclude_type_namespace_from_url(
             Type marker, string expected)
         {
-            var request = RequestGraph.CreateFor<MyWebApp.Api.Users.Handler>(x => x.Action());
+            var request = RequestGraph.CreateFor<MyWebApp
+                .Api.Users.Handler>(x => x.Action());
             request.Configure(x => x.ExcludeTypeNamespaceFromUrl(marker));
 
-            var @namespace = request.Configuration.GetHandlerNamespace(
+            var @namespace = request.Configuration.HandlerNamespaceParser(
                 request.Configuration, request.ActionMethod);
 
             @namespace.ShouldEqual(expected);

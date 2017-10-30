@@ -118,7 +118,7 @@ namespace Tests.Unit.Routing
 
             descriptors.Count.ShouldEqual(1);
             descriptors.First().Method.ShouldEqual(action.GetMethodInfo()
-                .Name.Remove("_Segment").ToUpper());
+                .Name.Replace("_Segment", "").ToUpper());
         }
 
         [Test]

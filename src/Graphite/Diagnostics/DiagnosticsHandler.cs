@@ -286,15 +286,15 @@ namespace Graphite.Diagnostics
                 <table class=""configuration row-seperator"">
                     <tr><td>Startup Time</td><td><code>{_metrics.StartupTime}</code></td></tr>
                     <tr><td>Total Requests</td><td><code>{_metrics.TotalRequests}</code></td></tr>
-                    <tr><td>Handler Name Filter Regex</td><td><code>{_configuration.HandlerNameFilterRegex}</code></td></tr>
-                    <tr><td>Handler Namespace Regex</td><td><code>{_configuration.HandlerNamespaceRegex}</code></td></tr>
+                    <tr><td>Handler Name Filter Regex</td><td><code>{_configuration.HandlerNameConvention}</code></td></tr>
+                    <tr><td>Handler Namespace Regex</td><td><code>{_configuration.HandlerNamespaceConvention}</code></td></tr>
                     <tr><td>Url Aliases</td><td>{HowManyConfigured(_configuration.UrlAliases)}</td></tr>
                     <tr><td>Handler Filter</td><td>{SetNotSetDefault(_configuration.HandlerFilter, DefaultConfiguration.HandlerFilter)}</td></tr>
-                    <tr><td>Action Regex</td><td>{SetNotSetDefault(_configuration.ActionRegex, DefaultConfiguration.ActionRegex)}</td></tr>
+                    <tr><td>Action Regex</td><td>{SetNotSetDefault(_configuration.ActionNameConvention, DefaultConfiguration.ActionNameConvention)}</td></tr>
                     <tr><td>Action Filter</td><td>{SetNotSetDefault(_configuration.ActionFilter, DefaultConfiguration.ActionFilter)}</td></tr>
-                    <tr><td>Get Handler Namespace</td><td>{SetNotSetDefault(_configuration.GetHandlerNamespace, DefaultConfiguration.GetHandlerNamespace)}</td></tr>
-                    <tr><td>Get Action Method Name</td><td>{SetNotSetDefault(_configuration.GetActionMethodName, DefaultConfiguration.GetActionMethodName)}</td></tr>
-                    <tr><td>Get Http Method</td><td>{SetNotSetDefault(_configuration.GetHttpMethod, DefaultConfiguration.GetHttpMethod)}</td></tr>
+                    <tr><td>Get Handler Namespace</td><td>{SetNotSetDefault(_configuration.HandlerNamespaceParser, DefaultConfiguration.HandlerNamespaceParser)}</td></tr>
+                    <tr><td>Get Action Method Name</td><td>{SetNotSetDefault(_configuration.ActionSegmentsConvention, DefaultConfiguration.ActionSegmentsConvention)}</td></tr>
+                    <tr><td>Get Http Method</td><td>{SetNotSetDefault(_configuration.HttpMethodConvention, DefaultConfiguration.HttpMethodConvention)}</td></tr>
                 </table>";
         }
 
@@ -307,7 +307,6 @@ namespace Graphite.Diagnostics
                             <th>Method</th>
                             <th>Request</th>
                             <th>Response</th>
-                            <th>Action Regex</th>
                         </tr>
                     </thead>
                     <tbody>{_configuration.SupportedHttpMethods.Select(x =>
@@ -315,7 +314,6 @@ namespace Graphite.Diagnostics
                             <td><code>{x.Method}</code></td>
                             <td>{YesNo(x.AllowRequestBody)}</td>
                             <td>{YesNo(x.AllowResponseBody)}</td>
-                            <td><code>{x.ActionRegex.HtmlEncode()}</code></td>
                         </tr>").Join()}
                     </tbody>
                 </table>";
