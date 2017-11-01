@@ -64,9 +64,12 @@ namespace Graphite
         public XmlWriterSettings XmlWriterSettings { get; } = new XmlWriterSettings();
         public JsonSerializerSettings JsonSerializerSettings { get; } = new JsonSerializerSettings();
 
-        public HttpMethods SupportedHttpMethods { get; } = new HttpMethods {
-            HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Patch, HttpMethod.Delete,
-            HttpMethod.Options, HttpMethod.Head, HttpMethod.Trace, HttpMethod.Connect };
+        public HttpMethods SupportedHttpMethods { get; } = new HttpMethods
+        {
+            HttpMethod.Get, HttpMethod.Post, HttpMethod.Put,
+            HttpMethod.Patch, HttpMethod.Delete, HttpMethod.Options, 
+            HttpMethod.Head, HttpMethod.Trace, HttpMethod.Connect
+        };
 
         public Plugin<IPathProvider> PathProvider { get; } =
             Plugin<IPathProvider>.Create(singleton: true);
@@ -87,49 +90,14 @@ namespace Graphite
             Plugin<ITypeCache>
                 .Create<TypeCache>(singleton: true);
 
-        public const string HandlerNamespaceGroupName = "namespace";
-        public static readonly string DefaultHandlerNamespaceConventionRegex = $"(?<{HandlerNamespaceGroupName}>.*)";
-
-        public Regex HandlerNamespaceConvention { get; set; } = new Regex(DefaultHandlerNamespaceConventionRegex);
-
-        public Func<Configuration, ActionMethod, string> HandlerNamespaceParser { get; set; } =
-            (c, a) => a.HandlerTypeDescriptor.Type.Namespace
-                .MatchGroupValue(c.HandlerNamespaceConvention, HandlerNamespaceGroupName);
-
-        public const string DefaultHandlerNameConventionRegex = "Handler$";
-
-        public Regex HandlerNameConvention { get; set; } = new Regex(DefaultHandlerNameConventionRegex);
-
-        public Func<Configuration, TypeDescriptor, bool> HandlerFilter { get; set; } = (c, t) => true;
-
-        public static readonly string HttpMethodGroupName = "method";
-        public static readonly string ActionSegmentsGroupName = "segments";
-
-        public static Func<Configuration, string> DefaultActionNameConventionRegex = c =>
-        {
-            var methods = c.SupportedHttpMethods.Select(m => m.Method.InitialCap()).Join("|");
-            return $"^(?<{HttpMethodGroupName}>{methods})" +
-                   $"(?<{ActionSegmentsGroupName}>.*)";
-        };
-
-        public Func<Configuration, Regex> ActionNameConvention { get; set; } = 
-            c => new Regex(DefaultActionNameConventionRegex(c));
-
-        public Func<Configuration, MethodDescriptor, bool> ActionFilter { get; set; } = (c, a) => true;
-
-        public Func<Configuration, ActionMethod, string[]> ActionSegmentsConvention { get; set; } =
-            (c, a) =>
-            {
-                var segments = a.MethodDescriptor.Name.MatchGroupValue(
-                    c.ActionNameConvention(c), ActionSegmentsGroupName);
-                return segments.IsNotNullOrEmpty() 
-                    ? segments.Split('_') 
-                    : null;
-            };
-
-        public Func<Configuration, ActionMethod, string> HttpMethodConvention { get; set; } =
-            (c, a) => c.SupportedHttpMethods[a.MethodDescriptor.Name
-                .MatchGroupValue(c.ActionNameConvention(c), HttpMethodGroupName)]?.Method;
+        public Regex HandlerNamespaceConvention { get; set; }
+        public Func<Configuration, ActionMethod, string> HandlerNamespaceParser { get; set; }
+        public Regex HandlerNameConvention { get; set; }
+        public Func<Configuration, TypeDescriptor, bool> HandlerFilter { get; set; }
+        public Func<Configuration, Regex> ActionNameConvention { get; set; }
+        public Func<Configuration, MethodDescriptor, bool> ActionFilter { get; set; }
+        public Func<Configuration, ActionMethod, string[]> ActionSegmentsConvention { get; set; }
+        public Func<Configuration, ActionMethod, string> HttpMethodConvention { get; set; }
 
         public Plugins<IActionMethodSource> ActionMethodSources { get; } = 
             new Plugins<IActionMethodSource>(true)

@@ -21,6 +21,11 @@ namespace Graphite.Extensions
             return source.Split(delmiter, StringSplitOptions.None);
         }
 
+        public static string[] Split(this string source, string seperator, StringSplitOptions options)
+        {
+            return source.Split(new [] { seperator }, options);
+        }
+
         public static StringBuilder AppendLine(this StringBuilder source, object value)
         {
             source.AppendLine(value.ToString());

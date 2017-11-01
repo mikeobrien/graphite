@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Graphite;
@@ -552,5 +553,76 @@ namespace Tests.Unit.Routing
             urlConvention.AppliesToCalled.ShouldBeFalse();
             urlConvention.GetUrlsCalled.ShouldBeFalse();
         }
+
+        [Test]
+        public void Should_match_handler_namespace_regex()
+        {
+            "fark".MatchGroupValue(DefaultRouteConvention.DefaultHandlerNamespaceConvention,
+                    DefaultRouteConvention.HandlerNamespaceGroupName)
+                .ShouldEqual("fark");
+        }
+
+        public class ParseNamespace
+        {
+            public void Post() { }
+        }
+
+        [Test]
+        public void Should_parse_default_handler_namespace()
+        {
+            DefaultRouteConvention.DefaultHandlerNamespaceParser(_configuration,
+                    ActionMethod.From<ParseNamespace>(x => x.Post()))
+                .ShouldEqual("Tests.Unit.Routing");
+        }
+
+        public class ParseHttpMethod
+        {
+            public void GetFark() { }
+            public void Get() { }
+            public void Post() { }
+            public void Put() { }
+            public void Delete() { }
+            public void Options() { }
+            public void Head() { }
+            public void Trace() { }
+            public void Connect() { }
+        }
+
+        [TestCase(nameof(ParseHttpMethod.GetFark), "GET")]
+        [TestCase(nameof(ParseHttpMethod.Get), "GET")]
+        [TestCase(nameof(ParseHttpMethod.Post), "POST")]
+        [TestCase(nameof(ParseHttpMethod.Put), "PUT")]
+        [TestCase(nameof(ParseHttpMethod.Delete), "DELETE")]
+        [TestCase(nameof(ParseHttpMethod.Options), "OPTIONS")]
+        [TestCase(nameof(ParseHttpMethod.Head), "HEAD")]
+        [TestCase(nameof(ParseHttpMethod.Trace), "TRACE")]
+        [TestCase(nameof(ParseHttpMethod.Connect), "CONNECT")]
+        public void Should_return_method_name_from_method_name_convention(string name, string expected)
+        {
+            DefaultRouteConvention.DefaultHttpMethodConvention(_configuration,
+                    ActionMethod.From<ParseHttpMethod>(name))
+                .ShouldEqual(expected);
+        }
+
+        public class ParseSegments
+        {
+            public void Get() { }
+            public void GetFark() { }
+            public void GetFark_Farker() { }
+        }
+
+        [TestCase(nameof(ParseSegments.GetFark), "Fark")]
+        [TestCase(nameof(ParseSegments.Get), null)]
+        [TestCase(nameof(ParseSegments.GetFark_Farker), "Fark,Farker")]
+        public void Should_return_segments_from_segment_convention(
+            string name, string expected)
+        {
+            var result = DefaultRouteConvention.DefaultActionSegmentsConvention(_configuration,
+                ActionMethod.From<ParseSegments>(name));
+
+            if (expected == null) result.ShouldBeNull();
+            else result.ShouldOnlyContain(expected.Split(','));
+        }
+
     }
 }

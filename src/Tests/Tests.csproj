@@ -152,7 +152,6 @@
     <Compile Include="Unit\Cors\CorsAttributePolicySourceTests.cs" />
     <Compile Include="Unit\Cors\CorsConfigurationDslTests.cs" />
     <Compile Include="Unit\Cors\ExtensionTests.cs" />
-    <Compile Include="Unit\DefaultConfigurationTests.cs" />
     <Compile Include="Unit\DependencyInjection\RegistryTests.cs" />
     <Compile Include="Unit\DependencyInjection\StructureMapTests.cs" />
     <Compile Include="Unit\Diagnostics\DiagnosticsActionSourceTests.cs" />

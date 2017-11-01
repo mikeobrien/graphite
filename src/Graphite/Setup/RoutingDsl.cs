@@ -109,8 +109,8 @@ namespace Graphite.Setup
         /// </summary>
         public ConfigurationDsl ExcludeNamespaceFromUrl(string @namespace)
         {
-            WithHandlerNamespaceConvention($"{@namespace.RegexEscape()}\\.?" + 
-                Configuration.DefaultHandlerNamespaceConventionRegex);
+            WithHandlerNamespaceConvention($"{@namespace.RegexEscape()}\\.?" +
+                DefaultRouteConvention.DefaultHandlerNamespaceConventionRegex);
             return this;
         }
 

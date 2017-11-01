@@ -4,8 +4,10 @@ using System.Linq;
 using System.Reflection;
 using Graphite;
 using Graphite.Actions;
+using Graphite.Extensions;
 using Graphite.Reflection;
 using NUnit.Framework;
+using Should;
 using Tests.Common;
 using Tests.Unit.Actions.ActionSource;
 
@@ -116,6 +118,64 @@ namespace Tests.Unit.Actions
         {
             actions.ShouldNotContain(x => x.HandlerTypeDescriptor.Type.IsType<T>() &&
                 x.MethodDescriptor.MethodInfo == typeof(T).GetMethod(methodName));
+        }
+
+        [TestCase("", false)]
+        [TestCase("Fark", false)]
+        [TestCase("Handler", true)]
+        [TestCase("FarkHandler", true)]
+        public void Should_match_handler_name(string name, bool matches)
+        {
+            DefaultActionMethodSource.DefaultHandlerNameConvention.IsMatch(name).ShouldEqual(matches);
+        }
+
+        [TestCase("", false)]
+        [TestCase("Fark", false)]
+        [TestCase("GetFark", true)]
+        [TestCase("Get", true)]
+        [TestCase("Post", true)]
+        [TestCase("Put", true)]
+        [TestCase("Delete", true)]
+        [TestCase("Options", true)]
+        [TestCase("Head", true)]
+        [TestCase("Trace", true)]
+        [TestCase("Connect", true)]
+        public void Should_match_method_name(string name, bool matches)
+        {
+            DefaultActionMethodSource.DefaultActionNameConvention(
+                    new Configuration()).IsMatch(name)
+                .ShouldEqual(matches);
+        }
+        
+        [TestCase("", null)]
+        [TestCase("GetFark", "Get")]
+        [TestCase("Get", "Get")]
+        [TestCase("Post", "Post")]
+        [TestCase("Put", "Put")]
+        [TestCase("Delete", "Delete")]
+        [TestCase("Options", "Options")]
+        [TestCase("Head", "Head")]
+        [TestCase("Trace", "Trace")]
+        [TestCase("Connect", "Connect")]
+        public void Should_return_method_name(string name, string expected)
+        {
+            name.MatchGroupValue(DefaultActionMethodSource
+                .DefaultActionNameConvention(new Configuration()),
+                    DefaultActionMethodSource.HttpMethodGroupName)
+                .ShouldEqual(expected);
+        }
+
+        [TestCase("", null)]
+        [TestCase("GetFark", "Fark")]
+        [TestCase("Get_Fark", "_Fark")]
+        [TestCase("Get_Fark_Farker", "_Fark_Farker")]
+        [TestCase("GetFark_Farker", "Fark_Farker")]
+        public void Should_return_segments(string name, string expected)
+        {
+            name.MatchGroupValue(DefaultActionMethodSource
+                        .DefaultActionNameConvention(new Configuration()),
+                    DefaultActionMethodSource.ActionSegmentsGroupName)
+                .ShouldEqual(expected);
         }
     }
 }

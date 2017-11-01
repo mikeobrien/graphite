@@ -1,4 +1,5 @@
 ﻿using System;
+using Graphite.Routing;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
@@ -35,7 +36,7 @@ namespace Tests.Unit
                 .Api.Users.Handler>(x => x.Action());
             request.Configure(x => x.ExcludeTypeNamespaceFromUrl(marker));
 
-            var @namespace = request.Configuration.HandlerNamespaceParser(
+            var @namespace = DefaultRouteConvention.DefaultHandlerNamespaceParser(
                 request.Configuration, request.ActionMethod);
 
             @namespace.ShouldEqual(expected);

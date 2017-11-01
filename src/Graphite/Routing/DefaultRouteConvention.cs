@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web.Http;
 using Graphite.Actions;
 using Graphite.Extensions;
@@ -61,10 +62,18 @@ namespace Graphite.Routing
 
         protected virtual string GetHttpMethod(ActionMethod action)
         {
-            return _configuration.HttpMethodConvention(_configuration, action)
+            return (_configuration.HttpMethodConvention ?? DefaultHttpMethodConvention)(_configuration, action)
                 .AssertNotEmptyOrWhitespace("Http method not found on " +
                     $"action {action.HandlerTypeDescriptor.Type.FullName}.{action.MethodDescriptor.Name}.")
                 .Trim().ToUpper();
+        }
+
+        public static string DefaultHttpMethodConvention(Configuration configuration, ActionMethod action)
+        {
+            return configuration.SupportedHttpMethods[action.MethodDescriptor.Name
+                .MatchGroupValue((configuration.ActionNameConvention ?? 
+                    DefaultActionMethodSource.DefaultActionNameConvention)(configuration), 
+                    DefaultActionMethodSource.HttpMethodGroupName)]?.Method;
         }
 
         protected virtual ParameterDescriptor GetRequestParameter(ActionMethod action, string httpMethod)
@@ -105,11 +114,23 @@ namespace Graphite.Routing
         protected virtual IEnumerable<Segment> GetMethodSegments(ActionMethod action, 
             List<ActionParameter> actionParameters)
         {
-            var segments = _configuration.ActionSegmentsConvention(_configuration, action);
+            var segments = (_configuration.ActionSegmentsConvention ?? 
+                DefaultActionSegmentsConvention)(_configuration, action);
             if (segments == null || !segments.Any()) return Enumerable.Empty<Segment>();
             return segments
                 .Where(x => x.IsNotNullOrWhiteSpace())
                 .Select(x => GetSegment(x, actionParameters));
+        }
+
+        public static string[] DefaultActionSegmentsConvention(Configuration configuration, ActionMethod action)
+        {
+            var segments = action.MethodDescriptor.Name.MatchGroupValue(
+                (configuration.ActionNameConvention ?? DefaultActionMethodSource
+                       .DefaultActionNameConvention)(configuration), 
+                    DefaultActionMethodSource.ActionSegmentsGroupName);
+            return segments.IsNotNullOrEmpty()
+                ? segments.Split("_", StringSplitOptions.RemoveEmptyEntries)
+                : null;
         }
 
         protected virtual Segment GetSegment(string segment, List<ActionParameter> actionParameters)
@@ -129,7 +150,8 @@ namespace Graphite.Routing
                 .Select(x => x.Parameter);
         }
 
-        protected virtual void ValidateUrlParameters(ActionMethod action, List<UrlParameter> urlParameters)
+        protected virtual void ValidateUrlParameters(ActionMethod action, 
+            List<UrlParameter> urlParameters)
         {
             if (urlParameters.Count(x => x.IsWildcard) > 1)
                 throw new InvalidOperationException("Multiple wildcard parameters found on " +
@@ -145,10 +167,25 @@ namespace Graphite.Routing
 
         protected virtual Url GetUrl(ActionMethod action, List<Segment> methodSegments)
         {
-            return _configuration.HandlerNamespaceParser(_configuration, action)
+            return (_configuration.HandlerNamespaceParser ?? 
+                    DefaultHandlerNamespaceParser)(_configuration, action)
                 .Split('.').Where(x => x.IsNotNullOrWhiteSpace())
                 .Select(x => new Segment(x))
                 .Concat(methodSegments.Select(x => x)).ToUrl();
+        }
+
+        public const string HandlerNamespaceGroupName = "namespace";
+        public static readonly string DefaultHandlerNamespaceConventionRegex = 
+            $"(?<{HandlerNamespaceGroupName}>.*)";
+        public static readonly Regex DefaultHandlerNamespaceConvention = 
+            new Regex(DefaultHandlerNamespaceConventionRegex);
+
+        public static string DefaultHandlerNamespaceParser(
+            Configuration configuration, ActionMethod action)
+        {
+            return action.HandlerTypeDescriptor.Type.Namespace
+                .MatchGroupValue(configuration.HandlerNamespaceConvention ?? 
+                    DefaultHandlerNamespaceConvention, HandlerNamespaceGroupName);
         }
 
         protected virtual TypeDescriptor GetResponseBody(ActionMethod action)
