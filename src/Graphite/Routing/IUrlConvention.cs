@@ -9,14 +9,15 @@ namespace Graphite.Routing
     {
         public UrlContext(
             ActionMethod actionMethod, string httpMethod, 
-            Url url, IEnumerable<UrlParameter> urlParameters,
+            List<Segment> methodSegments, 
+            IEnumerable<UrlParameter> urlParameters,
             IEnumerable<ActionParameter> parameters,
             ParameterDescriptor requestParameter, 
             TypeDescriptor responseType)
         {
             ActionMethod = actionMethod;
             HttpMethod = httpMethod;
-            Url = url;
+            MethodSegments = methodSegments;
             UrlParameters = urlParameters;
             Parameters = parameters;
             RequestParameter = requestParameter;
@@ -25,7 +26,7 @@ namespace Graphite.Routing
         
         public virtual ActionMethod ActionMethod { get; }
         public virtual string HttpMethod { get; }
-        public virtual Url Url { get; }
+        public virtual List<Segment> MethodSegments { get; }
         public virtual IEnumerable<UrlParameter> UrlParameters { get; }
         public virtual IEnumerable<ActionParameter> Parameters { get; }
         public virtual ParameterDescriptor RequestParameter { get; }

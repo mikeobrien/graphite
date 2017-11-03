@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
@@ -119,14 +118,13 @@ namespace Graphite
             Plugin<IInlineConstraintBuilder>
                 .Create<DefaultInlineConstraintBuilder>(singleton: true);
 
-        public ConditionalPlugins<IUrlConvention, UrlConfigurationContext> UrlConventions { get; } = 
-            new ConditionalPlugins<IUrlConvention, UrlConfigurationContext>(true)
+        public ConditionalPlugins<IUrlConvention, UrlContext> UrlConventions { get; } = 
+            new ConditionalPlugins<IUrlConvention, UrlContext>(true)
                 .Configure(x => x
-                    .Append<DefaultUrlConvention>()
-                    .Append<AliasUrlConvention>());
+                    .Append<DefaultUrlConvention>());
 
-        public List<Func<ActionMethod, Url, string>> UrlAliases { get; } =
-            new List<Func<ActionMethod, Url, string>>();
+        public List<Func<UrlContext, string>> UrlAliases { get; } =
+            new List<Func<UrlContext, string>>();
         public string UrlPrefix { get; set; }
 
         public ConditionalPlugins<IActionDecorator, ActionConfigurationContext> ActionDecorators { get; } = 

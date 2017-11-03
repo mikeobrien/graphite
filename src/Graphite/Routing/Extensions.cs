@@ -30,9 +30,8 @@ namespace Graphite.Routing
             UrlContext urlContext, Configuration configuration, 
             HttpConfiguration httpConfiguration)
         {
-            return configuration.UrlConventions.ThatAppliesTo(urlConventions, 
-                new UrlConfigurationContext(configuration, httpConfiguration, 
-                    urlContext), urlContext);
+            return configuration.UrlConventions.ThatAppliesTo(
+                urlConventions, urlContext, urlContext);
         }
 
 

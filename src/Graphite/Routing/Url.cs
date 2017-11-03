@@ -6,9 +6,9 @@ namespace Graphite.Routing
 {
     public static class UrlExtensions
     {
-        public static Url ToUrl(this IEnumerable<Segment> segments)
+        public static string ToUrl(this IEnumerable<Segment> segments)
         {
-            return new Url(segments);
+            return segments.Select(x => x.Content).Join("/");
         }
 
         public static string JoinUrls(this string left, string right)
@@ -16,21 +16,6 @@ namespace Graphite.Routing
             if (left.IsNullOrEmpty()) return right;
             if (right.IsNullOrEmpty()) return left;
             return $"{left.TrimEnd('/')}/{right.TrimStart('/')}";
-        }
-    }
-
-    public class Url : List<Segment>
-    {
-        public Url(IEnumerable<Segment> segments) : base(segments) { }
-
-        public static Url Create(params string[] segments)
-        {
-            return new Url(segments.Select(x => new Segment(x)));
-        }
-
-        public override string ToString()
-        {
-            return this.Select(x => x.Content).Join("/");
         }
     }
 

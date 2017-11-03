@@ -110,9 +110,8 @@ namespace Tests.Unit
             actionDecorators[0].ShouldBeType<TestActionDecorator>();
 
             var urlConventions = container.GetInstances<IUrlConvention>().ToList();
-            urlConventions.Count.ShouldEqual(2);
+            urlConventions.Count.ShouldEqual(1);
             urlConventions[0].ShouldBeType<DefaultUrlConvention>();
-            urlConventions[1].ShouldBeType<AliasUrlConvention>();
 
             var requestReaders = container.GetInstances<IRequestReader>().ToList();
             requestReaders.Count.ShouldEqual(6);

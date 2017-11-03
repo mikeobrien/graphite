@@ -194,7 +194,6 @@
     <Compile Include="Unit\Routing\DefaultUrlConventionTests.cs" />
     <Compile Include="Unit\Routing\RouteExtensionTests.cs" />
     <Compile Include="Unit\Routing\HttpRouteMapperTests.cs" />
-    <Compile Include="Unit\Routing\UrlAliasConventionTests.cs" />
     <Compile Include="Unit\Writers\RedirectWriterTests.cs" />
     <Compile Include="Unit\Writers\ByteWriterTests.cs" />
     <Compile Include="Unit\Writers\StreamWriterTests.cs" />

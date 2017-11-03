@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Web.Http;
 using Graphite.Actions;
 using Graphite.Extensions;
@@ -48,10 +47,9 @@ namespace Graphite.Routing
             ValidateUrlParameters(action, urlParameters);
             
             var parameters = GetParameters(actionParameters, urlParameters).ToList();
-            var url = GetUrl(action, methodSegments);
             var responseBody = GetResponseBody(action);
 
-            var urlContext = new UrlContext(action, httpMethod, url, 
+            var urlContext = new UrlContext(action, httpMethod, methodSegments, 
                 urlParameters, parameters, requestParameter, responseBody);
 
             return _urlConventions.ThatApplyTo(urlContext, _configuration, _httpConfiguration)
@@ -163,29 +161,6 @@ namespace Graphite.Routing
             List<ActionParameter> actionParameters, List<UrlParameter> urlParameters)
         {
             return actionParameters.Where(p => !urlParameters.Contains(p));
-        }
-
-        protected virtual Url GetUrl(ActionMethod action, List<Segment> methodSegments)
-        {
-            return (_configuration.HandlerNamespaceParser ?? 
-                    DefaultHandlerNamespaceParser)(_configuration, action)
-                .Split('.').Where(x => x.IsNotNullOrWhiteSpace())
-                .Select(x => new Segment(x))
-                .Concat(methodSegments.Select(x => x)).ToUrl();
-        }
-
-        public const string HandlerNamespaceGroupName = "namespace";
-        public static readonly string DefaultHandlerNamespaceConventionRegex = 
-            $"(?<{HandlerNamespaceGroupName}>.*)";
-        public static readonly Regex DefaultHandlerNamespaceConvention = 
-            new Regex(DefaultHandlerNamespaceConventionRegex);
-
-        public static string DefaultHandlerNamespaceParser(
-            Configuration configuration, ActionMethod action)
-        {
-            return action.HandlerTypeDescriptor.Type.Namespace
-                .MatchGroupValue(configuration.HandlerNamespaceConvention ?? 
-                    DefaultHandlerNamespaceConvention, HandlerNamespaceGroupName);
         }
 
         protected virtual TypeDescriptor GetResponseBody(ActionMethod action)

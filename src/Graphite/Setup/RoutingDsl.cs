@@ -35,7 +35,7 @@ namespace Graphite.Setup
         /// Configures url conventions.
         /// </summary>
         public ConfigurationDsl ConfigureUrlConventions(Action<ConditionalPluginsDsl
-            <IUrlConvention, UrlConfigurationContext>> configure)
+            <IUrlConvention, UrlContext>> configure)
         {
             _configuration.UrlConventions.Configure(configure);
             return this;
@@ -44,7 +44,7 @@ namespace Graphite.Setup
         /// <summary>
         /// Adds url aliases.
         /// </summary>
-        public ConfigurationDsl WithUrlAlias(params Func<ActionMethod, Url, string>[] aliases)
+        public ConfigurationDsl WithUrlAlias(params Func<UrlContext, string>[] aliases)
         {
             _configuration.UrlAliases.AddRange(aliases);
             return this;
@@ -110,7 +110,7 @@ namespace Graphite.Setup
         public ConfigurationDsl ExcludeNamespaceFromUrl(string @namespace)
         {
             WithHandlerNamespaceConvention($"{@namespace.RegexEscape()}\\.?" +
-                DefaultRouteConvention.DefaultHandlerNamespaceConventionRegex);
+                DefaultUrlConvention.DefaultHandlerNamespaceConventionRegex);
             return this;
         }
 

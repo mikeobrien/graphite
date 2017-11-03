@@ -36,7 +36,7 @@ namespace Tests.Unit
                 .Api.Users.Handler>(x => x.Action());
             request.Configure(x => x.ExcludeTypeNamespaceFromUrl(marker));
 
-            var @namespace = DefaultRouteConvention.DefaultHandlerNamespaceParser(
+            var @namespace = DefaultUrlConvention.DefaultHandlerNamespaceParser(
                 request.Configuration, request.ActionMethod);
 
             @namespace.ShouldEqual(expected);

@@ -461,8 +461,10 @@ namespace Tests.Unit.Routing
             var urlConvention = new TestUrlConvention
             {
                 AppliesToFunc = c => true,
-                GetUrlsFunc = c => new[] {"fark", "farker"}.Select(y => $@"{y}/{c.ActionMethod
-                    .MethodDescriptor.Name}/{c.Url}").ToArray()
+                GetUrlsFunc = c => new[] {"fark", "farker"}.Select(y => 
+                    $"{y}/{c.ActionMethod.MethodDescriptor.Name}/" + 
+                    $"{c.ActionMethod.HandlerTypeDescriptor.Type.Namespace.Replace(".", "/")}/" +
+                    $"{c.MethodSegments.ToUrl()}").ToArray()
             };
             _urlConventions.Add(urlConvention);
             _configuration.UrlConventions.Configure(x => x.Append(urlConvention));
@@ -481,7 +483,8 @@ namespace Tests.Unit.Routing
             urlConvention.AppliesToCalled.ShouldBeTrue();
             urlConvention.AppliesToContext.ActionMethod.ShouldEqual(actionMethod);
             urlConvention.AppliesToContext.HttpMethod.ShouldEqual("GET");
-            urlConvention.AppliesToContext.Url.ToString().ShouldEqual(defaultUrl);
+            urlConvention.AppliesToContext.MethodSegments
+                .ToUrl().ToString().ShouldEqual("Segment");
             urlConvention.AppliesToContext.UrlParameters.ShouldBeEmpty();
             urlConvention.AppliesToContext.Parameters.ShouldBeEmpty();
             urlConvention.AppliesToContext.RequestParameter.ShouldEqual(null);
@@ -490,7 +493,8 @@ namespace Tests.Unit.Routing
             urlConvention.GetUrlsCalled.ShouldBeTrue();
             urlConvention.GetUrlsContext.ActionMethod.ShouldEqual(actionMethod);
             urlConvention.GetUrlsContext.HttpMethod.ShouldEqual("GET");
-            urlConvention.GetUrlsContext.Url.ToString().ShouldEqual(defaultUrl);
+            urlConvention.GetUrlsContext.MethodSegments
+                .ToUrl().ToString().ShouldEqual("Segment");
             urlConvention.GetUrlsContext.UrlParameters.ShouldBeEmpty();
             urlConvention.GetUrlsContext.Parameters.ShouldBeEmpty();
             urlConvention.GetUrlsContext.RequestParameter.ShouldEqual(null);
@@ -552,27 +556,6 @@ namespace Tests.Unit.Routing
 
             urlConvention.AppliesToCalled.ShouldBeFalse();
             urlConvention.GetUrlsCalled.ShouldBeFalse();
-        }
-
-        [Test]
-        public void Should_match_handler_namespace_regex()
-        {
-            "fark".MatchGroupValue(DefaultRouteConvention.DefaultHandlerNamespaceConvention,
-                    DefaultRouteConvention.HandlerNamespaceGroupName)
-                .ShouldEqual("fark");
-        }
-
-        public class ParseNamespace
-        {
-            public void Post() { }
-        }
-
-        [Test]
-        public void Should_parse_default_handler_namespace()
-        {
-            DefaultRouteConvention.DefaultHandlerNamespaceParser(_configuration,
-                    ActionMethod.From<ParseNamespace>(x => x.Post()))
-                .ShouldEqual("Tests.Unit.Routing");
         }
 
         public class ParseHttpMethod

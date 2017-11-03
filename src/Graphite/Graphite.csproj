@@ -169,7 +169,6 @@
     <Compile Include="Routing\IInlineConstraintBuilder.cs" />
     <Compile Include="Routing\RouteConfigurationContext.cs" />
     <Compile Include="Routing\Url.cs" />
-    <Compile Include="Routing\UrlConfigurationContext.cs" />
     <Compile Include="Routing\UrlParameter.cs" />
     <Compile Include="Http\AsyncContent.cs" />
     <Compile Include="Setup\ActionDsl.cs" />
@@ -216,7 +215,6 @@
     <Compile Include="DependencyInjection\IContainer.cs" />
     <Compile Include="Initializer.cs" />
     <Compile Include="RuntimeConfiguration.cs" />
-    <Compile Include="Routing\AliasUrlConvention.cs" />
     <Compile Include="Routing\DefaultUrlConvention.cs" />
     <Compile Include="Routing\IRouteConvention.cs" />
     <Compile Include="Extensions\Memoize.cs" />
@@ -224,7 +222,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Routing\DefaultRouteConvention.cs" />
     <Compile Include="Routing\IUrlConvention.cs" />
-    <Compile Include="Routing\LambdaUrlConvention.cs" />
     <Compile Include="Routing\RouteDescriptor.cs" />
     <Compile Include="Reflection\TypeCache.cs" />
   </ItemGroup>
