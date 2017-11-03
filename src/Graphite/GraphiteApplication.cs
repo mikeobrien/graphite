@@ -61,6 +61,7 @@ namespace Graphite
                 Container.RegisterPlugin(configuration.InlineConstraintBuilder);
                 Container.RegisterPlugin(configuration.ConstraintBuilder);
                 Container.RegisterPlugins(configuration.UrlConventions);
+                Container.RegisterPlugins(configuration.NamespaceUrlMappingConventions);
                 Container.RegisterPlugin(configuration.Initializer);
                 Container.RegisterPlugin(configuration.HttpRouteMapper);
                 Container.RegisterPlugin(configuration.RequestPropertiesProvider);

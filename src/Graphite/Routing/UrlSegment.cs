@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace Graphite.Routing
 {
-    public static class UrlExtensions
+    public static class SegmentExtensions
     {
-        public static string ToUrl(this IEnumerable<Segment> segments)
+        public static string ToUrl(this IEnumerable<UrlSegment> segments)
         {
             return segments.Select(x => x.Content).Join("/");
         }
@@ -19,17 +19,17 @@ namespace Graphite.Routing
         }
     }
 
-    public class Segment
+    public class UrlSegment
     {
         private readonly string _content;
 
-        public Segment(string content)
+        public UrlSegment(string content)
         {
             _content = content;
             Constraints = new List<string>();
         }
 
-        public Segment(UrlParameter parameter, List<string> constraints)
+        public UrlSegment(UrlParameter parameter, List<string> constraints)
         {
             Parameter = parameter;
             Constraints = constraints;

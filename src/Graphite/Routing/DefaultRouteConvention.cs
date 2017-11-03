@@ -15,13 +15,13 @@ namespace Graphite.Routing
     {
         private readonly Configuration _configuration;
         private readonly HttpConfiguration _httpConfiguration;
-        private readonly IEnumerable<IUrlConvention> _urlConventions;
+        private readonly List<IUrlConvention> _urlConventions;
         private readonly IInlineConstraintBuilder _constraintBuilder;
 
         public DefaultRouteConvention(
             Configuration configuration, 
             HttpConfiguration httpConfiguration,
-            IEnumerable<IUrlConvention> urlConventions,
+            List<IUrlConvention> urlConventions,
             IInlineConstraintBuilder constraintBuilder)
         {
             _configuration = configuration;
@@ -109,12 +109,12 @@ namespace Graphite.Routing
             return actionParameters;
         }
 
-        protected virtual IEnumerable<Segment> GetMethodSegments(ActionMethod action, 
+        protected virtual IEnumerable<UrlSegment> GetMethodSegments(ActionMethod action, 
             List<ActionParameter> actionParameters)
         {
             var segments = (_configuration.ActionSegmentsConvention ?? 
                 DefaultActionSegmentsConvention)(_configuration, action);
-            if (segments == null || !segments.Any()) return Enumerable.Empty<Segment>();
+            if (segments == null || !segments.Any()) return Enumerable.Empty<UrlSegment>();
             return segments
                 .Where(x => x.IsNotNullOrWhiteSpace())
                 .Select(x => GetSegment(x, actionParameters));
@@ -131,17 +131,17 @@ namespace Graphite.Routing
                 : null;
         }
 
-        protected virtual Segment GetSegment(string segment, List<ActionParameter> actionParameters)
+        protected virtual UrlSegment GetSegment(string segment, List<ActionParameter> actionParameters)
         {
             var parameter = actionParameters.FirstOrDefault(p => p.Name.EqualsIgnoreCase(segment));
-            if (parameter == null) return new Segment(segment);
+            if (parameter == null) return new UrlSegment(segment);
 
             var isWildcard = parameter.HasAttributes<WildcardAttribute, ParamArrayAttribute>();
             var urlParameter = new UrlParameter(parameter, isWildcard);
-            return new Segment(urlParameter, _constraintBuilder.Build(urlParameter));
+            return new UrlSegment(urlParameter, _constraintBuilder.Build(urlParameter));
         }
 
-        protected virtual IEnumerable<UrlParameter> GetUrlParameters(List<Segment> methodSegments)
+        protected virtual IEnumerable<UrlParameter> GetUrlParameters(List<UrlSegment> methodSegments)
         {
             return methodSegments
                 .Where(s => s.IsParameter)

@@ -89,15 +89,6 @@ namespace Graphite
             Plugin<ITypeCache>
                 .Create<TypeCache>(singleton: true);
 
-        public Regex HandlerNamespaceConvention { get; set; }
-        public Func<Configuration, ActionMethod, string> HandlerNamespaceParser { get; set; }
-        public Regex HandlerNameConvention { get; set; }
-        public Func<Configuration, TypeDescriptor, bool> HandlerFilter { get; set; }
-        public Func<Configuration, Regex> ActionNameConvention { get; set; }
-        public Func<Configuration, MethodDescriptor, bool> ActionFilter { get; set; }
-        public Func<Configuration, ActionMethod, string[]> ActionSegmentsConvention { get; set; }
-        public Func<Configuration, ActionMethod, string> HttpMethodConvention { get; set; }
-
         public Plugins<IActionMethodSource> ActionMethodSources { get; } = 
             new Plugins<IActionMethodSource>(true)
                 .Configure(x => x
@@ -117,11 +108,30 @@ namespace Graphite
         public Plugin<IInlineConstraintBuilder> ConstraintBuilder { get; } =
             Plugin<IInlineConstraintBuilder>
                 .Create<DefaultInlineConstraintBuilder>(singleton: true);
+        
+        public Regex HandlerNameConvention { get; set; }
+        public Func<Configuration, TypeDescriptor, bool> HandlerFilter { get; set; }
+        public Func<Configuration, Regex> ActionNameConvention { get; set; }
+        public Func<Configuration, MethodDescriptor, bool> ActionFilter { get; set; }
+        public Func<Configuration, ActionMethod, string[]> ActionSegmentsConvention { get; set; }
+        public Func<Configuration, ActionMethod, string> HttpMethodConvention { get; set; }
 
         public ConditionalPlugins<IUrlConvention, UrlContext> UrlConventions { get; } = 
             new ConditionalPlugins<IUrlConvention, UrlContext>(true)
                 .Configure(x => x
                     .Append<DefaultUrlConvention>());
+
+        public ConditionalPlugins<INamespaceUrlMappingConvention, UrlContext> 
+                NamespaceUrlMappingConventions { get; } =
+            new ConditionalPlugins<INamespaceUrlMappingConvention, UrlContext>(true)
+                .Configure(x => x
+                    .Append<DefaultNamespaceUrlMappingConvention>());
+
+        public List<NamespaceUrlMapping> NamespaceUrlMappings { get; set; } = 
+            new List<NamespaceUrlMapping>
+            {
+                NamespaceUrlMapping.DefaultMapping
+            };
 
         public List<Func<UrlContext, string>> UrlAliases { get; } =
             new List<Func<UrlContext, string>>();

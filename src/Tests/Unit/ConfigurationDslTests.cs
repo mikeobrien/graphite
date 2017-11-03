@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Graphite.Routing;
 using NUnit.Framework;
 using Should;
@@ -34,10 +35,13 @@ namespace Tests.Unit
         {
             var request = RequestGraph.CreateFor<MyWebApp
                 .Api.Users.Handler>(x => x.Action());
-            request.Configure(x => x.ExcludeTypeNamespaceFromUrl(marker));
+            request.Configure(x => x
+                .ConfigureNamespaceUrlMapping(m => m
+                    .Clear().MapNamespaceAfter(marker)));
 
-            var @namespace = DefaultUrlConvention.DefaultHandlerNamespaceParser(
-                request.Configuration, request.ActionMethod);
+            var mapping = request.Configuration.NamespaceUrlMappings.First();
+            var @namespace = mapping.Namespace.Replace(
+                request.HandlerType.Namespace, mapping.Url);
 
             @namespace.ShouldEqual(expected);
         }

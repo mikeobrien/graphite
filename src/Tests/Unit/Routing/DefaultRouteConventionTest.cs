@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Graphite;
@@ -28,7 +27,13 @@ namespace Tests.Unit.Routing
         public void Setup()
         {
             _configuration = new Configuration();
-            _urlConventions = new List<IUrlConvention> { new DefaultUrlConvention(_configuration) };
+            _urlConventions = new List<IUrlConvention>
+            {
+                new DefaultUrlConvention(new List<INamespaceUrlMappingConvention>
+                {
+                    new DefaultNamespaceUrlMappingConvention(_configuration)
+                }, _configuration, null)
+            };
             _configuration.UrlConventions.Configure(c => c.Append<DefaultUrlConvention>());
             _routeConvention = new DefaultRouteConvention(
                 _configuration, null, _urlConventions,
@@ -57,7 +62,7 @@ namespace Tests.Unit.Routing
             descriptors.Count.ShouldEqual(1);
 
             var descriptor = descriptors.First();
-            var url = "Tests/Unit/Routing/{urlParam1}/Segment/{urlParam2}";
+            var url = "Unit/Routing/{urlParam1}/Segment/{urlParam2}";
 
             descriptor.Id.ShouldEqual($"POST:{url.RemoveParameterNames()}");
             descriptor.Method.ShouldEqual("POST");
@@ -383,7 +388,7 @@ namespace Tests.Unit.Routing
             var routeDescriptor = _routeConvention.GetRouteDescriptors(new RouteContext(
                 ActionMethod.From<RouteConstraintHandler>(x => x.Get_Segment_Value(0)))).FirstOrDefault();
 
-            routeDescriptor.Url.ShouldEqual("Tests/Unit/Routing/Segment/{value:range(5,10)}");
+            routeDescriptor.Url.ShouldEqual("Unit/Routing/Segment/{value:range(5,10)}");
         }
 
         public class ResponseHandler
@@ -446,7 +451,7 @@ namespace Tests.Unit.Routing
             descriptors.Count.ShouldEqual(1);
             var descriptor = descriptors.First();
 
-            descriptor.Url.ShouldEqual($"Tests/Unit/Routing/{url}".Trim('/'));
+            descriptor.Url.ShouldEqual($"Unit/Routing/{url}".Trim('/'));
         }
 
         public class UrlConventionHandler
@@ -474,7 +479,7 @@ namespace Tests.Unit.Routing
 
             descriptors.Count.ShouldEqual(3);
 
-            var defaultUrl = "Tests/Unit/Routing/Segment";
+            var defaultUrl = "Unit/Routing/Segment";
 
             descriptors[0].Url.ShouldEqual(defaultUrl);
             descriptors[1].Url.ShouldEqual("fark/Get_Segment/Tests/Unit/Routing/Segment");
@@ -484,7 +489,7 @@ namespace Tests.Unit.Routing
             urlConvention.AppliesToContext.ActionMethod.ShouldEqual(actionMethod);
             urlConvention.AppliesToContext.HttpMethod.ShouldEqual("GET");
             urlConvention.AppliesToContext.MethodSegments
-                .ToUrl().ToString().ShouldEqual("Segment");
+                .ToUrl().ShouldEqual("Segment");
             urlConvention.AppliesToContext.UrlParameters.ShouldBeEmpty();
             urlConvention.AppliesToContext.Parameters.ShouldBeEmpty();
             urlConvention.AppliesToContext.RequestParameter.ShouldEqual(null);
@@ -494,7 +499,7 @@ namespace Tests.Unit.Routing
             urlConvention.GetUrlsContext.ActionMethod.ShouldEqual(actionMethod);
             urlConvention.GetUrlsContext.HttpMethod.ShouldEqual("GET");
             urlConvention.GetUrlsContext.MethodSegments
-                .ToUrl().ToString().ShouldEqual("Segment");
+                .ToUrl().ShouldEqual("Segment");
             urlConvention.GetUrlsContext.UrlParameters.ShouldBeEmpty();
             urlConvention.GetUrlsContext.Parameters.ShouldBeEmpty();
             urlConvention.GetUrlsContext.RequestParameter.ShouldEqual(null);

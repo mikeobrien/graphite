@@ -178,6 +178,8 @@
     <Compile Include="Unit\InitializerTests.cs" />
     <Compile Include="Unit\Owin\BootstrapTests.cs" />
     <Compile Include="Unit\Owin\RequestPropertyProviderTests.cs" />
+    <Compile Include="Unit\Routing\NamespaceUrlMappingTests.cs" />
+    <Compile Include="Unit\Routing\DefaultNamespaceUrlMappingConventionTests.cs" />
     <Compile Include="Unit\Writers\SerializerWriterBaseTests.cs" />
     <Compile Include="Unit\Writers\WeightedContentWriterBaseTests.cs" />
     <Compile Include="Unit\Writers\ExtensionTests.cs" />

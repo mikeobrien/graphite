@@ -37,14 +37,17 @@ namespace Graphite.Diagnostics
         {
             var configuration = new Configuration();
             var actionMethodSource = new DefaultActionMethodSource(configuration, _typeCache);
-            var urlConvention = new DefaultUrlConvention(configuration);
+            var urlMappingConvention = new DefaultNamespaceUrlMappingConvention(configuration);
+            var urlConvention = new DefaultUrlConvention(urlMappingConvention
+                .AsList<INamespaceUrlMappingConvention>(), configuration, _httpConfiguration);
             var routeConvention = new DefaultRouteConvention(configuration,
-                _httpConfiguration, urlConvention.AsList(), _constraintBuilder);
+                _httpConfiguration, urlConvention.AsList<IUrlConvention>(), _constraintBuilder);
 
             new ConfigurationDsl(configuration, _httpConfiguration)
                 .IncludeTypeAssembly<DiagnosticsActionSource>()
                 .OnlyIncludeHandlersUnder<DiagnosticsActionSource>()
-                .ExcludeTypeNamespaceFromUrl<DiagnosticsActionSource>()
+                .ConfigureNamespaceUrlMapping(x => x.Clear()
+                    .MapNamespaceAfter<DiagnosticsActionSource>())
                 .WithUrlPrefix(_configuration.DiagnosticsUrl.Trim('/'))
                 .ConfigureUrlConventions(x => x.Clear().Append(urlConvention))
                 .ConfigureActionMethodSources(x => x.Clear().Append(actionMethodSource))

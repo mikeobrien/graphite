@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
-using Graphite.Actions;
+using System.Web.Http;
 using Graphite.Extensions;
 
 namespace Graphite.Routing
@@ -32,10 +31,17 @@ namespace Graphite.Routing
     public class DefaultUrlConvention : IUrlConvention
     {
         private readonly Configuration _configuration;
+        private readonly List<INamespaceUrlMappingConvention> _mappingConventions;
+        private readonly HttpConfiguration _httpConfiguration;
 
-        public DefaultUrlConvention(Configuration configuration)
+        public DefaultUrlConvention(
+            List<INamespaceUrlMappingConvention> mappingConventions,
+            Configuration configuration,
+            HttpConfiguration httpConfiguration)
         {
             _configuration = configuration;
+            _mappingConventions = mappingConventions;
+            _httpConfiguration = httpConfiguration;
         }
 
         public virtual bool AppliesTo(UrlContext context)
@@ -45,55 +51,34 @@ namespace Graphite.Routing
 
         public virtual string[] GetUrls(UrlContext context)
         {
-            var conventionalUrl = GetUrl(context.ActionMethod, context.MethodSegments);
-            var explicitUrls = context.ActionMethod.GetAttribute<UrlAttribute>()?.Urls
-                .Where(x => x.IsNotNullOrWhiteSpace())
-                .Select(x => x.Trim('/')).ToArray();
-            var prefix = _configuration.UrlPrefix?.Trim('/');
-            return (explicitUrls ?? new[] 
-                {
-                    prefix.IsNullOrEmpty() 
-                        ? conventionalUrl 
-                        : prefix.JoinUrls(conventionalUrl)
-                })
-                .Concat(GetUrlAliases(context))
-                .ToArray();
+            var urls = context.ActionMethod
+                    .GetAttribute<UrlAttribute>()?.Urls
+                    .Where(x => x.IsNotNullOrWhiteSpace())
+                    .Select(x => x.Trim('/')).ToArray() ??
+                MapNamespaceToUrls(context);
+            return urls.Concat(GetUrlAliases(context)).ToArray();
         }
-        
-        protected virtual string GetUrl(ActionMethod action, List<Segment> methodSegments)
+
+        protected virtual string[] MapNamespaceToUrls(UrlContext context)
         {
-            return (_configuration.HandlerNamespaceParser ??
-                    DefaultHandlerNamespaceParser)(_configuration, action)
-                .Split('.').Where(x => x.IsNotNullOrWhiteSpace())
-                .Select(x => new Segment(x))
-                .Concat(methodSegments.Select(x => x)).ToUrl();
+            var prefix = _configuration.UrlPrefix?.Trim('/');
+            return _mappingConventions.ThatApplyTo(context, _configuration, _httpConfiguration)
+                .SelectMany(x => x.GetUrls(context))
+                .Select(x => prefix.IsNotNullOrEmpty() ? prefix.JoinUrls(x) : x)
+                .ToArray();
         }
 
         public virtual string[] GetUrlAliases(UrlContext context)
         {
             var aliases = new List<string>();
 
-            var attriubteAliases = context.ActionMethod.GetAttribute<UrlAliasAttribute>();
-            if (attriubteAliases != null) aliases.AddRange(attriubteAliases.Urls);
+            var attributeAliases = context.ActionMethod.GetAttribute<UrlAliasAttribute>();
+            if (attributeAliases != null) aliases.AddRange(attributeAliases.Urls);
 
             aliases.AddRange(_configuration.UrlAliases.Select(x => x(context)));
 
             return aliases.Where(x => x.IsNotNullOrWhiteSpace())
                 .Select(x => x.Trim('/')).ToArray();
-        }
-
-        public const string HandlerNamespaceGroupName = "namespace";
-        public static readonly string DefaultHandlerNamespaceConventionRegex =
-            $"(?<{HandlerNamespaceGroupName}>.*)";
-        public static readonly Regex DefaultHandlerNamespaceConvention =
-            new Regex(DefaultHandlerNamespaceConventionRegex);
-
-        public static string DefaultHandlerNamespaceParser(
-            Configuration configuration, ActionMethod action)
-        {
-            return action.HandlerTypeDescriptor.Type.Namespace
-                .MatchGroupValue(configuration.HandlerNamespaceConvention ??
-                                 DefaultHandlerNamespaceConvention, HandlerNamespaceGroupName);
         }
     }
 }

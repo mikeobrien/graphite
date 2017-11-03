@@ -113,6 +113,10 @@ namespace Tests.Unit
             urlConventions.Count.ShouldEqual(1);
             urlConventions[0].ShouldBeType<DefaultUrlConvention>();
 
+            var namespaceUrlMappingConventions = container.GetInstances<INamespaceUrlMappingConvention>().ToList();
+            namespaceUrlMappingConventions.Count.ShouldEqual(1);
+            namespaceUrlMappingConventions[0].ShouldBeType<DefaultNamespaceUrlMappingConvention>();
+
             var requestReaders = container.GetInstances<IRequestReader>().ToList();
             requestReaders.Count.ShouldEqual(6);
             requestReaders[0].ShouldBeType<StringReader>();

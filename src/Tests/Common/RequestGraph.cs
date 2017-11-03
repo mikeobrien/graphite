@@ -39,6 +39,7 @@ namespace Tests.Common
         public RequestGraph(ActionMethod actionMethod)
         {
             ActionMethod = actionMethod;
+            HandlerType = actionMethod.HandlerTypeDescriptor.Type;
             ResponseType = !actionMethod.MethodDescriptor.HasResult ? 
                 null : actionMethod.MethodDescriptor.ReturnType;
             CancellationToken = new CancellationToken();
@@ -81,6 +82,7 @@ namespace Tests.Common
             return new RequestGraph(actionMethod);
         }
 
+        public Type HandlerType { get; }
         public List<UrlParameter> UrlParameters { get; } = new List<UrlParameter>();
         public ITypeCache TypeCache { get; set; }
         public Configuration Configuration { get; }

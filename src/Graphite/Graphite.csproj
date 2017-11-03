@@ -121,6 +121,7 @@
     <Compile Include="Http\RemoteHost.cs" />
     <Compile Include="Readers\ReadResult.cs" />
     <Compile Include="Readers\RequestParameterCreationException.cs" />
+    <Compile Include="Routing\DefaultNamespaceUrlMappingConvention.cs" />
     <Compile Include="Routing\IHttpRouteDecorator.cs" />
     <Compile Include="Routing\IHttpRouteMapper.cs" />
     <Compile Include="Monitoring\Metrics.cs" />
@@ -167,8 +168,11 @@
     <Compile Include="Routing\DefaultInlineConstraintBuilder.cs" />
     <Compile Include="Routing\Extensions.cs" />
     <Compile Include="Routing\IInlineConstraintBuilder.cs" />
+    <Compile Include="Routing\INamespaceUrlMappingConvention.cs" />
+    <Compile Include="Routing\NamespaceUrlMapping.cs" />
     <Compile Include="Routing\RouteConfigurationContext.cs" />
-    <Compile Include="Routing\Url.cs" />
+    <Compile Include="Routing\UrlSegment.cs" />
+    <Compile Include="Routing\UrlContext.cs" />
     <Compile Include="Routing\UrlParameter.cs" />
     <Compile Include="Http\AsyncContent.cs" />
     <Compile Include="Setup\ActionDsl.cs" />

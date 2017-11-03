@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 using System.Web.Http.Routing;
 using Graphite.Actions;
 using Graphite.Extensibility;
-using Graphite.Extensions;
 using Graphite.Routing;
 
 namespace Graphite.Setup
@@ -59,58 +58,77 @@ namespace Graphite.Setup
             return this;
         }
 
-        /// <summary>
-        /// Specifies the regex used to parse the handler namespace. 
-        /// The namespace is pulled from the "namespace" capture 
-        /// group e.g. "MyApp\.Handlers\.(?&lt;namespace&gt;.*)".
-        /// </summary>
-        public ConfigurationDsl WithHandlerNamespaceConvention(string regex)
+        public class NamespaceUrlMappingDsl
         {
-            _configuration.HandlerNamespaceConvention = new Regex(regex);
-            return this;
+            private readonly Configuration _configuration;
+
+            public NamespaceUrlMappingDsl(Configuration configuration)
+            {
+                _configuration = configuration;
+            }
+
+            /// <summary>
+            /// Clears all namespace url mappings.
+            /// </summary>
+            public NamespaceUrlMappingDsl Clear()
+            {
+                _configuration.NamespaceUrlMappings.Clear();
+                return this;
+            }
+
+            /// <summary>
+            /// Adds a namespace url mapping.
+            /// </summary>
+            /// <param name="namespaceRegex">Regex matching the namespace to map.</param>
+            /// <param name="url">Resulting url. Supports substitutions e.g. $1 or ${capturegroup}</param>
+            public NamespaceUrlMappingDsl Add(string namespaceRegex, string url)
+            {
+                _configuration.NamespaceUrlMappings.Add(
+                    new NamespaceUrlMapping(new Regex(namespaceRegex), url));
+                return this;
+            }
+
+            /// <summary>
+            /// Maps the namespace starting after the calling types' namespace.
+            /// </summary>
+            public NamespaceUrlMappingDsl MapNamespaceAfterCallingType()
+            {
+                return MapNamespaceAfter(new StackFrame(1).GetMethod().ReflectedType);
+            }
+
+            /// <summary>
+            /// Maps the namespace starting after the types' namespace.
+            /// </summary>
+            public NamespaceUrlMappingDsl MapNamespaceAfter<T>()
+            {
+                return MapNamespaceAfter(typeof(T));
+            }
+
+            /// <summary>
+            /// Maps the namespace starting after the types' namespace.
+            /// </summary>
+            public NamespaceUrlMappingDsl MapNamespaceAfter(Type type)
+            {
+                return MapNamespaceAfter(type.Namespace);
+            }
+
+            /// <summary>
+            /// Maps the namespace starting after this namespace.
+            /// </summary>
+            public NamespaceUrlMappingDsl MapNamespaceAfter(string @namespace)
+            {
+                _configuration.NamespaceUrlMappings.Add(
+                    NamespaceUrlMapping.MapAfterNamespace(@namespace));
+                return this;
+            }
         }
 
         /// <summary>
-        /// Parses the handler namespace.
+        /// Enables you to configure the namespace to url mappings.
         /// </summary>
-        public ConfigurationDsl WithHandlerNamespaceParser(
-            Func<Configuration, ActionMethod, string> parser)
+        public ConfigurationDsl ConfigureNamespaceUrlMapping(Action<NamespaceUrlMappingDsl> config)
         {
-            _configuration.HandlerNamespaceParser = parser;
-            return this;
-        }
-
-        /// <summary>
-        /// Removes the types namespace from the url.
-        /// </summary>
-        public ConfigurationDsl ExcludeTypeNamespaceFromUrl<T>()
-        {
-            return ExcludeTypeNamespaceFromUrl(typeof(T));
-        }
-
-        /// <summary>
-        /// Removes the calling method's type namespace from the url.
-        /// </summary>
-        public ConfigurationDsl ExcludeCurrentNamespaceFromUrl()
-        {
-            return ExcludeTypeNamespaceFromUrl(new StackFrame(1).GetMethod().ReflectedType);
-        }
-
-        /// <summary>
-        /// Removes the types namespace from the url.
-        /// </summary>
-        public ConfigurationDsl ExcludeTypeNamespaceFromUrl(Type type)
-        {
-            return ExcludeNamespaceFromUrl(type.Namespace);
-        }
-
-        /// <summary>
-        /// Removes the namespace from the begining of the url.
-        /// </summary>
-        public ConfigurationDsl ExcludeNamespaceFromUrl(string @namespace)
-        {
-            WithHandlerNamespaceConvention($"{@namespace.RegexEscape()}\\.?" +
-                DefaultUrlConvention.DefaultHandlerNamespaceConventionRegex);
+            config(new NamespaceUrlMappingDsl(_configuration));
             return this;
         }
 
