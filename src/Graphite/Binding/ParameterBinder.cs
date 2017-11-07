@@ -8,6 +8,17 @@ using Graphite.Routing;
 
 namespace Graphite.Binding
 {
+    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property)]
+    public class NameAttribute : Attribute
+    {
+        public NameAttribute(string name)
+        {
+            Name = name;
+        }
+
+        public string Name { get; }
+    }
+
     public class ParameterBinder<TStatus>
     {
         private readonly Configuration _configuration;
@@ -38,7 +49,7 @@ namespace Graphite.Binding
             var parameterValues = values
                 .Where(x => x.Any())
                 .JoinIgnoreCase(actionParameters, x => x.Key,
-                    x => mapName?.Invoke(x) ?? x.Name,
+                    x => mapName?.Invoke(x) ?? MapName(x),
                     (p, ap) => new
                     {
                         Parameter = ap,
@@ -65,6 +76,11 @@ namespace Graphite.Binding
                 }
             }
             return successStatus();
+        }
+
+        protected virtual string MapName(ActionParameter parameter)
+        {
+            return parameter.GetAttribute<NameAttribute>()?.Name ?? parameter.Name;
         }
     }
 }

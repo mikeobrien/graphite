@@ -2,7 +2,6 @@
 using System.Linq;
 using Graphite.Binding;
 using Graphite.Http;
-using Graphite.Readers;
 using Graphite.Routing;
 using NUnit.Framework;
 using Should;
@@ -16,12 +15,13 @@ namespace Tests.Unit.Binding
         public class Model
         {
             public string Param1 { get; set; }
+            [Name("fark")]
             public string Param2 { get; set; }
         }
 
         public class Handler
         {
-            public void Params(Model model, string param1, int param2) { }
+            public void Params(Model model, string param1, [Name("fark")] int param2) { }
         }
 
         [Test]
@@ -29,7 +29,7 @@ namespace Tests.Unit.Binding
         {
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Params(null, null, 0))
-                .WithUrl("http://fark.com?param1=value1&param2=value2")
+                .WithUrl("http://fark.com?param1=value1&fark=value2")
                 .AddParameters("param1", "param2")
                 .AddValueMapper1(x => MapResult.Success(x.Values.First()));
 
@@ -51,7 +51,7 @@ namespace Tests.Unit.Binding
         {
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Params(null, null, 0))
-                .WithUrl("http://fark.com?param1=value1&param2=value2")
+                .WithUrl("http://fark.com?param1=value1&fark=value2")
                 .AddModelParameters("model", "param1", "param2")
                 .AddValueMapper1(x => MapResult.Success(x.Values.First()));
 
@@ -104,7 +104,6 @@ namespace Tests.Unit.Binding
             var result = Bind(requestGraph,
                 x => x.Name.EndsWith("2") ? x.Name.Replace("2", "3") : x.Name);
 
-
             result.Status.ShouldEqual(BindingStatus.Success);
 
             requestGraph.ActionArguments.ShouldOnlyContain(null, "value1", "value3");
@@ -131,7 +130,7 @@ namespace Tests.Unit.Binding
         {
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Params(null, null, 0))
-                .WithUrl("http://fark.com?param1=value1&param2=value2")
+                .WithUrl("http://fark.com?param1=value1&fark=value2")
                 .AddParameters("param1", "param2")
                 .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"))
                 .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
@@ -154,7 +153,7 @@ namespace Tests.Unit.Binding
         {
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Params(null, null, 0))
-                .WithUrl("http://fark.com?param1=value1&param2=value2")
+                .WithUrl("http://fark.com?param1=value1&fark=value2")
                 .AddParameters("param1", "param2")
                 .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"), 
                     configAppliesTo: x => false)
@@ -178,7 +177,7 @@ namespace Tests.Unit.Binding
         {
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Params(null, null, 0))
-                .WithUrl("http://fark.com?param1=value1&param2=value2")
+                .WithUrl("http://fark.com?param1=value1&fark=value2")
                 .AddParameters("param1", "param2")
                 .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"), instanceAppliesTo: x => false)
                 .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
@@ -234,7 +233,7 @@ namespace Tests.Unit.Binding
         {
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(h => h.Params(null, null, 0))
-                .WithUrl("http://fark.com?param2=fark")
+                .WithUrl("http://fark.com?fark=fark")
                 .AddParameters("param2")
                 .WithRequestParameter("model")
                 .WithContentType(MimeTypes.ApplicationFormUrlEncoded);
@@ -254,7 +253,7 @@ namespace Tests.Unit.Binding
                 .Bind(requestGraph.GetQuerystringParameters(),
                     requestGraph.GetActionParameters(),
                     (p, v) => p.BindArgument(requestGraph.ActionArguments, v),
-                    BindResult.Success, BindResult.Failure, mapName ?? (x => x.Name));
+                    BindResult.Success, BindResult.Failure, mapName);
         }
     }
 }
