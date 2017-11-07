@@ -118,6 +118,7 @@ namespace Graphite.Setup
             /// </summary>
             public NamespaceUrlMappingDsl MapNamespaceAfter(string @namespace)
             {
+                Clear();
                 _configuration.NamespaceUrlMappings.Add(
                     NamespaceMapping.MapAfterNamespace(@namespace));
                 return this;

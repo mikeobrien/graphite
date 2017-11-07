@@ -165,6 +165,7 @@ namespace Graphite.Views
             /// </summary>
             public NamespacePathMappingDsl MapNamespaceAfter(string @namespace)
             {
+                Clear();
                 _configuration.NamespacePathMappings.Add(
                     NamespaceMapping.MapAfterNamespace(@namespace));
                 return this;
