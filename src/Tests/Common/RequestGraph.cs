@@ -234,6 +234,13 @@ namespace Tests.Common
             return message;
         }
 
+        public HttpRequestHeaders GetHttpHeaders()
+        {
+            var message = new HttpRequestMessage();
+            Headers.ForEach(x => message.Headers.Add(x.Key, x.Value));
+            return message.Headers;
+        }
+
         public HttpRequestContext GetHttpRequestContext(HttpRequestMessage httpRequestMessage)
         {
             return new HttpRequestContext
@@ -288,7 +295,7 @@ namespace Tests.Common
 
         public bool RemoveParameter(string name)
         {
-            var parameter = _parameters.FirstOrDefault(x => x.Name.EqualsIgnoreCase(name));
+            var parameter = _parameters.FirstOrDefault(x => x.Name.EqualsUncase(name));
             if (parameter != null) _parameters.Remove(parameter);
             return parameter != null;
         }
@@ -296,7 +303,7 @@ namespace Tests.Common
         private ParameterDescriptor GetParameter(string name)
         {
             var parameter = ActionMethod.MethodDescriptor.Parameters
-                .FirstOrDefault(x => x.Name.EqualsIgnoreCase(name));
+                .FirstOrDefault(x => x.Name.EqualsUncase(name));
             if (parameter == null) throw new Exception($"Could not find parameter '{name}', " +
                 $@"should be {ActionMethod.MethodDescriptor.Parameters.Select(x => 
                     $"'{x.Name}'").Join(", ")}.");
@@ -314,7 +321,7 @@ namespace Tests.Common
         private PropertyDescriptor GetProperty(ParameterDescriptor parameter, string name)
         {
             var property = parameter.ParameterType.Properties
-                .FirstOrDefault(x => x.Name.EqualsIgnoreCase(name));
+                .FirstOrDefault(x => x.Name.EqualsUncase(name));
             if (property == null) throw new Exception($"Could not find property {name} " +
                 $@"should be {parameter.ParameterType.Properties.Select(x =>
                     x.Name).Join(", ")}.");
@@ -454,8 +461,7 @@ namespace Tests.Common
 
         public JsonReader GetJsonReader()
         {
-            return new JsonReader(new JsonSerializer(), 
-                GetRouteDescriptor(), GetHttpRequestMessage());
+            return new JsonReader(new JsonSerializer());
         }
 
         public RequestGraph AddReaderBinder(params IRequestReader[] readers)

@@ -1,5 +1,6 @@
-﻿using System;
+﻿using System.IO;
 using System.Threading.Tasks;
+using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Readers;
 using NUnit.Framework;
@@ -27,7 +28,9 @@ namespace Tests.Unit.Readers
         {
             var requestGraph = RequestGraph.CreateFor<Handler>(x => x.ByteRequest(null))
                 .WithRequestParameter("bytes");
-            CreateByteReader(requestGraph).Applies().ShouldBeTrue();
+            CreateByteReader(requestGraph)
+                .AppliesTo(CreateReaderContext(requestGraph))
+                .ShouldBeTrue();
         }
 
         [Test]
@@ -35,7 +38,9 @@ namespace Tests.Unit.Readers
         {
             var requestGraph = RequestGraph.CreateFor<Handler>(x => x.InputBytesRequest(null))
                 .WithRequestParameter("inputBytes");
-            CreateByteReader(requestGraph).Applies().ShouldBeTrue();
+            CreateByteReader(requestGraph)
+                .AppliesTo(CreateReaderContext(requestGraph))
+                .ShouldBeTrue();
         }
 
         [Test]
@@ -43,14 +48,18 @@ namespace Tests.Unit.Readers
         {
             var requestGraph = RequestGraph.CreateFor<Handler>(x => x.NonBytesRequest(0))
                 .WithRequestParameter("request");
-            CreateByteReader(requestGraph).Applies().ShouldBeFalse();
+            CreateByteReader(requestGraph)
+                .AppliesTo(CreateReaderContext(requestGraph))
+                .ShouldBeFalse();
         }
 
         [Test]
         public void Should_not_apply_to_actions_with_no_request()
         {
             var requestGraph = RequestGraph.CreateFor<Handler>(x => x.NoRequest());
-            CreateByteReader(requestGraph).Applies().ShouldBeFalse();
+            CreateByteReader(requestGraph)
+                .AppliesTo(CreateReaderContext(requestGraph))
+                .ShouldBeFalse();
         }
 
         [Test]
@@ -60,7 +69,8 @@ namespace Tests.Unit.Readers
                 .WithRequestParameter("bytes")
                 .WithRequestData("fark");
 
-            var result = await CreateByteReader(requestGraph).Read();
+            var result = await CreateByteReader(requestGraph)
+                .Read(CreateReaderContext(requestGraph));
 
             result.Status.ShouldEqual(ReadStatus.Success);
             result.Value.ShouldBeType<byte[]>();
@@ -79,22 +89,34 @@ namespace Tests.Unit.Readers
             if (mimeType.IsNotNullOrEmpty()) requestGraph.WithContentType(mimeType);
             if (filename.IsNotNullOrEmpty()) requestGraph.WithAttachmentFilename(filename);
 
-            var result = await CreateByteReader(requestGraph).Read();
+            var result = await CreateByteReader(requestGraph)
+                .Read(CreateReaderContext(requestGraph));
 
             result.Status.ShouldEqual(ReadStatus.Success);
             result.Value.ShouldBeType<InputBytes>();
             var inputBytes = result.Value.As<InputBytes>();
             inputBytes.Data.ShouldOnlyContain<byte>(102, 97, 114, 107);
             inputBytes.Length.ShouldEqual(4);
-            inputBytes.MimeType.ShouldEqual(mimeType);
+            inputBytes.ContentType.ShouldEqual(mimeType);
             inputBytes.Filename.ShouldEqual(filename);
+        }
+
+        private ReaderContext CreateReaderContext(RequestGraph requestGraph)
+        {
+            return new ReaderContext(
+                requestGraph.RequestParameter?.ParameterType,
+                requestGraph.ContentType, null,
+                requestGraph.AttachmentFilename,
+                requestGraph.GetHttpHeaders(),
+                requestGraph.RequestData == null ? null :
+                    new MemoryStream(requestGraph.RequestData)
+                        .ToTaskResult<Stream>(),
+                contentLength: requestGraph.RequestData?.Length);
         }
 
         private ByteReader CreateByteReader(RequestGraph requestGraph)
         {
-            return new ByteReader(
-                requestGraph.GetRouteDescriptor(),
-                requestGraph.GetHttpRequestMessage());
+            return new ByteReader();
         }
     }
 }

@@ -48,7 +48,7 @@ namespace Graphite.Binding
         {
             var parameterValues = values
                 .Where(x => x.Any())
-                .JoinIgnoreCase(actionParameters, x => x.Key,
+                .JoinUncase(actionParameters, x => x.Key,
                     x => mapName?.Invoke(x) ?? MapName(x),
                     (p, ap) => new
                     {

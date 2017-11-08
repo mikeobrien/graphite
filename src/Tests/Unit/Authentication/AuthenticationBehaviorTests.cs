@@ -203,7 +203,7 @@ namespace Tests.Unit.Authentication
             foreach (var authenticator in authenticators)
             {
                 var header = responseMessage.Headers.WwwAuthenticate.FirstOrDefault(
-                    x => x.Scheme.EqualsIgnoreCase(authenticator.Scheme));
+                    x => x.Scheme.EqualsUncase(authenticator.Scheme));
 
                 header.ShouldNotBeNull();
                 realm = realm ?? authenticator.Realm;

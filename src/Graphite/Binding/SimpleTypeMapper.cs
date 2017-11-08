@@ -32,9 +32,12 @@ namespace Graphite.Binding
             }
             catch (FormatException exception)
             {
-                return MapResult.Failure($"Parameter {context.Parameter.Name} " + 
-                    $"value {context.Values.Select(x => $"'{x}'").Join(",")} " +
-                    $"is not formatted correctly. {exception.Message}");
+                var message = $"{context.Values.Select(x => $"'{x}'").Join(",")} " +
+                    $"is not formatted correctly. {exception.Message}";
+
+                return MapResult.Failure(context.Parameter != null
+                    ? $"Parameter {context.Parameter.Name} value {message}" 
+                    : $"Value {message}");
             }
         }
     }

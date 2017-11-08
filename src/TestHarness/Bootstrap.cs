@@ -1,6 +1,7 @@
 ﻿using System.Web.Http;
 using Graphite.Authentication;
 using Graphite.Cors;
+using Graphite.Http;
 using Graphite.Setup;
 using Graphite.StructureMap;
 using Graphite.Views;
@@ -9,7 +10,7 @@ using TestHarness.Routing;
 
 namespace TestHarness
 {
-    public static class Configuration
+    public static class Bootstrap
     {
         public static void Configure(ConfigurationDsl configure)
         {
@@ -19,7 +20,7 @@ namespace TestHarness
                 .EnableDiagnosticsInDebugMode()
                 .ConfigureWebApi(x => x
                     .RouteExistingFiles()
-                    .Configuration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Never)
+                    .SetExceptionHandler<DebugExceptionHandler>())
                 //.ConfigureSerialization(s => s
                 //    .Json(j => j.UseCamelCaseNaming())
                 //    .Xml(x => x

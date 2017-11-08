@@ -1,6 +1,4 @@
-﻿using System.Net.Http;
-using Graphite.Http;
-using Graphite.Routing;
+﻿using Graphite.Http;
 using Newtonsoft.Json;
 
 namespace Graphite.Readers
@@ -8,23 +6,20 @@ namespace Graphite.Readers
     public class JsonReader : StringReaderBase
     {
         private readonly JsonSerializer _serializer;
-        private readonly RouteDescriptor _routeDescriptor;
 
-        public JsonReader(JsonSerializer serializer,
-            RouteDescriptor routeDescriptor, HttpRequestMessage requestMessage) : 
-            base(requestMessage, MimeTypes.ApplicationJson)
+        public JsonReader(JsonSerializer serializer) : 
+            base(MimeTypes.ApplicationJson)
         {
             _serializer = serializer;
-            _routeDescriptor = routeDescriptor;
         }
 
-        protected override ReadResult GetRequest(string data)
+        protected override ReadResult GetRequest(string data, ReaderContext context)
         {
             try
             {
                 var jsonReader = new JsonTextReader(new System.IO.StringReader(data));
-                return ReadResult.Success(_serializer.Deserialize(jsonReader, _routeDescriptor
-                    .RequestParameter.ParameterType.Type));
+                return ReadResult.Success(_serializer.Deserialize(
+                    jsonReader, context.ReadType.Type));
             }
             catch (JsonReaderException exception)
             {

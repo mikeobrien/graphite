@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Graphite.Actions;
 using Graphite.Extensibility;
 using Graphite.Extensions;
+using Graphite.Http;
 using Graphite.Routing;
 
 namespace Graphite.Binding
@@ -73,6 +77,19 @@ namespace Graphite.Binding
             Configuration configuration, object[] actionArguments)
         {
             return binder.Bind(new RequestBinderContext(actionArguments));
+        }
+
+        public static InputStream CreateInputStream(this HttpContent content)
+        {
+            var headers = content?.Headers;
+            return new InputStream(
+                headers?.ContentDisposition?.Name.Unquote(),
+                headers?.ContentDisposition?.FileName.Unquote(),
+                headers?.ContentType?.MediaType,
+                headers?.ContentEncoding?.ToArray(),
+                headers?.ContentLength,
+                headers,
+                content?.ReadAsStreamAsync().Result);
         }
     }
 }

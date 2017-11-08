@@ -51,7 +51,7 @@ namespace Graphite
         public HttpStatusCode DefaultNoWriterStatusCode { get; set; } = HttpStatusCode.BadRequest;
         public string DefaultNoWriterReasonPhrase { get; set; } = "Response format not supported or not specified.";
 
-        public int DownloadBufferSize { get; set; } = 1.MB();
+        public int DefaultBufferSize { get; set; } = 1.MB();
         public int? SerializerBufferSize { get; set; }
         public bool AutomaticallyConstrainUrlParameterByType { get; set; }
         public bool DisposeSerializedObjects { get; set; }
@@ -177,6 +177,7 @@ namespace Graphite
         public ConditionalPlugins<IRequestBinder, ActionConfigurationContext> RequestBinders { get; } = 
             new ConditionalPlugins<IRequestBinder, ActionConfigurationContext>(false)
             .Configure(x => x
+                .Append<MultipartFormBinder>()
                 .Append<ReaderBinder>()
                 .Append<UrlParameterBinder>()
                 .Append<QuerystringBinder>()

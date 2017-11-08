@@ -1,5 +1,4 @@
-﻿using Graphite.Extensions;
-using Graphite.Http;
+﻿using Graphite.Http;
 using Graphite.Linq;
 using Graphite.Routing;
 
@@ -9,7 +8,7 @@ namespace Graphite.Cors
     {
         public bool AppliesTo(HttpRouteDecoratorContext context)
         {
-            return !context.Route.MethodConstraints.ContainsIgnoreCase(HttpMethod.Options.Method);
+            return !context.Route.MethodConstraints.ContainsUncase(HttpMethod.Options.Method);
         }
 
         public void Decorate(HttpRouteDecoratorContext context)

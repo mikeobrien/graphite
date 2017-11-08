@@ -62,12 +62,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DummyStream.cs" />
     <Compile Include="HostHandler.cs" />
     <Compile Include="ActionTestHandler.cs" />
     <Compile Include="AuthenticationTestsHandler.cs" />
     <Compile Include="Behaviors.cs" />
     <Compile Include="BindingTestHandler.cs" />
-    <Compile Include="Configuration.cs" />
+    <Compile Include="Bootstrap.cs" />
     <Compile Include="CorsTestHandler.cs" />
     <Compile Include="Decorators.cs" />
     <Compile Include="PerformanceTests.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="RequestTestHandler.cs" />
     <Compile Include="RoutingTestHandler.cs" />
     <Compile Include="Views\ViewTestHandler.cs" />
+    <Compile Include="MultipartTestHandler.cs" />
     <Compile Include="WriterTestHandler.cs" />
   </ItemGroup>
   <ItemGroup>

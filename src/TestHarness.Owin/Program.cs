@@ -22,7 +22,7 @@ namespace TestHarness.Owin
         {
             appBuilder.InitializeGraphite(x =>
             {
-                TestHarness.Configuration.Configure(x);
+                Bootstrap.Configure(x);
                 x.IncludeTypeAssembly<Startup>();
             });
 

@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using System.Web.Http;
+using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Readers;
 using Should;
@@ -40,7 +41,7 @@ namespace TestHarness.Reader
             return new OutputInfoModel
             {
                 Filename = stringInfo.Filename,
-                MimeType = stringInfo.MimeType,
+                MimeType = stringInfo.ContentType,
                 Length = stringInfo.Length,
                 Data = stringInfo.Data
             };
@@ -59,7 +60,7 @@ namespace TestHarness.Reader
             return new OutputInfoModel
             {
                 Filename = stream.Filename,
-                MimeType = stream.MimeType,
+                MimeType = stream.ContentType,
                 Length = stream.Length,
                 Data = stream.Data.ReadToEnd(Encoding.UTF8)
             };
@@ -78,7 +79,7 @@ namespace TestHarness.Reader
             return new OutputInfoModel
             {
                 Filename = byteInfo.Filename,
-                MimeType = byteInfo.MimeType,
+                MimeType = byteInfo.ContentType,
                 Length = byteInfo.Length,
                 Data = Encoding.UTF8.GetString(byteInfo.Data)
             };

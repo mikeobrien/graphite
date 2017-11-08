@@ -21,11 +21,11 @@ namespace Graphite.Setup
         }
 
         /// <summary>
-        /// Specifies the download buffer size in bytes. The default is 1MB.
+        /// Specifies the default buffer size in bytes. The default is 1MB.
         /// </summary>
-        public ConfigurationDsl WithDownloadBufferSizeOf(int length)
+        public ConfigurationDsl WithDefaultBufferSizeOf(int length)
         {
-            _configuration.DownloadBufferSize = length;
+            _configuration.DefaultBufferSize = length;
             return this;
         }
 

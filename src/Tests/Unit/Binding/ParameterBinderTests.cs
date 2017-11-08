@@ -179,7 +179,8 @@ namespace Tests.Unit.Binding
                 .CreateFor<Handler>(h => h.Params(null, null, 0))
                 .WithUrl("http://fark.com?param1=value1&fark=value2")
                 .AddParameters("param1", "param2")
-                .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"), instanceAppliesTo: x => false)
+                .AddValueMapper1(x => MapResult.Success(x.Values.First() + "mapper1"), 
+                    instanceAppliesTo: x => false)
                 .AddValueMapper2(x => MapResult.Success(x.Values.First() + "mapper2"));
 
             var result = Bind(requestGraph);
@@ -242,8 +243,9 @@ namespace Tests.Unit.Binding
             var result = Bind(requestGraph);
 
             result.Status.ShouldEqual(BindingStatus.Failure);
-            result.ErrorMessage.ShouldEqual("Parameter param2 value 'fark' is not formatted correctly. " +
-                                            "Input string was not in a correct format.");
+            result.ErrorMessage.ShouldEqual(
+                "Parameter param2 value 'fark' is not formatted correctly. " +
+                "Input string was not in a correct format.");
         }
 
         private BindResult Bind(RequestGraph requestGraph,

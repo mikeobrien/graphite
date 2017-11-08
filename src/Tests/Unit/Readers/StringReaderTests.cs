@@ -1,6 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
+using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Readers;
 using NUnit.Framework;
@@ -29,7 +29,9 @@ namespace Tests.Unit.Readers
         {
             var requestGraph = RequestGraph.CreateFor<Handler>(x => x.StringRequest(null))
                 .WithRequestParameter("value");
-            CreateStringReader(requestGraph).Applies().ShouldBeTrue();
+            CreateStringReader(requestGraph)
+                .AppliesTo(CreateReaderContext(requestGraph))
+                .ShouldBeTrue();
         }
 
         [Test]
@@ -37,7 +39,9 @@ namespace Tests.Unit.Readers
         {
             var requestGraph = RequestGraph.CreateFor<Handler>(x => x.InputStringRequest(null))
                 .WithRequestParameter("inputString");
-            CreateStringReader(requestGraph).Applies().ShouldBeTrue();
+            CreateStringReader(requestGraph)
+                .AppliesTo(CreateReaderContext(requestGraph))
+                .ShouldBeTrue();
         }
 
         [Test]
@@ -45,14 +49,18 @@ namespace Tests.Unit.Readers
         {
             var requestGraph = RequestGraph.CreateFor<Handler>(x => x.NonStringRequest(0))
                 .WithRequestParameter("request");
-            CreateStringReader(requestGraph).Applies().ShouldBeFalse();
+            CreateStringReader(requestGraph)
+                .AppliesTo(CreateReaderContext(requestGraph))
+                .ShouldBeFalse();
         }
 
         [Test]
         public void Should_not_apply_to_actions_with_no_request()
         {
             var requestGraph = RequestGraph.CreateFor<Handler>(x => x.NoRequest());
-            CreateStringReader(requestGraph).Applies().ShouldBeFalse();
+            CreateStringReader(requestGraph)
+                .AppliesTo(CreateReaderContext(requestGraph))
+                .ShouldBeFalse();
         }
 
         [Test]
@@ -62,7 +70,8 @@ namespace Tests.Unit.Readers
                 .WithRequestParameter("value")
                 .WithRequestData("fark");
 
-            var result = await CreateStringReader(requestGraph).Read();
+            var result = await CreateStringReader(requestGraph)
+                .Read(CreateReaderContext(requestGraph));
 
             result.Status.ShouldEqual(ReadStatus.Success);
             result.Value.ShouldBeType<string>();
@@ -81,22 +90,34 @@ namespace Tests.Unit.Readers
             if (mimeType.IsNotNullOrEmpty()) requestGraph.WithContentType(mimeType);
             if (filename.IsNotNullOrEmpty()) requestGraph.WithAttachmentFilename(filename);
 
-            var result = await CreateStringReader(requestGraph).Read();
+            var result = await CreateStringReader(requestGraph)
+                .Read(CreateReaderContext(requestGraph));
 
             result.Status.ShouldEqual(ReadStatus.Success);
             result.Value.ShouldBeType<InputString>();
             var inputString = result.Value.As<InputString>();
             inputString.Data.ShouldEqual("fark");
             inputString.Length.ShouldEqual(4);
-            inputString.MimeType.ShouldEqual(mimeType);
+            inputString.ContentType.ShouldEqual(mimeType);
             inputString.Filename.ShouldEqual(filename);
+        }
+
+        private ReaderContext CreateReaderContext(RequestGraph requestGraph)
+        {
+            return new ReaderContext(
+                requestGraph.RequestParameter?.ParameterType, 
+                requestGraph.ContentType, null,
+                requestGraph.AttachmentFilename,
+                requestGraph.GetHttpHeaders(),
+                requestGraph.RequestData == null ? null :
+                    new MemoryStream(requestGraph.RequestData)
+                        .ToTaskResult<Stream>(),
+                contentLength: requestGraph.RequestData?.Length);
         }
 
         private StringReader CreateStringReader(RequestGraph requestGraph)
         {
-            return new StringReader(
-                requestGraph.GetRouteDescriptor(),
-                requestGraph.GetHttpRequestMessage());
+            return new StringReader();
         }
     }
 }

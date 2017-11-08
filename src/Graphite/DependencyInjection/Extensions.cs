@@ -84,7 +84,9 @@ namespace Graphite.DependencyInjection
 
         public static IContainer GetGraphiteContainer(this HttpRequestMessage request)
         {
-            return request.Properties[ContainerProperty] as IContainer;
+            return request.Properties.ContainsKey(ContainerProperty)
+                ? request.Properties[ContainerProperty] as IContainer
+                : null;
         }
 
         public static void SetGraphiteContainer(this HttpRequestMessage request, IContainer container)

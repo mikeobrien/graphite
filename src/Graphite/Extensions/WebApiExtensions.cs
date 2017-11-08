@@ -46,17 +46,17 @@ namespace Graphite.Extensions
 
         public static bool IsPost(this string method)
         {
-            return method.EqualsIgnoreCase("POST");
+            return method.EqualsUncase("POST");
         }
 
         public static bool IsPut(this string method)
         {
-            return method.EqualsIgnoreCase("PUT");
+            return method.EqualsUncase("PUT");
         }
 
         public static bool IsDelete(this string method)
         {
-            return method.EqualsIgnoreCase("DELETE");
+            return method.EqualsUncase("DELETE");
         }
 
         public static ILookup<string, object> ParseQueryString(this string querystring)
@@ -104,18 +104,23 @@ namespace Graphite.Extensions
             if (acceptMimeType == "*/*") return MatchType.Any;
             if (acceptMimeType.EndsWith("/*"))
             {
-                return mimeType.StartsWithIgnoreCase(acceptMimeType
+                return mimeType.StartsWithUncase(acceptMimeType
                         .Substring(0, acceptMimeType.Length - 1)) 
                     ? MatchType.Partial : MatchType.None;
             }
-            return mimeType.EqualsIgnoreCase(acceptMimeType) ? MatchType.Full : MatchType.None;
+            return mimeType.EqualsUncase(acceptMimeType) ? MatchType.Full : MatchType.None;
         }
 
         public static bool ContentTypeIs(this HttpRequestMessage request, params string[] mimeTypes)
         {
-            return mimeTypes.ContainsIgnoreCase(request.Content.Headers.ContentType?.MediaType);
+            return request.Content.Headers.ContentType?.MediaType.ContentTypeIs(mimeTypes) ?? false;
         }
-        
+
+        public static bool ContentTypeIs(this string contentType, params string[] mimeTypes)
+        {
+            return contentType.IsNotNullOrEmpty() && mimeTypes.ContainsUncase(contentType);
+        }
+
         public static string HtmlEncode(this string text)
         {
             return HttpUtility.HtmlEncode(text);

@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Graphite;
 using Graphite.Extensions;
+using Graphite.Linq;
 using NUnit.Framework;
 using Should;
 using Tests.Common;

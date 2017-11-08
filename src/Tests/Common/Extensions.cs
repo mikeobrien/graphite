@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Graphite.Extensibility;
 using Graphite.Extensions;
+using Graphite.Http;
 using Graphite.Linq;
 using Tests.Common.Fakes;
 
@@ -74,11 +76,6 @@ namespace Tests.Common
             {
                 action();
             }
-        }
-
-        public static IEnumerable<int> To(this int start, int end)
-        {
-            return Enumerable.Range(start, end);
         }
 
         public static void TimesParallel(this int iterations, Action action)
@@ -203,6 +200,36 @@ namespace Tests.Common
         public static TValue TryGet<TKey, TValue>(this IDictionary<TKey, TValue> source, TKey key)
         {
             return source.ContainsKey(key) ? source[key] : default(TValue);
+        }
+
+        public static MultipartFormDataContent AddTextFormData(this MultipartFormDataContent form,
+            string name, string value, string filename = null, string contentType = null)
+        {
+            return form.AddFormData(name, new StringContent(value), filename, contentType);
+        }
+
+        public static MultipartFormDataContent AddStreamFormData(this MultipartFormDataContent form,
+            string name, Stream stream, string filename = null, string contentType = null)
+        {
+            return form.AddFormData(name, new StreamContent(stream, 1.MB()), 
+                filename, contentType, stream.Length);
+        }
+
+        public static MultipartFormDataContent AddFormData(this MultipartFormDataContent form,
+            string name, HttpContent content, string filename = null, string contentType = null,
+            long? contentLength = null)
+        {
+            if (contentType != null)
+                content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+            var disposition = content.Headers.ContentDisposition = 
+                new ContentDispositionHeaderValue("form-data")
+            {
+                Name = name
+            };
+            if (filename.IsNotNullOrEmpty())  disposition.FileName = filename;
+            content.Headers.ContentLength = contentLength;
+            form.Add(content);
+            return form;
         }
     }
 }

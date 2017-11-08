@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Graphite.Actions;
 using Graphite.Extensibility;
+using Graphite.Http;
 using Graphite.Readers;
 
 namespace Graphite.Binding
@@ -28,15 +29,16 @@ namespace Graphite.Binding
 
         public virtual bool AppliesTo(RequestBinderContext context)
         {
-            return _actionDescriptor.Route.HasRequest;
+            return _actionDescriptor.Route.HasRequest &&
+                !_requestMessage.HasMimeMultipartContent();
         }
         
         public virtual async Task<BindResult> Bind(RequestBinderContext context)
         {
-
             var position = _actionDescriptor.Route.RequestParameter.Position;
+            var headers = _requestMessage.Content?.Headers;
 
-            if ((_requestMessage.Content?.Headers.ContentLength ?? 0) == 0)
+            if ((headers?.ContentLength ?? 0) == 0)
             {
                 if (_configuration.CreateEmptyRequestParameterValue)
                     context.ActionArguments[position] = _actionDescriptor
@@ -44,10 +46,14 @@ namespace Graphite.Binding
                 return BindResult.Success();
             }
 
+            var readContext = _requestMessage.Content
+                .CreateReaderContext(_actionDescriptor);
             var reader = _actionDescriptor.RequestReaders
-                .ThatApplyOrDefault(_readers).FirstOrDefault();
+                .ThatApplyToOrDefault(_readers, readContext)
+                .FirstOrDefault();
             if (reader == null) return BindResult.NoReader();
-            var result = await reader.Read();
+
+            var result = await reader.Read(readContext);
 
             if (result.Status == ReadStatus.Failure)
                 return BindResult.Failure(result.ErrorMessage);

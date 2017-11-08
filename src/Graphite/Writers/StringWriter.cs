@@ -57,8 +57,8 @@ namespace Graphite.Writers
 
         protected override string GetContentType(string data)
         {
-            return data.ContainsIgnoreCase("</") || 
-                data.ContainsIgnoreCase("/>") 
+            return data.ContainsUncase("</") || 
+                data.ContainsUncase("/>") 
                 ? MimeTypes.TextHtml 
                 : MimeTypes.TextPlain;
         }

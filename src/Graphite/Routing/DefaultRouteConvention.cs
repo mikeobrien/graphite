@@ -133,7 +133,7 @@ namespace Graphite.Routing
 
         protected virtual UrlSegment GetSegment(string segment, List<ActionParameter> actionParameters)
         {
-            var parameter = actionParameters.FirstOrDefault(p => p.Name.EqualsIgnoreCase(segment));
+            var parameter = actionParameters.FirstOrDefault(p => p.Name.EqualsUncase(segment));
             if (parameter == null) return new UrlSegment(segment);
 
             var isWildcard = parameter.HasAttributes<WildcardAttribute, ParamArrayAttribute>();

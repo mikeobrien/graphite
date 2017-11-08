@@ -1,19 +1,20 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
-using Graphite.Routing;
+﻿using System.Threading.Tasks;
+using Graphite.Binding;
+using Graphite.Extensions;
 
 namespace Graphite.Readers
 {
-    public class InputString : InputBody<string> { }
-
     public class StringReader : BodyReaderBase<string, InputString>
     {
-        public StringReader(RouteDescriptor routeDescriptor, HttpRequestMessage requestMessage) : 
-            base(routeDescriptor, requestMessage) { }
-
-        protected override async Task<string> GetData(HttpContent content)
+        protected override async Task<string> GetData(ReaderContext context)
         {
-            return await content.ReadAsStringAsync();
+            return await context.Data.ReadAsString();
+        }
+
+        protected override InputString GetResult(
+            ReaderContext context, object data)
+        {
+            return context.CreateInputString((string)data);
         }
     }
 }

@@ -28,10 +28,10 @@ namespace Graphite.Linq
             return new[] { item }.Concat(tail);
         }
 
-        public static bool ContainsIgnoreCase(this IEnumerable<string> source,
+        public static bool ContainsUncase(this IEnumerable<string> source,
             params string[] search)
         {
-            return source.Any(x => search.Any(x.EqualsIgnoreCase));
+            return source.Any(x => search.Any(x.EqualsUncase));
         }
 
         public static IEnumerable<T> Append<T>(this IEnumerable<T> source, T item)
@@ -94,7 +94,7 @@ namespace Graphite.Linq
             return source.Select(x => new KeyValuePair<TKey, TValue>(key(x), value(x)));
         }
 
-        public static IEnumerable<TResult> JoinIgnoreCase<TOuter, TInner, TResult>(
+        public static IEnumerable<TResult> JoinUncase<TOuter, TInner, TResult>(
             this IEnumerable<TOuter> outer, IEnumerable<TInner> inner, 
             Func<TOuter, string> outerKeySelector, Func<TInner, string> innerKeySelector,
             Func<TOuter, TInner, TResult> resultSelector)
@@ -111,6 +111,11 @@ namespace Graphite.Linq
                 yield return current;
                 current = map(current);
             }
+        }
+
+        public static IEnumerable<int> To(this int start, int count)
+        {
+            return Enumerable.Range(start, count);
         }
     }
 }

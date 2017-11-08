@@ -5,8 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Sockets;
-using System.Text;
 using System.Xml.Serialization;
 using Graphite.Extensions;
 using Graphite.Http;
@@ -46,7 +44,7 @@ namespace Tests.Common
                 ReasonPhrase = response.ReasonPhrase;
                 ContentType = response.Content?.Headers?.ContentType?.MediaType;
                 Headers = response.Headers;
-                Cookies = Headers.Where(x => x.Key.EqualsIgnoreCase("Set-Cookie"))
+                Cookies = Headers.Where(x => x.Key.EqualsUncase("Set-Cookie"))
                     .SelectMany(x => x.Value)
                     .Select(x => x.Split('='))
                     .ToDictionary(x => x[0].Trim(), x => x[1].Trim(),
@@ -235,6 +233,18 @@ namespace Tests.Common
                 cookies: cookies, requestHeaders: requestHeaders, contentHeaders: contentHeaders);
         }
 
+        public Result<TResponse> PostMultipartForm<TResponse>(string relativeUrl,
+            Action<MultipartFormDataContent> multipart,
+            IDictionary<string, string> cookies = null,
+            Action<HttpRequestHeaders> requestHeaders = null,
+            Action<HttpContentHeaders> contentHeaders = null) where TResponse : class
+        {
+            return Execute(HttpMethod.Post, relativeUrl, MimeTypes.MultipartFormData, 
+                MimeTypes.ApplicationJson, DeserializeJson<TResponse>, null, cookies, 
+                requestHeaders: requestHeaders, contentHeaders: contentHeaders,
+                multipart: multipart);
+        }
+
         public Result<TResponse> PostXml<TRequest, TResponse>(string relativeUrl, TRequest data,
             IDictionary<string, string> cookies = null,
             Action<HttpRequestHeaders> requestHeaders = null,
@@ -322,10 +332,11 @@ namespace Tests.Common
             string accept = null, Func<Stream, TResponse> reader = null,
             Action<Stream> writer = null, IDictionary<string, string> cookies = null,
             string filename = null, Action<HttpRequestHeaders> requestHeaders = null, 
-            Action<HttpContentHeaders> contentHeaders = null) where TResponse : class
+            Action<HttpContentHeaders> contentHeaders = null,
+            Action<MultipartFormDataContent> multipart = null) where TResponse : class
         {
             var request = new HttpRequestMessage(method, relativeUrl);
-
+            
             if (accept.IsNotNullOrEmpty())
                 request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(accept));
 
@@ -347,6 +358,12 @@ namespace Tests.Common
                         ("attachment") { FileName = filename };
 
                 contentHeaders?.Invoke(request.Content.Headers);
+            }
+            else if (multipart != null)
+            {
+                var form = new MultipartFormDataContent();
+                multipart(form);
+                request.Content = form;
             }
 
             var response = _httpClient.SendAsync(request).Result;

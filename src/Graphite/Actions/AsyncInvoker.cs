@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Graphite.Extensions;
 using Graphite.Reflection;
-using TaskExtensions = Graphite.Extensions.TaskExtensions;
 
 namespace Graphite.Actions
 {
@@ -76,13 +75,13 @@ namespace Graphite.Actions
 
         private static Expression ConvertToObjectReturn(this Expression expression)
         {
-            return Expression.Call(typeof(TaskExtensions), nameof(TaskExtensions
+            return Expression.Call(typeof(ThreadingExtensions), nameof(ThreadingExtensions
                 .ConvertToObjectReturn), new Type[] { }, expression);
         }
 
         private static Expression ConvertToObjectReturn(this Expression expression, Type returnType)
         {
-            return Expression.Call(typeof(TaskExtensions), nameof(TaskExtensions
+            return Expression.Call(typeof(ThreadingExtensions), nameof(ThreadingExtensions
                 .ConvertToObjectReturn), new[] { returnType }, expression);
         }
 

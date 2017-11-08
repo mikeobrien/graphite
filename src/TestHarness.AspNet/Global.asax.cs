@@ -19,7 +19,7 @@ namespace TestHarness.AspNet
             configuration
                 .InitializeGraphite(x =>
                 {
-                    Configuration.Configure(x);
+                    Bootstrap.Configure(x);
                     x.IncludeTypeAssembly<Global>();
                 });
 

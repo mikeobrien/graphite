@@ -21,7 +21,7 @@ namespace Graphite.Views.ViewSource
                 .SelectMany(t => viewNames.Select(v => new
                 {
                     Resource = resources.FirstOrDefault(x => x.Name
-                        .EqualsIgnoreCase($"{@namespace}.{v}.{t}")),
+                        .EqualsUncase($"{@namespace}.{v}.{t}")),
                     Type = t
                 }))
                 .Where(x => x.Resource != null)

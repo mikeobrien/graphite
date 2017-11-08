@@ -19,13 +19,13 @@ namespace Tests.Common.Fakes
         public bool AppliesCalled { get; set; }
         public bool ReadCalled { get; set; }
 
-        public bool Applies()
+        public bool AppliesTo(ReaderContext context)
         {
             AppliesCalled = true;
             return AppliesFunc?.Invoke() ?? true;
         }
 
-        public Task<ReadResult> Read()
+        public Task<ReadResult> Read(ReaderContext context)
         {
             ReadCalled = true;
             return ReadFunc();

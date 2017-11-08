@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Graphite.Extensibility;
+using Graphite.Extensions;
 using Graphite.Linq;
 using Graphite.Reflection;
+using Graphite.Routing;
 
 namespace Graphite.Actions
 {
@@ -48,6 +51,17 @@ namespace Graphite.Actions
         public static bool IsGraphiteAction(this ActionMethod actionMethod)
         {
             return actionMethod.HandlerTypeDescriptor.Type.IsUnderNamespace("Graphite");
+        }
+
+        public static bool HasParameterNamed(this RouteDescriptor routeDescriptor, string name)
+        {
+            return routeDescriptor.Parameters.Any(x => x.Name.EqualsUncase(name));
+        }
+
+        public static bool HasPropertyNamed(this ParameterDescriptor parameter, string name)
+        {
+            return parameter?.ParameterType.Properties
+                .Any(x => x.Name.EqualsUncase(name)) ?? false;
         }
     }
 }

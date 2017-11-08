@@ -65,7 +65,8 @@ namespace Graphite.Exceptions
             return message.ToString();
         }
 
-        private static string GetDebugResponse(this UnhandledGraphiteException exception, HttpRequestMessage requestMessage)
+        private static string GetDebugResponse(this UnhandledGraphiteException exception, 
+            HttpRequestMessage requestMessage)
         {
             var message = new StringBuilder(100.KB());
 

@@ -19,5 +19,17 @@ namespace Graphite.Extensions
                 x => value?.Invoke(source[(string) x]) ?? (TValue)(object)source[(string) x],
                 StringComparer.OrdinalIgnoreCase);
         }
+
+        public static void Add<TKey, TValue>(this IList<KeyValuePair<TKey, TValue>> source, 
+            TKey key, TValue value)
+        {
+            source.Add(new KeyValuePair<TKey, TValue>(key, value));
+        }
+
+        public static ILookup<TKey, TValue> ToLookup<TKey, TValue>(
+            this IList<KeyValuePair<TKey, TValue>> source)
+        {
+            return source.ToLookup(x => x.Key, x => x.Value);
+        }
     }
 }

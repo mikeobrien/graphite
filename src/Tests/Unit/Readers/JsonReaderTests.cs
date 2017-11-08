@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.IO;
 using System.Threading.Tasks;
 using Graphite.Extensions;
 using Graphite.Http;
@@ -39,7 +39,7 @@ namespace Tests.Unit.Readers
             }
 
             CreateReader(requestGraph)
-                .Applies()
+                .AppliesTo(CreateReaderContext(requestGraph))
                 .ShouldEqual(isJson);
         }
 
@@ -52,7 +52,8 @@ namespace Tests.Unit.Readers
                     .WithRequestParameter("request")
                     .WithContentType(MimeTypes.ApplicationJson);
 
-            var result = await CreateReader(requestGraph).Read();
+            var result = await CreateReader(requestGraph)
+                .Read(CreateReaderContext(requestGraph));
 
             result.Status.ShouldEqual(ReadStatus.Success);
             result.Value.ShouldNotBeNull();
@@ -75,18 +76,27 @@ namespace Tests.Unit.Readers
                 .WithRequestParameter("request")
                 .WithContentType(MimeTypes.ApplicationJson);
 
-            var result = await CreateReader(requestGraph).Read();
+            var result = await CreateReader(requestGraph)
+                .Read(CreateReaderContext(requestGraph));
 
             result.Status.ShouldEqual(ReadStatus.Failure);
             result.ErrorMessage.ShouldEqual(message);
         }
 
+        private ReaderContext CreateReaderContext(RequestGraph requestGraph)
+        {
+            return new ReaderContext(
+                requestGraph.RequestParameter?.ParameterType, 
+                requestGraph.ContentType, null,
+                requestGraph.AttachmentFilename,
+                requestGraph.GetHttpHeaders(),
+                new MemoryStream(requestGraph.RequestData).ToTaskResult<Stream>(),
+                contentLength: requestGraph.RequestData.Length);
+        }
+
         private JsonReader CreateReader(RequestGraph requestGraph)
         {
-            return new JsonReader(
-                new JsonSerializer(),
-                requestGraph.GetRouteDescriptor(),
-                requestGraph.GetHttpRequestMessage());
+            return new JsonReader(new JsonSerializer());
         }
     }
 }

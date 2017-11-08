@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using System.Runtime.ExceptionServices;
 using System.Threading;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using Graphite.Behaviors;
 using Graphite.DependencyInjection;
 using Graphite.Exceptions;
+using Graphite.Http;
 using Graphite.Monitoring;
 
 namespace Graphite.Actions
@@ -42,6 +44,12 @@ namespace Graphite.Actions
             {
                 return await _behaviorChainInvoker.Invoke(
                     _actionDescriptor, requestMessage, cancellationToken);
+            }
+            catch (BadRequestException exception)
+            {
+                var response = requestMessage.CreateResponse(HttpStatusCode.BadRequest);
+                response.SafeSetReasonPhrase(exception.Message);
+                return response;
             }
             catch (Exception exception)
             {

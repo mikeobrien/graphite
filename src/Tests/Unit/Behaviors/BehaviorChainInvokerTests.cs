@@ -297,8 +297,6 @@ namespace Tests.Unit.Behaviors
             result.InnerException.ShouldBeType<BehaviorException>();
         }
 
-        public class BehaviorException : Exception { }
-
         public class ExceptionBehavior : TestBehavior
         {
             public override Task<HttpResponseMessage> Invoke()
@@ -306,5 +304,29 @@ namespace Tests.Unit.Behaviors
                 throw new BehaviorException();
             }
         }
+
+        [Test]
+        public async Task Should_allow_bad_request_exception_to_bubble_up()
+        {
+            _requestGraph.Configuration.Behaviors.Configure(x => x
+                .Append<BadRequestExceptionBehavior>());
+
+            var result = await _invoker.Should().Throw<BadRequestException>(
+                x => x.Invoke(_requestGraph.GetActionDescriptor(),
+                    _requestGraph.GetHttpRequestMessage(),
+                    _requestGraph.CancellationToken));
+
+            result.ShouldBeType<BadRequestException>();
+        }
+
+        public class BadRequestExceptionBehavior : TestBehavior
+        {
+            public override Task<HttpResponseMessage> Invoke()
+            {
+                throw new BadRequestException("fark");
+            }
+        }
+
+        public class BehaviorException : Exception { }
     }
 }

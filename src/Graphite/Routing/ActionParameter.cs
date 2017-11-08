@@ -53,8 +53,8 @@ namespace Graphite.Routing
             PropertyDescriptor = actionParameter.PropertyDescriptor;
         }
 
-        public string Name { get; }
-        public ActionMethod Action { get; set; }
+        public virtual string Name { get; }
+        public virtual ActionMethod Action { get; set; }
         public virtual TypeDescriptor TypeDescriptor { get; }
         public virtual bool IsParameter { get; }
         public virtual ParameterDescriptor ParameterDescriptor { get; }

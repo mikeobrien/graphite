@@ -54,7 +54,7 @@ namespace Graphite.Authentication
             if (authorization == null) return GetUnauthorizedResponse(authenticators);
 
             var authenticator = authenticators.FirstOrDefault(x => 
-                x.Scheme.EqualsIgnoreCase(authorization.Scheme));
+                x.Scheme.EqualsUncase(authorization.Scheme));
             if (authenticator == null) return GetUnauthorizedResponse(authenticators);
 
             return authenticator.Authenticate(authorization.Parameter)

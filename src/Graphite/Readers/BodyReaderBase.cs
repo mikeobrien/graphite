@@ -1,50 +1,26 @@
-using System.Net.Http;
 using System.Threading.Tasks;
-using Graphite.Routing;
+using Graphite.Binding;
 
 namespace Graphite.Readers
 {
-    public abstract class InputBody<T>
-    {
-        public string Filename { get; set; }
-        public string MimeType { get; set; }
-        public long? Length { get; set; }
-        public T Data { get; set; }
-    }
-
     public abstract class BodyReaderBase<T, TWrapper> : IRequestReader 
-        where TWrapper : InputBody<T>, new()
+        where TWrapper : InputBody<T>
     {
-        private readonly RouteDescriptor _routeDescriptor;
-        private readonly HttpRequestMessage _requestMessage;
-
-        protected BodyReaderBase(RouteDescriptor routeDescriptor, HttpRequestMessage requestMessage)
+        public bool AppliesTo(ReaderContext context)
         {
-            _routeDescriptor = routeDescriptor;
-            _requestMessage = requestMessage;
+            return context.ReadType != null &&
+                (context.ReadType.Type == typeof(T) || 
+                context.ReadType.Type == typeof(TWrapper));
         }
 
-        public bool Applies()
-        {
-            var requestType = _routeDescriptor.RequestParameter?.ParameterType.Type;
-            return requestType == typeof(T) || requestType == typeof(TWrapper);
-        }
+        protected abstract Task<T> GetData(ReaderContext content);
+        protected abstract TWrapper GetResult(ReaderContext context, object data);
 
-        protected abstract Task<T> GetData(HttpContent content);
-
-        public async Task<ReadResult> Read()
+        public async Task<ReadResult> Read(ReaderContext context)
         {
-            var requestType = _routeDescriptor.RequestParameter?.ParameterType.Type;
-            var data = await GetData(_requestMessage.Content);
-            if (requestType == typeof(T)) return ReadResult.Success(data);
-            var headers = _requestMessage.Content.Headers;
-            return ReadResult.Success(new TWrapper
-            {
-                Filename = headers.ContentDisposition?.FileName.Trim('"'),
-                MimeType = headers.ContentType?.MediaType,
-                Length = headers.ContentLength,
-                Data = data
-            });
+            var data = await GetData(context);
+            if (context.ReadType.Type == typeof(T)) return ReadResult.Success(data);
+            return ReadResult.Success(GetResult(context, data));
         }
     }
 }

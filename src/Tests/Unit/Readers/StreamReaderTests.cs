@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Readers;
 using NUnit.Framework;
@@ -28,7 +29,9 @@ namespace Tests.Unit.Readers
         {
             var requestGraph = RequestGraph.CreateFor<Handler>(x => x.StreamRequest(null))
                 .WithRequestParameter("stream");
-            CreateStreamReader(requestGraph).Applies().ShouldBeTrue();
+            CreateStreamReader(requestGraph)
+                .AppliesTo(CreateReaderContext(requestGraph))
+                .ShouldBeTrue();
         }
 
         [Test]
@@ -36,7 +39,9 @@ namespace Tests.Unit.Readers
         {
             var requestGraph = RequestGraph.CreateFor<Handler>(x => x.InputStreamRequest(null))
                 .WithRequestParameter("inputStream");
-            CreateStreamReader(requestGraph).Applies().ShouldBeTrue();
+            CreateStreamReader(requestGraph)
+                .AppliesTo(CreateReaderContext(requestGraph))
+                .ShouldBeTrue();
         }
 
         [Test]
@@ -44,14 +49,18 @@ namespace Tests.Unit.Readers
         {
             var requestGraph = RequestGraph.CreateFor<Handler>(x => x.NonStreamRequest(0))
                 .WithRequestParameter("request");
-            CreateStreamReader(requestGraph).Applies().ShouldBeFalse();
+            CreateStreamReader(requestGraph)
+                .AppliesTo(CreateReaderContext(requestGraph))
+                .ShouldBeFalse();
         }
 
         [Test]
         public void Should_not_apply_to_actions_with_no_request()
         {
             var requestGraph = RequestGraph.CreateFor<Handler>(x => x.NoRequest());
-            CreateStreamReader(requestGraph).Applies().ShouldBeFalse();
+            CreateStreamReader(requestGraph)
+                .AppliesTo(CreateReaderContext(requestGraph))
+                .ShouldBeFalse();
         }
 
         [Test]
@@ -61,7 +70,8 @@ namespace Tests.Unit.Readers
                 .WithRequestParameter("stream")
                 .WithRequestData("fark");
 
-            var result = await CreateStreamReader(requestGraph).Read();
+            var result = await CreateStreamReader(requestGraph)
+                .Read(CreateReaderContext(requestGraph));
 
             result.Status.ShouldEqual(ReadStatus.Success);
             result.Value.ShouldBeType<MemoryStream>();
@@ -80,22 +90,34 @@ namespace Tests.Unit.Readers
             if (mimeType.IsNotNullOrEmpty()) requestGraph.WithContentType(mimeType);
             if (filename.IsNotNullOrEmpty()) requestGraph.WithAttachmentFilename(filename);
 
-            var result = await CreateStreamReader(requestGraph).Read();
+            var result = await CreateStreamReader(requestGraph)
+                .Read(CreateReaderContext(requestGraph));
 
             result.Status.ShouldEqual(ReadStatus.Success);
             result.Value.ShouldBeType<InputStream>();
             var inputStream = result.Value.As<InputStream>();
             inputStream.Data.ReadAllText().ShouldEqual("fark");
             inputStream.Length.ShouldEqual(4);
-            inputStream.MimeType.ShouldEqual(mimeType);
+            inputStream.ContentType.ShouldEqual(mimeType);
             inputStream.Filename.ShouldEqual(filename);
+        }
+
+        private ReaderContext CreateReaderContext(RequestGraph requestGraph)
+        {
+            return new ReaderContext(
+                requestGraph.RequestParameter?.ParameterType, 
+                requestGraph.ContentType, null,
+                requestGraph.AttachmentFilename,
+                requestGraph.GetHttpHeaders(),
+                requestGraph.RequestData == null ? null :
+                    new MemoryStream(requestGraph.RequestData)
+                        .ToTaskResult<Stream>(),
+                contentLength: requestGraph.RequestData?.Length);
         }
 
         private StreamReader CreateStreamReader(RequestGraph requestGraph)
         {
-            return new StreamReader(
-                requestGraph.GetRouteDescriptor(),
-                requestGraph.GetHttpRequestMessage());
+            return new StreamReader();
         }
     }
 }

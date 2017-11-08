@@ -22,6 +22,11 @@ namespace Graphite.Extensions
                 value.ToString(), out intValue) ? intValue : 0;
         }
 
+        public static bool TryParseLong(this string value, out long result)
+        {
+            return long.TryParse(value, out result);
+        }
+
         public static int KB(this int value)
         {
             return value * 1024;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Graphite;
@@ -82,6 +83,20 @@ namespace Tests.Unit.Actions
                 x => x.SendAsync(_request, _requestGraph.CancellationToken));
 
             response.ShouldEqual(exception);
+        }
+
+        [Test]
+        public async Task Should_return_400_when_bad_request_exception_caught()
+        {
+            var exception = new BadRequestException("fark");
+            _invoker.Invoke(_action, _request, _requestGraph.CancellationToken)
+                .Throws(exception);
+
+            var response = await _messageHandler.SendAsync(_request, 
+                _requestGraph.CancellationToken);
+
+            response.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
+            response.ReasonPhrase.ShouldEqual("fark");
         }
     }
 }

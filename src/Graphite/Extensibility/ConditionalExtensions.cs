@@ -94,7 +94,8 @@ namespace Graphite.Extensibility
 
         public static TPlugin FirstThatAppliesToOrDefault<TPlugin, TPluginContext, TInstanceContext>(
             this ConditionalPlugins<TPlugin, TPluginContext> plugins,
-            IEnumerable<TPlugin> instances, TPluginContext pluginContext, TInstanceContext instanceContext)
+            IEnumerable<TPlugin> instances, TPluginContext pluginContext, 
+            TInstanceContext instanceContext)
             where TPlugin : class, IConditional<TInstanceContext>
         {
             return plugins.ThatAppliesToOrDefault(instances, 

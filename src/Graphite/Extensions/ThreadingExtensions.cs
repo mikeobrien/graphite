@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Graphite.Extensions
 {
-    public static class TaskExtensions
+    public static class ThreadingExtensions
     {
         public static Task<object> ConvertToObjectReturn(this Task task)
         {
@@ -16,7 +16,7 @@ namespace Graphite.Extensions
             }, TaskContinuationOptions.ExecuteSynchronously);
             return completionSource.Task;
         }
-        
+
         public static Task<object> ConvertToObjectReturn<TResult>(this Task<TResult> task)
         {
             var completionSource = new TaskCompletionSource<object>();

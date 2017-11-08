@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Graphite;
 using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Http;
@@ -44,7 +43,7 @@ namespace Tests.Unit.Readers
             }
 
             CreateReader(requestGraph)
-                .Applies()
+                .AppliesTo(CreateReaderContext(requestGraph))
                 .ShouldEqual(isForm);
         }
 
@@ -59,7 +58,8 @@ namespace Tests.Unit.Readers
                     .AddParameters("param");
             requestGraph.AppendValueMapper(new SimpleTypeMapper(requestGraph.Configuration));
 
-            var result = await CreateReader(requestGraph).Read();
+            var result = await CreateReader(requestGraph)
+                .Read(CreateReaderContext(requestGraph));
 
             result.Status.ShouldEqual(ReadStatus.Success);
             result.Value.ShouldNotBeNull();
@@ -80,7 +80,8 @@ namespace Tests.Unit.Readers
                     .AddParameters("param");
             requestGraph.AppendValueMapper(new SimpleTypeMapper(requestGraph.Configuration));
 
-            var result = await CreateReader(requestGraph).Read();
+            var result = await CreateReader(requestGraph)
+                .Read(CreateReaderContext(requestGraph));
 
             result.Status.ShouldEqual(ReadStatus.Success);
             result.Value.ShouldNotBeNull();
@@ -112,7 +113,8 @@ namespace Tests.Unit.Readers
                     .AddParameters("param");
             requestGraph.AppendValueMapper(new SimpleTypeMapper(requestGraph.Configuration));
 
-            var result = await CreateReader(requestGraph).Read();
+            var result = await CreateReader(requestGraph)
+                .Read(CreateReaderContext(requestGraph));
 
             result.Status.ShouldEqual(ReadStatus.Success);
             result.Value.ShouldNotBeNull();
@@ -134,7 +136,8 @@ namespace Tests.Unit.Readers
 
             var reader = CreateReader(requestGraph);
 
-            var result = await reader.Read();
+            var result = await reader
+                .Read(CreateReaderContext(requestGraph));
 
             result.Status.ShouldEqual(ReadStatus.Success);
             result.Value.ShouldNotBeNull();
@@ -162,7 +165,8 @@ namespace Tests.Unit.Readers
 
             var reader = CreateReader(requestGraph);
 
-            var result = await reader.Read();
+            var result = await reader
+                .Read(CreateReaderContext(requestGraph));
 
             result.Status.ShouldEqual(ReadStatus.Success);
             result.Value.ShouldNotBeNull();
@@ -190,7 +194,8 @@ namespace Tests.Unit.Readers
 
             var reader = CreateReader(requestGraph);
 
-            var result = await reader.Read();
+            var result = await reader
+                .Read(CreateReaderContext(requestGraph));
 
             result.Status.ShouldEqual(ReadStatus.Success);
             result.Value.ShouldNotBeNull();
@@ -216,7 +221,8 @@ namespace Tests.Unit.Readers
 
             var reader = CreateReader(requestGraph);
 
-            var result = await reader.Read();
+            var result = await reader
+                .Read(CreateReaderContext(requestGraph));
 
             result.Status.ShouldEqual(ReadStatus.Success);
             result.Value.ShouldNotBeNull();
@@ -238,7 +244,8 @@ namespace Tests.Unit.Readers
 
             var reader = CreateReader(requestGraph);
 
-            var exception = await reader.Should().Throw<MapperNotFoundException>(x => x.Read());
+            var exception = await reader.Should().Throw<MapperNotFoundException>(x => x
+                .Read(CreateReaderContext(requestGraph)));
 
             exception.Message.ShouldEqual("Unable to map 'value1' to type string for 'Param1' " +
                 "parameter on action Tests.Unit.Readers.FormReaderTests.Handler.Post.");
@@ -254,10 +261,11 @@ namespace Tests.Unit.Readers
                 .WithContentType(MimeTypes.ApplicationFormUrlEncoded);
             requestGraph.AppendValueMapper(new SimpleTypeMapper(requestGraph.Configuration));
 
-            var result = await CreateReader(requestGraph).Read();
+            var result = await CreateReader(requestGraph)
+                .Read(CreateReaderContext(requestGraph));
 
             result.Status.ShouldEqual(ReadStatus.Failure);
-            result.ErrorMessage.ShouldEqual("Parameter request value 'fark' is not formatted correctly. " +
+            result.ErrorMessage.ShouldEqual("Value 'fark' is not formatted correctly. " +
                                             "Input string was not in a correct format.");
         }
 
@@ -281,11 +289,25 @@ namespace Tests.Unit.Readers
 
             var reader = CreateReader(requestGraph);
 
-            var exception = await reader.Should().Throw<RequestParameterCreationException>(x => x.Read());
+            var exception = await reader.Should().Throw<RequestTypeCreationException>(x => x
+                .Read(CreateReaderContext(requestGraph)));
 
             exception.Message.ShouldEqual("Unable to instantiate type Tests.Unit.Readers.FormReaderTests" +
-                ".CtorInputModel for 'request' parameter on action Tests.Unit.Readers.FormReaderTests" +
+                ".CtorInputModel for action Tests.Unit.Readers.FormReaderTests" +
                 ".CtorHandler.Post. Type must have a parameterless constructor.");
+        }
+
+        private ReaderContext CreateReaderContext(RequestGraph requestGraph)
+        {
+            return new ReaderContext(
+                requestGraph.RequestParameter?.ParameterType, 
+                requestGraph.ContentType, null,
+                requestGraph.AttachmentFilename,
+                requestGraph.GetHttpHeaders(),
+                requestGraph.RequestData == null ? null :
+                    new MemoryStream(requestGraph.RequestData)
+                        .ToTaskResult<Stream>(),
+                contentLength: requestGraph.RequestData?.Length);
         }
 
         private FormReader CreateReader(RequestGraph requestGraph)
@@ -296,11 +318,7 @@ namespace Tests.Unit.Readers
                 requestGraph.ActionMethod,
                 requestGraph.GetRouteDescriptor(),
                 requestGraph.ValueMappers);
-            return new FormReader(
-                parameterBinder,
-                requestGraph.ActionMethod,
-                requestGraph.GetRouteDescriptor(),
-                requestGraph.GetHttpRequestMessage());
+            return new FormReader(parameterBinder, requestGraph.ActionMethod);
         }
     }
 }

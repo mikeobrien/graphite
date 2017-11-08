@@ -130,7 +130,7 @@ namespace Tests.Common
             return actual.ShouldContainAll(StringComparison.Ordinal, expected);
         }
 
-        public static string ShouldContainAllIgnoreCase(this string actual, params string[] expected)
+        public static string ShouldContainAllUncase(this string actual, params string[] expected)
         {
             return actual.ShouldContainAll(StringComparison.OrdinalIgnoreCase, expected);
         }

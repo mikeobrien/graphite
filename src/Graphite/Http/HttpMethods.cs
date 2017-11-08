@@ -18,7 +18,7 @@ namespace Graphite.Http
         {
             methods.ForEach(method =>
             {
-                var remove = this.FirstOrDefault(x => x.Method.EqualsIgnoreCase(method));
+                var remove = this.FirstOrDefault(x => x.Method.EqualsUncase(method));
                 if (remove != null) Remove(remove);
             });
             return this;
@@ -76,16 +76,16 @@ namespace Graphite.Http
         }
 
         public HttpMethod this[string method] => this.FirstOrDefault(
-            x => method?.EqualsIgnoreCase(x.Method) ?? false);
+            x => method?.EqualsUncase(x.Method) ?? false);
 
         public bool Contains(string method)
         {
-            return this.Any(x => method.EqualsIgnoreCase(x.Method));
+            return this.Any(x => method.EqualsUncase(x.Method));
         }
 
         private HttpMethods Configure(HttpMethod method, Action<HttpMethodDsl> configure)
         {
-            var current = this.FirstOrDefault(x => x.Method.EqualsIgnoreCase(method.Method));
+            var current = this.FirstOrDefault(x => x.Method.EqualsUncase(method.Method));
             if (current != null) Remove(current);
             Add(CreateFrom(current ?? method, configure));
             return this;

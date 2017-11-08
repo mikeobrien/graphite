@@ -317,7 +317,7 @@ namespace Tests.Unit.Routing
 
             foreach (var name in urlParameterNames)
             {
-                urlParameters.ShouldContain(x => x.Name.EqualsIgnoreCase(name));
+                urlParameters.ShouldContain(x => x.Name.EqualsUncase(name));
             }
 
             var parameters = descriptor.Parameters;
@@ -325,7 +325,7 @@ namespace Tests.Unit.Routing
 
             foreach (var name in parameterNames)
             {
-                parameters.ShouldContain(x => x.Name.EqualsIgnoreCase(name));
+                parameters.ShouldContain(x => x.Name.EqualsUncase(name));
             }
         }
 

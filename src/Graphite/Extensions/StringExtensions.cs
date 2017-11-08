@@ -56,14 +56,19 @@ namespace Graphite.Extensions
             return $"{padding}{value}{padding}".Substring(0, width);
         }
 
-        public static bool EqualsIgnoreCase(this string source, string compare)
+        public static bool EqualsUncase(this string source, string compare)
         {
             return source.Equals(compare, StringComparison.OrdinalIgnoreCase);
         }
 
-        public static bool StartsWithIgnoreCase(this string source, string compare)
+        public static bool StartsWithUncase(this string source, string compare)
         {
             return source.StartsWith(compare, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool EndsWithUncase(this string source, string compare)
+        {
+            return source.EndsWith(compare, StringComparison.OrdinalIgnoreCase);
         }
 
         public static bool IsNullOrEmpty(this string value)
@@ -121,7 +126,7 @@ namespace Graphite.Extensions
             return source.IndexOf(find, comparison) >= 0;
         }
 
-        public static bool ContainsIgnoreCase(this string value, params string[] find)
+        public static bool ContainsUncase(this string value, params string[] find)
         {
             if (value.IsNullOrEmpty()) return false;
             return find.Where(x => x.IsNotNullOrEmpty()).Any(y => 

@@ -37,7 +37,7 @@ namespace Tests.Acceptance
             result.Status.ShouldEqual(HttpStatusCode.PaymentRequired);
         }
 
-        [Test]
+        [Test, Ignore("Run manually...")]
         public void Should_not_get_exception_details(
             [Values(Host.Owin, Host.IISExpress)] Host host)
         {

@@ -1,20 +1,20 @@
 ﻿using System.IO;
-using System.Net.Http;
 using System.Threading.Tasks;
-using Graphite.Routing;
+using Graphite.Binding;
 
 namespace Graphite.Readers
 {
-    public class InputStream : InputBody<Stream> { }
-
     public class StreamReader : BodyReaderBase<Stream, InputStream>
     {
-        public StreamReader(RouteDescriptor routeDescriptor, HttpRequestMessage requestMessage) : 
-            base(routeDescriptor, requestMessage) { }
-
-        protected override async Task<Stream> GetData(HttpContent content)
+        protected override Task<Stream> GetData(ReaderContext context)
         {
-            return await content.ReadAsStreamAsync();
+            return context.Data;
+        }
+
+        protected override InputStream GetResult(
+            ReaderContext context, object data)
+        {
+            return context.CreateInputStream((Stream)data);
         }
     }
 }

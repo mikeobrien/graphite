@@ -44,7 +44,7 @@ namespace Graphite.Binding
             (KeyValuePair<string, object> value, IEnumerable<UrlParameter> parameters)
         {
             var wildcard = parameters.FirstOrDefault(x => 
-                x.IsWildcard && x.Name.EqualsIgnoreCase(value.Key));
+                x.IsWildcard && x.Name.EqualsUncase(value.Key));
             return wildcard == null || !(wildcard.TypeDescriptor.IsArray ||
                 wildcard.TypeDescriptor.IsGenericListCastable)
                     ? new[] { value }

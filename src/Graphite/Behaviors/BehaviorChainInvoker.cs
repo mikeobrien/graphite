@@ -38,6 +38,10 @@ namespace Graphite.Behaviors
                 return await requestContainer.GetInstance<IBehaviorChain>(
                     _configuration.BehaviorChain).InvokeNext();
             }
+            catch (BadRequestException)
+            {
+                throw;
+            }
             catch (Exception exception)
             {
                 throw new UnhandledGraphiteException(_actionDescriptor, _container, exception);
