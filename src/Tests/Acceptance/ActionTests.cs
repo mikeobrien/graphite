@@ -63,7 +63,7 @@ namespace Tests.Acceptance
             var result = Http.ForHost(host).Get($"{BaseUrl}CustomStatus");
 
             result.Status.ShouldEqual(HttpStatusCode.Created);
-            result.StatusText.ShouldEqual("farker");
+            result.ReasonPhrase.ShouldEqual("farker");
         }
     }
 }

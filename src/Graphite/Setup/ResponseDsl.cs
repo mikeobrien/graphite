@@ -42,21 +42,21 @@ namespace Graphite.Setup
         /// Specifies the default status code when binding fails.
         /// </summary>
         public ConfigurationDsl WithDefaultBindingFailureStatus(HttpStatusCode statusCode,
-            Func<string, string> statusText = null)
+            Func<string, string> reasonPhrase = null)
         {
             _configuration.DefaultBindingFailureStatusCode = statusCode;
-            if (statusText != null)
-                _configuration.DefaultBindingFailureStatusText = statusText;
+            if (reasonPhrase != null)
+                _configuration.DefaultBindingFailureReasonPhrase = reasonPhrase;
             return this;
         }
 
         /// <summary>
         /// Specifies the default status text when binding fails.
         /// </summary>
-        public ConfigurationDsl WithDefaultBindingFailureStatusText(
-            Func<string, string> statusText)
+        public ConfigurationDsl WithDefaultBindingFailureReasonPhrase(
+            Func<string, string> reasonPhrase)
         {
-            _configuration.DefaultBindingFailureStatusText = statusText;
+            _configuration.DefaultBindingFailureReasonPhrase = reasonPhrase;
             return this;
         }
 
@@ -73,10 +73,10 @@ namespace Graphite.Setup
         /// Specifies the default status code and text when no reader applies.
         /// </summary>
         public ConfigurationDsl WithDefaultNoReaderStatus(
-            HttpStatusCode statusCode, string statusText)
+            HttpStatusCode statusCode, string reasonPhrase)
         {
             _configuration.DefaultNoReaderStatusCode = statusCode;
-            _configuration.DefaultNoReaderStatusText = statusText;
+            _configuration.DefaultNoReaderReasonPhrase = reasonPhrase;
             return this;
         }
 
@@ -84,11 +84,11 @@ namespace Graphite.Setup
         /// Specifies the default response status code and text.
         /// </summary>
         public ConfigurationDsl WithDefaultResponseStatus(
-            HttpStatusCode statusCode, string statusText = null)
+            HttpStatusCode statusCode, string reasonPhrase = null)
         {
             _configuration.DefaultHasResponseStatusCode = statusCode;
-            if (statusText.IsNotNullOrEmpty())
-                _configuration.DefaultHasResponseStatusText = statusText;
+            if (reasonPhrase.IsNotNullOrEmpty())
+                _configuration.DefaultHasResponseReasonPhrase = reasonPhrase;
             return this;
         }
 
@@ -96,11 +96,11 @@ namespace Graphite.Setup
         /// Specifies the default no response status code and text.
         /// </summary>
         public ConfigurationDsl WithDefaultNoResponseStatus(
-            HttpStatusCode statusCode, string statusText = null)
+            HttpStatusCode statusCode, string reasonPhrase = null)
         {
             _configuration.DefaultNoResponseStatusCode = statusCode;
-            if (statusText.IsNotNullOrEmpty())
-                _configuration.DefaultNoResponseStatusText = statusText;
+            if (reasonPhrase.IsNotNullOrEmpty())
+                _configuration.DefaultNoResponseReasonPhrase = reasonPhrase;
             return this;
         }
 
@@ -117,10 +117,10 @@ namespace Graphite.Setup
         /// Specifies the default status code and text when no writer applies.
         /// </summary>
         public ConfigurationDsl WithDefaultNoWriterStatus(
-            HttpStatusCode statusCode, string statusText)
+            HttpStatusCode statusCode, string reasonPhrase)
         {
             _configuration.DefaultNoWriterStatusCode = statusCode;
-            _configuration.DefaultNoWriterStatusText = statusText;
+            _configuration.DefaultNoWriterReasonPhrase = reasonPhrase;
             return this;
         }
     }

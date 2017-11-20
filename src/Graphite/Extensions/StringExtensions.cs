@@ -17,6 +17,15 @@ namespace Graphite.Extensions
             return Regex.Escape(source);
         }
 
+        public static string Left(this string value, int maxLength)
+        {
+            return value.IsNotNullOrEmpty() && 
+                value.Length > maxLength && 
+                maxLength >= 0
+                ? value.Substring(0, maxLength)
+                : value;
+        }
+
         public static string[] Split(this string source, params string[] delmiter)
         {
             return source.Split(delmiter, StringSplitOptions.None);

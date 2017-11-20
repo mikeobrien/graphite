@@ -46,6 +46,19 @@ namespace Tests.Unit.Extensions
                 "Fark300 Farker3  ");
         }
 
+        [TestCase(null, 5, null)]
+        [TestCase("", 5, "")]
+        [TestCase("f", -1, "f")]
+        [TestCase("f", 0, "")]
+        [TestCase("f", 1, "f")]
+        [TestCase("f", 2, "f")]
+        [TestCase("fark", 2, "fa")]
+        [TestCase("fark", 4, "fark")]
+        public void Should_left_truncate(string source, int length, string expected)
+        {
+            source.Left(length).ShouldEqual(expected);
+        }
+
         [TestCase(null, null)]
         [TestCase("", "")]
         [TestCase("f", "F")]

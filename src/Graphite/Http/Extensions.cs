@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using Graphite.Extensions;
 
 namespace Graphite.Http
 {
@@ -34,6 +35,19 @@ namespace Graphite.Http
             var value = create();
             request.Properties[key] = value;
             return value;
+        }
+
+        public static HttpResponseMessage SafeSetReasonPhrase(
+            this HttpResponseMessage response, string reasonPhrase)
+        {
+            response.ReasonPhrase = reasonPhrase?
+                .Replace("\r\n", " ")
+                .Replace("\r", " ")
+                .Replace("\n", " ")
+                // This is the max length allowed by Web Api
+                // although the spec doesn't define a max length.
+                .Left(512); 
+            return response;
         }
     }
 }

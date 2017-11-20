@@ -6,7 +6,7 @@ namespace Graphite.Authentication
     {
         string Scheme { get; }
         string Realm { get; }
-        string UnauthorizedStatusMessage { get; }
+        string UnauthorizedReasonPhrase { get; }
         bool Authenticate(string credentials);
     }
 }

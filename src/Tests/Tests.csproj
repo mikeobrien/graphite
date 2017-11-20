@@ -176,6 +176,7 @@
     <Compile Include="Unit\Extensions\ExtensionTests.cs" />
     <Compile Include="Unit\Extensions\SerializerExtensionTests.cs" />
     <Compile Include="Unit\Http\AsyncContentTests.cs" />
+    <Compile Include="Unit\Http\ExtensionTests.cs" />
     <Compile Include="Unit\Linq\ExtensionTests.cs" />
     <Compile Include="Unit\Extensions\MemoizeTests.cs" />
     <Compile Include="Unit\Extensions\StringExtensionTests.cs" />
