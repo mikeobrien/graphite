@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http;
+using Graphite.Http;
 
 namespace Graphite.Actions
 {
@@ -26,41 +27,41 @@ namespace Graphite.Actions
                 case ResponseState.NoReader:
                     SetStatus<NoReaderStatusAttribute>(context.ResponseMessage,
                         _configuration.DefaultNoReaderStatusCode,
-                        _configuration.DefaultNoReaderStatusText);
+                        _configuration.DefaultNoReaderReasonPhrase);
                     break;
                 case ResponseState.BindingFailure:
                     SetStatus<BindingFailureStatusAttribute>(context.ResponseMessage,
                         _configuration.DefaultBindingFailureStatusCode,
-                        _configuration.DefaultBindingFailureStatusText?
+                        _configuration.DefaultBindingFailureReasonPhrase?
                             .Invoke(context.ErrorMessage));
                     break;
                 case ResponseState.HasResponse:
                     SetStatus<HasResponseStatusAttribute>(context.ResponseMessage,
                         _configuration.DefaultHasResponseStatusCode,
-                        _configuration.DefaultHasResponseStatusText);
+                        _configuration.DefaultHasResponseReasonPhrase);
                     break;
                 case ResponseState.NoResponse:
                     SetStatus<NoResponseStatusAttribute>(context.ResponseMessage, 
                         _configuration.DefaultNoResponseStatusCode,
-                        _configuration.DefaultNoResponseStatusText);
+                        _configuration.DefaultNoResponseReasonPhrase);
                     break;
                 case ResponseState.NoWriter:
                     SetStatus<NoWriterStatusAttribute>(context.ResponseMessage,
                         _configuration.DefaultNoWriterStatusCode,
-                        _configuration.DefaultNoWriterStatusText);
+                        _configuration.DefaultNoWriterReasonPhrase);
                     break;
             }
         }
 
         private void SetStatus<T>(HttpResponseMessage responseMessage,
-            HttpStatusCode defaultStatus, string defaultStatusText)
+            HttpStatusCode defaultStatus, string defaultReasonPhrase)
             where T : ResponseStatusAttributeBase
         {
             var statusAttribute = _actionMethod.GetActionOrHandlerAttribute<T>();
             responseMessage.StatusCode = statusAttribute?.StatusCode ?? defaultStatus;
 
-            var statusText = statusAttribute?.StatusText ?? defaultStatusText;
-            if (statusText != null) responseMessage.ReasonPhrase = statusText;
+            var reasonPhrase = statusAttribute?.ReasonPhrase ?? defaultReasonPhrase;
+            if (reasonPhrase != null) responseMessage.SafeSetReasonPhrase(reasonPhrase);
         }
     }
 }

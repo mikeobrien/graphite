@@ -6,7 +6,7 @@ namespace Tests.Common.Fakes
     {
         public string Scheme { get; }
         public string Realm { get; }
-        public string UnauthorizedStatusMessage { get; }
+        public string UnauthorizedReasonPhrase { get; }
 
         public bool Applies()
         {

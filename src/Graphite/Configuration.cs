@@ -41,15 +41,15 @@ namespace Graphite
         public bool Metrics { get; set; } = true;
 
         public HttpStatusCode DefaultBindingFailureStatusCode { get; set; } = HttpStatusCode.BadRequest;
-        public Func<string, string> DefaultBindingFailureStatusText { get; set; } = x => x;
+        public Func<string, string> DefaultBindingFailureReasonPhrase { get; set; } = x => x;
         public HttpStatusCode DefaultNoReaderStatusCode { get; set; } = HttpStatusCode.BadRequest;
-        public string DefaultNoReaderStatusText { get; set; } = "Request format not supported or not specified.";
+        public string DefaultNoReaderReasonPhrase { get; set; } = "Request format not supported or not specified.";
         public HttpStatusCode DefaultHasResponseStatusCode { get; set; } = HttpStatusCode.OK;
-        public string DefaultHasResponseStatusText { get; set; }
+        public string DefaultHasResponseReasonPhrase { get; set; }
         public HttpStatusCode DefaultNoResponseStatusCode { get; set; } = HttpStatusCode.NoContent;
-        public string DefaultNoResponseStatusText { get; set; }
+        public string DefaultNoResponseReasonPhrase { get; set; }
         public HttpStatusCode DefaultNoWriterStatusCode { get; set; } = HttpStatusCode.BadRequest;
-        public string DefaultNoWriterStatusText { get; set; } = "Response format not supported or not specified.";
+        public string DefaultNoWriterReasonPhrase { get; set; } = "Response format not supported or not specified.";
 
         public int DownloadBufferSize { get; set; } = 1.MB();
         public int? SerializerBufferSize { get; set; }

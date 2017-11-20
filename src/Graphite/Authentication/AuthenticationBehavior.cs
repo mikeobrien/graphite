@@ -7,6 +7,7 @@ using Graphite.Actions;
 using Graphite.Behaviors;
 using Graphite.Extensibility;
 using Graphite.Extensions;
+using Graphite.Http;
 
 namespace Graphite.Authentication
 {
@@ -65,8 +66,8 @@ namespace Graphite.Authentication
             List<IAuthenticator> authenticators, IAuthenticator authenticator = null)
         {
             _responseMessage.StatusCode = HttpStatusCode.Unauthorized;
-            _responseMessage.ReasonPhrase = authenticator?.UnauthorizedStatusMessage ??
-                _configuration.DefaultUnauthorizedStatusMessage;
+            _responseMessage.SafeSetReasonPhrase(authenticator?.UnauthorizedReasonPhrase ??
+                _configuration.DefaultUnauthorizedStatusMessage);
 
             authenticators.ForEach(x => _responseMessage.AddAuthenticateHeader(
                 x.Scheme, x.Realm ?? _configuration.DefaultAuthenticationRealm));

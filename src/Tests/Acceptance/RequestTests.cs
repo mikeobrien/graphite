@@ -81,8 +81,8 @@ namespace Tests.Acceptance
                 "WithQueryParam?query=fark");
 
             result.Status.ShouldEqual(HttpStatusCode.BadRequest);
-            result.StatusText.ShouldContain("query");
-            result.StatusText.ShouldContain("fark");
+            result.ReasonPhrase.ShouldContain("query");
+            result.ReasonPhrase.ShouldContain("fark");
         }
 
         [Test]

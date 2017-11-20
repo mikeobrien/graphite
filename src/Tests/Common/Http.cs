@@ -43,7 +43,7 @@ namespace Tests.Common
             public Result(HttpResponseMessage response)
             {
                 Status = response.StatusCode;
-                StatusText = response.ReasonPhrase;
+                ReasonPhrase = response.ReasonPhrase;
                 ContentType = response.Content?.Headers?.ContentType?.MediaType;
                 Headers = response.Headers;
                 Cookies = Headers.Where(x => x.Key.EqualsIgnoreCase("Set-Cookie"))
@@ -64,7 +64,7 @@ namespace Tests.Common
 
             public string Error { get; }
             public HttpStatusCode Status { get; }
-            public string StatusText { get; }
+            public string ReasonPhrase { get; }
             public string ContentType { get; }
             public string Filename { get; }
             public bool WasRedirected { get; }

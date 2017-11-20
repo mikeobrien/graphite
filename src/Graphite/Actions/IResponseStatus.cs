@@ -32,57 +32,57 @@ namespace Graphite.Actions
 
     public abstract class ResponseStatusAttributeBase : Attribute
     {
-        protected ResponseStatusAttributeBase(HttpStatusCode statusCode, string statusText = null)
+        protected ResponseStatusAttributeBase(HttpStatusCode statusCode, string reasonPhrase = null)
         {
             StatusCode = statusCode;
-            StatusText = statusText;
+            ReasonPhrase = reasonPhrase;
         }
 
-        protected ResponseStatusAttributeBase(string statusText)
+        protected ResponseStatusAttributeBase(string reasonPhrase)
         {
-            StatusText = statusText;
+            ReasonPhrase = reasonPhrase;
         }
 
         public HttpStatusCode? StatusCode { get; }
-        public string StatusText { get; }
+        public string ReasonPhrase { get; }
     }
 
     public class BindingFailureStatusAttribute : ResponseStatusAttributeBase
     {
         public BindingFailureStatusAttribute(HttpStatusCode statusCode) : base(statusCode) { }
 
-        public BindingFailureStatusAttribute(string statusText) : base(statusText) { }
+        public BindingFailureStatusAttribute(string reasonPhrase) : base(reasonPhrase) { }
     }
 
     public class NoReaderStatusAttribute : ResponseStatusAttributeBase
     {
         public NoReaderStatusAttribute(HttpStatusCode statusCode,
-            string statusText = null) : base(statusCode, statusText) { }
+            string reasonPhrase = null) : base(statusCode, reasonPhrase) { }
 
-        public NoReaderStatusAttribute(string statusText) : base(statusText) { }
+        public NoReaderStatusAttribute(string reasonPhrase) : base(reasonPhrase) { }
     }
 
     public class HasResponseStatusAttribute : ResponseStatusAttributeBase
     {
         public HasResponseStatusAttribute(HttpStatusCode statusCode, 
-            string statusText = null) : base(statusCode, statusText) { }
+            string reasonPhrase = null) : base(statusCode, reasonPhrase) { }
 
-        public HasResponseStatusAttribute(string statusText) : base(statusText) { }
+        public HasResponseStatusAttribute(string reasonPhrase) : base(reasonPhrase) { }
     }
 
     public class NoResponseStatusAttribute : ResponseStatusAttributeBase
     {
         public NoResponseStatusAttribute(HttpStatusCode statusCode,
-            string statusText = null) : base(statusCode, statusText) { }
+            string reasonPhrase = null) : base(statusCode, reasonPhrase) { }
 
-        public NoResponseStatusAttribute(string statusText) : base(statusText) { }
+        public NoResponseStatusAttribute(string reasonPhrase) : base(reasonPhrase) { }
     }
 
     public class NoWriterStatusAttribute : ResponseStatusAttributeBase
     {
         public NoWriterStatusAttribute(HttpStatusCode statusCode,
-            string statusText = null) : base(statusCode, statusText) { }
+            string reasonPhrase = null) : base(statusCode, reasonPhrase) { }
 
-        public NoWriterStatusAttribute(string statusText) : base(statusText) { }
+        public NoWriterStatusAttribute(string reasonPhrase) : base(reasonPhrase) { }
     }
 }

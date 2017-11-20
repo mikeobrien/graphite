@@ -35,7 +35,7 @@ namespace Tests.Unit.Authentication
         }
 
         public string RealmOverride { set => Realm = value; }
-        public string StatusMessageOverride { set => UnauthorizedStatusMessage = value; }
+        public string StatusMessageOverride { set => UnauthorizedReasonPhrase = value; }
 
         public override bool Authenticate(string username, string password)
         {

@@ -35,5 +35,15 @@ namespace Graphite.Http
             request.Properties[key] = value;
             return value;
         }
+
+        public static HttpResponseMessage SafeSetReasonPhrase(
+            this HttpResponseMessage response, string reasonPhrase)
+        {
+            response.ReasonPhrase = reasonPhrase?
+                .Replace("\r\n", " ")
+                .Replace("\r", " ")
+                .Replace("\n", " ");
+            return response;
+        }
     }
 }

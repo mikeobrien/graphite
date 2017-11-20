@@ -50,7 +50,7 @@ namespace Tests.Unit.Actions
                 .SetStatus(CreateContext(ResponseState.NoReader));
 
             _response.StatusCode.ShouldEqual(_configuration.DefaultNoReaderStatusCode);
-            _response.ReasonPhrase.ShouldEqual(_configuration.DefaultNoReaderStatusText);
+            _response.ReasonPhrase.ShouldEqual(_configuration.DefaultNoReaderReasonPhrase);
         }
 
         [Test]
@@ -60,7 +60,7 @@ namespace Tests.Unit.Actions
                 .SetStatus(CreateContext(ResponseState.NoReader));
 
             _response.StatusCode.ShouldEqual(HttpStatusCode.Created);
-            _response.ReasonPhrase.ShouldEqual(_configuration.DefaultNoReaderStatusText);
+            _response.ReasonPhrase.ShouldEqual(_configuration.DefaultNoReaderReasonPhrase);
         }
 
         [Test]
@@ -95,26 +95,26 @@ namespace Tests.Unit.Actions
 
         [Test]
         public void Should_set_default_has_response_status(
-            [Values(null, "fark")] string statusText)
+            [Values(null, "fark")] string reasonPhrase)
         {
-            _configuration.DefaultHasResponseStatusText = statusText;
+            _configuration.DefaultHasResponseReasonPhrase = reasonPhrase;
             CreateStatus(ActionMethod.From<Handler>(x => x.Post()))
                 .SetStatus(CreateContext(ResponseState.HasResponse));
 
             _response.StatusCode.ShouldEqual(_configuration.DefaultHasResponseStatusCode);
-            _response.ReasonPhrase.ShouldEqual(statusText ?? "OK");
+            _response.ReasonPhrase.ShouldEqual(reasonPhrase ?? "OK");
         }
 
         [Test]
         public void Should_override_has_response_code(
-            [Values(null, "fark")] string statusText)
+            [Values(null, "fark")] string reasonPhrase)
         {
-            _configuration.DefaultHasResponseStatusText = statusText;
+            _configuration.DefaultHasResponseReasonPhrase = reasonPhrase;
             CreateStatus(ActionMethod.From<Handler>(x => x.OverrideCodePost()))
                 .SetStatus(CreateContext(ResponseState.HasResponse));
 
             _response.StatusCode.ShouldEqual(HttpStatusCode.Forbidden);
-            _response.ReasonPhrase.ShouldEqual(statusText ?? "Forbidden");
+            _response.ReasonPhrase.ShouldEqual(reasonPhrase ?? "Forbidden");
         }
 
         [Test]
@@ -129,26 +129,26 @@ namespace Tests.Unit.Actions
 
         [Test]
         public void Should_set_default_no_response_status(
-            [Values(null, "fark")] string statusText)
+            [Values(null, "fark")] string reasonPhrase)
         {
-            _configuration.DefaultNoResponseStatusText = statusText;
+            _configuration.DefaultNoResponseReasonPhrase = reasonPhrase;
             CreateStatus(ActionMethod.From<Handler>(x => x.Post()))
                 .SetStatus(CreateContext(ResponseState.NoResponse));
 
             _response.StatusCode.ShouldEqual(_configuration.DefaultNoResponseStatusCode);
-            _response.ReasonPhrase.ShouldEqual(statusText ?? "No Content");
+            _response.ReasonPhrase.ShouldEqual(reasonPhrase ?? "No Content");
         }
 
         [Test]
         public void Should_override_no_response_code(
-            [Values(null, "fark")] string statusText)
+            [Values(null, "fark")] string reasonPhrase)
         {
-            _configuration.DefaultNoResponseStatusText = statusText;
+            _configuration.DefaultNoResponseReasonPhrase = reasonPhrase;
             CreateStatus(ActionMethod.From<Handler>(x => x.OverrideCodePost()))
                 .SetStatus(CreateContext(ResponseState.NoResponse));
 
             _response.StatusCode.ShouldEqual(HttpStatusCode.Created);
-            _response.ReasonPhrase.ShouldEqual(statusText ?? "Created");
+            _response.ReasonPhrase.ShouldEqual(reasonPhrase ?? "Created");
         }
 
         [Test]
@@ -168,7 +168,7 @@ namespace Tests.Unit.Actions
                 .SetStatus(CreateContext(ResponseState.NoWriter));
 
             _response.StatusCode.ShouldEqual(_configuration.DefaultNoWriterStatusCode);
-            _response.ReasonPhrase.ShouldEqual(_configuration.DefaultNoWriterStatusText);
+            _response.ReasonPhrase.ShouldEqual(_configuration.DefaultNoWriterReasonPhrase);
         }
 
         [Test]
@@ -178,7 +178,7 @@ namespace Tests.Unit.Actions
                 .SetStatus(CreateContext(ResponseState.NoWriter));
 
             _response.StatusCode.ShouldEqual(HttpStatusCode.Moved);
-            _response.ReasonPhrase.ShouldEqual(_configuration.DefaultNoWriterStatusText);
+            _response.ReasonPhrase.ShouldEqual(_configuration.DefaultNoWriterReasonPhrase);
         }
 
         [Test]
