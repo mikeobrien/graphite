@@ -1,5 +1,7 @@
 ﻿using Graphite.Extensions;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -49,6 +51,12 @@ namespace Graphite.Actions
         public T GetActionOrHandlerAttribute<T>() where T : Attribute
         {
             return MethodDescriptor.GetAttribute<T>() ?? HandlerTypeDescriptor.GetAttribute<T>();
+        }
+
+        public IEnumerable<T> GetActionOrHandlerAttributes<T>() where T : Attribute
+        {
+            return MethodDescriptor.GetAttributes<T>()
+                .Union(HandlerTypeDescriptor.GetAttributes<T>());
         }
 
         public T[] GetAttributes<T>() where T : Attribute

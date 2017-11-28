@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphite.StructureMap", "Gr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphite.Views", "Graphite.Views\Graphite.Views.csproj", "{1DAF1566-C4A6-4216-981F-69A8F82CB8AF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphite.Swank", "Graphite.Swank\Graphite.Swank.csproj", "{45A09DC1-62DC-4485-8D52-4686B8F2E079}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,7 +71,10 @@ Global
 		{1DAF1566-C4A6-4216-981F-69A8F82CB8AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DAF1566-C4A6-4216-981F-69A8F82CB8AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DAF1566-C4A6-4216-981F-69A8F82CB8AF}.Release|Any CPU.Build.0 = Release|Any CPU
-
+		{45A09DC1-62DC-4485-8D52-4686B8F2E079}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45A09DC1-62DC-4485-8D52-4686B8F2E079}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45A09DC1-62DC-4485-8D52-4686B8F2E079}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45A09DC1-62DC-4485-8D52-4686B8F2E079}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

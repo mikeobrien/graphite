@@ -83,6 +83,7 @@ buildNugetPackage('Graphite.Owin', 'GraphiteWeb.Owin');
 buildNugetPackage('Graphite.StructureMap', 'GraphiteWeb.StructureMap');
 buildNugetPackage('Graphite.Cors', 'GraphiteWeb.Cors');
 buildNugetPackage('Graphite.Views', 'GraphiteWeb.Views');
+buildNugetPackage('Graphite.Swank', 'GraphiteWeb.Swank');
 
 gulp.task('nuget-pack', [
     'nuget-pack-GraphiteWeb.Core',
@@ -90,7 +91,8 @@ gulp.task('nuget-pack', [
     'nuget-pack-GraphiteWeb.Owin', 
     'nuget-pack-GraphiteWeb.StructureMap', 
     'nuget-pack-GraphiteWeb.Cors',
-    'nuget-pack-GraphiteWeb.Views']);
+    'nuget-pack-GraphiteWeb.Views',
+    'nuget-pack-GraphiteWeb.Swank']);
 
 gulp.task('nuget-push', ['nuget-pack'], function() {
     return nuget.push('*.nupkg', { 
