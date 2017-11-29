@@ -7,11 +7,9 @@ namespace Graphite.Routing
 {
     public class ActionParameter
     {
-        private readonly DescriptorBase _descriptor;
-
         public ActionParameter(ActionMethod action, ParameterDescriptor parameter)
         {
-            _descriptor = parameter;
+            Descriptor = parameter;
             Name = parameter.Name;
             IsParameter = true;
             Action = action;
@@ -22,7 +20,7 @@ namespace Graphite.Routing
         public ActionParameter(ActionMethod action, ParameterDescriptor parameter, 
             PropertyDescriptor property)
         {
-            _descriptor = property;
+            Descriptor = property;
             Name = property.Name;
             IsPropertyOfParameter = true;
             Action = action;
@@ -33,7 +31,7 @@ namespace Graphite.Routing
 
         public ActionParameter(ActionMethod action, PropertyDescriptor property)
         {
-            _descriptor = property;
+            Descriptor = property;
             Name = property.Name;
             IsProperty = true;
             Action = action;
@@ -43,7 +41,7 @@ namespace Graphite.Routing
 
         public ActionParameter(ActionParameter actionParameter)
         {
-            _descriptor = actionParameter._descriptor;
+            Descriptor = actionParameter.Descriptor;
             Name = actionParameter.Name;
             Action = actionParameter.Action;
             TypeDescriptor = actionParameter.TypeDescriptor;
@@ -53,6 +51,7 @@ namespace Graphite.Routing
             PropertyDescriptor = actionParameter.PropertyDescriptor;
         }
 
+        public DescriptorBase Descriptor { get; }
         public virtual string Name { get; }
         public virtual ActionMethod Action { get; set; }
         public virtual TypeDescriptor TypeDescriptor { get; }
@@ -62,12 +61,12 @@ namespace Graphite.Routing
         public virtual bool IsProperty { get; }
         public virtual PropertyDescriptor PropertyDescriptor { get; }
 
-        public Attribute[] Attributes => _descriptor.Attributes;
-        public bool HasAttribute<T>() where T : Attribute => _descriptor.HasAttribute<T>();
+        public Attribute[] Attributes => Descriptor.Attributes;
+        public bool HasAttribute<T>() where T : Attribute => Descriptor.HasAttribute<T>();
         public bool HasAttributes<T1, T2>() where T1 : Attribute where T2 : Attribute => 
-            _descriptor.HasAttributes<T1, T2>();
-        public T GetAttribute<T>() where T : Attribute => _descriptor.GetAttribute<T>();
-        public T[] GetAttributes<T>() where T : Attribute => _descriptor.GetAttributes<T>();
+            Descriptor.HasAttributes<T1, T2>();
+        public T GetAttribute<T>() where T : Attribute => Descriptor.GetAttribute<T>();
+        public T[] GetAttributes<T>() where T : Attribute => Descriptor.GetAttributes<T>();
 
         public override int GetHashCode()
         {

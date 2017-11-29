@@ -16,7 +16,7 @@
       <iconUrl>https://github.com/mikeobrien/graphite/raw/master/misc/logo128x128.png</iconUrl>
       <tags>graphite web api view razor mustache template</tags>
       <dependencies>
-         <dependency id="Swank" version="1.0.155" />
+         <dependency id="Swank" version="1.0.158" />
       </dependencies>
    </metadata>
 </package>
