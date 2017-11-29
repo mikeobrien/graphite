@@ -9,8 +9,10 @@ namespace Graphite.Exceptions
     {
         public Task LogAsync(ExceptionLoggerContext context, CancellationToken cancellationToken)
         {
-            return context.Request.GetGraphiteContainer().GetInstance<T>()
-                .LogAsync(context, cancellationToken);
+            var container = context.Request.GetGraphiteContainer();
+            return container != null 
+                ? container.GetInstance<T>()?.LogAsync(context, cancellationToken)
+                : Task.CompletedTask;
         }
     }
 }
