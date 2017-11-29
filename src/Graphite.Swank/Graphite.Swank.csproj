@@ -43,8 +43,8 @@
     <Reference Include="RazorEngine, Version=3.9.0.0, Culture=neutral, PublicKeyToken=9ee697374c7e744a, processorArchitecture=MSIL">
       <HintPath>..\packages\RazorEngine.3.9.0\lib\net45\RazorEngine.dll</HintPath>
     </Reference>
-    <Reference Include="Swank, Version=1.0.155.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Swank.1.0.155\lib\Swank.dll</HintPath>
+    <Reference Include="Swank, Version=1.0.158.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Swank.1.0.158\lib\Swank.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
