@@ -85,8 +85,6 @@ namespace Tests.Unit
             container.Register(requestGraph.GetHttpRequestMessage());
             container.Register(requestGraph.GetHttpResponseMessage());
             container.Register(requestGraph.ActionMethod);
-            container.Register(requestGraph.GetUrlParameters());
-            container.Register(requestGraph.GetQuerystringParameters());
         }
 
         public static void Should_be_configured_with_graphite_defaults(Container container)

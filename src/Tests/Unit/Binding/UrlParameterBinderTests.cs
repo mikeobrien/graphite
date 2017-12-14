@@ -80,7 +80,7 @@ namespace Tests.Unit.Binding
 
             await binder.Bind(requestGraph.GetRequestBinderContext());
 
-            var arguments  =requestGraph.ActionArguments;
+            var arguments = requestGraph.ActionArguments;
             arguments[0].ShouldBeNull();
             arguments[1].ShouldEqual("value1");
             arguments[2].As<IEnumerable<int>>().ToArray().ShouldEqual(new [] { 1, 2, 3 });

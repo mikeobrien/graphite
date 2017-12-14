@@ -208,5 +208,16 @@ namespace Tests.Acceptance
             result.Data.Query1.ShouldEqual("query1");
             result.Data.Query2.ShouldEqual(6);
         }
+
+        [Test]
+        public void Should_split_delimited_querystring(
+            [Values(Host.Owin, Host.IISExpress)] Host host)
+        {
+            var result = Http.ForHost(host).GetJson<Handler.DelimitedResponseModel>(
+                "WithDelimitedQuerystring?ids=1,2,3");
+
+            result.Status.ShouldEqual(HttpStatusCode.OK);
+            result.Data.Ids.ShouldOnlyContain(1, 2, 3);
+        }
     }
 }

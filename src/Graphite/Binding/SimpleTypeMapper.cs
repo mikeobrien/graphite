@@ -7,7 +7,7 @@ namespace Graphite.Binding
 {
     public class SimpleTypeMapper : ValueMapperBase
     {
-        public SimpleTypeMapper(Configuration configuration) : base(configuration) { }
+        public SimpleTypeMapper(Configuration configuration) { }
 
         public override bool AppliesTo(ValueMapperContext context)
         {

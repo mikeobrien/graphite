@@ -2,21 +2,58 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using Graphite.Extensions;
 using Graphite.Linq;
+using Graphite.Routing;
 
 namespace Graphite.Http
 {
-    public class QuerystringParameters : LookupWrapper<string, object>
+    public interface IQuerystringParameters : ILookup<string, object> { }
+
+    [AttributeUsage(AttributeTargets.Parameter)]
+    public class DelimitedAttribute : Attribute
     {
-        public QuerystringParameters() : base(null, null) { }
-
-        public QuerystringParameters(IEnumerable<KeyValuePair<string, string>> source):
-            base(source?.Select(x => new KeyValuePair<string, object>(x.Key, x.Value)), 
-                StringComparer.OrdinalIgnoreCase) { }
-
-        public static QuerystringParameters CreateFrom(HttpRequestMessage message)
+        public DelimitedAttribute(string delimiter = ",")
         {
-            return new QuerystringParameters(message.GetQueryNameValuePairs());
+            Delimiter = delimiter;
+        }
+
+        public string Delimiter { get; }
+    }
+    
+    public class QuerystringParameters : ParametersBase<string>, IQuerystringParameters
+    {
+        public QuerystringParameters(HttpRequestMessage request, 
+            RouteDescriptor routeDescriptor, Configuration configuration) : 
+            base(GetParameters(request, routeDescriptor, configuration)) { }
+        
+        private static IEnumerable<KeyValuePair<string, string>> GetParameters(
+            HttpRequestMessage request, RouteDescriptor routeDescriptor, Configuration configuration)
+        {
+            var parameters = request.GetQueryNameValuePairs();
+            return configuration.QuerystringParameterDelimiters.Any()
+                ? parameters.SelectMany(x => ParseDelimitedParameters(
+                    x, routeDescriptor, configuration))
+                : parameters;
+        }
+
+        private static IEnumerable<KeyValuePair<string, string>> ParseDelimitedParameters
+            (KeyValuePair<string, string> value, RouteDescriptor routeDescriptor, Configuration configuration)
+        {
+            var parameter = routeDescriptor.Parameters.FirstOrDefault(
+                x => x.Name.EqualsUncase(value.Key));
+
+            if (parameter == null || (!parameter.TypeDescriptor.IsArray &&
+                !parameter.TypeDescriptor.IsGenericListCastable))
+                return new[] { value };
+
+            var delimiter = configuration.QuerystringParameterDelimiters
+                .Select(x => x(parameter)).FirstOrDefault(x => x.IsNotNullOrEmpty());
+
+            return delimiter != null && (parameter.TypeDescriptor.IsArray || 
+                    parameter.TypeDescriptor.IsGenericListCastable)
+                ? value.Value.Split(delimiter).ToKeyValuePairs(value.Key)
+                : new[] { value };
         }
     }
 }

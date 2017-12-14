@@ -82,10 +82,10 @@ namespace Graphite.Linq
                 .ToLookup(x => getKey?.Invoke(x.Key) ?? x.Key, x => x.Value);
         }
 
-        public static IEnumerable<KeyValuePair<TKey, object>> ToKeyValuePairs<TKey>(
-            this IEnumerable<object> source, TKey key)
+        public static IEnumerable<KeyValuePair<TKey, TValue>> ToKeyValuePairs<TKey, TValue>(
+            this IEnumerable<TValue> source, TKey key)
         {
-            return source.Select(x => new KeyValuePair<TKey, object>(key, x));
+            return source.Select(x => new KeyValuePair<TKey, TValue>(key, x));
         }
 
         public static IEnumerable<KeyValuePair<TKey, TValue>> ToKeyValuePairs<TSource, TKey, TValue>(

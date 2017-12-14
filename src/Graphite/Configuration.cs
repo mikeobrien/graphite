@@ -169,6 +169,20 @@ namespace Graphite
             .Configure(x => x
                 .Append<SimpleTypeMapper>());
 
+        public Plugin<IUrlParameters> UrlParameters { get; } =
+            Plugin<IUrlParameters>
+                .Create<UrlParameters>(singleton: false);
+
+        public Plugin<IQuerystringParameters> QuerystringParameters { get; } =
+            Plugin<IQuerystringParameters>
+                .Create<QuerystringParameters>(singleton: false);
+
+        public List<Func<ActionParameter, string>> QuerystringParameterDelimiters { get; } = 
+            new List<Func<ActionParameter, string>>
+            {
+                x => x.GetAttribute<DelimitedAttribute>()?.Delimiter
+            };
+
         // Action scoped configuration
 
         public ConditionalPlugins<IAuthenticator, ActionConfigurationContext> Authenticators { get; } = 

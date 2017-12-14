@@ -194,17 +194,14 @@ namespace Tests.Common
             return _parameters.ToArray();
         }
 
-        public QuerystringParameters GetQuerystringParameters()
+        public IQuerystringParameters GetQuerystringParameters()
         {
-            return new QuerystringParameters(
-                GetHttpRequestMessage().GetQueryNameValuePairs());
+            return new QuerystringParameters(GetHttpRequestMessage(), GetRouteDescriptor(), Configuration);
         }
 
-        public UrlParameters GetUrlParameters()
+        public IUrlParameters GetUrlParameters()
         {
-            return new UrlParameters(GetHttpRequestMessage()
-                .GetRequestContext().RouteData.Values
-                .ToDictionary(x => x.Key, x => x.Value));
+            return new UrlParameters(GetHttpRequestMessage(), GetRouteDescriptor());
         }
 
         public ActionDescriptor GetActionDescriptor()

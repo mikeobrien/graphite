@@ -184,12 +184,14 @@
     <Compile Include="Unit\Extensions\IOExtensionTests.cs" />
     <Compile Include="Unit\Extensions\SerializerExtensionTests.cs" />
     <Compile Include="Unit\Http\AsyncContentTests.cs" />
+    <Compile Include="Unit\Http\QuerystringParameterTests.cs" />
     <Compile Include="Unit\Http\TextResultTests.cs" />
     <Compile Include="Unit\Http\MultipartPartStreamTests.cs" />
     <Compile Include="Unit\Http\DebugExceptionHandlerTests.cs" />
     <Compile Include="Unit\Http\ExtensionTests.cs" />
     <Compile Include="Unit\Http\DelimitedBufferTests.cs" />
     <Compile Include="Unit\Http\MultipartReaderTests.cs" />
+    <Compile Include="Unit\Http\UrlParameterTests.cs" />
     <Compile Include="Unit\Linq\ExtensionTests.cs" />
     <Compile Include="Unit\Extensions\MemoizeTests.cs" />
     <Compile Include="Unit\Extensions\StringExtensionTests.cs" />

@@ -70,6 +70,12 @@ namespace Tests.Common
             return stopwatch.Elapsed;
         }
 
+        public static long TicksSinceEpoch(this DateTime datetime)
+        {
+            return (datetime.Ticks - 621355968000000000 - 
+                TimeZone.CurrentTimeZone.GetUtcOffset(datetime).Ticks) / 10000;
+        }
+
         public static void Times(this int iterations, Action action)
         {
             for (var i = 0; i < iterations; i++)

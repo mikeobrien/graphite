@@ -10,11 +10,11 @@ namespace Graphite.Binding
     {
         private readonly RouteDescriptor _routeDescriptor;
         private readonly ArgumentBinder _argumentBinder;
-        private readonly QuerystringParameters _querystringParameters;
+        private readonly IQuerystringParameters _querystringParameters;
 
         public QuerystringBinder(RouteDescriptor routeDescriptor,
             ArgumentBinder argumentBinder,
-            QuerystringParameters querystringParameters)
+            IQuerystringParameters querystringParameters)
         {
             _argumentBinder = argumentBinder;
             _routeDescriptor = routeDescriptor;

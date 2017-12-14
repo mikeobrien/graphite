@@ -19,8 +19,6 @@ namespace Tests.Unit.Binding
     {
         public class TestValueMapper : ValueMapperBase
         {
-            public TestValueMapper(Configuration configuration) : base(configuration) { }
-
             public override bool AppliesTo(ValueMapperContext context)
             {
                 throw new NotImplementedException();
@@ -64,7 +62,7 @@ namespace Tests.Unit.Binding
         [Test]
         public void Should_map_source_to_value()
         {
-            var result = new TestValueMapper(_configuration)
+            var result = new TestValueMapper()
                 .Map(new ValueMapperContext(new ActionParameter(_actionMethod,
                     Properties[nameof(Model.Value)]), new object[] { "1,2,3" }));
 
@@ -76,7 +74,7 @@ namespace Tests.Unit.Binding
         [Test]
         public void Should_map_source_to_array()
         {
-            var result = new TestValueMapper(_configuration)
+            var result = new TestValueMapper()
                 .Map(new ValueMapperContext(new ActionParameter(_actionMethod,
                     Properties[nameof(Model.Array)]), new object[] { "1,2,3" }));
 
@@ -88,7 +86,7 @@ namespace Tests.Unit.Binding
         [Test]
         public void Should_map_source_to_list()
         {
-            var result = new TestValueMapper(_configuration)
+            var result = new TestValueMapper()
                 .Map(new ValueMapperContext(new ActionParameter(_actionMethod,
                     Properties[nameof(Model.List)]), new object[] { "1,2,3" }));
 
@@ -100,7 +98,7 @@ namespace Tests.Unit.Binding
         [Test, PerformanceTest]
         public void Should_set_properties_faster_than_reflection()
         {
-            var mapper = new TestValueMapper(_configuration);
+            var mapper = new TestValueMapper();
             var mapperContext = new ValueMapperContext(new ActionParameter(_actionMethod,
                 Properties[nameof(Model.Value)]), new object[] { "1,2,3" });
             var method = typeof(TestValueMapper)

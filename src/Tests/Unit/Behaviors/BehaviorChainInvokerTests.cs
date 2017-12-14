@@ -54,8 +54,8 @@ namespace Tests.Unit.Behaviors
                 ActionMethod actionMethod,
                 RouteDescriptor routeDescriptor,
                 RequestCancellation requestCancellation,
-                UrlParameters urlParameters,
-                QuerystringParameters querystringParameters,
+                IUrlParameters urlParameters,
+                IQuerystringParameters querystringParameters,
                 SomeType someInstance)
             {
                 BehaviorChain = behaviorChainChain;
@@ -90,6 +90,8 @@ namespace Tests.Unit.Behaviors
             _requestGraph.UnderlyingContainer.Configure(x =>
             {
                 x.For<Logger>().Use(log);
+                x.For<IQuerystringParameters>().Use<QuerystringParameters>();
+                x.For<IUrlParameters>().Use<UrlParameters>();
             });
 
             var requestMessage = _requestGraph.GetHttpRequestMessage();
@@ -122,7 +124,7 @@ namespace Tests.Unit.Behaviors
             var urlParameters = log.OfType<UrlParameters>().FirstOrDefault();
             urlParameters.ShouldNotBeNull();
 
-            urlParameters["urlParam"].ShouldEqual("urlparamvalue");
+            urlParameters["urlParam"].ShouldOnlyContain("urlparamvalue");
 
             var querystringParameters = log.OfType<QuerystringParameters>().FirstOrDefault();
             querystringParameters.ShouldNotBeNull();

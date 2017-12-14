@@ -1,4 +1,6 @@
-﻿using Graphite.Routing;
+﻿using System.Collections.Generic;
+using Graphite.Http;
+using Graphite.Routing;
 
 namespace TestHarness
 {
@@ -173,6 +175,19 @@ namespace TestHarness
                 Url2 = url2,
                 Query1 = query1,
                 Query2 = query2
+            };
+        }
+
+        public class DelimitedResponseModel
+        {
+            public List<int> Ids { get; set; }
+        }
+
+        public DelimitedResponseModel GetWithDelimitedQuerystring([Delimited] List<int> ids)
+        {
+            return new DelimitedResponseModel
+            {
+                Ids = ids
             };
         }
     }

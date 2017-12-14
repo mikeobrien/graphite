@@ -6,13 +6,6 @@ namespace Graphite.Binding
 {
     public abstract class ValueMapperBase : IValueMapper
     {
-        private readonly Configuration _configuration;
-
-        protected ValueMapperBase(Configuration configuration)
-        {
-            _configuration = configuration;
-        }
-
         public abstract bool AppliesTo(ValueMapperContext context);
         public abstract MapResult Map<T>(ValueMapperContext context);
 

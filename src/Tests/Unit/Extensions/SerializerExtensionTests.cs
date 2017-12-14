@@ -41,18 +41,22 @@ namespace Tests.Unit.Extensions
         public void Should_serialize_null_microsoft_datetime_format()
         {
             var settings = new JsonSerializerSettings();
+            var datetime = new DateTime(1977, 3, 14, 9, 10, 11, DateTimeKind.Utc);
 
             settings.WriteMicrosoftJsonDateTime(x => x.AdjustToUtcBeforeSerializing());
 
-            var result = JsonConvert.SerializeObject(new DateTimeModel(), settings);
+            var result = JsonConvert.SerializeObject(new DateTimeModel
+            {
+                DateTime = datetime
+            }, settings);
 
             result.ShouldEqual(
                 "{" +
-                    "\"DateTime\":\"\\/Date(-62135578800000)\\/\"," +
+                    $"\"DateTime\":\"\\/Date({datetime.TicksSinceEpoch()})\\/\"," +
                     "\"NullableDateTime\":null" +
                 "}");
         }
-
+        
         [TestCase("\\/Date(499152060000)\\/", DateTimeKind.Utc)]
         [TestCase("10\\/26\\/1985 5:21:00 AM", DateTimeKind.Unspecified)]
         public void Should_deserialize_utc_microsoft_datetime_format(

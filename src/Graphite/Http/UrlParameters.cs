@@ -1,25 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
-using System.Web.Http.Controllers;
-using Graphite.Collections;
+using Graphite.Extensions;
+using Graphite.Linq;
+using Graphite.Routing;
 
 namespace Graphite.Http
 {
-    public class UrlParameters : DictionaryWrapper<string, object>
+    public interface IUrlParameters : ILookup<string, object> { }
+
+    public class UrlParameters : ParametersBase<object>, IUrlParameters
     {
-        public UrlParameters() : base(null) { }
+        public UrlParameters(HttpRequestMessage request, RouteDescriptor routeDescriptor)
+            : base(GetParameters(request, routeDescriptor)) { }
 
-        public UrlParameters(IDictionary<string, object> source) : 
-            base(new ReadOnlyDictionary<string, object>(new Dictionary<string, object>(
-                source, StringComparer.OrdinalIgnoreCase))) { }
-
-        public static UrlParameters CreateFrom(HttpRequestMessage message)
+        private static IEnumerable<KeyValuePair<string, object>> GetParameters(
+            HttpRequestMessage request, RouteDescriptor routeDescriptor)
         {
-            return new UrlParameters(message.GetRequestContext().RouteData.Values);
+            var parameters = request.GetRequestContext().RouteData.Values;
+            return routeDescriptor.UrlParameters.Any(x => x.IsWildcard)
+                ? parameters.SelectMany(x => ExpandWildcardParameters(x, routeDescriptor))
+                : parameters;
         }
 
-        public override object this[string key] => TryGetValue(key, out var value) ? value : null;
+        private static IEnumerable<KeyValuePair<string, object>> ExpandWildcardParameters
+            (KeyValuePair<string, object> value, RouteDescriptor routeDescriptor)
+        {
+            var wildcard = routeDescriptor.UrlParameters.FirstOrDefault(x => 
+                x.IsWildcard && x.Name.EqualsUncase(value.Key));
+            return wildcard == null || (!wildcard.TypeDescriptor.IsArray && 
+                    !wildcard.TypeDescriptor.IsGenericListCastable)
+                ? new[] { value }
+                : value.Value.Split('/').ToKeyValuePairs<string, object>(value.Key);
+        }
     }
 }
