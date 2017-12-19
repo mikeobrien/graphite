@@ -12,7 +12,7 @@ namespace Graphite.Http
             var properties = requestPropertiesProvider.GetProperties();
 
             Host = properties[RemoteHostProperty].ToString();
-            Port = properties[RemotePortProperty].TryParseInt();
+            Port = properties[RemotePortProperty].TryParseInt32();
         }
 
         public string Host { get; }

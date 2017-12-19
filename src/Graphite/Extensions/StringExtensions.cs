@@ -26,6 +26,11 @@ namespace Graphite.Extensions
                 : value;
         }
 
+        public static string ToFormat(this string format, params object[] args)
+        {
+            return string.Format(format, args);
+        }
+
         public static string[] Split(this string source, params string[] delmiter)
         {
             return source.Split(delmiter, StringSplitOptions.None);

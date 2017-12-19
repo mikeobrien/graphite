@@ -250,46 +250,5 @@ namespace Graphite.Reflection
                 throw new FormatException($"Unable to parse '{value}'.", exception);
             }
         }
-
-        public static bool IsSimpleType(this Type type)
-        {
-            bool SimpleType(Type x) => x.IsPrimitive || x.IsEnum || x == typeof(string) || 
-                x == typeof(decimal) || x == typeof(DateTime) || x == typeof(TimeSpan) || 
-                x == typeof(Guid) || x == typeof(Uri);
-
-            return SimpleType(type) || (type.IsNullable() && SimpleType(Nullable.GetUnderlyingType(type)));
-        }
-
-        public static object ParseSimpleType(this string value, TypeDescriptor type)
-        {
-            if (type.Type.Is<string>() || value == null) return value;
-            if (type.UnderlyingNullableType.Type.IsEnum) return value
-                .WrapWithFormatException(x => Enum.Parse(type
-                    .UnderlyingNullableType.Type, value, true));
-            if (type.Type.Is<char>(true))
-            {
-                if (value.Length == 1) return value[0];
-                throw new FormatException($"Char length {value.Length} is invalid.");
-            }
-            if (type.Type.Is<bool>(true)) return bool.Parse(value.ToLower());
-            if (type.Type.Is<sbyte>(true)) return sbyte.Parse(value);
-            if (type.Type.Is<byte>(true)) return byte.Parse(value);
-            if (type.Type.Is<short>(true)) return short.Parse(value);
-            if (type.Type.Is<ushort>(true)) return ushort.Parse(value);
-            if (type.Type.Is<int>(true)) return int.Parse(value);
-            if (type.Type.Is<uint>(true)) return uint.Parse(value);
-            if (type.Type.Is<long>(true)) return long.Parse(value);
-            if (type.Type.Is<ulong>(true)) return ulong.Parse(value);
-            if (type.Type.Is<float>(true)) return float.Parse(value);
-            if (type.Type.Is<double>(true)) return double.Parse(value);
-            if (type.Type.Is<decimal>(true)) return decimal.Parse(value);
-            if (type.Type.Is<DateTime>(true)) return DateTime.Parse(value);
-            if (type.Type.Is<Guid>(true)) return Guid.Parse(value);
-            if (type.Type.Is<TimeSpan>(true)) return TimeSpan.Parse(value);
-            if (type.Type.Is<Uri>()) return value.WrapWithFormatException(x => new Uri(x));
-            if (type.Type.Is<IntPtr>(true)) return new IntPtr(long.Parse(value));
-            if (type.Type.Is<UIntPtr>(true)) return new UIntPtr(ulong.Parse(value));
-            throw new ArgumentException($"Type '{type}' is not a simple type.");
-        }
     }
 }

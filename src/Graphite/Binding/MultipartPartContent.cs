@@ -70,7 +70,7 @@ namespace Graphite.Binding
                 }
                 else if (parsedHeader.Key.EqualsUncase(RequestHeaders.ContentLength))
                 {
-                    if (parsedHeader.Value.TryParseLong(out var length))
+                    if (parsedHeader.Value.TryParseInt64(out var length))
                         Headers.ContentLength = length;
                 }
                 else if (parsedHeader.Key.EqualsUncase(RequestHeaders.ContentLanguage))

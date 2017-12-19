@@ -35,7 +35,7 @@ namespace Tests.Unit.Readers
                     .WithRequestData("Param1=value1&Param2=value2")
                     .WithRequestParameter("request")
                     .AddParameters("param");
-            requestGraph.AppendValueMapper(new SimpleTypeMapper(requestGraph.Configuration));
+            requestGraph.AppendValueMapper(new SimpleTypeMapper(new ParsedValueMapper()));
 
             if (isForm)
             {
@@ -56,7 +56,7 @@ namespace Tests.Unit.Readers
                     .WithRequestParameter("request")
                     .WithContentType(MimeTypes.ApplicationFormUrlEncoded)
                     .AddParameters("param");
-            requestGraph.AppendValueMapper(new SimpleTypeMapper(requestGraph.Configuration));
+            requestGraph.AppendValueMapper(new SimpleTypeMapper(new ParsedValueMapper()));
 
             var result = await CreateReader(requestGraph)
                 .Read(CreateReaderContext(requestGraph));
@@ -78,7 +78,7 @@ namespace Tests.Unit.Readers
                     .WithRequestParameter("request")
                     .WithContentType(MimeTypes.ApplicationFormUrlEncoded)
                     .AddParameters("param");
-            requestGraph.AppendValueMapper(new SimpleTypeMapper(requestGraph.Configuration));
+            requestGraph.AppendValueMapper(new SimpleTypeMapper(new ParsedValueMapper()));
 
             var result = await CreateReader(requestGraph)
                 .Read(CreateReaderContext(requestGraph));
@@ -111,7 +111,7 @@ namespace Tests.Unit.Readers
                     .WithRequestParameter("request")
                     .WithContentType(MimeTypes.ApplicationFormUrlEncoded)
                     .AddParameters("param");
-            requestGraph.AppendValueMapper(new SimpleTypeMapper(requestGraph.Configuration));
+            requestGraph.AppendValueMapper(new SimpleTypeMapper(new ParsedValueMapper()));
 
             var result = await CreateReader(requestGraph)
                 .Read(CreateReaderContext(requestGraph));
@@ -259,14 +259,15 @@ namespace Tests.Unit.Readers
                 .WithRequestData("Param2=fark")
                 .WithRequestParameter("request")
                 .WithContentType(MimeTypes.ApplicationFormUrlEncoded);
-            requestGraph.AppendValueMapper(new SimpleTypeMapper(requestGraph.Configuration));
+            requestGraph.AppendValueMapper(new SimpleTypeMapper(new ParsedValueMapper()));
 
             var result = await CreateReader(requestGraph)
                 .Read(CreateReaderContext(requestGraph));
 
             result.Status.ShouldEqual(ReadStatus.Failure);
-            result.ErrorMessage.ShouldEqual("Value 'fark' is not formatted correctly. " +
-                                            "Input string was not in a correct format.");
+            result.ErrorMessage.ShouldEqual(
+                "Property 'Param2' value 'fark' is not formatted correctly. " +
+                "'fark' is not a valid 32 bit integer. Must be an integer between -2,147,483,648 and 2,147,483,647.");
         }
 
         public class CtorInputModel

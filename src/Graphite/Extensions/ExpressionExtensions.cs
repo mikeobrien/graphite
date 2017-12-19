@@ -77,6 +77,16 @@ namespace Graphite.Extensions
                 methodInfo = methodInfo.GetGenericMethodDefinition();
             return methodInfo.MakeGenericMethod(typeArguments);
         }
+        
+        public static Func<TInstance, TParam, TResult> CloseGenericMethod<TInstance, TParam, TResult>(
+            this Type typeArg, Expression<Func<TInstance, object>> method)
+        {
+            var instance = Type<TInstance>.Parameter();
+            var context = Type<TParam>.Parameter();
+            return Expression.Lambda<Func<TInstance, TParam, TResult>>(
+                Type<TInstance>.Call(instance, method, typeArg, context), 
+                instance, context).Compile();
+        }
 
         public static Expression UnwrapConvert(this LambdaExpression expression)
         {

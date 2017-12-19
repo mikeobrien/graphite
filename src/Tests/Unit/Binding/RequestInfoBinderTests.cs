@@ -96,7 +96,7 @@ namespace Tests.Unit.Binding
             var requestGraph = RequestGraph
                 .CreateFor(action)
                 .AddParameters(parameter)
-                .AddValueMapper(new SimpleTypeMapper(_configuration));
+                .AddValueMapper(new SimpleTypeMapper(new ParsedValueMapper()));
 
             var properties = new Dictionary<string, object>
             {

@@ -261,14 +261,12 @@ namespace Tests.Unit.Reflection
         [TestCase(typeof(ulong)), TestCase(typeof(ulong?))]
         [TestCase(typeof(double)), TestCase(typeof(double?))]
         [TestCase(typeof(float)), TestCase(typeof(float?))]
-        [TestCase(typeof(IntPtr)), TestCase(typeof(IntPtr?))]
-        [TestCase(typeof(UIntPtr)), TestCase(typeof(UIntPtr?))]
         [TestCase(typeof(DateTime)), TestCase(typeof(DateTime?))]
         [TestCase(typeof(TimeSpan)), TestCase(typeof(TimeSpan?))]
         [TestCase(typeof(Guid)), TestCase(typeof(Guid?))]
         public void should_indicate_if_a_type_is_simple(Type type)
         {
-            type.IsSimpleType().ShouldBeTrue();
+            new TypeCache().GetTypeDescriptor(type).IsSimpleType().ShouldBeTrue();
         }
 
         [Test]
@@ -277,153 +275,37 @@ namespace Tests.Unit.Reflection
         [TestCase(typeof(object))]
         public void should_indicate_if_a_type_is_not_simple(Type type)
         {
-            type.IsSimpleType().ShouldBeFalse();
-        }
-
-        public static readonly object[] SimpleTypeParsing = TestCaseSource.Create(x => x
-            .Add<string>("1")
-            .Add<Uri>(new Uri("http://www.xkcd.com"))
-
-            .Add<UriFormat>(UriFormat.UriEscaped).Add<UriFormat?>(UriFormat.UriEscaped)
-
-            .Add<DateTime>(DateTime.Today).Add<DateTime?>(DateTime.Today)
-            .Add<TimeSpan>(TimeSpan.MaxValue).Add<TimeSpan?>(TimeSpan.MaxValue)
-            .Add<Guid>(Guid.Empty).Add<Guid?>(Guid.Empty)
-
-            .Add<Boolean>(true).Add<Boolean?>(true)
-            .Add<Byte>(5).Add<Byte?>(55)
-            .Add<SByte>(6).Add<SByte?>(66)
-            .Add<Int16>(7).Add<Int16?>(77)
-            .Add<UInt16>(8).Add<UInt16?>(88)
-            .Add<Int32>(9).Add<Int32?>(99)
-            .Add<UInt32>(10).Add<UInt32?>(110)
-            .Add<Int64>(11).Add<Int64?>(111)
-            .Add<UInt64>(12).Add<UInt64?>(120)
-            .Add<IntPtr>(new IntPtr(13)).Add<IntPtr?>(new IntPtr(130))
-            .Add<UIntPtr>(new UIntPtr(14)).Add<UIntPtr?>(new UIntPtr(140))
-            .Add<Char>('a').Add<Char?>('b')
-            .Add<Double>(15).Add<Double?>(150)
-            .Add<Single>(16).Add<Single?>(160)
-            .Add<Decimal>(17).Add<Decimal?>(170));
-
-        [Test]
-        [TestCaseSource(nameof(SimpleTypeParsing))]
-        public void should_parse_simple_types(Type type, object value)
-        {
-            var result = value.ToString().ParseSimpleType(
-                new TypeCache().GetTypeDescriptor(type));
-            result.ShouldEqual(value);
-            result.ShouldBeType(type.GetUnderlyingNullableType());
+            new TypeCache().GetTypeDescriptor(type).IsSimpleType().ShouldBeFalse();
         }
 
         [Test]
         public void should_parse_enum_integer()
         {
-            "2".ParseSimpleType(new TypeCache().GetTypeDescriptor(typeof(UriFormat)))
-                .ShouldEqual(UriFormat.Unescaped);
+            var result = "2".TryParseEnum<UriFormat>(new TypeCache().GetTypeDescriptor(typeof(UriFormat)));
+            
+            result.Success.ShouldBeTrue();
+            result.Original.ShouldEqual("2");
+            result.Result.ShouldEqual(UriFormat.Unescaped);
         }
 
         [Test]
         public void should_parse_enum_case_insensitively()
         {
-            "UNESCAPED".ParseSimpleType(new TypeCache().GetTypeDescriptor(typeof(UriFormat)))
-                .ShouldEqual(UriFormat.Unescaped);
+            var result = "UNESCAPED".TryParseEnum<UriFormat>(new TypeCache().GetTypeDescriptor(typeof(UriFormat)));
+            
+            result.Success.ShouldBeTrue();
+            result.Original.ShouldEqual("UNESCAPED");
+            result.Result.ShouldEqual(UriFormat.Unescaped);
         }
 
         [Test]
         public void should_parse_bool_case_insensitively()
         {
-            "TRUE".ParseSimpleType(new TypeCache().GetTypeDescriptor(typeof(bool)))
-                .ShouldEqual(true);
-        }
-
-        [Test]
-        public void should_return_empty_string_when_source_is_empty_string()
-        {
-            "".ParseSimpleType(new TypeCache().GetTypeDescriptor(
-                typeof(string))).ShouldEqual("");
-        }
-
-        [Test]
-        [TestCase(typeof(string))]
-        [TestCase(typeof(Uri))]
-        [TestCase(typeof(UriFormat)), TestCase(typeof(UriFormat?))]
-        [TestCase(typeof(DateTime)), TestCase(typeof(DateTime?))]
-        [TestCase(typeof(TimeSpan)), TestCase(typeof(TimeSpan?))]
-        [TestCase(typeof(Guid)), TestCase(typeof(Guid?))]
-        [TestCase(typeof(Boolean)), TestCase(typeof(Boolean?))]
-        [TestCase(typeof(Byte)), TestCase(typeof(Byte?))]
-        [TestCase(typeof(SByte)), TestCase(typeof(SByte?))]
-        [TestCase(typeof(Int16)), TestCase(typeof(Int16?))]
-        [TestCase(typeof(UInt16)), TestCase(typeof(UInt16?))]
-        [TestCase(typeof(Int32)), TestCase(typeof(Int32?))]
-        [TestCase(typeof(UInt32)), TestCase(typeof(UInt32?))]
-        [TestCase(typeof(Int64)), TestCase(typeof(Int64?))]
-        [TestCase(typeof(UInt64)), TestCase(typeof(UInt64?))]
-        [TestCase(typeof(IntPtr)), TestCase(typeof(IntPtr?))]
-        [TestCase(typeof(UIntPtr)), TestCase(typeof(UIntPtr?))]
-        [TestCase(typeof(Char)), TestCase(typeof(Char?))]
-        [TestCase(typeof(Double)), TestCase(typeof(Double?))]
-        [TestCase(typeof(Single)), TestCase(typeof(Single?))]
-        [TestCase(typeof(Decimal)), TestCase(typeof(Decimal?))]
-        public void should_return_null_when_source_is_null(Type type)
-        {
-            ((string)null).ParseSimpleType(new TypeCache()
-                .GetTypeDescriptor(type)).ShouldEqual(null);
-        }
-
-        [Test]
-        [TestCase(typeof(Uri))]
-        [TestCase(typeof(UriFormat)), TestCase(typeof(UriFormat?))]
-        [TestCase(typeof(DateTime)), TestCase(typeof(DateTime?))]
-        [TestCase(typeof(TimeSpan)), TestCase(typeof(TimeSpan?))]
-        [TestCase(typeof(Guid)), TestCase(typeof(Guid?))]
-        [TestCase(typeof(Boolean)), TestCase(typeof(Boolean?))]
-        [TestCase(typeof(Byte)), TestCase(typeof(Byte?))]
-        [TestCase(typeof(SByte)), TestCase(typeof(SByte?))]
-        [TestCase(typeof(Int16)), TestCase(typeof(Int16?))]
-        [TestCase(typeof(UInt16)), TestCase(typeof(UInt16?))]
-        [TestCase(typeof(Int32)), TestCase(typeof(Int32?))]
-        [TestCase(typeof(UInt32)), TestCase(typeof(UInt32?))]
-        [TestCase(typeof(Int64)), TestCase(typeof(Int64?))]
-        [TestCase(typeof(UInt64)), TestCase(typeof(UInt64?))]
-        [TestCase(typeof(IntPtr)), TestCase(typeof(IntPtr?))]
-        [TestCase(typeof(UIntPtr)), TestCase(typeof(UIntPtr?))]
-        [TestCase(typeof(Char)), TestCase(typeof(Char?))]
-        [TestCase(typeof(Double)), TestCase(typeof(Double?))]
-        [TestCase(typeof(Single)), TestCase(typeof(Single?))]
-        [TestCase(typeof(Decimal)), TestCase(typeof(Decimal?))]
-        public void should_fail_when_source_is_empty_string(Type type)
-        {
-            "".Should().Throw<FormatException>(x => x.ParseSimpleType(
-                new TypeCache().GetTypeDescriptor(type)));
-        }
-
-        [Test]
-        [TestCase(typeof(Uri))]
-        [TestCase(typeof(UriFormat)), TestCase(typeof(UriFormat?))]
-        [TestCase(typeof(DateTime)), TestCase(typeof(DateTime?))]
-        [TestCase(typeof(TimeSpan)), TestCase(typeof(TimeSpan?))]
-        [TestCase(typeof(Guid)), TestCase(typeof(Guid?))]
-        [TestCase(typeof(Boolean)), TestCase(typeof(Boolean?))]
-        [TestCase(typeof(Byte)), TestCase(typeof(Byte?))]
-        [TestCase(typeof(SByte)), TestCase(typeof(SByte?))]
-        [TestCase(typeof(Int16)), TestCase(typeof(Int16?))]
-        [TestCase(typeof(UInt16)), TestCase(typeof(UInt16?))]
-        [TestCase(typeof(Int32)), TestCase(typeof(Int32?))]
-        [TestCase(typeof(UInt32)), TestCase(typeof(UInt32?))]
-        [TestCase(typeof(Int64)), TestCase(typeof(Int64?))]
-        [TestCase(typeof(UInt64)), TestCase(typeof(UInt64?))]
-        [TestCase(typeof(IntPtr)), TestCase(typeof(IntPtr?))]
-        [TestCase(typeof(UIntPtr)), TestCase(typeof(UIntPtr?))]
-        [TestCase(typeof(Char)), TestCase(typeof(Char?))]
-        [TestCase(typeof(Double)), TestCase(typeof(Double?))]
-        [TestCase(typeof(Single)), TestCase(typeof(Single?))]
-        [TestCase(typeof(Decimal)), TestCase(typeof(Decimal?))]
-        public void should_fail_when_source_is_invalid_string(Type type)
-        {
-            "yada".Should().Throw<FormatException>(x => x.ParseSimpleType(
-               new TypeCache().GetTypeDescriptor(type)));
+            var result = "TRUE".TryParseBool();
+            
+            result.Success.ShouldBeTrue();
+            result.Original.ShouldEqual("TRUE");
+            result.Result.ShouldBeTrue();
         }
     }
 }

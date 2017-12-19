@@ -77,7 +77,7 @@ namespace Tests.Unit.Binding
                 .CreateFor(action)
                 .AddParameters(parameter)
                 .AddHeader("value", HeaderValue)
-                .AddValueMapper(new SimpleTypeMapper(_configuration));
+                .AddValueMapper(new SimpleTypeMapper(new ParsedValueMapper()));
 
             requestGraph.Configuration.HeadersBindingMode = bindingMode;
 
