@@ -54,7 +54,7 @@ namespace Graphite.Binding
                     {
                         Parameter = ap,
                         Values = p.ToArray()
-                    });
+                    }).ToList();
 
             foreach (var parameterValue in parameterValues)
             {

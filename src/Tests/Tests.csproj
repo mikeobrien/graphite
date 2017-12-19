@@ -147,6 +147,7 @@
     <Compile Include="Unit\Binding\MultipartContentTests.cs" />
     <Compile Include="Unit\Binding\ParameterBinderTests.cs" />
     <Compile Include="Unit\Binding\ContainerBinderTests.cs" />
+    <Compile Include="Unit\Binding\ParsedValueMapperTests.cs" />
     <Compile Include="Unit\Binding\XmlBinderTests.cs" />
     <Compile Include="Unit\Binding\JsonBinderTests.cs" />
     <Compile Include="Unit\Binding\FormBinderTests.cs" />
@@ -157,7 +158,6 @@
     <Compile Include="Unit\Binding\ReaderBinderTests.cs" />
     <Compile Include="Unit\Binding\SimpleTypeMapperTests.cs" />
     <Compile Include="Unit\Binding\UrlParameterBinderTests.cs" />
-    <Compile Include="Unit\Binding\ValueMapperBaseTests.cs" />
     <Compile Include="Unit\ConfigurationDslTests.cs" />
     <Compile Include="Unit\Cors\OptionsRouteDecoratorTests.cs" />
     <Compile Include="Unit\Cors\CorsPolicySourceTests.cs" />

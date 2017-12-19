@@ -29,7 +29,7 @@ namespace Graphite.Reflection
             Type = type;
             AssemblyDescriptor = typeCache.GetAssemblyDescriptor(type.Assembly);
             IsBclType = type.IsBclType();
-            _isSimpleType = type.ToLazy(x => x.IsSimpleType());
+            _isSimpleType = this.ToLazy(x => x.IsSimpleType());
             _friendlyName = type.ToLazy(x => x.GetFriendlyTypeName());
             _friendlyFullName = type.ToLazy(x => x.GetFriendlyTypeName(true));
             _baseName = type.ToLazy(x => x.GetNonGenericName());

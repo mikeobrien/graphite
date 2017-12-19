@@ -74,7 +74,7 @@ namespace Tests.Unit.Binding
                 .CreateFor(action)
                     .WithUrl("http://fark.com/value1/segment/1/2/3")
                     .WithUrlTemplate("{param1}/segment/{*param2}")
-                    .AddValueMapper(new SimpleTypeMapper(_configuration));
+                    .AddValueMapper(new SimpleTypeMapper(new ParsedValueMapper()));
 
             var binder = CreateBinder(requestGraph);
 

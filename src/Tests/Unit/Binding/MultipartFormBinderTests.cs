@@ -605,7 +605,7 @@ namespace Tests.Unit.Binding
             var configuration = new Configuration();
             var parameterBinder = new ParameterBinder<BindResult>(configuration, 
                 null, actionDescriptor.Action, actionDescriptor.Route, 
-                new SimpleTypeMapper(configuration).AsList());
+                new SimpleTypeMapper(new ParsedValueMapper()).AsList());
             var argumentBinder = new ArgumentBinder(parameterBinder);
             return new MultipartFormBinder(request, actionDescriptor, 
                 readers, argumentBinder, parameterBinder, configuration);

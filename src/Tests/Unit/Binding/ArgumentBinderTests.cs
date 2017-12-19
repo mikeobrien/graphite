@@ -234,13 +234,14 @@ namespace Tests.Unit.Binding
                 .AddParameters("param3")
                 .WithRequestParameter("model")
                 .WithContentType(MimeTypes.ApplicationFormUrlEncoded);
-            requestGraph.AppendValueMapper(new SimpleTypeMapper(requestGraph.Configuration));
+            requestGraph.AppendValueMapper(new SimpleTypeMapper(new ParsedValueMapper()));
 
             var result = Bind(requestGraph);
 
             result.Status.ShouldEqual(BindingStatus.Failure);
-            result.ErrorMessage.ShouldEqual("Parameter param3 value 'fark' is not formatted correctly. " +
-                                            "Input string was not in a correct format.");
+            result.ErrorMessage.ShouldEqual("Parameter 'param3' value 'fark' is not formatted correctly. " +
+                "'fark' is not a valid 32 bit integer. " +
+                "Must be an integer between -2,147,483,648 and 2,147,483,647.");
         }
 
         private BindResult Bind(RequestGraph requestGraph,

@@ -62,6 +62,7 @@
     <Compile Include="Actions\ActionInvoker.cs" />
     <Compile Include="Actions\DefaultResponseStatus.cs" />
     <Compile Include="Binding\BindResult.cs" />
+    <Compile Include="Binding\ParsedValueMapper.cs" />
     <Compile Include="Collections\EnumerableMapper.cs" />
     <Compile Include="Collections\EnumeratorMapper.cs" />
     <Compile Include="Binding\MapperNotFoundException.cs" />
@@ -138,12 +139,12 @@
     <Compile Include="Readers\RequestTypeCreationException.cs" />
     <Compile Include="Reflection\AssemblyDescriptor.cs" />
     <Compile Include="Reflection\AssemblyResource.cs" />
+    <Compile Include="Reflection\ParseResult.cs" />
     <Compile Include="Routing\IHttpRouteDecorator.cs" />
     <Compile Include="Routing\IHttpRouteMapper.cs" />
     <Compile Include="Monitoring\Metrics.cs" />
     <Compile Include="Binding\MapResult.cs" />
     <Compile Include="Binding\FormBinder.cs" />
-    <Compile Include="Binding\ValueMapperBase.cs" />
     <Compile Include="DependencyInjection\Registry.cs" />
     <Compile Include="Actions\AsyncInvoker.cs" />
     <Compile Include="Http\QuerystringParameters.cs" />

@@ -14,7 +14,7 @@ namespace Graphite.Extensions
             return Math.Max(value, min);
         }
 
-        public static int TryParseInt(this object value)
+        public static int TryParseInt32(this object value)
         {
             if (value is int) return (int) value;
             int intValue;
@@ -22,7 +22,7 @@ namespace Graphite.Extensions
                 value.ToString(), out intValue) ? intValue : 0;
         }
 
-        public static bool TryParseLong(this string value, out long result)
+        public static bool TryParseInt64(this string value, out long result)
         {
             return long.TryParse(value, out result);
         }

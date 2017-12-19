@@ -35,15 +35,13 @@ namespace Tests.Unit.Binding
             byte byteValue, short shortValue, ushort ushortValue, int intValue, uint uintValue,
             long longValue, ulong ulongValue, float floatValue, double doubleValue, decimal decimalValue,
             DateTime datetimeValue, Guid guidValue, TimeSpan tiemspanValue, Uri uriValue,
-            IntPtr intptrValue, UIntPtr uintptrValue,
 
             AttributeTargets? enumNullableValue, char? charNullableValue, bool? boolNullableValue,
             sbyte? sbyteNullableValue, byte? byteNullableValue, short? shortNullableValue,
             ushort? ushortNullableValue, int? intNullableValue, uint? uintNullableValue,
             long? longNullableValue, ulong? ulongNullableValue, float? floatNullableValue,
             double? doubleNullableValue, decimal? decimalNullableValue, DateTime? datetimeNullableValue,
-            Guid? guidNullableValue, TimeSpan? timespanNullableValue, IntPtr? intptrNullableValue,
-            UIntPtr? unitptrNullableValue) { }
+            Guid? guidNullableValue, TimeSpan? timespanNullableValue) { }
 
         private static readonly ParameterDescriptor[] SimpleTypeParameters =
             new TypeCache().GetTypeDescriptor(typeof(SimpleTypeMapperTests)).Methods
@@ -55,7 +53,7 @@ namespace Tests.Unit.Binding
         [TestCaseSource(nameof(SimpleTypeParameterTestCases))]
         public void Should_apply_to_simple_types(ParameterDescriptor parameter)
         {
-            new SimpleTypeMapper(_configuration).AppliesTo(new ValueMapperContext(
+            new SimpleTypeMapper(new ParsedValueMapper()).AppliesTo(new ValueMapperContext(
                 new ActionParameter(_actionMethod, parameter), null)).ShouldBeTrue();
         }
 
@@ -71,7 +69,7 @@ namespace Tests.Unit.Binding
         [TestCaseSource(nameof(ComplexParameterTypeTestCases))]
         public void Should_not_apply_to_complex_types(ParameterDescriptor parameter)
         {
-            new SimpleTypeMapper(_configuration).AppliesTo(new ValueMapperContext(
+            new SimpleTypeMapper(new ParsedValueMapper()).AppliesTo(new ValueMapperContext(
                 new ActionParameter(_actionMethod, parameter), null)).ShouldBeFalse();
         }
 
@@ -120,17 +118,13 @@ namespace Tests.Unit.Binding
             .Add<TimeSpan>(TimeSpan.MaxValue, TimeSpan.MaxValue.ToString())
             .Add<TimeSpan>(TimeSpan.MaxValue, TimeSpan.MaxValue)
             .Add<TimeSpan?>((TimeSpan?)null, null)
-            .Add<TimeSpan?>((TimeSpan?)TimeSpan.MaxValue, (TimeSpan?)TimeSpan.MaxValue)
-            .Add<IntPtr>(new IntPtr(12), "12").Add<IntPtr>(new IntPtr(12), new IntPtr(12))
-            .Add<IntPtr?>((IntPtr?)null, null).Add<IntPtr?>((IntPtr?)new IntPtr(12), (IntPtr?)new IntPtr(12))
-            .Add<UIntPtr>(new UIntPtr(13), "13").Add<UIntPtr>(new UIntPtr(13), new UIntPtr(13))
-            .Add<UIntPtr?>((UIntPtr?)null, null).Add<UIntPtr?>((UIntPtr?)new UIntPtr(13), (UIntPtr?)new UIntPtr(13)));
+            .Add<TimeSpan?>((TimeSpan?)TimeSpan.MaxValue, (TimeSpan?)TimeSpan.MaxValue));
 
         [TestCaseSource(nameof(SimpleTypeParameterParsingTestCases))]
         public void Should_map_simple_types(Type type, object expected, object value)
         {
             var parameter = SimpleTypeParameters.FirstOrDefault(x => x.ParameterType.Type == type);
-            var result = new SimpleTypeMapper(_configuration).Map(new ValueMapperContext(
+            var result = new SimpleTypeMapper(new ParsedValueMapper()).Map(new ValueMapperContext(
                 new ActionParameter(_actionMethod, parameter), value.AsArray()));
 
             result.Status.ShouldEqual(MappingStatus.Success);
@@ -144,7 +138,7 @@ namespace Tests.Unit.Binding
         {
             if (type == typeof(string)) return;
             var parameter = SimpleTypeParameters.FirstOrDefault(x => x.ParameterType.Type == type);
-            var result = new SimpleTypeMapper(_configuration).Map(new ValueMapperContext(
+            var result = new SimpleTypeMapper(new ParsedValueMapper()).Map(new ValueMapperContext(
                 new ActionParameter(_actionMethod, parameter), "fark".AsArray()));
 
             result.Status.ShouldEqual(MappingStatus.Failure);
@@ -161,22 +155,20 @@ namespace Tests.Unit.Binding
             byte[] byteValue, short[] shortValue, ushort[] ushortValue, int[] intValue, uint[] uintValue,
             long[] longValue, ulong[] ulongValue, float[] floatValue, double[] doubleValue, decimal[] decimalValue,
             DateTime[] datetimeValue, Guid[] guidValue, TimeSpan[] tiemspanValue, Uri[] uriValue,
-            IntPtr[] intptrValue, UIntPtr[] uintptrValue,
 
             AttributeTargets?[] enumNullableValue, char?[] charNullableValue, bool?[] boolNullableValue,
             sbyte?[] sbyteNullableValue, byte?[] byteNullableValue, short?[] shortNullableValue,
             ushort?[] ushortNullableValue, int?[] intNullableValue, uint?[] uintNullableValue,
             long?[] longNullableValue, ulong?[] ulongNullableValue, float?[] floatNullableValue,
             double?[] doubleNullableValue, decimal?[] decimalNullableValue, DateTime?[] datetimeNullableValue,
-            Guid?[] guidNullableValue, TimeSpan?[] timespanNullableValue, IntPtr?[] intptrNullableValue,
-            UIntPtr?[] unitptrNullableValue) { }
+            Guid?[] guidNullableValue, TimeSpan?[] timespanNullableValue) { }
 
         [TestCaseSource(nameof(SimpleTypeParameterParsingTestCases))]
         public void Should_map_simple_types_to_an_array(Type type, object expected, object value)
         {
             var parameter = SimpleTypeParameterArrays.FirstOrDefault(
                 x => x.ParameterType.ElementType.Type == type);
-            var result = new SimpleTypeMapper(_configuration).Map(new ValueMapperContext(
+            var result = new SimpleTypeMapper(new ParsedValueMapper()).Map(new ValueMapperContext(
                 new ActionParameter(_actionMethod, parameter), new[] { value, value }));
 
             result.Status.ShouldEqual(MappingStatus.Success);
@@ -193,22 +185,20 @@ namespace Tests.Unit.Binding
             List<byte> byteValue, List<short> shortValue, List<ushort> ushortValue, List<int> intValue, List<uint> uintValue,
             List<long> longValue, List<ulong> ulongValue, List<float> floatValue, List<double> doubleValue, List<decimal> decimalValue,
             List<DateTime> datetimeValue, List<Guid> guidValue, List<TimeSpan> tiemspanValue, List<Uri> uriValue,
-            List<IntPtr> intptrValue, List<UIntPtr> uintptrValue,
 
             List<AttributeTargets?> enumNullableValue, List<char?> charNullableValue, List<bool?> boolNullableValue,
             List<sbyte?> sbyteNullableValue, List<byte?> byteNullableValue, List<short?> shortNullableValue,
             List<ushort?> ushortNullableValue, List<int?> intNullableValue, List<uint?> uintNullableValue,
             List<long?> longNullableValue, List<ulong?> ulongNullableValue, List<float?> floatNullableValue,
             List<double?> doubleNullableValue, List<decimal?> decimalNullableValue, List<DateTime?> datetimeNullableValue,
-            List<Guid?> guidNullableValue, List<TimeSpan?> timespanNullableValue, List<IntPtr?> intptrNullableValue,
-            List<UIntPtr?> unitptrNullableValue) { }
+            List<Guid?> guidNullableValue, List<TimeSpan?> timespanNullableValue) { }
 
         [TestCaseSource(nameof(SimpleTypeParameterParsingTestCases))]
         public void Should_map_simple_types_to_a_list(Type type, object expected, object value)
         {
             var parameter = SimpleTypeParameterLists.FirstOrDefault(
                 x => x.ParameterType.ElementType.Type == type);
-            var result = new SimpleTypeMapper(_configuration).Map(new ValueMapperContext(
+            var result = new SimpleTypeMapper(new ParsedValueMapper()).Map(new ValueMapperContext(
                 new ActionParameter(_actionMethod, parameter), new[] { value, value }));
 
             result.Status.ShouldEqual(MappingStatus.Success);
@@ -225,22 +215,20 @@ namespace Tests.Unit.Binding
             IList<byte> byteValue, IList<short> shortValue, IList<ushort> ushortValue, IList<int> intValue, IList<uint> uintValue,
             IList<long> longValue, IList<ulong> ulongValue, IList<float> floatValue, IList<double> doubleValue, IList<decimal> decimalValue,
             IList<DateTime> datetimeValue, IList<Guid> guidValue, IList<TimeSpan> tiemspanValue, IList<Uri> uriValue,
-            IList<IntPtr> intptrValue, IList<UIntPtr> uintptrValue,
 
             IList<AttributeTargets?> enumNullableValue, IList<char?> charNullableValue, IList<bool?> boolNullableValue,
             IList<sbyte?> sbyteNullableValue, IList<byte?> byteNullableValue, IList<short?> shortNullableValue,
             IList<ushort?> ushortNullableValue, IList<int?> intNullableValue, IList<uint?> uintNullableValue,
             IList<long?> longNullableValue, IList<ulong?> ulongNullableValue, IList<float?> floatNullableValue,
             IList<double?> doubleNullableValue, IList<decimal?> decimalNullableValue, IList<DateTime?> datetimeNullableValue,
-            IList<Guid?> guidNullableValue, IList<TimeSpan?> timespanNullableValue, IList<IntPtr?> intptrNullableValue,
-            IList<UIntPtr?> unitptrNullableValue) { }
+            IList<Guid?> guidNullableValue, IList<TimeSpan?> timespanNullableValue) { }
 
         [TestCaseSource(nameof(SimpleTypeParameterParsingTestCases))]
         public void Should_map_simple_types_to_a_list_interface(Type type, object expected, object value)
         {
             var parameter = SimpleTypeParameterListInterface.FirstOrDefault(
                 x => x.ParameterType.ElementType.Type == type);
-            var result = new SimpleTypeMapper(_configuration).Map(new ValueMapperContext(
+            var result = new SimpleTypeMapper(new ParsedValueMapper()).Map(new ValueMapperContext(
                 new ActionParameter(_actionMethod, parameter), new[] { value, value }));
 
             result.Status.ShouldEqual(MappingStatus.Success);

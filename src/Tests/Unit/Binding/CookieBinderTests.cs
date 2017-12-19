@@ -77,7 +77,7 @@ namespace Tests.Unit.Binding
                 .CreateFor(action)
                 .AddParameters(parameter)
                 .AddCookie("value", CookieValue)
-                .AddValueMapper(new SimpleTypeMapper(_configuration));
+                .AddValueMapper(new SimpleTypeMapper(new ParsedValueMapper()));
 
             requestGraph.Configuration.CookiesBindingMode = bindingMode;
 
