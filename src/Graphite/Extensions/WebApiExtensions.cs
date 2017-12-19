@@ -136,7 +136,11 @@ namespace Graphite.Extensions
             headers.ContentDisposition =
                 new ContentDispositionHeaderValue("attachment")
                 {
-                    FileName = filename
+                    FileName = filename.Contains(' ') && 
+                        !filename.StartsWith("\"") && 
+                        !filename.EndsWith("\"")
+                            ? $"\"{filename}\""
+                            : filename
                 };
         }
         

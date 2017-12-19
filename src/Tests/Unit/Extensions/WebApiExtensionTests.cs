@@ -114,5 +114,16 @@ namespace Tests.Unit.Extensions
                 "Accept: fark/farker\r\n" +
                 "Content-Type: oh/hai; charset=utf-8");
         }
+
+        [TestCase("fark.text", "fark.text")]
+        [TestCase("fark farker.txt", "\"fark farker.txt\"")]
+        public void Should_set_attachment_disposition(string filename, string expected)
+        {
+            var response = new HttpResponseMessage { Content = new StringContent("") };
+
+            response.Content.Headers.SetAttachmentDisposition(filename);
+
+            response.Content.Headers.ContentDisposition.FileName.ShouldEqual(expected);
+        }
     }
 }
