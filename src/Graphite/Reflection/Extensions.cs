@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -29,6 +31,23 @@ namespace Graphite.Reflection
         public static TypeDescriptor GetTypeDescriptor<T>(this ITypeCache typeCache)
         {
             return typeCache.GetTypeDescriptor(typeof(T));
+        }
+
+        public static AssemblyDescriptor GetCurrentAssemblyDescriptor(this ITypeCache typeCache)
+        {
+            return typeCache.GetAssemblyDescriptor(Assembly.GetCallingAssembly());
+        }
+
+        public static string GetResourceString<T>(this AssemblyDescriptor assembly, string name)
+        {
+            var fullName = $"{typeof(T).Namespace}.{name}";
+            return assembly.Resources.FirstOrDefault(x => x.Name.EqualsUncase(fullName))?.GetString();
+        }
+
+        public static Stream GetResourceStream<T>(this AssemblyDescriptor assembly, string name)
+        {
+            var fullName = $"{typeof(T).Namespace}.{name}";
+            return assembly.Resources.FirstOrDefault(x => x.Name.EqualsUncase(fullName))?.GetStream();
         }
 
         public static Func<object> CompileTryCreate(this Type type)
@@ -227,6 +246,11 @@ namespace Graphite.Reflection
                    typeDefinition == typeof(IEnumerable<>) ||
                    typeDefinition == typeof(ICollection<>)
                 ? type.GenericTypeArguments[0] : null;
+        }
+
+        public static bool IsEnumerable(this Type type)
+        {
+            return type == typeof(IEnumerable) || type.GetInterfaces().Contains(typeof(IEnumerable));
         }
 
         public static bool Is<T>(this Type type)

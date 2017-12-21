@@ -183,6 +183,7 @@
     <Compile Include="Unit\Extensions\ExtensionTests.cs" />
     <Compile Include="Unit\Extensions\IOExtensionTests.cs" />
     <Compile Include="Unit\Extensions\SerializerExtensionTests.cs" />
+    <Compile Include="Unit\Extensions\MustacheExtensionTests.cs" />
     <Compile Include="Unit\Http\AsyncContentTests.cs" />
     <Compile Include="Unit\Http\QuerystringParameterTests.cs" />
     <Compile Include="Unit\Http\TextResultTests.cs" />

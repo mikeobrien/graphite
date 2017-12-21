@@ -1,0 +1,31 @@
+﻿{{#plugins}} 
+<table class="plugins body-seperator">
+    <thead>
+        <tr>
+            <th>Plugin Type</th>
+            <th>Order</th>
+            <th>Singleton</th>
+            <th nowrap>Applies To</th>
+            <th>Type</th>
+            <th width="100%">Assembly</th>
+        </tr>
+    </thead>
+    {{#types}}
+    <tbody>
+    {{#registrations}}
+        <tr>
+            <td nowrap>{{name}}</td>
+            <td>{{order}}</td>
+            <td>{{singleton}}</td>
+            <td>{{appliesTo}}</td>
+            <td><code>{{type}}</code></td> 
+            <td><code>{{assembly}}</code></td>
+        </tr>
+    {{/registrations}}
+    {{#noneConfigured}}
+        <tr><td>{{name}}</td><td colspan="5"><span class="red">None configured</span></td></tr>
+    {{/noneConfigured}}
+    </tbody>
+    {{/types}}
+</table>
+{{/plugins}} 

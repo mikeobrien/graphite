@@ -37,7 +37,10 @@ namespace Graphite.Http
             response.SafeSetReasonPhrase(_reasonPhrase);
             response.Content = new StringContent(_data);
             response.Content.Headers.ContentType =
-                new MediaTypeHeaderValue(MimeTypes.TextPlain);
+                new MediaTypeHeaderValue(MimeTypes.TextPlain)
+                {
+                    CharSet = "utf-8"
+                };
             return Task.FromResult(response);
         }
     }

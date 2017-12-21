@@ -41,5 +41,18 @@ namespace Graphite.Extensions
                 return result;
             };
         }
+
+        public static Func<TKey, TArg1, TArg2, TResult> Func<TKey, TArg1, TArg2, TResult>(
+            this Func<TKey, TArg1, TArg2, TResult> func)
+        {
+            var map = new ConcurrentDictionary<TKey, TResult>();
+            return (k, a1, a2) =>
+            {
+                if (map.ContainsKey(k)) return map[k];
+                var result = func(k, a1, a2);
+                map.TryAdd(k, result);
+                return result;
+            };
+        }
     }
 }

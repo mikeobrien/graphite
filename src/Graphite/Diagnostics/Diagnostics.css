@@ -1,0 +1,183 @@
+﻿body {
+    background-color: #101214;
+    font-family: Verdana, Arial, sans-serif;
+    padding: 24px 30px 30px 30px;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:visited, a:active, a:hover {
+    color: #fff;
+}
+
+.hidden {
+    display: none
+}
+
+.panels {
+    width: 100%;
+    border-spacing: 10px;
+}
+
+.panel {
+    background: #2a2a2a;
+    color: #e2e2e2;
+    padding: 20px 30px;
+}
+
+.panel.nav {
+    padding: 10px 30px;
+}
+
+.title {
+    font-size: 20pt;
+    vertical-align: middle;
+    width: 100%;
+    font-weight: bold;
+}
+
+.menu-nav {
+    padding: 0;
+}
+
+.menu-nav a {
+    padding: 36px 50px;
+    display: block;
+    font-size: 16pt;
+    text-align: center;
+    cursor: pointer;
+}
+
+.menu-nav.selected  {
+    background-color: #585858;
+    cursor: default;
+}
+
+.menu-nav.selected a  {
+    cursor: default;
+}
+
+.menu-nav.hover {
+    background-color: #585858;
+}
+
+td {
+    color: #e2e2e2;
+    font-size: 10pt;
+    vertical-align: top;
+}
+
+.row-seperator tr:nth-child(n+2) td {
+    border-top: 1px #464646 solid;
+}
+
+.body-seperator tbody:not(:last-child) tr:last-child td {
+    border-bottom: 1px #464646 solid;
+}
+
+.panel table {
+    width: 100%;
+}
+
+.panel th {
+    text-align: left;
+    color: #e2e2e2;
+    font-weight: normal;
+    font-size: 12pt;
+    border-bottom: 1px #464646 solid;
+    padding-bottom: 10px;
+}
+
+.panel h3 {
+    font-size: 14pt;
+}
+
+.panel td {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+code {
+    color: #3eb4f9;
+}
+
+.panel th, .panel td {
+    padding-right: 20px;
+}
+
+    .panel th, .panel td:first-child {
+        white-space: nowrap;
+    }
+
+.configuration td:last-child {
+    width: 100%;
+}
+
+.assemblies {
+    padding-bottom: 15px;
+}
+
+.actions > tbody > tr:first-child {
+    cursor: pointer;
+    cursor: hand;
+}
+
+.actions > tbody:not(:first-of-type) > tr:first-child > td {
+    border-top: 1px #464646 solid;
+}
+
+.actions > tbody > tr:last-child > td {
+    padding-left: 15px;
+    padding-bottom: 15px;
+}
+
+.actions > tbody > tr:last-child > td td:last-child {
+    width: 100%;
+}
+
+.actions > tbody > tr:last-child > td td:first-child {
+    white-space: nowrap;
+}
+
+table.actions > tbody th {
+    font-size: 10pt;
+}
+
+table.behaviors {
+    width: auto;
+}
+
+.behaviors td {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.behaviors td.arrow {
+    text-align: center;
+}
+
+.green {
+    color: #90c564;
+}
+
+.red {
+    color: #e3524f;
+}
+
+.purple {
+    color: #b842ff;
+}
+
+.dark-blue {
+    color: #4272ff;
+}
+
+.pink {
+    color: #ef3cc7;
+}
+
+.grey {
+    color: #888888;
+}

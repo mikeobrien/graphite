@@ -1,0 +1,92 @@
+﻿{{#actions}}
+<table class="assemblies">
+    <tr>
+        <th>Source Assembiles</th>
+    </tr>
+    {{#assemblies}}<tr><td><code>{{.}}</code></td></tr>{{/assemblies}}
+</table>
+<table class="actions">
+    <thead>
+        <tr>
+            <th colspan="2">Url</th>
+            <th></th>
+            <th>Action</th>
+            <th width="100%">Assembly</th>
+            <th nowrap>Average Time</th>
+        </tr>
+    </thead>
+    {{#endpoints}}
+    <tbody>
+        <tr onclick="toggleVisibility(this)">
+            <td><code><span class="{{methodClass}}"\>{{method}}</span></code></td>
+            <td><code>/{{url}}</code></td>
+            <td>&rarr;</td>
+            <td><code>{{actionName}}</code></td>
+            <td width=""100%""><code>{{assembly}}</code></td>
+            <td><code>{{averageRequestTime}}</code></td>
+        </tr>
+        <tr style="display: none">
+            <td colspan="6">
+                <table>
+                    <tr>
+                        <td>Behaviors</td>
+                        <td><table class="behaviors">{{behaviors}}</table></td>
+                    </tr>
+                    <tr>
+                        <td>Request Parameter</td>
+                        <td>{{requestParameter}}</td>
+                    </tr>
+                    <tr>
+                        <td>Url Parameters</td>
+                        <td>{{urlParameters}}</td>
+                    </tr>
+                    <tr>
+                        <td>Parameters</td>
+                        <td>{{parameters}}</td>
+                    </tr>
+                    <tr>
+                        <td>Response Type</td>
+                        <td>{{response}}</td>
+                    </tr>
+                    <tr>
+                        <td>Action Registry</td>
+                        <td>
+                            {{#registry}}
+                            {{#empty}}<span class="red">Empty</span>{{/empty}}
+                            {{#notEmpty}}
+                            <table class="container row-seperator">
+                                <thead>
+                                    <tr>
+                                        <th>Plugin Type</th>
+                                        <th>Plugin Assembly</th>
+                                        <th>Singleton</th>
+                                        <th>Instance</th>
+                                        <th>Concrete Type</th>
+                                        <th width="100%">Concrete Assembly</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {{#registrations}}
+                                    <tr>
+                                        <td nowrap><code>{{type}}</code></td>
+                                        <td nowrap><code>{{assembly}}</code></td>
+                                        <td>{{singleton}}</td> 
+                                        <td>{{instance}}</td> 
+                                        <td><code>{{concreteType}}</code></td>
+                                        <td nowrap><code>{{concreteAssembly}}</code></td>
+                                    </tr> 
+                                {{/registrations}}                                                       
+                                </tbody>
+                            </table>
+                            {{/notEmpty}}
+                            {{/registry}}
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </tbody>
+    {{/endpoints}}
+</table>
+{{/actions}}

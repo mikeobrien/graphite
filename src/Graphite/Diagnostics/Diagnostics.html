@@ -1,0 +1,56 @@
+﻿<html>
+    <head>
+        <title>GRAPHITE</title>
+        <link rel="shortcut icon" type="image/png" href="{{url}}/favicon"/>
+        <style>
+            {{styles}}
+        </style>
+    </head>
+    <body>
+
+        <table class="panels">
+
+            <tr>
+                <td class="panel nav">
+                    <table><tr>
+                        <td><img src="{{url}}/logo"/></td>
+                        <td class="title"> Graphite v{{version}}</td>
+                    </tr></table>
+                </td>
+                <td class="panel menu-nav selected">
+                    <a href="#configuration">Configuration</a>
+                </td>
+                <td class="panel menu-nav">
+                    <a href="#actions">Actions</a>
+                </td>
+                <td class="panel menu-nav">
+                    <a href="#plugins">Plugins</a>
+                </td>
+                <td class="panel menu-nav">
+                    <a href="#containers">Containers</a>
+                </td>
+            </tr>
+
+            <tr>
+                <td class ="panel" colspan="5">
+                    <div id="configuration" class="hidden menu-content">
+                        {{> configuration}}
+                    </div>
+                    <div id="actions" class="hidden menu-content">
+                        {{> actions}}
+                    </div>
+                    <div id="plugins" class="hidden menu-content">
+                        {{> plugins}}
+                    </div>
+                    <div id="containers" class="hidden menu-content">
+                        {{> containers}}
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+    </body>
+    <script>
+        {{scripts}}
+    </script>
+</html>

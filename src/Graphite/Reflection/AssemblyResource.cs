@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.IO;
+using System.Reflection;
 using System.Text;
 using Graphite.Extensions;
 
@@ -22,6 +23,11 @@ namespace Graphite.Reflection
             {
                 return stream.ReadToEnd(encoding);
             }
+        }
+
+        public Stream GetStream()
+        {
+            return _assembly.GetManifestResourceStream(Name);
         }
     }
 }

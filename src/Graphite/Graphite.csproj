@@ -103,6 +103,7 @@
     <Compile Include="Binding\HeaderBinder.cs" />
     <Compile Include="Binding\CookieBinder.cs" />
     <Compile Include="Exceptions\UnhandledGraphiteException.cs" />
+    <Compile Include="Extensions\MustacheExtensions.cs" />
     <Compile Include="Http\BufferPolicySelector.cs" />
     <Compile Include="DependencyInjection\TrackingContainer.cs" />
     <Compile Include="Actions\IActionDecorator.cs" />
@@ -254,6 +255,27 @@
   <ItemGroup>
     <EmbeddedResource Include="Diagnostics\favicon.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Diagnostics\Diagnostics.css" />
+    <EmbeddedResource Include="Diagnostics\Diagnostics.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Diagnostics\Diagnostics.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Diagnostics\Actions.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Diagnostics\Configuration.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Diagnostics\Containers.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Diagnostics\Plugins.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Diagnostics\logo.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,0 +1,38 @@
+﻿{{#configuration}} 
+<table>
+    <tr>
+        <td class="panel">                    
+            <table class="configuration row-seperator">
+                <tr><td>Startup Time</td><td><code>{{startupTime}}</code></td></tr>
+                <tr><td>Total Requests</td><td><code>{{totalRequests}}</code></td></tr>
+                <tr><td>Handler Name Filter Regex</td><td><code>{{handlerNameConvention}}</code></td></tr>
+                <tr><td>Url Aliases</td><td>{{urlAliases}}</td></tr>
+                <tr><td>Handler Filter</td><td>{{handlerFilter}}</td></tr>
+                <tr><td>Action Regex</td><td>{{actionRegex}}</td></tr>
+                <tr><td>Action Filter</td><td>{{actionFilter}}</td></tr>
+                <tr><td>Get Action Method Name</td><td>{{actionMethodName}}</td></tr>
+                <tr><td>Get Http Method</td><td>{{httpMethod}}</td></tr>
+            </table>
+        </td>
+        <td class="panel">
+            <h3>Enabled Http Methods</h3>
+            <table class="http-methods row-seperator">
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Request</th>
+                        <th>Response</th>
+                    </tr>
+                </thead>
+                <tbody>{{#httpMethods}}
+                    <tr>
+                        <td><code>{{method}}</code></td>
+                        <td>{{allowRequestBody}}</td>
+                        <td>{{allowResponseBody}}</td>
+                    </tr>{{/httpMethods}}
+                </tbody>
+            </table>
+        </td>
+    </tr>
+</table>
+{{/configuration}} 

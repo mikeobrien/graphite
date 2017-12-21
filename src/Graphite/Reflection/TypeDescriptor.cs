@@ -19,6 +19,7 @@ namespace Graphite.Reflection
         private readonly Lazy<TypeDescriptor> _underlyingNullableType;
         private readonly Lazy<Func<object>> _tryCreate;
         private readonly Lazy<bool> _hasDefaultConstructor;
+        private readonly Lazy<bool> _isEnumerable;
 
         public TypeDescriptor(Type type, ITypeCache typeCache) : 
             this(type.UnwrapTask(), type, typeCache) { }
@@ -35,6 +36,7 @@ namespace Graphite.Reflection
             _baseName = type.ToLazy(x => x.GetNonGenericName());
             _tryCreate = type.ToLazy(x => x.CompileTryCreate());
             _hasDefaultConstructor = type.ToLazy(x => x.GetConstructor(Type.EmptyTypes) != null);
+            _isEnumerable = type.ToLazy(x => x.IsEnumerable());
 
             _methods = type.ToLazy(x => x.GetMethods().Select(y => 
                 new MethodDescriptor(this, y, typeCache)).ToArray());
@@ -78,6 +80,7 @@ namespace Graphite.Reflection
         public TypeDescriptor GenericListCastableElementType => _genericListCastableType.Value;
         public bool HasElement => IsArray || IsGenericListCastable;
         public TypeDescriptor ElementType => ArrayElementType ?? GenericListCastableElementType;
+        public bool IsEnumerable => _isEnumerable.Value;
         public bool IsTask { get; }
         public bool IsTaskWithResult { get; }
 

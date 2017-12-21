@@ -1,0 +1,27 @@
+﻿{{#containers}}
+<h3>{{name}}</h3>
+<table class="container row-seperator">
+    <thead>
+        <tr>
+            <th>Plugin Type</th>
+            <th>Plugin Assembly</th>
+            <th>Singleton</th>
+            <th>Instance</th>
+            <th>Concrete Type</th>
+            <th width="100%">Concrete Assembly</th>
+        </tr>
+    </thead>
+    <tbody>
+    {{#registrations}}
+        <tr>
+            <td nowrap><code>{{type}}</code></td>
+            <td nowrap><code>{{assembly}}</code></td>
+            <td>{{singleton}}</td> 
+            <td>{{instance}}</td> 
+            <td><code>{{concreteType}}</code></td>
+            <td nowrap><code>{{concreteAssembly}}</code></td>
+        </tr> 
+    {{/registrations}}                                                       
+    </tbody>
+</table>
+{{/containers}}
