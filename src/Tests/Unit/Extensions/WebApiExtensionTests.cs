@@ -117,6 +117,7 @@ namespace Tests.Unit.Extensions
 
         [TestCase("fark.text", "fark.text")]
         [TestCase("fark farker.txt", "\"fark farker.txt\"")]
+        [TestCase("fark \"farker\".txt", "\"fark \\\"farker\\\".txt\"")]
         public void Should_set_attachment_disposition(string filename, string expected)
         {
             var response = new HttpResponseMessage { Content = new StringContent("") };

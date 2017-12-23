@@ -35,6 +35,14 @@ namespace Graphite.Http
                 : value;
         }
 
+        public static string Quote(this string value)
+        {
+            return value.IsNotNullOrEmpty() && value.Contains(' ') && 
+                   !value.StartsWith("\"") && !value.EndsWith("\"")
+                ? $"\"{value}\""
+                : value;
+        }
+
         public static IList<KeyValuePair<string, string>> ParseHeaders(this string headers)
         {
             headers = headers?.Trim();
