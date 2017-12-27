@@ -11,10 +11,14 @@ namespace TestHarness.Handlers
 
         public void Decorate(ActionDecoratorContext context)
         {
-            context.ActionDescriptor.Registry.Register<IDependency, Dependency>();
+            context.ActionDescriptor.Registry.Register<IDependency1, Dependency1>();
+            context.ActionDescriptor.Registry.Register<IDependency2, Dependency2>();
         }
     }
 
-    public interface IDependency { }
-    public class Dependency : IDependency { }
+    public interface IDependency1 { }
+    public class Dependency1 : IDependency1 { }
+
+    public interface IDependency2 { }
+    public class Dependency2 : IDependency2 { }
 }

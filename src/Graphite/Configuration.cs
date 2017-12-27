@@ -40,6 +40,17 @@ namespace Graphite
         public bool Diagnostics { get; set; }
         public bool Metrics { get; set; } = true;
 
+        public Plugin<IDiagnosticsProvider> DiagnosticsProvider { get; } = Plugin<IDiagnosticsProvider>
+            .Create<DiagnosticsProvider>(singleton: false);
+
+        public Plugins<IDiagnosticsSection> DiagnosticsSections { get; } = 
+            new Plugins<IDiagnosticsSection>(true)
+                .Configure(x => x
+                    .Append<ConfigurationSection>()
+                    .Append<ActionsSection>()
+                    .Append<PluginsSection>()
+                    .Append<ContainersSection>());
+
         public HttpStatusCode DefaultBindingFailureStatusCode { get; set; } = HttpStatusCode.BadRequest;
         public Func<string, string> DefaultBindingFailureReasonPhrase { get; set; } = x => x;
         public HttpStatusCode DefaultNoReaderStatusCode { get; set; } = HttpStatusCode.BadRequest;
@@ -153,7 +164,7 @@ namespace Graphite
             Plugin<IRequestPropertiesProvider>.Create();
 
         public string DefaultAuthenticationRealm { get; set; }
-        public string DefaultUnauthorizedStatusMessage { get; set; }
+        public string DefaultUnauthorizedReasonPhrase { get; set; }
 
         public Type BehaviorChain { get; set; } = typeof(BehaviorChain);
         public Type DefaultBehavior { get; set; } = typeof(InvokerBehavior);

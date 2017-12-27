@@ -36,5 +36,20 @@ namespace Graphite.Extensions
         {
             return value * 1024 * 1024;
         }
+
+        public static string ToSizeString(this int bytes)
+        {
+            string result;
+            if (bytes < 1024) result = $"{bytes}B";
+            else if (bytes < Math.Pow(1024, 2)) result = $"{bytes / 1024.0:##.#}KB";
+            else if (bytes < Math.Pow(1024, 3)) result = $"{bytes / Math.Pow(1024.0, 2):##.#}MB";
+            else result = $"{bytes / Math.Pow(1024.0, 3):##.#}GB";
+            return result.Replace(".0", "");
+        }
+
+        public static string ToSizeString(this int? bytes)
+        {
+            return bytes?.ToSizeString();
+        }
     }
 }

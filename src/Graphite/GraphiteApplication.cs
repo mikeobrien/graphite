@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web.Http;
 using Graphite.DependencyInjection;
+using Graphite.Diagnostics;
 using Graphite.Extensibility;
 using Graphite.Monitoring;
 using Graphite.Reflection;
@@ -80,8 +81,10 @@ namespace Graphite
                 Container.RegisterPlugins(configuration.ValueMappers);
                 Container.RegisterPlugins(configuration.ResponseWriters);
                 Container.RegisterPlugins(configuration.ResponseStatus);
+                Container.RegisterPlugin(configuration.DiagnosticsProvider);
+                Container.RegisterPlugins(configuration.DiagnosticsSections);
                 Container.IncludeRegistry(configuration.Registry);
-
+                
                 Container.GetInstance<IInitializer>().Initialize();
 
                 Metrics.StartupComplete();

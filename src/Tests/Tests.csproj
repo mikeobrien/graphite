@@ -182,6 +182,7 @@
     <Compile Include="Unit\Extensions\ExpressionTests.cs" />
     <Compile Include="Unit\Extensions\ExtensionTests.cs" />
     <Compile Include="Unit\Extensions\IOExtensionTests.cs" />
+    <Compile Include="Unit\Extensions\NumericExtensionTests.cs" />
     <Compile Include="Unit\Extensions\SerializerExtensionTests.cs" />
     <Compile Include="Unit\Extensions\MustacheExtensionTests.cs" />
     <Compile Include="Unit\Http\AsyncContentTests.cs" />

@@ -1,10 +1,12 @@
-﻿{{#actions}}
-<table class="assemblies">
+﻿<table class="assemblies">
     <tr>
         <th>Source Assembiles</th>
     </tr>
     {{#assemblies}}<tr><td><code>{{.}}</code></td></tr>{{/assemblies}}
 </table>
+
+<input type="text" class="action-search" id="action-search" placeholder="Search..." /> 
+
 <table class="actions">
     <thead>
         <tr>
@@ -16,77 +18,78 @@
         </tr>
     </thead>
     {{#endpoints}}
-    <tbody>
+    <tbody class="action-row" data-description="{{url}} {{actionName}}">
         <tr onclick="toggleVisibility(this)">
-            <td><code><span class="{{methodClass}}"\>{{method}}</span></code></td>
-            <td><code>/{{url}}</code></td>
+            <td><code><span class="http-method-{{method}}"\>{{method}}</span></code></td>
+            <td><code>{{#urlParts}}/{{#segment}}{{.}}{{/segment}}{{#parameter}}<span class=\"url-parameter\">{{.}}</span>{{/parameter}}{{/urlParts}}</code></td>
             <td>&rarr;</td>
             <td><code>{{actionName}}</code></td>
             <td width=""100%""><code>{{assembly}}</code></td>
             <td><code>{{averageRequestTime}}</code></td>
         </tr>
-        <tr style="display: none">
+        <tr style="display: none" class="configuration">
             <td colspan="6">
                 <table>
                     <tr>
                         <td>Behaviors</td>
-                        <td><table class="behaviors">{{behaviors}}</table></td>
+                        <td colspan="6"><table class="behaviors">
+                            {{#behaviors}}
+                                {{#empty}}<span class="red">None</span>{{/empty}}
+                                {{#items}}
+                                    {{#item}}<tr><td><code>{{.}}</code></td></tr>{{/item}}
+                                    {{#middle}}<tr><td class="arrow">&darr;</td></tr>{{/middle}}
+                                {{/items}}
+                            {{/behaviors}}
+                        </table></td>
                     </tr>
                     <tr>
                         <td>Request Parameter</td>
-                        <td>{{requestParameter}}</td>
+                        <td colspan="6">
+                            {{#requestParameter}}
+                                {{#none}}<span class="red">None</span>{{/none}}
+                                {{#value}}
+                                    <code class="red">{{name}}</code>:<code>{{type}}</code>
+                                {{/value}}
+                            {{/requestParameter}}
+                        </td>
                     </tr>
                     <tr>
                         <td>Url Parameters</td>
-                        <td>{{urlParameters}}</td>
+                        <td colspan="6">
+                            {{#urlParameters}}
+                                {{#empty}}<span class="red">None</span>{{/empty}}
+                                {{#items}}
+                                    {{#item}}<code class="red">{{name}}</code>:<code>{{type}}</code>{{/item}}{{#middle}}, {{/middle}}
+                                {{/items}}
+                            {{/urlParameters}}
+                        </td>
                     </tr>
                     <tr>
                         <td>Parameters</td>
-                        <td>{{parameters}}</td>
+                        <td colspan="6">
+                            {{#actionParameters}}
+                                {{#empty}}<span class="red">None</span>{{/empty}}
+                                {{#items}}
+                                    {{#item}}<code class="red">{{name}}</code>:<code>{{type}}</code>{{/item}}{{#middle}}, {{/middle}}
+                                {{/items}}
+                            {{/actionParameters}}
+                        </td>
                     </tr>
                     <tr>
                         <td>Response Type</td>
-                        <td>{{response}}</td>
-                    </tr>
-                    <tr>
-                        <td>Action Registry</td>
-                        <td>
-                            {{#registry}}
-                            {{#empty}}<span class="red">Empty</span>{{/empty}}
-                            {{#notEmpty}}
-                            <table class="container row-seperator">
-                                <thead>
-                                    <tr>
-                                        <th>Plugin Type</th>
-                                        <th>Plugin Assembly</th>
-                                        <th>Singleton</th>
-                                        <th>Instance</th>
-                                        <th>Concrete Type</th>
-                                        <th width="100%">Concrete Assembly</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                {{#registrations}}
-                                    <tr>
-                                        <td nowrap><code>{{type}}</code></td>
-                                        <td nowrap><code>{{assembly}}</code></td>
-                                        <td>{{singleton}}</td> 
-                                        <td>{{instance}}</td> 
-                                        <td><code>{{concreteType}}</code></td>
-                                        <td nowrap><code>{{concreteAssembly}}</code></td>
-                                    </tr> 
-                                {{/registrations}}                                                       
-                                </tbody>
-                            </table>
-                            {{/notEmpty}}
-                            {{/registry}}
+                        <td colspan="6">
+                            {{#responseType}}
+                                {{#none}}<span class="red">None</span>{{/none}}
+                                {{#value}}<code>{{.}}</code>{{/value}}
+                            {{/responseType}}
                         </td>
                     </tr>
-
+                    {{#actionPlugins}}
+                    {{> actionPlugins}}
+                    {{/actionPlugins}}
                 </table>
             </td>
         </tr>
     </tbody>
     {{/endpoints}}
 </table>
-{{/actions}}

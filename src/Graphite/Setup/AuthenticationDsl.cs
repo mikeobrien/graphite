@@ -31,7 +31,7 @@ namespace Graphite.Setup
         /// </summary>
         public ConfigurationDsl WithDefaultUnauthorizedStatusMessage(string statusMessage)
         {
-            _configuration.DefaultUnauthorizedStatusMessage = statusMessage;
+            _configuration.DefaultUnauthorizedReasonPhrase = statusMessage;
             return this;
         }
 

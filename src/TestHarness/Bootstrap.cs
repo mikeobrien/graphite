@@ -1,4 +1,5 @@
-﻿using System.Web.Http;
+﻿using System;
+using System.Web.Http;
 using Graphite.Authentication;
 using Graphite.Cors;
 using Graphite.Http;

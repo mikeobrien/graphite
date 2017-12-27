@@ -70,6 +70,13 @@
     <Compile Include="Binding\MultipartPartContent.cs" />
     <Compile Include="Binding\ParameterBinder.cs" />
     <Compile Include="Actions\IResponseStatus.cs" />
+    <Compile Include="Diagnostics\ActionsSection.cs" />
+    <Compile Include="Diagnostics\ConfigurationSection.cs" />
+    <Compile Include="Diagnostics\ContainersSection.cs" />
+    <Compile Include="Diagnostics\DiagnosticsProvider.cs" />
+    <Compile Include="Diagnostics\DiagnosticsSection.cs" />
+    <Compile Include="Diagnostics\Extensions.cs" />
+    <Compile Include="Diagnostics\PluginsSection.cs" />
     <Compile Include="Exceptions\BadRequestException.cs" />
     <Compile Include="Exceptions\ExceptionHandlerWrapper.cs" />
     <Compile Include="Exceptions\ExceptionLoggerWrapper.cs" />
@@ -276,6 +283,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Diagnostics\logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Diagnostics\ActionPlugins.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

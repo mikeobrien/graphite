@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using Graphite.Extensions;
 using Graphite.Linq;
 
 namespace Graphite.DependencyInjection
@@ -38,6 +37,13 @@ namespace Graphite.DependencyInjection
         public static IEnumerable<T> GetInstances<T>(this IContainer container) where T : class
         {
             return container.GetInstances(typeof(T)).Cast<T>();
+        }
+
+        public static IContainer Register<TPlugin, TConcrete>(this IContainer container,
+            bool singleton = false) where TPlugin : class where TConcrete : TPlugin
+        {
+            container.Register(typeof(TPlugin), typeof(TConcrete), singleton);
+            return container;
         }
 
         public static IContainer Register<TPlugin>(this IContainer container,

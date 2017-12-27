@@ -69,12 +69,12 @@ td {
     vertical-align: top;
 }
 
-.row-seperator tr:nth-child(n+2) td {
+.row-seperator tr td {
     border-top: 1px #464646 solid;
 }
 
-.body-seperator tbody:not(:last-child) tr:last-child td {
-    border-bottom: 1px #464646 solid;
+.body-seperator tbody:not(:last-child) tr:first-child td {
+    border-top: 1px #464646 solid;
 }
 
 .panel table {
@@ -86,7 +86,6 @@ td {
     color: #e2e2e2;
     font-weight: normal;
     font-size: 12pt;
-    border-bottom: 1px #464646 solid;
     padding-bottom: 10px;
 }
 
@@ -95,7 +94,6 @@ td {
 }
 
 .panel td {
-    padding-top: 5px;
     padding-bottom: 5px;
 }
 
@@ -104,12 +102,13 @@ code {
 }
 
 .panel th, .panel td {
+    padding-top: 5px;
     padding-right: 20px;
 }
 
-    .panel th, .panel td:first-child {
-        white-space: nowrap;
-    }
+.panel th, .panel td:first-child {
+    white-space: nowrap;
+}
 
 .configuration td:last-child {
     width: 100%;
@@ -121,10 +120,9 @@ code {
 
 .actions > tbody > tr:first-child {
     cursor: pointer;
-    cursor: hand;
 }
 
-.actions > tbody:not(:first-of-type) > tr:first-child > td {
+.actions > tbody > tr:first-child > td {
     border-top: 1px #464646 solid;
 }
 
@@ -143,6 +141,19 @@ code {
 
 table.actions > tbody th {
     font-size: 10pt;
+}
+
+table.actions tr.configuration {
+    background-color: #353535;
+}
+
+.action-search {
+    background-color: #a5a5a5;
+    border-width: 0;
+    margin: 5px 10px 15px 0;
+    font-family: Verdana, Arial, sans-serif;
+    padding: 5px;
+    width: 400px;
 }
 
 table.behaviors {
@@ -180,4 +191,24 @@ table.behaviors {
 
 .grey {
     color: #888888;
+}
+
+.http-method-post {
+    color: #90c564;
+}
+
+.http-method-delete {
+    color: #e3524f;
+}
+
+.http-method-patch {
+    color: #b842ff;
+}
+
+.http-method-get {
+    color: #4272ff;
+}
+
+.http-method-put {
+    color: #ef3cc7;
 }

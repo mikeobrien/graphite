@@ -33,9 +33,9 @@ namespace Graphite.Reflection
             return typeCache.GetTypeDescriptor(typeof(T));
         }
 
-        public static AssemblyDescriptor GetCurrentAssemblyDescriptor(this ITypeCache typeCache)
+        public static AssemblyDescriptor GetTypeAssemblyDescriptor<T>(this ITypeCache typeCache)
         {
-            return typeCache.GetAssemblyDescriptor(Assembly.GetCallingAssembly());
+            return typeCache.GetAssemblyDescriptor(typeof(T).Assembly);
         }
 
         public static string GetResourceString<T>(this AssemblyDescriptor assembly, string name)

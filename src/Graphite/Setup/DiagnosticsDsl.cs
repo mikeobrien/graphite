@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
+using Graphite.Diagnostics;
+using Graphite.Extensibility;
 using Graphite.Reflection;
 
 namespace Graphite.Setup
@@ -50,6 +53,26 @@ namespace Graphite.Setup
         public ConfigurationDsl ExcludeDiagnosticsFromAuthentication()
         {
             _configuration.ExcludeDiagnosticsFromAuthentication = true;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the diagnostics provider.
+        /// </summary>
+        public ConfigurationDsl WithDiagnosticsProvider<T>(bool singleton = false) 
+            where T : IDiagnosticsProvider
+        {
+            _configuration.DiagnosticsProvider.Set<T>(singleton);
+            return this;
+        }
+
+        /// <summary>
+        /// Configures diagnostic page sections.
+        /// </summary>
+        public ConfigurationDsl ConfigureDiagnosticsSections(
+            Action<PluginsDsl<IDiagnosticsSection>> configure)
+        {
+            _configuration.DiagnosticsSections.Configure(configure);
             return this;
         }
     }

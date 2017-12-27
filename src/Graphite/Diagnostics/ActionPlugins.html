@@ -1,0 +1,51 @@
+﻿<tr>
+    <th>{{name}}</th>
+    <th>Plugin Type</th>
+    <th>Plugin Assembly</th>
+    <th>Singleton</th>
+    <th>Instance</th>
+    <th>Concrete Type</th>
+    <th width="100%">Concrete Assembly</th>
+</tr>
+{{#plugins}}
+{{#empty}}
+    <tbody>
+        <tr>
+            <td/>
+            <td colspan="7">
+                <span class="red">Empty</span>
+            </td>
+        </tr>
+    </tbody>
+{{/empty}}
+{{#items}}
+    {{#first}}
+    <tbody>
+    {{/first}}
+    {{#item}}
+        <tr>
+            <td/>
+            <td nowrap><code>{{type}}</code></td>
+            <td nowrap><code>{{assembly}}</code></td>
+            <td>
+                {{#singleton}}
+                    {{#yes}}<span class="green">Yes</span>{{/yes}}
+                    {{#no}}<span class="red">No</span>{{/no}}
+                    {{#none}}<span class="grey">N/A</span>{{/none}}
+                {{/singleton}}
+            </td> 
+            <td>
+                {{#instance}}
+                    {{#yes}}<span class="green">Yes</span>{{/yes}}
+                    {{#no}}<span class="red">No</span>{{/no}}
+                {{/instance}}
+            </td> 
+            <td><code>{{concreteType}}</code></td>
+            <td nowrap><code>{{concreteAssembly}}</code></td>
+        </tr>     
+    {{/item}}
+    {{#last}}                                                  
+    </tbody>
+    {{/last}}
+{{/items}}
+{{/plugins}}

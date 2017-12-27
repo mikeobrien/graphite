@@ -17,34 +17,20 @@
                         <td class="title"> Graphite v{{version}}</td>
                     </tr></table>
                 </td>
-                <td class="panel menu-nav selected">
-                    <a href="#configuration">Configuration</a>
-                </td>
+                {{#tabs}}
                 <td class="panel menu-nav">
-                    <a href="#actions">Actions</a>
+                    <a href="#{{id}}">{{name}}</a>
                 </td>
-                <td class="panel menu-nav">
-                    <a href="#plugins">Plugins</a>
-                </td>
-                <td class="panel menu-nav">
-                    <a href="#containers">Containers</a>
-                </td>
+                {{/tabs}}
             </tr>
 
             <tr>
                 <td class ="panel" colspan="5">
-                    <div id="configuration" class="hidden menu-content">
-                        {{> configuration}}
+                    {{#sections}}
+                    <div id="{{id}}" class="menu-content hidden">
+                        {{template}}
                     </div>
-                    <div id="actions" class="hidden menu-content">
-                        {{> actions}}
-                    </div>
-                    <div id="plugins" class="hidden menu-content">
-                        {{> plugins}}
-                    </div>
-                    <div id="containers" class="hidden menu-content">
-                        {{> containers}}
-                    </div>
+                    {{/sections}}
                 </td>
             </tr>
         </table>

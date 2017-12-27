@@ -164,7 +164,7 @@ namespace Tests.Unit.Authentication
             string authenticatorStatusMessage, string expected)
         {
             _requestMessage.SetBasicAuthorizationHeader("fark", "wrong");
-            _configuration.DefaultUnauthorizedStatusMessage = "config";
+            _configuration.DefaultUnauthorizedReasonPhrase = "config";
             _basicAuthenticator.StatusMessageOverride = authenticatorStatusMessage;
             _authenticators.Add(_basicAuthenticator);
             _actionDescriptor.Authenticators.Configure(x => x
@@ -196,7 +196,7 @@ namespace Tests.Unit.Authentication
         {
             responseMessage.StatusCode.ShouldEqual(HttpStatusCode.Unauthorized);
             responseMessage.ReasonPhrase.ShouldEqual(statusMessage ?? 
-                _configuration.DefaultUnauthorizedStatusMessage ?? "Unauthorized");
+                _configuration.DefaultUnauthorizedReasonPhrase ?? "Unauthorized");
 
             responseMessage.Headers.WwwAuthenticate.Count.ShouldEqual(authenticators.Length);
 

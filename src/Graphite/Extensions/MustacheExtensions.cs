@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Graphite.Reflection;
+using PropertyDescriptor = Graphite.Reflection.PropertyDescriptor;
 
 namespace Graphite.Extensions
 {
@@ -26,6 +28,8 @@ namespace Graphite.Extensions
         public static string RenderMustache(this string template, object model, 
             ITypeCache typeCache, object partials = null)
         {
+            if (template == null) throw new ArgumentNullException(
+                nameof(template), "Template must not be null.");
             return ParsedTemplates(template, partials, typeCache).ReplaceTokens(model, typeCache);
         }
         
@@ -40,6 +44,7 @@ namespace Graphite.Extensions
         private static string ReplaceToken(this string template, Block block, 
             PropertyDescriptor property, object model, ITypeCache typeCache)
         {
+            if (property.Name.IsNullOrEmpty()) return "";
             var value = property.GetValue(model);
             var type = value?.GetType() ?? property.PropertyType.Type;
             return template.Replace($"{{{{{property.Name}}}}}", 
@@ -58,11 +63,13 @@ namespace Graphite.Extensions
             var type = model != null
                 ? typeCache.GetTypeDescriptor(model.GetType())
                 : property.PropertyType;
-            return model != null
-                ? (type.IsEnumerable
-                    ? block.ReplaceLoop(model, typeCache)
-                    : block.ReplaceTokens(model, typeCache))
-                : "";
+            return (model != null
+                ? (type.IsSimpleType
+                    ? block.Template.Replace("{{.}}", model.ToString())
+                    : (type.IsEnumerable
+                        ? block.ReplaceLoop(model, typeCache)
+                        : block.ReplaceTokens(model, typeCache)))
+                : "").Trim('\r', '\n');
         }
 
         private static string ReplaceLoop(this Block block, object model, ITypeCache typeCache)
@@ -71,7 +78,7 @@ namespace Graphite.Extensions
                 .Aggregate("", (a, i) => a + (
                     typeCache.GetTypeDescriptor(i.GetType()).IsSimpleType
                         ? block.Template.Replace("{{.}}", i.ToString())
-                        : block.ReplaceTokens(i, typeCache)));
+                        : block.ReplaceTokens(i, typeCache)).Trim('\r', '\n'));
         }
         
         private class Block
@@ -126,6 +133,96 @@ namespace Graphite.Extensions
                 .Aggregate(template, (a, i) => new Regex($@"\{{\{{\> {i.Name}\}}\}}")
                     .Replace(a, (string)i.GetValue(partials)));
             return PartialTokenRegex.Replace(fullTemplate, "");
+        }
+
+        public static object ToListModel(this IEnumerable list, object empty = null)
+        {
+            return list.Cast<object>().ToListModel(x => x, empty);
+        }
+
+        public static object ToListModel<T, TResult>(this IEnumerable<T> list, 
+            Func<T, TResult> map, object empty = null)
+        {
+            var items = list.ToList();
+            return new 
+            {
+                empty = !items.Any() ? (empty ?? true) : null,
+                count = items.Any() ? items.Count : (int?)null,
+                items = items.Select((x, i) => new
+                {
+                    first = i == 0,
+                    last = i == items.Count - 1,
+                    middle = i != items.Count - 1,
+                    item = map(x)
+                })
+            };
+        }
+
+        public static object ToOptionalModel(this string value)
+        {
+            var none = value.IsNullOrEmpty();
+            return new 
+            {
+                none,
+                value = !none ? value : ""
+            };
+        }
+
+        public static object ToOptionalModel<T>(this T value)
+        {
+            return new 
+            {
+                none = value == null,
+                value = value != null ? value : default(T)
+            };
+        }
+
+        public static object ToOptionalModel<T, TResult>(this T value, Func<T, TResult> map)
+        {
+            return new 
+            {
+                none = value == null,
+                value = value != null ? map(value) : default(TResult)
+            };
+        }
+
+        public static object ToOptionalModel(this object value, object @default)
+        {
+            return new
+            {
+                @default = value == @default ? (value ?? new object()) : false,
+                value = value != @default && value != null ? value : false,
+                none = value != @default && value == null
+            };
+        }
+
+        public static object ToYesNoModel(this bool value)
+        {
+            return new
+            {
+                yes = value,
+                no = !value
+            };
+        }
+
+        public static object ToYesNoModel(this bool? value)
+        {
+            return new
+            {
+                none = !value.HasValue,
+                yes = value,
+                no = !value
+            };
+        }
+
+        public static object ToYesNoModel(this bool value, bool applies)
+        {
+            return new
+            {
+                none = !applies,
+                yes = applies && value,
+                no = applies && !value
+            };
         }
     }
 }

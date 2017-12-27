@@ -67,7 +67,7 @@ namespace Graphite.Authentication
         {
             _responseMessage.StatusCode = HttpStatusCode.Unauthorized;
             _responseMessage.SafeSetReasonPhrase(authenticator?.UnauthorizedReasonPhrase ??
-                _configuration.DefaultUnauthorizedStatusMessage);
+                _configuration.DefaultUnauthorizedReasonPhrase);
 
             authenticators.ForEach(x => _responseMessage.AddAuthenticateHeader(
                 x.Scheme, x.Realm ?? _configuration.DefaultAuthenticationRealm));

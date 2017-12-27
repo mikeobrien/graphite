@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Graphite.Extensions;
 using Graphite.Reflection;
@@ -21,26 +20,45 @@ namespace Tests.Unit.Extensions
             template.RenderMustache(new { value = "fark" }, new TypeCache())
                 .ShouldEqual(expected);
         }
-
-        [TestCase("{{value}}", "fark")]
-        [TestCase("{{value}}{{#list}}{{value}}{{/list}}", "farknested1nested2")]
-        [TestCase("{{value}}{{#list}}{{value}}\r\n{{/list}}", "farknested1\r\nnested2\r\n")]
-        [TestCase("{{#simpleValues}}{{.}}{{/simpleValues}}", "abc")]
-        [TestCase("{{#isTrue}}yay {{value}}{{/isTrue}}{{#isFalse}}aw {{value}}{{/isFalse}}", "yay fark")]
-        [TestCase("{{value}}" +
-                  "{{#list}}" +
+        
+        [TestCase("{{#model}}{{value}}{{/model}}", 
+            "nested")]
+        public void Should_render_complex_block(string template, string expected)
+        {
+            template.RenderMustache(new
+                {
+                    model = new
+                    {
+                        value = "nested"
+                    }
+                }, new TypeCache())
+                .ShouldEqual(expected);
+        }
+        
+        [TestCase("{{#isTrue}}yay {{value}}{{/isTrue}}{{#isFalse}}aw {{value}}{{/isFalse}}", "yay ")]
+        public void Should_render_boolean_block(string template, string expected)
+        {
+            template.RenderMustache(new
+                {
+                    isTrue = true,
+                    isFalse = false
+                }, new TypeCache())
+                .ShouldEqual(expected);
+        }
+        
+        [TestCase("{{#list}}{{value}}{{/list}}", "nested1nested2")]
+        [TestCase("{{#list}}{{value}}\r\n{{/list}}", "nested1nested2")]
+        [TestCase("{{#list}}" +
                         "{{value}}" +
                         "{{#nestedValues}}" +
                             "{{value}}" +
                         "{{/nestedValues}}" +
-                  "{{/list}}" +
-                  "{{#model}}{{value}}{{/model}}", 
-            "farknested1nestedNested1nestedNested2nested2nestedNested3nestedNested4nested")]
-        public void Should_render_nested_template(string template, string expected)
+                  "{{/list}}",
+            "nested1nestedNested1nestedNested2nested2nestedNested3nestedNested4")]
+        public void Should_render_complex_list(string template, string expected)
         {
             template.RenderMustache(new
                 {
-                    value = "fark",
                     list = new ArrayList
                     {
                         new
@@ -61,14 +79,28 @@ namespace Tests.Unit.Extensions
                                 new { value = "nestedNested4" }
                             }
                         }
-                    } as object,
-                    model = new
-                    {
-                        value = "nested"
-                    },
-                    simpleValues = new ArrayList { "a", "b", "c" } as object,
-                    isTrue = true,
-                    isFalse = false
+                    } as object
+                }, new TypeCache())
+                .ShouldEqual(expected);
+        }
+        
+        [TestCase("{{#simpleValues}}{{.}}{{/simpleValues}}", "abc")]
+        public void Should_render_simple_list(string template, string expected)
+        {
+            template.RenderMustache(new
+                {
+                    simpleValues = new ArrayList { "a", "b", "c" } as object
+                }, new TypeCache())
+                .ShouldEqual(expected);
+        }
+
+        [TestCase(null, "")]
+        [TestCase(5, "5")]
+        public void Should_conditionally_render_nullable_types(int? value, string expected)
+        {
+            "{{#value}}{{.}}{{/value}}".RenderMustache(new
+                {
+                    value
                 }, new TypeCache())
                 .ShouldEqual(expected);
         }

@@ -1,19 +1,184 @@
-﻿{{#configuration}} 
-<table>
+﻿<table>
     <tr>
-        <td class="panel">                    
+        <td class="panel"> 
+            <h3>General</h3>                   
             <table class="configuration row-seperator">
                 <tr><td>Startup Time</td><td><code>{{startupTime}}</code></td></tr>
                 <tr><td>Total Requests</td><td><code>{{totalRequests}}</code></td></tr>
-                <tr><td>Handler Name Filter Regex</td><td><code>{{handlerNameConvention}}</code></td></tr>
-                <tr><td>Url Aliases</td><td>{{urlAliases}}</td></tr>
-                <tr><td>Handler Filter</td><td>{{handlerFilter}}</td></tr>
-                <tr><td>Action Regex</td><td>{{actionRegex}}</td></tr>
-                <tr><td>Action Filter</td><td>{{actionFilter}}</td></tr>
-                <tr><td>Get Action Method Name</td><td>{{actionMethodName}}</td></tr>
-                <tr><td>Get Http Method</td><td>{{httpMethod}}</td></tr>
+                <tr><td>Metrics Enabled</td><td>
+                    {{#metrics}}
+                        {{#yes}}<span class="green">Yes</span>{{/yes}}
+                        {{#no}}<span class="red">No</span>{{/no}}
+                    {{/metrics}}
+                </td></tr>
+                <tr><td>Container</td><td>
+                    {{#container}}
+                        {{#value}}<code>{{.}}</code>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/container}}
+                </td></tr>
+                <tr><td>Default Encoding</td><td>
+                    {{#defaultEncoding}}
+                        {{#value}}<code>{{.}}</code>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/defaultEncoding}}
+                </td></tr>
+                <tr><td>Default Buffer Size</td><td><code>{{defaultBufferSize}}</code></td></tr>
+                <tr><td>Behavior Chain</td><td><code>{{behaviorChain}}</code></td></tr>
+                <tr><td>Default Behavior</td><td><code>{{defaultBehavior}}</code></td></tr>
+            </table>
+
+            <h3>Discovery</h3>
+            
+            <table class="configuration row-seperator">
+                <tr><td>Handler Name Filter Regex</td><td>
+                    {{#handlerNameConvention}}
+                        {{#default}}<span class="grey">Default</span>{{/default}}
+                        {{#value}}<span class="green">Custom</span>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/handlerNameConvention}}
+                </td></tr>
+                <tr><td>Handler Filter</td><td>
+                    {{#handlerFilter}}
+                        {{#default}}<span class="grey">Default</span>{{/default}}
+                        {{#value}}<span class="green">Custom</span>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/handlerFilter}}
+                </td></tr>
+                <tr><td>Action Regex</td><td>
+                    {{#actionNameConvention}}
+                        {{#default}}<span class="grey">Default</span>{{/default}}
+                        {{#value}}<span class="green">Custom</span>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/actionNameConvention}}
+                </td></tr>
+                <tr><td>Action Filter</td><td>
+                    {{#actionFilter}}
+                        {{#default}}<span class="grey">Default</span>{{/default}}
+                        {{#value}}<span class="green">Custom</span>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/actionFilter}}
+                </td></tr>
+            </table>
+
+            <h3>Routing</h3>
+            
+            <table class="configuration row-seperator">
+                <tr><td>Url Prefix</td><td>
+                    {{#urlPrefix}}
+                        {{#value}}<code>{{.}}</code>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/urlPrefix}}
+                </td></tr>
+                <tr><td>Url Aliases</td><td>
+                    {{#urlAliases}}
+                        {{#empty}}<span class="red">None configured</span>{{/empty}}
+                        {{#count}}<span class="green">{{.}} configured</span>{{/count}}
+                    {{/urlAliases}}
+                </td></tr>
+                <tr><td>Action Segments Convention</td><td>
+                    {{#actionSegmentsConvention}}
+                        {{#default}}<span class="grey">Default</span>{{/default}}
+                        {{#value}}<span class="green">Custom</span>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/actionSegmentsConvention}}
+                </td></tr>
+                <tr><td>Http Method Convention</td><td>
+                    {{#httpMethodConvention}}
+                        {{#default}}<span class="grey">Default</span>{{/default}}
+                        {{#value}}<span class="green">Custom</span>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/httpMethodConvention}}
+                </td></tr>
+                <tr><td>Automatically Constrain Url Parameter By Type</td><td>
+                    {{#automaticallyConstrainUrlParameterByType}}
+                        {{#yes}}<span class="green">Yes</span>{{/yes}}
+                        {{#no}}<span class="red">No</span>{{/no}}
+                    {{/automaticallyConstrainUrlParameterByType}}
+                </td></tr>
+                <tr><td>Querystring Parameter Delimiters</td><td>
+                    {{#querystringParameterDelimiters}}
+                        {{#empty}}<span class="red">None configured</span>{{/empty}}
+                        {{#count}}<span class="green">{{.}} configured</span>{{/count}}
+                    {{/querystringParameterDelimiters}}
+                </td></tr>
+                <tr><td>Namespace Url Mappings</td><td>
+                    {{#namespaceUrlMappings}}
+                        {{#empty}}<span class="red">None configured</span>{{/empty}}
+                        {{#count}}<span class="green">{{.}} configured</span>{{/count}}
+                    {{/namespaceUrlMappings}}
+                </td></tr>
+            </table>
+
+            <h3>Binding</h3>
+            
+            <table class="configuration row-seperator">
+                <tr><td>Headers Binding Mode</td><td><code>{{headersBindingMode}}</code></td></tr>
+                <tr><td>Cookies Binding Mode</td><td><code>{{cookiesBindingMode}}</code></td></tr>
+                <tr><td>Request Info Binding Mode</td><td><code>{{requestInfoBindingMode}}</code></td></tr>
+                <tr><td>Continer Binding Mode</td><td><code>{{continerBindingMode}}</code></td></tr>
+                <tr><td>Bind Complex Type Properties</td><td>
+                    {{#bindComplexTypeProperties}}
+                        {{#yes}}<span class="green">Yes</span>{{/yes}}
+                        {{#no}}<span class="red">No</span>{{/no}}
+                    {{/bindComplexTypeProperties}}
+                </td></tr>
+                <tr><td>Create Empty Request Parameter Value</td><td>
+                    {{#createEmptyRequestParameterValue}}
+                        {{#yes}}<span class="green">Yes</span>{{/yes}}
+                        {{#no}}<span class="red">No</span>{{/no}}
+                    {{/createEmptyRequestParameterValue}}
+                </td></tr>
+                <tr><td>Fail If No Mapper Found</td><td>
+                    {{#failIfNoMapperFound}}
+                        {{#yes}}<span class="green">Yes</span>{{/yes}}
+                        {{#no}}<span class="red">No</span>{{/no}}
+                    {{/failIfNoMapperFound}}
+                </td></tr>
+            </table>
+
+            <h3>Response Status</h3>
+            
+            <table class="configuration row-seperator">
+                <tr><td>Default Binding Failure Status</td><td><code>{{defaultBindingFailureStatusCode}}</code></td></tr>
+                <tr><td>Default Binding Failure Reason Phrase</td><td>
+                    {{#defaultBindingFailureReasonPhrase}}
+                        {{#default}}<span class="grey">Default</span>{{/default}}
+                        {{#value}}<span class="green">Custom</span>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/defaultBindingFailureReasonPhrase}}
+                </td></tr>
+                <tr><td>Default No Reader Status</td><td><code>{{defaultNoReaderStatusCode}}</code></td></tr>
+                <tr><td>Default No Reader Reason Phrase</td><td>
+                    {{#defaultNoReaderReasonPhrase}}
+                        {{#value}}<code>{{.}}</code>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/defaultNoReaderReasonPhrase}}
+                </td></tr>
+                <tr><td>Default Has Response Status</td><td><code>{{defaultHasResponseStatusCode}}</code></td></tr>
+                <tr><td>Default Has Response Reason Phrase</td><td>
+                    {{#defaultHasResponseReasonPhrase}}
+                        {{#value}}<code>{{.}}</code>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/defaultHasResponseReasonPhrase}}
+                </td></tr>
+                <tr><td>Default No Response Status</td><td><code>{{defaultNoResponseStatusCode}}</code></td></tr>
+                <tr><td>Default No Response Reason Phrase</td><td>
+                    {{#defaultNoResponseReasonPhrase}}
+                        {{#value}}<code>{{.}}</code>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/defaultNoResponseReasonPhrase}}
+                </td></tr>
+                <tr><td>Default No Writer Status</td><td><code>{{defaultNoWriterStatusCode}}</code></td></tr>
+                <tr><td>Default No Writer Reason Phrase</td><td>
+                    {{#defaultNoWriterReasonPhrase}}
+                        {{#value}}<code>{{.}}</code>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/defaultNoWriterReasonPhrase}}
+                </td></tr>
             </table>
         </td>
+
         <td class="panel">
             <h3>Enabled Http Methods</h3>
             <table class="http-methods row-seperator">
@@ -27,12 +192,114 @@
                 <tbody>{{#httpMethods}}
                     <tr>
                         <td><code>{{method}}</code></td>
-                        <td>{{allowRequestBody}}</td>
-                        <td>{{allowResponseBody}}</td>
+                        <td>
+                            {{#allowRequestBody}}
+                                {{#yes}}<span class="green">Yes</span>{{/yes}}
+                                {{#no}}<span class="red">No</span>{{/no}}
+                            {{/allowRequestBody}}
+                        </td>
+                        <td>
+                            {{#allowResponseBody}}
+                                {{#yes}}<span class="green">Yes</span>{{/yes}}
+                                {{#no}}<span class="red">No</span>{{/no}}
+                            {{/allowResponseBody}}
+                        </td>
                     </tr>{{/httpMethods}}
                 </tbody>
             </table>
+
+            <h3>Serialization</h3>
+            
+            <table class="configuration row-seperator">
+                <tr><td>Dispose Serialized Objects</td><td>
+                    {{#disposeSerializedObjects}}
+                        {{#yes}}<span class="green">Yes</span>{{/yes}}
+                        {{#no}}<span class="red">No</span>{{/no}}
+                    {{/disposeSerializedObjects}}
+                </td></tr>
+                <tr><td>Serializer Buffer Size</td><td>
+                    {{#serializerBufferSize}}
+                        {{#value}}<code>{{.}}</code>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/serializerBufferSize}}
+                </td></tr>
+            </table>
+
+            <h3>JSON Serialization</h3>
+            
+            <table class="configuration row-seperator">
+            
+                {{#jsonSerializer}}
+                
+                <tr><td>Check Additional Content</td><td>
+                    {{#checkAdditionalContent}}
+                        {{#yes}}<span class="green">Yes</span>{{/yes}}
+                        {{#no}}<span class="red">No</span>{{/no}}
+                    {{/checkAdditionalContent}}
+                </td></tr>
+                <tr><td>Constructor Handling</td><td><code>{{constructorHandling}}</code></td></tr>
+                <tr><td>Converters</td><td>
+                    {{#converters}}
+                        {{#empty}}<span class="red">None configured</span>{{/empty}}
+                        {{#count}}<span class="green">{{.}} configured</span>{{/count}}
+                    {{/converters}}
+                </td></tr>
+                <tr><td>Culture</td><td><code>{{culture}}</code></td></tr>
+                <tr><td>Date Format Handling</td><td><code>{{dateFormatHandling}}</code></td></tr>
+                <tr><td>Date Format String</td><td><code>{{dateFormatString}}</code></td></tr>
+                <tr><td>Date Parse Handling</td><td><code>{{dateParseHandling}}</code></td></tr>
+                <tr><td>Date Time Zone Handling</td><td><code>{{dateTimeZoneHandling}}</code></td></tr>
+                <tr><td>Default Value Handling</td><td><code>{{defaultValueHandling}}</code></td></tr>
+                <tr><td>Float Format Handling</td><td><code>{{floatFormatHandling}}</code></td></tr>
+                <tr><td>Float Parse Handling</td><td><code>{{floatParseHandling}}</code></td></tr>
+                <tr><td>Formatting</td><td><code>{{formatting}}</code></td></tr>
+                <tr><td>Max Depth</td><td>
+                    {{#maxDepth}}
+                        {{#value}}<code>{{.}}</code>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/maxDepth}}
+                </td></tr>
+                <tr><td>Metadata Property Handling</td><td><code>{{metadataPropertyHandling}}</code></td></tr>
+                <tr><td>Missing Member Handling</td><td><code>{{missingMemberHandling}}</code></td></tr>
+                <tr><td>Null Value Handling</td><td><code>{{nullValueHandling}}</code></td></tr>
+                <tr><td>Object Creation Handling</td><td><code>{{objectCreationHandling}}</code></td></tr>
+                <tr><td>Preserve References Handling</td><td><code>{{preserveReferencesHandling}}</code></td></tr>
+                <tr><td>Reference Loop Handling</td><td><code>{{referenceLoopHandling}}</code></td></tr>
+                <tr><td>String Escape Handling</td><td><code>{{stringEscapeHandling}}</code></td></tr>
+                <tr><td>Type Name Handling</td><td><code>{{typeNameHandling}}</code></td></tr>
+
+                {{/jsonSerializer}}
+
+            </table>
+
+            <h3>Authorization</h3>
+            
+            <table class="configuration row-seperator">
+                <tr><td>Fail If No Authenticators Apply To Action</td><td>
+                    {{#failIfNoAuthenticatorsApplyToAction}}
+                        {{#yes}}<span class="green">Yes</span>{{/yes}}
+                        {{#no}}<span class="red">No</span>{{/no}}
+                    {{/failIfNoAuthenticatorsApplyToAction}}
+                </td></tr>
+                <tr><td>Exclude Diagnostics From Authentication</td><td>
+                    {{#excludeDiagnosticsFromAuthentication}}
+                        {{#yes}}<span class="green">Yes</span>{{/yes}}
+                        {{#no}}<span class="red">No</span>{{/no}}
+                    {{/excludeDiagnosticsFromAuthentication}}
+                </td></tr>
+                <tr><td>Default Authentication Realm</td><td>
+                    {{#defaultAuthenticationRealm}}
+                        {{#value}}<code>{{.}}</code>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/defaultAuthenticationRealm}}
+                </td></tr>
+                <tr><td>Default Unauthorized Reason Phrase</td><td>
+                    {{#defaultUnauthorizedReasonPhrase}}
+                        {{#value}}<code>{{.}}</code>{{/value}}
+                        {{#none}}<span class="red">Not set</span>{{/none}}
+                    {{/defaultUnauthorizedReasonPhrase}}
+                </td></tr>
+            </table>
         </td>
     </tr>
-</table>
-{{/configuration}} 
+</table> 

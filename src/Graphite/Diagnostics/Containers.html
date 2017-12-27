@@ -1,6 +1,4 @@
-﻿{{#containers}}
-<h3>{{name}}</h3>
-<table class="container row-seperator">
+﻿<table class="container body-seperator">
     <thead>
         <tr>
             <th>Plugin Type</th>
@@ -13,15 +11,38 @@
     </thead>
     <tbody>
     {{#registrations}}
-        <tr>
-            <td nowrap><code>{{type}}</code></td>
-            <td nowrap><code>{{assembly}}</code></td>
-            <td>{{singleton}}</td> 
-            <td>{{instance}}</td> 
-            <td><code>{{concreteType}}</code></td>
-            <td nowrap><code>{{concreteAssembly}}</code></td>
-        </tr> 
+        {{#empty}}
+            <tbody>
+                <tr>
+                    <td>{{.}}</td><td colspan="5"><span class="red">None configured</span></td>
+                </tr>
+            </tbody>
+        {{/empty}}
+        {{#items}}
+            {{#first}}<tbody>{{/first}}  
+            {{#item}}
+            <tr>
+                <td nowrap><code>{{pluginType}}</code></td>
+                <td nowrap><code>{{pluginAssembly}}</code></td>
+                <td>
+                    {{#singleton}}
+                        {{#yes}}<span class="green">Yes</span>{{/yes}}
+                        {{#no}}<span class="red">No</span>{{/no}}
+                        {{#none}}<span class="grey">N/A</span>{{/none}}
+                    {{/singleton}}
+                </td> 
+                <td>
+                    {{#instance}}
+                        {{#yes}}<span class="green">Yes</span>{{/yes}}
+                        {{#no}}<span class="red">No</span>{{/no}}
+                    {{/instance}}
+                </td> 
+                <td><code>{{concreteType}}</code></td>
+                <td nowrap><code>{{concreteAssembly}}</code></td>
+            </tr> 
+            {{/item}}
+            {{#last}}</tbody>{{/last}}
+        {{/items}}
     {{/registrations}}                                                       
     </tbody>
 </table>
-{{/containers}}

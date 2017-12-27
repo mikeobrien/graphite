@@ -9,6 +9,7 @@ using Graphite.Monitoring;
 using Graphite.Reflection;
 using Graphite.Routing;
 using Graphite.StructureMap;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Should;
 using Tests.Common.Fakes;
@@ -51,9 +52,17 @@ namespace Tests.Unit.Diagnostics
                 new ActionDescriptorFactory(configuration, null, new TypeCache())
                     .CreateDescriptor(actionMethod ,routeDescriptor)
             };
+            var metrics = new Metrics();
+            var typeCache = new TypeCache();
             var runtimeConfiguration = new RuntimeConfiguration(actionDescriptors);
-            var handler = new DiagnosticsHandler(configuration, runtimeConfiguration, 
-                new Metrics(), new Container(), new TypeCache());
+            var handler = new DiagnosticsHandler(new DiagnosticsProvider(configuration, 
+                typeCache, new List<IDiagnosticsSection>
+                {
+                    new ConfigurationSection(configuration, new JsonSerializerSettings(), metrics, typeCache),
+                    new ActionsSection(configuration, runtimeConfiguration, metrics, typeCache),
+                    new PluginsSection(configuration, typeCache),
+                    new ContainersSection(new Container(), typeCache)
+                }), typeCache);
 
             var result = handler.Get();
 
