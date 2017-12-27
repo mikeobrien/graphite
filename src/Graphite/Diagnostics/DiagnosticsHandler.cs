@@ -114,7 +114,7 @@ namespace Graphite.Diagnostics
                 : "<span class=\"red\">None configured</span>";
         }
 
-        public object GetContainers()
+        private object GetContainers()
         {
             return new ArrayList
             {

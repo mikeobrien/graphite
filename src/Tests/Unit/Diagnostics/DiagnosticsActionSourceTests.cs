@@ -35,14 +35,17 @@ namespace Tests.Unit.Diagnostics
 
             var actions = actionSource.GetActions();
 
-            actions.Count.ShouldEqual(1);
+            actions.Count.ShouldEqual(3);
 
-            var action = actions.First();
+            var action = actions.FirstOrDefault(x => x.Route.Url == configuration.DiagnosticsUrl);
 
-            action.Route.Url.ShouldEqual(configuration.DiagnosticsUrl);
+            action.ShouldNotBeNull();
             action.Action.HandlerTypeDescriptor.Type.ShouldEqual(diagnosticsHandler);
             action.Action.MethodDescriptor.MethodInfo.ShouldEqual(diagnosticsHandler
                 .GetMethod(nameof(DiagnosticsHandler.Get)));
+
+            actions.Any(x => x.Route.Url == $"{configuration.DiagnosticsUrl}/Favicon").ShouldBeTrue();
+            actions.Any(x => x.Route.Url == $"{configuration.DiagnosticsUrl}/Logo").ShouldBeTrue();
         }
     }
 }

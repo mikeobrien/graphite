@@ -136,7 +136,7 @@ namespace Graphite.Extensions
             headers.ContentDisposition =
                 new ContentDispositionHeaderValue("attachment")
                 {
-                    FileName = filename.Unquote().Replace("\"", "\\\"").Quote()
+                    FileName = filename.Unquote().Replace("\"", "").Quote()
                 };
         }
         
