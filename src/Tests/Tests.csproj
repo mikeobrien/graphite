@@ -183,7 +183,6 @@
     <Compile Include="Unit\Extensions\ExtensionTests.cs" />
     <Compile Include="Unit\Extensions\IOExtensionTests.cs" />
     <Compile Include="Unit\Extensions\NumericExtensionTests.cs" />
-    <Compile Include="Unit\Extensions\SerializerExtensionTests.cs" />
     <Compile Include="Unit\Extensions\MustacheExtensionTests.cs" />
     <Compile Include="Unit\Http\AsyncContentTests.cs" />
     <Compile Include="Unit\Http\QuerystringParameterTests.cs" />
@@ -204,6 +203,8 @@
     <Compile Include="Unit\Owin\BootstrapTests.cs" />
     <Compile Include="Unit\Owin\RequestPropertyProviderTests.cs" />
     <Compile Include="Unit\Reflection\NamespaceMappingTests.cs" />
+    <Compile Include="Unit\Serialization\Iso8601DateConverterTests.cs" />
+    <Compile Include="Unit\Serialization\MicrosoftDateTimeFormatConverterTests.cs" />
     <Compile Include="Unit\Views\Engines\MustacheEngineTests.cs" />
     <Compile Include="Unit\Views\Engines\RazorEngineTests.cs" />
     <Compile Include="Unit\Views\ViewDecoratorTests.cs" />
@@ -266,7 +267,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
     <EmbeddedResource Include="Unit\Views\ViewSource\EmbeddedViewSourceTests.Handler.fark" />
     <EmbeddedResource Include="Unit\Views\ViewSource\EmbeddedViewSourceTests.Model.farker" />

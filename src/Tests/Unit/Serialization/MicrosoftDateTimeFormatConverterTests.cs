@@ -5,10 +5,10 @@ using NUnit.Framework;
 using Should;
 using Tests.Common;
 
-namespace Tests.Unit.Extensions
+namespace Tests.Unit.Serialization
 {
     [TestFixture]
-    public class SerializerExtensionTests
+    public class MicrosoftDateTimeFormatConverterTests
     {
         public class DateTimeModel
         {

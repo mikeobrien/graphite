@@ -110,6 +110,10 @@
     <Compile Include="Binding\HeaderBinder.cs" />
     <Compile Include="Binding\CookieBinder.cs" />
     <Compile Include="Exceptions\UnhandledGraphiteException.cs" />
+    <Compile Include="Extensions\DateTimeExtensions.cs" />
+    <Compile Include="Serialization\Iso8601DateConverter.cs" />
+    <Compile Include="Serialization\KindDateTimeConverter.cs" />
+    <Compile Include="Serialization\Iso8601DateTimeConverter.cs" />
     <Compile Include="Extensions\MustacheExtensions.cs" />
     <Compile Include="Http\BufferPolicySelector.cs" />
     <Compile Include="DependencyInjection\TrackingContainer.cs" />
@@ -201,6 +205,7 @@
     <Compile Include="Routing\UrlContext.cs" />
     <Compile Include="Routing\UrlParameter.cs" />
     <Compile Include="Http\AsyncContent.cs" />
+    <Compile Include="Serialization\IpAddressConverter.cs" />
     <Compile Include="Setup\ActionDsl.cs" />
     <Compile Include="Setup\AuthenticationDsl.cs" />
     <Compile Include="Setup\BehaviorsDsl.cs" />
