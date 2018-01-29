@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Web;
 using Graphite.Extensions;
 using Graphite.Http;
-using Graphite.Linq;
 
 namespace Graphite.AspNet
 {
@@ -28,7 +27,7 @@ namespace Graphite.AspNet
         {
             return requestMessage.Properties.ContainsKey(HttpContextKey)
                 ? requestMessage.Properties[HttpContextKey].As<HttpContextBase>()?
-                    .Request?.ServerVariables?.ToDictionary<object>(
+                    .Request.ServerVariables?.ToDictionary<object>(
                         NormalizeServerVariableKey, x => x) : null;
         }
 

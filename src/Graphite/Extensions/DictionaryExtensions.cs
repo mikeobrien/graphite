@@ -15,8 +15,8 @@ namespace Graphite.Extensions
         public static Dictionary<string, TValue> ToDictionary<TValue>(this NameValueCollection source,
             Func<string, string> key = null, Func<string, TValue> value = null) where TValue : class
         {
-            return source.AllKeys.ToDictionary(key ?? (x => x),
-                x => value?.Invoke(source[(string) x]) ?? (TValue)(object)source[(string) x],
+            return source.AllKeys.Distinct().ToDictionary(key ?? (x => x),
+                x => value?.Invoke(source[x]) ?? (TValue)(object)source[x],
                 StringComparer.OrdinalIgnoreCase);
         }
 

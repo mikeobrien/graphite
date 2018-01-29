@@ -23,6 +23,7 @@ namespace Tests.Unit.AspNet
             var serverVariables = new NameValueCollection
             {
                 ["REMOTE_ADDR"] = "192.168.1.1",
+                ["REMOTE_ADDR"] = "192.168.1.2",
                 ["REMOTE_PORT"] = "80"
             };
 
@@ -30,8 +31,10 @@ namespace Tests.Unit.AspNet
 
             var properties = provider.GetProperties();
 
+            properties.Count.ShouldEqual(2);
+
             properties.ContainsKey("remoteaddress").ShouldBeTrue();
-            properties["remoteaddress"].ShouldEqual("192.168.1.1");
+            properties["remoteaddress"].ShouldEqual("192.168.1.2");
 
             properties.ContainsKey("remoteport").ShouldBeTrue();
             properties["remoteport"].ShouldEqual("80");
@@ -42,20 +45,6 @@ namespace Tests.Unit.AspNet
         {
             var requestMessage = new HttpRequestMessage();
             var provider = new AspNetRequestPropertyProvider(requestMessage);
-
-            provider.GetProperties().ShouldBeNull();
-        }
-
-        [Test]
-        public void Should_not_fail_if_request_is_null()
-        {
-            var httpContext = Substitute.For<HttpContextBase>();
-            var requestMessage = new HttpRequestMessage();
-            var provider = new AspNetRequestPropertyProvider(requestMessage);
-
-            requestMessage.Properties[AspNetRequestPropertyProvider.HttpContextKey] = httpContext;
-
-            httpContext.Request.Returns((object)null);
 
             provider.GetProperties().ShouldBeNull();
         }
