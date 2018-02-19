@@ -28,7 +28,7 @@ namespace Tests.Unit.Http
         {
             var requestGraph = RequestGraph
                 .CreateFor<Handler>(x => x.Params(null, null, null))
-                .WithUrl("http://fark.com?param1=value1&param2=value2")
+                .WithUrl("http://fark.com?param1=value1&param2=value2&param3=")
                 .AddParameters("param1", "param2");
             
             var querystring = new QuerystringParameters(requestGraph.GetHttpRequestMessage(), 

@@ -31,10 +31,11 @@ namespace Graphite.Http
             HttpRequestMessage request, RouteDescriptor routeDescriptor, Configuration configuration)
         {
             var parameters = request.GetQueryNameValuePairs();
-            return configuration.QuerystringParameterDelimiters.Any()
-                ? parameters.SelectMany(x => ParseDelimitedParameters(
-                    x, routeDescriptor, configuration))
-                : parameters;
+            return (configuration.QuerystringParameterDelimiters.Any()
+                    ? parameters.SelectMany(x => ParseDelimitedParameters(
+                        x, routeDescriptor, configuration))
+                    : parameters)
+                .Where(x => x.Value.IsNotNullOrEmpty());
         }
 
         private static IEnumerable<KeyValuePair<string, string>> ParseDelimitedParameters
