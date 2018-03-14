@@ -11,8 +11,7 @@ namespace Graphite.Routing
             IsWildcard = isWildcard;
         }
 
-        public UrlParameter(ActionParameter parameter,
-            bool isWildcard) : base(parameter)
+        public UrlParameter(ActionParameter parameter, bool isWildcard) : base(parameter)
         {
             IsWildcard = isWildcard;
         }

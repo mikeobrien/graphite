@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Graphite;
 using Graphite.Actions;
+using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Routing;
 using Tests.Common;

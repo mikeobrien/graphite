@@ -149,5 +149,17 @@ namespace Tests.Acceptance
 
             result.Data.Url.ShouldEqual($"{BaseUrl}Container");
         }
+
+        [Test]
+        public void Should_override_querystring_name([Values(Host.Owin, Host.IISExpress)] Host host,
+            [Values("WithCustomParamName?param2=value", "WithCustomFromUriParamName?param2=value",
+                "WithCustomUrlParamName/value", "WithCustomFromUriUrlParamName/value")] string url)
+        {
+            var result = Http.ForHost(host).GetString($"{BaseUrl}{url}");
+
+            result.Status.ShouldEqual(HttpStatusCode.OK);
+
+            result.Data.ShouldEqual("value");
+        }
     }
 }

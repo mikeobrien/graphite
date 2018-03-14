@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using System.Web.Http;
 using Graphite;
 using Graphite.Binding;
 using Graphite.Extensions;
@@ -18,6 +19,8 @@ namespace Tests.Unit.Binding
         public class Handler
         {
             public void Params(object request, string param1, string param2) { }
+            public void ParamsWithNameOverride([Name("param1")] string param2) { }
+            public void ParamsWithFromUriNameOverride([FromUri(Name = "param1")] string param2) { }
             public void WildcardParams(object request, string param1, params int[] param2) { }
             public void WildcardArray(object request, string param1, int[] param2) { }
             public void WildcardList(object request, string param1, List<int> param2) { }

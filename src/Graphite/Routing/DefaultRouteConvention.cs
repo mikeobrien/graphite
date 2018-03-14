@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using Graphite.Actions;
+using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Reflection;
 
@@ -97,7 +98,9 @@ namespace Graphite.Routing
         {
             var actionParameters = action.MethodDescriptor.Parameters
                 .Where(x => x != requestParameter)
-                .Select(x => new ActionParameter(action, x)).ToList();
+                .Select(x => new ActionParameter(action, x, 
+                    x.GetAttribute<NameAttribute>()?.Name ?? 
+                    x.GetAttribute<FromUriAttribute>()?.Name)).ToList();
 
             if (_configuration.BindComplexTypeProperties)
                 actionParameters.AddRange(action.MethodDescriptor.Parameters
@@ -133,7 +136,8 @@ namespace Graphite.Routing
 
         protected virtual UrlSegment GetSegment(string segment, List<ActionParameter> actionParameters)
         {
-            var parameter = actionParameters.FirstOrDefault(p => p.Name.EqualsUncase(segment));
+            var parameter = actionParameters.FirstOrDefault(p =>
+                p.Name.EqualsUncase(segment));
             if (parameter == null) return new UrlSegment(segment);
 
             var isWildcard = parameter.HasAttributes<WildcardAttribute, ParamArrayAttribute>();

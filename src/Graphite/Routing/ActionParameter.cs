@@ -7,10 +7,10 @@ namespace Graphite.Routing
 {
     public class ActionParameter
     {
-        public ActionParameter(ActionMethod action, ParameterDescriptor parameter)
+        public ActionParameter(ActionMethod action, ParameterDescriptor parameter, string name = null)
         {
             Descriptor = parameter;
-            Name = parameter.Name;
+            Name = name ?? parameter.Name;
             IsParameter = true;
             Action = action;
             ParameterDescriptor = parameter;
@@ -18,10 +18,10 @@ namespace Graphite.Routing
         }
 
         public ActionParameter(ActionMethod action, ParameterDescriptor parameter, 
-            PropertyDescriptor property)
+            PropertyDescriptor property, string name = null)
         {
             Descriptor = property;
-            Name = property.Name;
+            Name = name ?? property.Name;
             IsPropertyOfParameter = true;
             Action = action;
             ParameterDescriptor = parameter;
@@ -29,10 +29,10 @@ namespace Graphite.Routing
             TypeDescriptor = property?.PropertyType;
         }
 
-        public ActionParameter(ActionMethod action, PropertyDescriptor property)
+        public ActionParameter(ActionMethod action, PropertyDescriptor property, string name = null)
         {
             Descriptor = property;
-            Name = property.Name;
+            Name = name ?? property.Name;
             IsProperty = true;
             Action = action;
             PropertyDescriptor = property;

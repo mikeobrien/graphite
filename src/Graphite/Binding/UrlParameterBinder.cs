@@ -31,8 +31,8 @@ namespace Graphite.Binding
         {
             var parameters = _routeDescriptor.UrlParameters
                 .Concat(_routeDescriptor.Parameters).ToArray();
-            return _argumentBinder.Bind(_urlParameters, context
-                .ActionArguments, parameters).ToTaskResult();
+            return _argumentBinder.Bind(_urlParameters, 
+                context.ActionArguments, parameters).ToTaskResult();
         }
     }
 }

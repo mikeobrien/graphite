@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web.Http;
 using Graphite.Binding;
 using Graphite.Extensions;
 using NUnit.Framework;
@@ -15,6 +16,8 @@ namespace Tests.Unit.Binding
         public class Handler
         {
             public void Params(object request, string param1, string param2) { }
+            public void ParamsWithNameOverride([Name("param1")] string param2) { }
+            public void ParamsWithFromUriNameOverride([FromUri(Name = "param1")] string param2) { }
             public void MultiParams(string[] param1) { }
         }
 

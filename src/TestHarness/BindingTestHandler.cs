@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using System.Web.Http;
 using Graphite.Actions;
 using Graphite.Binding;
 using Graphite.Routing;
@@ -101,6 +102,26 @@ namespace TestHarness.Binding
                 ParamByAttribute = someInfo.ToString(),
                 ParamByType = requestMessage != null
             };
+        }
+
+        public string GetWithCustomParamName([Name("param2")] string param1)
+        {
+            return param1;
+        }
+
+        public string GetWithCustomFromUriParamName([FromUri(Name = "param2")] string param1)
+        {
+            return param1;
+        }
+
+        public string GetWithCustomUrlParamName_Param2([Name("param2")] string param1)
+        {
+            return param1;
+        }
+
+        public string GetWithCustomFromUriUrlParamName_Param2([FromUri(Name = "param2")] string param1)
+        {
+            return param1;
         }
 
         public class ContainerBindingModel
