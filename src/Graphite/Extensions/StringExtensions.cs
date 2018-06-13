@@ -96,6 +96,13 @@ namespace Graphite.Extensions
             return !String.IsNullOrWhiteSpace(value);
         }
 
+        private static readonly Regex WhitespaceRegex = new Regex(@"\s");
+
+        public static bool ContainsWhitespace(this string value)
+        {
+            return WhitespaceRegex.IsMatch(value);
+        }
+
         public static string Join(this IEnumerable<object> parts, string seperator = "")
         {
             return Join(parts.Select(x => x?.ToString()), seperator);

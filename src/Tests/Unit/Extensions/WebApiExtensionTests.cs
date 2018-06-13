@@ -1,9 +1,11 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using Graphite.Extensions;
 using NUnit.Framework;
 using Should;
+using Tests.Common;
 
 namespace Tests.Unit.Extensions
 {
@@ -115,16 +117,45 @@ namespace Tests.Unit.Extensions
                 "Content-Type: oh/hai; charset=utf-8");
         }
 
-        [TestCase("fark.text", "fark.text")]
-        [TestCase("fark farker.txt", "\"fark farker.txt\"")]
-        [TestCase("fark \"farker\".txt", "\"fark farker.txt\"")]
-        public void Should_set_attachment_disposition(string filename, string expected)
+        [TestCase("fark.txt", AttachmentFilenameQuoting.Default, false, "fark.txt")]
+        [TestCase("fark.txt", AttachmentFilenameQuoting.QuoteWhenWhitespace, false, "fark.txt")]
+        [TestCase("fark.txt", AttachmentFilenameQuoting.AlwaysQuote, false, "\"fark.txt\"")]
+        [TestCase("fark farker.txt", AttachmentFilenameQuoting.Default, false, "\"fark farker.txt\"")]
+        [TestCase("fark farker.txt", AttachmentFilenameQuoting.AlwaysQuote, false, "\"fark farker.txt\"")]
+        [TestCase("fark farker.txt", AttachmentFilenameQuoting.QuoteWhenWhitespace, false, "\"fark farker.txt\"")]
+        [TestCase("fark \\\"farker\".txt", AttachmentFilenameQuoting.Default, true, "\"fark farker.txt\"")]
+        public void Should_set_attachment_disposition(string filename, AttachmentFilenameQuoting quoting, 
+            bool removeInnerQuotes, string expected)
         {
             var response = new HttpResponseMessage { Content = new StringContent("") };
 
-            response.Content.Headers.SetAttachmentDisposition(filename);
+            response.Content.Headers.SetAttachmentDisposition(filename, quoting, removeInnerQuotes);
 
             response.Content.Headers.ContentDisposition.FileName.ShouldEqual(expected);
+        }
+
+        [Test]
+        public void Should_throw_exception_when_filename_contains_quotes([Values("\"", "\\\"")] string quote)
+        {
+            var response = new HttpResponseMessage { Content = new StringContent("") };
+
+            response.Content.Headers.Should().Throw<ArgumentException>(x => 
+                x.SetAttachmentDisposition($"fark{quote}.txt", AttachmentFilenameQuoting.Default, false))
+                .Message.ShouldEqual($"The format of value 'fark{quote}.txt' is invalid.");
+        }
+        
+        [TestCase("fark.txt", AttachmentFilenameQuoting.Default, false, "fark.txt")]
+        [TestCase("fark.txt", AttachmentFilenameQuoting.QuoteWhenWhitespace, false, "fark.txt")]
+        [TestCase("fark.txt", AttachmentFilenameQuoting.AlwaysQuote, false, "\"fark.txt\"")]
+        [TestCase("fark farker.txt", AttachmentFilenameQuoting.Default, false, "fark farker.txt")]
+        [TestCase("fark farker.txt", AttachmentFilenameQuoting.AlwaysQuote, false, "\"fark farker.txt\"")]
+        [TestCase("fark farker.txt", AttachmentFilenameQuoting.QuoteWhenWhitespace, false, "\"fark farker.txt\"")]
+        [TestCase("fark \"farker\".txt", AttachmentFilenameQuoting.Default, false, "fark \"farker\".txt")]
+        [TestCase("fark \\\"farker\".txt", AttachmentFilenameQuoting.Default, true, "fark farker.txt")]
+        public void Should_quote_filename(string filename, AttachmentFilenameQuoting quoting, 
+            bool removeInnerQuotes, string expected)
+        {
+            filename.QuoteFilename(quoting, removeInnerQuotes).ShouldEqual(expected);
         }
     }
 }

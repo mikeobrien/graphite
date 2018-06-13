@@ -14,6 +14,18 @@ namespace Tests.Unit.Http
     [TestFixture]
     public class ExtensionTests
     {
+        [TestCase(null, false)]
+        [TestCase("", false)]
+        [TestCase("\"", false)]
+        [TestCase("\"\"", true)]
+        [TestCase("\"fark\"", true)]
+        [TestCase("   \"fark\"\t\t", true)]
+        public void Should_check_if_string_is_quoted(
+            string value, bool expected)
+        {
+            value.IsQuoted().ShouldEqual(expected);
+        }
+
         [TestCase(null, null)]
         [TestCase("", "")]
         [TestCase("\"", "\"")]

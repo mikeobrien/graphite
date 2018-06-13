@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
+using Graphite.Extensions;
 using Graphite.Http;
 using Graphite.Writers;
 using NUnit.Framework;
@@ -99,11 +100,14 @@ namespace Tests.Unit.Writers
             (headers?.ContentDisposition?.FileName).ShouldEqual("somefile.txt");
         }
 
-        [TestCase(null, MimeTypes.ApplicationOctetStream, null)]
-        [TestCase(MimeTypes.ApplicationOctetStream, MimeTypes.ApplicationOctetStream, null)]
-        [TestCase("fark/farker", "fark/farker", "fark.txt")]
+        [TestCase(null, MimeTypes.ApplicationOctetStream, null, null, AttachmentFilenameQuoting.Default)]
+        [TestCase(MimeTypes.ApplicationOctetStream, MimeTypes.ApplicationOctetStream, null, null, AttachmentFilenameQuoting.Default)]
+        [TestCase("fark/farker", "fark/farker", "fark.txt", "fark.txt", AttachmentFilenameQuoting.Default)]
+        [TestCase("fark/farker", "fark/farker", "fark\".txt", "fark.txt", AttachmentFilenameQuoting.Default)]
+        [TestCase("fark/farker", "fark/farker", "fark.txt", "\"fark.txt\"", AttachmentFilenameQuoting.AlwaysQuote)]
         public async Task Should_return_bytes_from_output_bytes_response(
-            string contentType, string expectedContentType, string filename)
+            string contentType, string expectedContentType, string filename, 
+            string expectedFilename, AttachmentFilenameQuoting quoting)
         {
             var outputStream = new OutputBytes
             {
@@ -111,7 +115,8 @@ namespace Tests.Unit.Writers
                 ContentType = contentType,
                 Filename = filename
             };
-            var requestGraph = RequestGraph.CreateFor<Handler>(x => x.OutputBytesResponse());
+            var requestGraph = RequestGraph.CreateFor<Handler>(x => x.OutputBytesResponse())
+                .Configure(x => x.WithAttachmentFilenameQuoting(quoting));
 
             var result = await CreateByteWriter(requestGraph)
                 .Write(requestGraph.GetResponseWriterContext(outputStream));
@@ -119,7 +124,7 @@ namespace Tests.Unit.Writers
             result.Content.ReadAsStreamAsync().Result.ReadAllText().ShouldEqual("fark");
 
             (result.Content.Headers.ContentType?.MediaType).ShouldEqual(expectedContentType);
-            (result.Content.Headers.ContentDisposition?.FileName).ShouldEqual(filename);
+            (result.Content.Headers.ContentDisposition?.FileName).ShouldEqual(expectedFilename);
         }
 
         private ByteWriter CreateByteWriter(RequestGraph requestGraph)
@@ -127,7 +132,8 @@ namespace Tests.Unit.Writers
             return new ByteWriter(
                 requestGraph.ActionMethod,
                 requestGraph.GetRouteDescriptor(),
-                requestGraph.GetHttpResponseMessage());
+                requestGraph.GetHttpResponseMessage(),
+                requestGraph.Configuration);
         }
     }
 }

@@ -43,13 +43,16 @@ namespace Graphite.Writers
         private readonly ActionMethod _actionMethod;
         private readonly RouteDescriptor _routeDescriptor;
         private readonly HttpResponseMessage _responseMessage;
+        private readonly Configuration _configuration;
 
         protected BodyWriterBase(ActionMethod actionMethod, 
             RouteDescriptor routeDescriptor, 
-            HttpResponseMessage responseMessage)
+            HttpResponseMessage responseMessage,
+            Configuration configuration)
         {
             _routeDescriptor = routeDescriptor;
             _responseMessage = responseMessage;
+            _configuration = configuration;
             _actionMethod = actionMethod;
         }
 
@@ -74,7 +77,9 @@ namespace Graphite.Writers
                 _responseMessage.Content.Headers.SetContentType(
                     outputInfo?.ContentType ?? GetContentType(data));
                 if (outputInfo != null && outputInfo.Filename.IsNotNullOrEmpty())
-                    _responseMessage.Content.Headers.SetAttachmentDisposition(outputInfo.Filename);
+                    _responseMessage.Content.Headers.SetAttachmentDisposition(
+                        outputInfo.Filename, _configuration.AttachmentFilenameQuoting,
+                        _configuration.RemoveAttachmentFilenameInnerQuotes);
             }
             return _responseMessage.ToTaskResult();
         }

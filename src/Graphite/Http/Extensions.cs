@@ -25,20 +25,24 @@ namespace Graphite.Http
             return value;
         }
 
+        public static bool IsQuoted(this string value)
+        {
+            value = value?.Trim();
+            return value != null && value.Length > 1 &&
+                value.StartsWith("\"") && value.EndsWith("\"");
+        }
+
         public static string Unquote(this string value)
         {
             value = value?.Trim();
-            return value.IsNotNullOrEmpty() && value.Length > 1 &&
-                   value.StartsWithUncase("\"") &&
-                   value.EndsWithUncase("\"")
+            return value.IsQuoted()
                 ? value.Substring(1, value.Length - 2)
                 : value;
         }
 
         public static string Quote(this string value)
         {
-            return value.IsNotNullOrEmpty() && value.Contains(' ') && 
-                   !value.StartsWith("\"") && !value.EndsWith("\"")
+            return !value.IsQuoted()
                 ? $"\"{value}\""
                 : value;
         }

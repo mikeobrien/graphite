@@ -69,6 +69,9 @@ namespace Graphite
         public bool FailIfNoAuthenticatorsApplyToAction { get; set; } = true;
         public bool ExcludeDiagnosticsFromAuthentication { get; set; }
         public bool FailIfNoMapperFound { get; set; }
+        public AttachmentFilenameQuoting AttachmentFilenameQuoting { get; set; } = 
+            AttachmentFilenameQuoting.Default;
+        public bool RemoveAttachmentFilenameInnerQuotes { get; set; } = true;
 
         public XmlReaderSettings XmlReaderSettings { get; } = new XmlReaderSettings();
         public XmlWriterSettings XmlWriterSettings { get; } = new XmlWriterSettings();

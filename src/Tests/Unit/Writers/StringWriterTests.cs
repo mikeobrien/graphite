@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using Graphite;
+using Graphite.Extensions;
 using Graphite.Http;
 using Graphite.Writers;
 using NUnit.Framework;
@@ -111,19 +112,21 @@ namespace Tests.Unit.Writers
             (headers?.ContentDisposition?.FileName).ShouldEqual("somefile.txt");
         }
 
-        [TestCase(null, null, null, null, null, null)]
-        [TestCase("", "", null, MimeTypes.TextPlain, null, null)]
-        [TestCase("fark", "fark", null, MimeTypes.TextPlain, null, null)]
-        [TestCase("<b>fark</b>", "<b>fark</b>", null, MimeTypes.TextHtml, null, null)]
-        [TestCase("fark<br/>", "fark<br/>", null, MimeTypes.TextHtml, null, null)]
-        [TestCase("fark", "fark", MimeTypes.TextHtml, MimeTypes.TextHtml, null, null)]
-        [TestCase("Ӝark", "Ӝark", null, MimeTypes.TextPlain, null, null)]
-        [TestCase("Ӝark", "?ark", null, MimeTypes.TextPlain, null, "ascii")]
-        [TestCase("fark", "fark", null, MimeTypes.TextPlain, "fark.txt", null)]
-        public async Task Should_return_string_from_output_string_response(
-            string data, string expectedData, 
-            string contentType, string expectedContentType, 
-            string filename, string encoding)
+        [TestCase(null, null, null, null, null, null, AttachmentFilenameQuoting.Default, null)]
+        [TestCase("", "", null, MimeTypes.TextPlain, null, null, AttachmentFilenameQuoting.Default, null)]
+        [TestCase("fark", "fark", null, MimeTypes.TextPlain, null, null, AttachmentFilenameQuoting.Default, null)]
+        [TestCase("<b>fark</b>", "<b>fark</b>", null, MimeTypes.TextHtml, null, null, AttachmentFilenameQuoting.Default, null)]
+        [TestCase("fark<br/>", "fark<br/>", null, MimeTypes.TextHtml, null, null, AttachmentFilenameQuoting.Default, null)]
+        [TestCase("fark", "fark", MimeTypes.TextHtml, MimeTypes.TextHtml, null, null, AttachmentFilenameQuoting.Default, null)]
+        [TestCase("Ӝark", "Ӝark", null, MimeTypes.TextPlain, null, null, AttachmentFilenameQuoting.Default, null)]
+        [TestCase("Ӝark", "?ark", null, MimeTypes.TextPlain, null, null, AttachmentFilenameQuoting.Default, "ascii")]
+        [TestCase("fark", "fark", null, MimeTypes.TextPlain, "fark.txt", "fark.txt", AttachmentFilenameQuoting.Default, null)]
+        [TestCase("fark", "fark", null, MimeTypes.TextPlain, "fark\".txt", "fark.txt", AttachmentFilenameQuoting.Default, null)]
+        [TestCase("fark", "fark", null, MimeTypes.TextPlain, "fark.txt", "\"fark.txt\"", AttachmentFilenameQuoting.AlwaysQuote, null)]
+        [TestCase("fark", "fark", null, MimeTypes.TextPlain, "fark farker.txt", "\"fark farker.txt\"", AttachmentFilenameQuoting.Default, null)]
+        public async Task Should_return_string_from_output_string_response(string data, 
+            string expectedData, string contentType, string expectedContentType, string filename, 
+            string expectedFilename, AttachmentFilenameQuoting quoting, string encoding)
         {
             var outputString = new OutputString
             {
@@ -132,7 +135,8 @@ namespace Tests.Unit.Writers
                 Filename = filename,
                 Encoding = encoding == null ? null : Encoding.GetEncoding(encoding)
             };
-            var requestGraph = RequestGraph.CreateFor<Handler>(x => x.OutputStringResponse());
+            var requestGraph = RequestGraph.CreateFor<Handler>(x => x.OutputStringResponse())
+                .Configure(x => x.WithAttachmentFilenameQuoting(quoting));
 
             var result = await CreateStringWriter(requestGraph)
                 .Write(requestGraph.GetResponseWriterContext(outputString));
@@ -142,7 +146,7 @@ namespace Tests.Unit.Writers
             var headers = result.Content?.Headers;
 
             (headers?.ContentType?.MediaType).ShouldEqual(expectedContentType);
-            (headers?.ContentDisposition?.FileName).ShouldEqual(filename);
+            (headers?.ContentDisposition?.FileName).ShouldEqual(expectedFilename);
         }
 
         private StringWriter CreateStringWriter(RequestGraph requestGraph)
@@ -151,7 +155,7 @@ namespace Tests.Unit.Writers
                 requestGraph.ActionMethod,
                 requestGraph.GetRouteDescriptor(),
                 requestGraph.GetHttpResponseMessage(),
-                new Configuration());
+                requestGraph.Configuration);
         }
     }
 }

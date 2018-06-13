@@ -19,6 +19,13 @@ namespace Graphite.Extensions
         Any = 3
     }
 
+    public enum AttachmentFilenameQuoting
+    {
+        Default,
+        AlwaysQuote,
+        QuoteWhenWhitespace
+    }
+
     public class AcceptTypeMatch
     {
         public AcceptTypeMatch(MatchType matchType, string contentType, string acceptType, double quality)
@@ -130,13 +137,36 @@ namespace Graphite.Extensions
         {
             headers.ContentType = new MediaTypeHeaderValue(mimetype);
         }
+        
+        public static string QuoteFilename(this string filename, 
+            AttachmentFilenameQuoting quoting, bool removeInnerQuotes)
+        {
+            var wasQuoted = filename.IsQuoted();
+            var unquotedFilename = removeInnerQuotes
+                ? filename.Unquote().Replace("\\\"", "").Replace("\"", "")
+                : filename.Unquote();
 
-        public static void SetAttachmentDisposition(this HttpContentHeaders headers, string filename)
+            switch (quoting)
+            {
+                case AttachmentFilenameQuoting.AlwaysQuote: 
+                    return unquotedFilename.Quote();
+                case AttachmentFilenameQuoting.QuoteWhenWhitespace:
+                    return unquotedFilename.ContainsWhitespace() 
+                        ? unquotedFilename.Quote() 
+                        : unquotedFilename;
+                default: return wasQuoted 
+                    ? unquotedFilename.Quote() 
+                    : unquotedFilename;
+            }
+        }
+
+        public static void SetAttachmentDisposition(this HttpContentHeaders headers, 
+            string filename, AttachmentFilenameQuoting quoting, bool removeInnerQuotes)
         {
             headers.ContentDisposition =
                 new ContentDispositionHeaderValue("attachment")
                 {
-                    FileName = filename.Unquote().Replace("\"", "").Quote()
+                    FileName = filename.QuoteFilename(quoting, removeInnerQuotes)
                 };
         }
         

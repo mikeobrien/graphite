@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Graphite.Extensions;
 using Graphite.Routing;
 
 namespace Graphite.Setup
@@ -52,6 +53,25 @@ namespace Graphite.Setup
             Action<QuerystringDelimiterDsl> config)
         {
             config(new QuerystringDelimiterDsl(_configuration));
+            return this;
+        }
+
+        /// <summary>
+        /// Determines how attachment filenames are quoted.
+        /// </summary>
+        public ConfigurationDsl WithAttachmentFilenameQuoting(
+            AttachmentFilenameQuoting quoting)
+        {
+            _configuration.AttachmentFilenameQuoting = quoting;
+            return this;
+        }
+
+        /// <summary>
+        /// Preserves attachment filename inner quotes.
+        /// </summary>
+        public ConfigurationDsl PreserveAttachmentFilenameInnerQuotes()
+        {
+            _configuration.RemoveAttachmentFilenameInnerQuotes = false;
             return this;
         }
     }
