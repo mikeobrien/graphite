@@ -65,5 +65,14 @@ namespace Tests.Acceptance
             result.Status.ShouldEqual(HttpStatusCode.Created);
             result.ReasonPhrase.ShouldEqual("farker");
         }
+
+        [Test]
+        public void Should_attribute_header([Values(Host.Owin, Host.IISExpress)] Host host)
+        {
+            var result = Http.ForHost(host).Get($"{BaseUrl}WithAttributeHeaders");
+            
+            result.Status.ShouldEqual(HttpStatusCode.NoContent);
+            result.Headers.GetValues("fark").ShouldOnlyContain("farker");
+        }
     }
 }

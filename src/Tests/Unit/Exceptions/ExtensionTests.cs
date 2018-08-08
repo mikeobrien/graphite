@@ -35,7 +35,7 @@ namespace Tests.Unit.Exceptions
             _urlTemplate = "http://www.fark.com/{fark}";
             _actionDescriptor = new ActionDescriptor(_actionMethod,
                 new RouteDescriptor("POST", _urlTemplate, null, null, null, null),
-                null, null, null, null, null, null, null);
+                null, null, null, null, null, null, null, null);
         }
 
         [Test]

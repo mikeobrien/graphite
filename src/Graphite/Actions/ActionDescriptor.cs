@@ -21,6 +21,7 @@ namespace Graphite.Actions
             Plugins<IRequestReader> requestReaders, 
             Plugins<IResponseWriter> responseWriters,
             Plugins<IResponseStatus> responseStatus,
+            Plugins<IResponseHeaders> responseHeaders,
             Plugins<IBehavior> behaviors,
             ITypeCache typeCache)
         {
@@ -31,6 +32,7 @@ namespace Graphite.Actions
             RequestReaders = requestReaders;
             ResponseWriters = responseWriters;
             ResponseStatus = responseStatus;
+            ResponseHeaders = responseHeaders;
             Behaviors = behaviors;
             Registry = new Registry(typeCache);
         }
@@ -44,6 +46,7 @@ namespace Graphite.Actions
         public virtual Plugins<IRequestReader> RequestReaders { get; } 
         public virtual Plugins<IResponseWriter> ResponseWriters { get; }
         public virtual Plugins<IResponseStatus> ResponseStatus { get; }
+        public virtual Plugins<IResponseHeaders> ResponseHeaders { get; }
         public virtual Plugins<IBehavior> Behaviors { get; }
 
         public override int GetHashCode()

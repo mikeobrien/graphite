@@ -60,7 +60,9 @@
     <Compile Include="Actions\ActionConfigurationContext.cs" />
     <Compile Include="Actions\ActionDescriptorFactory.cs" />
     <Compile Include="Actions\ActionInvoker.cs" />
+    <Compile Include="Actions\AttributeResponseHeaders.cs" />
     <Compile Include="Actions\DefaultResponseStatus.cs" />
+    <Compile Include="Actions\IResponseHeaders.cs" />
     <Compile Include="Binding\BindResult.cs" />
     <Compile Include="Binding\ParsedValueMapper.cs" />
     <Compile Include="Binding\TypeMapperBase.cs" />

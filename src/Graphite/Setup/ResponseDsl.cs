@@ -19,6 +19,24 @@ namespace Graphite.Setup
             _configuration.ResponseWriters.Configure(configure);
             return this;
         }
+        /// <summary>
+        /// Configures response status.
+        /// </summary>
+        public ConfigurationDsl ConfigureResponseStatus(Action<ConditionalPluginsDsl
+            <IResponseStatus, ActionConfigurationContext>> configure)
+        {
+            _configuration.ResponseStatus.Configure(configure);
+            return this;
+        }
+        /// <summary>
+        /// Configures response headers.
+        /// </summary>
+        public ConfigurationDsl ConfigureResponseHeaders(Action<ConditionalPluginsDsl
+            <IResponseHeaders, ActionConfigurationContext>> configure)
+        {
+            _configuration.ResponseHeaders.Configure(configure);
+            return this;
+        }
 
         /// <summary>
         /// Specifies the default buffer size in bytes. The default is 1MB.

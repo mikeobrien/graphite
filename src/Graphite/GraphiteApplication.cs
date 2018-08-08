@@ -81,6 +81,7 @@ namespace Graphite
                 Container.RegisterPlugins(configuration.ValueMappers);
                 Container.RegisterPlugins(configuration.ResponseWriters);
                 Container.RegisterPlugins(configuration.ResponseStatus);
+                Container.RegisterPlugins(configuration.ResponseHeaders);
                 Container.RegisterPlugin(configuration.DiagnosticsProvider);
                 Container.RegisterPlugins(configuration.DiagnosticsSections);
                 Container.IncludeRegistry(configuration.Registry);

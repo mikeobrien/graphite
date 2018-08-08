@@ -47,7 +47,7 @@ namespace Tests.Unit.Cors
             _corsEngine = new CorsEngine();
             _corsConfiguration = new CorsConfiguration();
             _actionDescriptor = new ActionDescriptor(ActionMethod.From<Handler>(x => x.Get()), 
-                null, null, null, null, null, null, null, new TypeCache());
+                null, null, null, null, null, null, null, null, new TypeCache());
             _innerResponse = new HttpResponseMessage();
             _behaviorChain = Substitute.For<IBehaviorChain>();
             _behaviorChain.InvokeNext().Returns(_innerResponse);

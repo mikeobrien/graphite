@@ -562,15 +562,7 @@ namespace Tests.Common
 
         /* ---------------- Response Status--------------- */
 
-        public ResponseStatusContext GetResponseStatusContext(
-            ResponseState responseState, string errorMessage = null)
-        {
-            return new ResponseStatusContext(GetHttpResponseMessage(), responseState, errorMessage);
-        }
-
         public List<IResponseStatus> ResponseStatus { get; } = new List<IResponseStatus>();
-        public TestResponseStatus1 ResponseStatus1 { get; private set; }
-        public TestResponseStatus2 ResponseStatus2 { get; private set; }
 
         public RequestGraph AddDefaultResponseStatus()
         {
@@ -578,41 +570,14 @@ namespace Tests.Common
             return this;
         }
 
-        public RequestGraph AddResponseStatus1(Action<ResponseStatusContext> setStatus,
-            Func<ActionConfigurationContext, bool> configAppliesTo = null,
-            Func<ResponseStatusContext, bool> instanceAppliesTo = null,
-            bool @default = false)
-        {
-            if (ResponseStatus1 != null) throw new Exception("Response status 1 already added.");
-            ResponseStatus1 = AddResponseStatus<TestResponseStatus1>(setStatus,
-                configAppliesTo, instanceAppliesTo, @default);
-            return this;
-        }
+        /* ---------------- Response Headers--------------- */
+        
+        public List<IResponseHeaders> ResponseHeaders { get; } = new List<IResponseHeaders>();
 
-        public RequestGraph AddResponseStatus2(Action<ResponseStatusContext> setStatus,
-            Func<ActionConfigurationContext, bool> configAppliesTo = null,
-            Func<ResponseStatusContext, bool> instanceAppliesTo = null,
-            bool @default = false)
+        public RequestGraph AddDefaultResponseHeaders()
         {
-            if (ResponseStatus2 != null) throw new Exception("Response status 2 already added.");
-            ResponseStatus2 = AddResponseStatus<TestResponseStatus2>(setStatus,
-                configAppliesTo, instanceAppliesTo, @default);
+            ResponseHeaders.Add(new AttributeResponseHeaders(ActionMethod));
             return this;
-        }
-
-        private T AddResponseStatus<T>(Action<ResponseStatusContext> setStatus,
-            Func<ActionConfigurationContext, bool> configAppliesTo,
-            Func<ResponseStatusContext, bool> instanceAppliesTo, bool @default)
-            where T : TestResponseStatus, new()
-        {
-            Configuration.ResponseStatus.Configure(x => x.Append<T>(configAppliesTo, @default));
-            var status = new T
-            {
-                AppliesToFunc = instanceAppliesTo,
-                SetStatusFunc = setStatus
-            };
-            ResponseStatus.Add(status);
-            return status;
         }
     }
 }

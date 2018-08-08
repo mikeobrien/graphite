@@ -151,6 +151,10 @@ namespace Tests.Unit
             responseStatus.Count.ShouldEqual(1);
             responseStatus[0].ShouldBeType<DefaultResponseStatus>();
 
+            var responseHeaders = container.GetInstances<IResponseHeaders>().ToList();
+            responseHeaders.Count.ShouldEqual(1);
+            responseHeaders[0].ShouldBeType<AttributeResponseHeaders>();
+
             container.GetInstance<IContainer>().ShouldBeType<TrackingContainer>();
             container.GetInstance<Configuration>().ShouldEqual(configuration);
             container.GetInstance<IRouteConvention>().ShouldBeType<DefaultRouteConvention>();

@@ -15,9 +15,6 @@ namespace Tests.Common.Fakes
         public bool AppliesToCalled { get; set; }
         public bool SetStatusCalled { get; set; }
 
-        public bool IsWeighted { get; set; }
-        public double Weight { get; set; }
-
         public bool AppliesTo(ResponseStatusContext context)
         {
             AppliesToCalled = true;

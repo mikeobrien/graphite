@@ -23,18 +23,31 @@ namespace Tests.Unit.Actions
 
         public interface IHandler
         {
+            [ResponseHeader("fark", "farker")]
             void NoParamsOrResponse();
+            [ResponseHeader("fark", "farker")]
             Task NoParamsOrResponseAsync();
+            [ResponseHeader("fark", "farker")]
             void Params(string param);
+            [ResponseHeader("fark", "farker")]
             Task ParamsAsync(string param);
+            [ResponseHeader("fark", "farker")]
             void Params(string param1, string param2);
+            [ResponseHeader("fark", "farker")]
             Task ParamsAsync(string param1, string param2);
+            [ResponseHeader("fark", "farker")]
             string Response();
+            [ResponseHeader("fark", "farker")]
             void NoResponse();
+            [ResponseHeader("fark", "farker")]
             HttpResponseMessage HttpResponseMessageResponse();
+            [ResponseHeader("fark", "farker")]
             Task<string> ResponseAsync();
+            [ResponseHeader("fark", "farker")]
             string ParamsAndResponse(string param);
+            [ResponseHeader("fark", "farker")]
             Task<string> ParamsAndResponseAsync(string param);
+            [ResponseHeader("fark", "farker")]
             void Request(Model request);
         }
 
@@ -56,16 +69,23 @@ namespace Tests.Unit.Actions
         {
             var requestGraph = RequestGraph
                 .CreateFor(actionMethod)
-                .AddDefaultResponseStatus();
+                .AddDefaultResponseStatus()
+                .AddDefaultResponseHeaders();
             var routeDescriptor = requestGraph.GetRouteDescriptor();
+            var responseMessage = requestGraph.GetHttpResponseMessage();
 
-            requestGraph.AddResponseWriter1(c => c.Response.ToString().CreateTextResponse().ToTaskResult());
+            requestGraph.AddResponseWriter1(c =>
+            {
+                responseMessage.Content = new StringContent(c.Response.ToString());
+                return responseMessage.ToTaskResult();
+            });
+
             requestGraph.AddRequestBinder1(c => SetArguments(requestGraph.ActionMethod, 
                 c, (a, p) => a[p.Position] = $"value{p.Position}"));
             requestGraph.AddRequestBinder2(c => SetArguments(requestGraph.ActionMethod, 
                 c, (a, p) => a[p.Position] += $"-{p.Position}"));
 
-            var invoker = CreateInvoker(requestGraph);
+            var invoker = CreateInvoker(requestGraph, responseMessage);
             var handler = Substitute.For<IHandler>();
 
             handler.Response().ReturnsForAnyArgs(x => "response");
@@ -88,6 +108,8 @@ namespace Tests.Unit.Actions
             }
             else response.StatusCode.ShouldEqual(requestGraph
                 .Configuration.DefaultNoResponseStatusCode);
+            
+            response.Headers.GetValues("fark").ShouldOnlyContain("farker");
         }
 
         private static Task<BindResult> SetArguments(ActionMethod actionMethod, 
@@ -222,8 +244,6 @@ namespace Tests.Unit.Actions
             var invoker = CreateInvoker(requestGraph);
             var handler = Substitute.For<IHandler>();
 
-            handler.Response().ReturnsForAnyArgs(x => "response");
-
             var response = await invoker.Invoke(handler);
 
             response.StatusCode.ShouldEqual(requestGraph
@@ -350,8 +370,8 @@ namespace Tests.Unit.Actions
         {
             return new ActionInvoker(requestGraph.GetActionDescriptor(),
                 requestGraph.RequestBinders, requestGraph.ResponseWriters,
-                requestGraph.ResponseStatus, responseMessage ?? 
-                requestGraph.GetHttpResponseMessage());
+                requestGraph.ResponseStatus, requestGraph.ResponseHeaders, 
+                responseMessage ?? requestGraph.GetHttpResponseMessage());
         }
     }
 }

@@ -14,6 +14,7 @@ namespace Graphite.Actions
         private readonly IEnumerable<IRequestBinder> _requestBinders;
         private readonly IEnumerable<IResponseWriter> _writers;
         private readonly IEnumerable<IResponseStatus> _responseStatus;
+        private readonly IEnumerable<IResponseHeaders> _responseHeaders;
         private readonly HttpResponseMessage _responseMessage;
         private readonly ActionDescriptor _actionDescriptor;
 
@@ -22,12 +23,14 @@ namespace Graphite.Actions
             IEnumerable<IRequestBinder> requestBinders, 
             IEnumerable<IResponseWriter> writers,
             IEnumerable<IResponseStatus> responseStatus,
+            IEnumerable<IResponseHeaders> responseHeaders, 
             HttpResponseMessage responseMessage)
         {
             _actionDescriptor = actionDescriptor;
             _requestBinders = requestBinders;
             _writers = writers;
             _responseStatus = responseStatus;
+            _responseHeaders = responseHeaders;
             _responseMessage = responseMessage;
         }
 
@@ -46,9 +49,9 @@ namespace Graphite.Actions
                     switch (result.Status)
                     {
                         case BindingStatus.Failure:
-                            return SetStatus(ResponseState.BindingFailure, result.ErrorMessage);
+                            return SetStatusAndHeaders(ResponseState.BindingFailure, result.ErrorMessage);
                         case BindingStatus.NoReader:
-                            return SetStatus(ResponseState.NoReader);
+                            return SetStatusAndHeaders(ResponseState.NoReader);
                     }
                 }
             }
@@ -56,22 +59,29 @@ namespace Graphite.Actions
             var response = await _actionDescriptor.Action.Invoke(handler, actionArguments);
 
             if (response is HttpResponseMessage)
-                return response.As<HttpResponseMessage>();
+                return SetHeaders(response.As<HttpResponseMessage>());
 
             if (!_actionDescriptor.Route.HasResponse)
-                return SetStatus(ResponseState.NoResponse);
+                return SetStatusAndHeaders(ResponseState.NoResponse);
 
             var writer = _writers.ThatApply(response, _actionDescriptor).FirstOrDefault();
-            if (writer == null) return SetStatus(ResponseState.NoWriter);
-            SetStatus(ResponseState.HasResponse);
+            if (writer == null) return SetStatusAndHeaders(ResponseState.NoWriter);
+            SetStatusAndHeaders(ResponseState.HasResponse);
             return await writer.Write(response);
         }
 
-        protected virtual HttpResponseMessage SetStatus(
+        private HttpResponseMessage SetStatusAndHeaders(
             ResponseState responseState, string errorMessage = null)
         {
-            return _responseMessage.SetStatus(_responseStatus, 
+            _responseMessage.SetStatus(_responseStatus, 
                 _actionDescriptor, responseState, errorMessage);
+            return SetHeaders(_responseMessage);
+        }
+
+        private HttpResponseMessage SetHeaders(HttpResponseMessage message)
+        {
+            message.ApplyHeaders(_responseHeaders, _actionDescriptor);
+            return message;
         }
     }
 }

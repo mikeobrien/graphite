@@ -57,6 +57,7 @@ namespace Graphite.Diagnostics
                         GetPlugins("Request Binder", _configuration.RequestBinders),
                         GetPlugins("Request Reader", _configuration.RequestReaders),
                         GetPlugins("Response Status", _configuration.ResponseStatus),
+                        GetPlugins("Response Headers", _configuration.ResponseHeaders),
                         GetPlugins("Response Writer", _configuration.ResponseWriters)
                     }
                 }, _typeCache);

@@ -40,7 +40,8 @@ namespace Tests.Unit.Writers
                 .Append<NotWeightedWriter3>());
 
             var actionDescriptor = new ActionDescriptor(null, null, null, null, null, 
-                configuration.ResponseWriters.CloneAllThatApplyTo(null), null, null, new TypeCache());
+                configuration.ResponseWriters.CloneAllThatApplyTo(null), 
+                null, null, null, new TypeCache());
 
             var results = writers.ThatApply(null, actionDescriptor);
 

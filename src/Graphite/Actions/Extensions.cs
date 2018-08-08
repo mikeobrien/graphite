@@ -24,6 +24,17 @@ namespace Graphite.Actions
                 responseStatus, context)?.SetStatus(context);
             return responseMessage;
         }
+        
+        public static HttpResponseMessage ApplyHeaders(
+            this HttpResponseMessage responseMessage,
+            IEnumerable<IResponseHeaders> responseHeaders,
+            ActionDescriptor actionDescriptor)
+        {
+            var context = new ResponseHeadersContext(responseMessage);
+            actionDescriptor.ResponseHeaders.ThatAppliesToOrDefault(
+                responseHeaders, context)?.SetHeaders(context);
+            return responseMessage;
+        }
 
         public static IEnumerable<IActionDecorator> ThatApplyTo(
             this IEnumerable<IActionDecorator> actionDecorators,

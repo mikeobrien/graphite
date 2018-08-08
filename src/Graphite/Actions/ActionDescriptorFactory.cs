@@ -29,6 +29,7 @@ namespace Graphite.Actions
                 _configuration.RequestReaders.CloneAllThatApplyTo(actionConfigurationContext),
                 _configuration.ResponseWriters.CloneAllThatApplyTo(actionConfigurationContext),
                 _configuration.ResponseStatus.CloneAllThatApplyTo(actionConfigurationContext),
+                _configuration.ResponseHeaders.CloneAllThatApplyTo(actionConfigurationContext),
                 _configuration.Behaviors.CloneAllThatApplyTo(actionConfigurationContext), _typeCache);
         }
     }

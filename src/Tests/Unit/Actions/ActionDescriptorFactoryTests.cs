@@ -196,6 +196,37 @@ namespace Tests.Unit.Actions
         }
 
         [Test]
+        public void Should_only_configure_matching_response_headers_on_action(
+            [Values(true, false)] bool applies)
+        {
+            _requestGraph.Configuration
+                .ResponseHeaders.Configure(c => c.Clear()
+                    .Append<TestResponseHeaders1>(x => applies)
+                    .Append<TestResponseHeaders2>());
+
+            var descriptor = _actionDescriptorFactory
+                .CreateDescriptor(_requestGraph.ActionMethod,
+                    _requestGraph.GetRouteDescriptor());
+
+            var headers = descriptor.ResponseHeaders;
+
+            if (applies)
+            {
+                headers.Count().ShouldEqual(2);
+                headers.ShouldOnlyContain(
+                    Plugin<IResponseHeaders>.Create<TestResponseHeaders1>(),
+                    Plugin<IResponseHeaders>.Create<TestResponseHeaders2>());
+            }
+            else
+            {
+                headers = descriptor.ResponseHeaders;
+                headers.Count().ShouldEqual(1);
+                headers.ShouldOnlyContain(
+                    Plugin<IResponseHeaders>.Create<TestResponseHeaders2>());
+            }
+        }
+
+        [Test]
         public void Should_only_configure_matching_behaviors_on_action(
             [Values(true, false)] bool applies)
         {

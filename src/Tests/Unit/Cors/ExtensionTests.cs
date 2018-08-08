@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Web.Cors;
 using Graphite;
 using Graphite.Actions;
-using Graphite.Behaviors;
 using NUnit.Framework;
 using Graphite.Cors;
 using Graphite.Extensions;
@@ -191,7 +190,7 @@ namespace Tests.Unit.Cors
 
             var applies = sources.ThatApplies(corsConfiguration, new ActionDescriptor(
                 ActionMethod.From<Handler>(x => x.Post()), null, null, null, 
-                    null, null, null, null, new TypeCache()), null, null);
+                    null, null, null, null, null, new TypeCache()), null, null);
 
             applies.ShouldEqual(policy2);
         }

@@ -242,6 +242,11 @@ namespace Graphite
                 .Configure(x => x
                     .Append<DefaultResponseStatus>(@default: true));
 
+        public ConditionalPlugins<IResponseHeaders, ActionConfigurationContext> ResponseHeaders { get; } =
+            new ConditionalPlugins<IResponseHeaders, ActionConfigurationContext>(false)
+                .Configure(x => x
+                    .Append<AttributeResponseHeaders>(AttributeResponseHeaders.AppliesTo));
+
         public ConditionalPlugins<IBehavior, ActionConfigurationContext> Behaviors { get; } = 
             new ConditionalPlugins<IBehavior, ActionConfigurationContext>(false);
     }

@@ -43,5 +43,8 @@ namespace TestHarness.Action
         {
             return "fark";
         }
+
+        [ResponseHeader("fark", "farker")]
+        public void GetWithAttributeHeaders() { }
     }
 }
