@@ -5,6 +5,6 @@ namespace Graphite.Actions
 {
     public interface IActionMethodSource : IConditional
     {
-        IEnumerable<ActionMethod> GetActionMethods();
+        List<ActionMethod> GetActionMethods();
     }
 }

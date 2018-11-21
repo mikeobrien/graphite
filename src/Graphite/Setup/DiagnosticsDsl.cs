@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using Graphite.Diagnostics;
 using Graphite.Extensibility;
 using Graphite.Reflection;
@@ -14,17 +13,6 @@ namespace Graphite.Setup
         public ConfigurationDsl EnableDiagnostics()
         {
             _configuration.Diagnostics = true;
-            return this;
-        }
-
-        /// <summary>
-        /// Enables the diagnostics page when the
-        /// calling assembly is in debug mode.
-        /// </summary>
-        public ConfigurationDsl EnableDiagnosticsInDebugMode()
-        {
-            _configuration.Diagnostics = Assembly
-                .GetCallingAssembly().IsInDebugMode();
             return this;
         }
 

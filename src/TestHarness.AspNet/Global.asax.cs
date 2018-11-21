@@ -12,18 +12,16 @@ namespace TestHarness.AspNet
         {
             RouteTable.Routes.RouteExistingFiles = true;
 
-            var configuration = GlobalConfiguration.Configuration;
+            GlobalConfiguration.Configure(c =>
+            {
+                c.MapHttpAttributeRoutes();
 
-            configuration.MapHttpAttributeRoutes();
-
-            configuration
-                .InitializeGraphite(x =>
-                {
-                    Bootstrap.Configure(x);
-                    x.IncludeTypeAssembly<Global>();
-                });
-
-            configuration.EnsureInitialized();
+                c.InitializeGraphite(x =>
+                    {
+                        Bootstrap.Configure(x);
+                        x.IncludeTypeAssembly<Global>();
+                    });
+            });
         }
     }
 }

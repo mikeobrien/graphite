@@ -1,5 +1,4 @@
-﻿using System.Web.Http;
-using Graphite.Owin;
+﻿using Graphite.Owin;
 using Graphite.Hosting;
 using Graphite.StructureMap;
 using Graphite.DependencyInjection;
@@ -30,7 +29,7 @@ namespace Tests.Unit.Owin
         {
             _builder.InitializeGraphite(config =>
                 config
-                    .IncludeThisAssembly()
+                    .IncludeTypeAssembly<BootstrapTests>()
                     .UseContainer(_container)
                     .FilterHandlersBy((c, t) => false)
                     .ConfigureActionDecorators(x => x.Append<TestActionDecorator>())

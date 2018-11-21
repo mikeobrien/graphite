@@ -29,7 +29,7 @@ namespace Graphite.Actions
             return true;
         }
 
-        public virtual IEnumerable<ActionMethod> GetActionMethods()
+        public virtual List<ActionMethod> GetActionMethods()
         {
             return _configuration.Assemblies
                 .SelectMany(x => _typeCache.GetAssemblyDescriptor(x).Types)
@@ -42,7 +42,8 @@ namespace Graphite.Actions
                         (_configuration.ActionNameConvention ?? DefaultActionNameConvention)
                             (_configuration).IsMatch(m.Name) && 
                         (_configuration.ActionFilter?.Invoke(_configuration, m) ?? true))
-                    .Select(m => new ActionMethod(t, m)));
+                    .Select(m => new ActionMethod(t, m)))
+                .ToList();
         }
 
         public static Regex DefaultActionNameConvention(Configuration configuration)

@@ -3,7 +3,6 @@ using System.Web.Http;
 using Graphite.Actions;
 using Graphite.Binding;
 using Graphite.Extensibility;
-using Graphite.Http;
 using Graphite.Readers;
 using Graphite.Reflection;
 
@@ -62,15 +61,6 @@ namespace Graphite.Setup
         public ConfigurationDsl WithTypeCache<T>(T instance) where T : ITypeCache
         {
             _configuration.TypeCache.Set(instance);
-            return this;
-        }
-
-        /// <summary>
-        /// Configure http methods.
-        /// </summary>
-        public ConfigurationDsl ConfigureHttpMethods(Action<HttpMethods> configure)
-        {
-            configure(_configuration.SupportedHttpMethods);
             return this;
         }
 

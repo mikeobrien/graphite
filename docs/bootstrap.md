@@ -12,6 +12,12 @@ First, if you are hosting with ASP.NET, you will need to install the Web Api web
 PM> Install-Package Microsoft.AspNet.WebApi.WebHost
 ```
 
+If you are self hosting with OWIN:
+
+```bash
+PM> Install-Package Microsoft.AspNet.WebApi.OwinSelfHost
+```
+
 Next you will need to install Graphite. Graphite requires an IoC container to initialize. Currently the only supported container is [StructureMap](http://structuremap.github.io/) so that will need to be installed as well.
 
 ```bash
@@ -28,13 +34,8 @@ public class Global : HttpApplication
 {
     protected void Application_Start(object sender, EventArgs e)
     {
-        var configuration = GlobalConfiguration.Configuration;
-
-        configuration.InitializeGraphite(c => c
-            .UseStructureMapContainer(configuration)
-            ...);
-
-        configuration.EnsureInitialized();
+        GlobalConfiguration.Configure(c => c            .InitializeGraphite(g => g                .UseStructureMapContainer()
+                ...));
     }
 }
 ```
@@ -48,33 +49,17 @@ public class Bootstrap
 {
     public static void Start()
     {
-        var configuration = GlobalConfiguration.Configuration;
-
-        configuration.InitializeGraphite(c => c
-            .UseStructureMapContainer(configuration)
-            ...);
-
-        configuration.EnsureInitialized();
+        GlobalConfiguration.Configure(c => c            .InitializeGraphite(g => g                .UseStructureMapContainer()
+                ...));
     }
 }
 ```
 
-Self hosted is the same idea:
+OWIN bootstrapping can be done in a startup class, a la:
 
 ```csharp
-public class Startup 
-{ 
-    public void Configuration(IAppBuilder appBuilder) 
-    { 
-        var configuration = new HttpConfiguration();
-         
-        configuration.InitializeGraphite(c => c
-            .UseStructureMapContainer(configuration)
-            ...);
-
-        appBuilder.UseWebApi(config); 
-    } 
-} 
+public class Program{    static void Main(string[] args)    {        WebApp.Start<Startup>(args[0]);        Console.WriteLine($"Server running at {args[0]}, press enter to exit.");        Console.ReadLine();    }}public class Startup{    public void Configuration(IAppBuilder appBuilder)    {        appBuilder.InitializeGraphite(g => g            .UseStructureMapContainer()            ...;
+    }}
 ```
 
 ### Next: [Configuration](configuration)

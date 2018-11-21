@@ -8,9 +8,9 @@ namespace Graphite.Http
 {
     public class HttpMethods : List<HttpMethod>
     {
-        public HttpMethods Add(string method, bool allowRequestbody, bool allowResponsebody)
+        public HttpMethods Add(string method, bool allowRequestBody, bool allowResponseBody)
         {
-            Add(new HttpMethod(method, allowRequestbody, allowResponsebody));
+            Add(new HttpMethod(method, allowRequestBody, allowResponseBody));
             return this;
         }
         

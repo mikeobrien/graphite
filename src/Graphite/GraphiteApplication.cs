@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Web.Http;
 using Graphite.DependencyInjection;
-using Graphite.Diagnostics;
 using Graphite.Extensibility;
 using Graphite.Monitoring;
 using Graphite.Reflection;

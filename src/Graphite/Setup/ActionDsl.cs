@@ -1,7 +1,6 @@
 ﻿using System;
 using Graphite.Actions;
 using Graphite.Extensibility;
-using Graphite.Extensions;
 using Graphite.Reflection;
 
 namespace Graphite.Setup

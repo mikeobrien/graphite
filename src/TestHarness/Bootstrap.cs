@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Web.Http;
 using Graphite.Authentication;
 using Graphite.Cors;
+using Graphite.Extensions;
 using Graphite.Http;
 using Graphite.Setup;
 using Graphite.StructureMap;
@@ -16,9 +18,8 @@ namespace TestHarness
         public static void Configure(ConfigurationDsl configure)
         {
             configure
-                .ClearAssemblies()
-                .IncludeThisAssembly()
-                .EnableDiagnosticsInDebugMode()
+                .IncludeTypeAssembly<Registry>()
+                .EnableDiagnosticsInDebugMode<Registry>()
                 .ConfigureWebApi(x => x
                     .RouteExistingFiles()
                     .SetExceptionHandler<DebugExceptionHandler>())

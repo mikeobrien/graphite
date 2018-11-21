@@ -39,7 +39,7 @@ namespace Tests.Unit.Routing
         public void Should_return_overriden_urls()
         {
             var actionMethod = ActionMethod.From<Handler>(x => x.Override());
-            var urls = new DefaultUrlConvention(_configuration, null)
+            var urls = new DefaultUrlConvention(_configuration)
                 .GetUrls(new UrlContext(actionMethod,
                     null, new List<UrlSegment>
                     {
@@ -55,7 +55,7 @@ namespace Tests.Unit.Routing
         public void Should_return_default_url_when_override_not_specified()
         {
             var actionMethod = ActionMethod.From<Handler>(x => x.NoOverride());
-            var urls = new DefaultUrlConvention(_configuration, null)
+            var urls = new DefaultUrlConvention(_configuration)
                 .GetUrls(new UrlContext(actionMethod,
                     null, new List<UrlSegment>
                     {
@@ -77,7 +77,7 @@ namespace Tests.Unit.Routing
         {
             var actionMethod = ActionMethod.From<Handler>(x => x.NoOverride());
             _configuration.UrlPrefix = prefix;
-            var urls = new DefaultUrlConvention(_configuration, null)
+            var urls = new DefaultUrlConvention(_configuration)
                 .GetUrls(new UrlContext(actionMethod,
                     null, new List<UrlSegment>
                     {
@@ -101,7 +101,7 @@ namespace Tests.Unit.Routing
         public void Should_return_attribute_url_aliases()
         {
             var actionMethod = ActionMethod.From<AliasHandler>(x => x.Get());
-            var urls = new DefaultUrlConvention(_configuration, null)
+            var urls = new DefaultUrlConvention(_configuration)
                 .GetUrls(new UrlContext(actionMethod,
                     null, new List<UrlSegment>
                     {
@@ -118,7 +118,7 @@ namespace Tests.Unit.Routing
             var actionMethod = ActionMethod.From<AliasHandler>(x => x.Post());
             _configuration.UrlAliases.Add(x => $"{x.ActionMethod.MethodDescriptor.Name}/url1/{x.MethodSegments.ToUrl()}");
             _configuration.UrlAliases.Add(x => $"{x.ActionMethod.MethodDescriptor.Name}/url2/{x.MethodSegments.ToUrl()}");
-            var urls = new DefaultUrlConvention(_configuration, null)
+            var urls = new DefaultUrlConvention(_configuration)
                 .GetUrls(new UrlContext(actionMethod,
                     null, new List<UrlSegment>
                     {
@@ -134,7 +134,7 @@ namespace Tests.Unit.Routing
         [Test]
         public void Should_not_fail_if_type_doesent_have_a_namespace()
         {
-            new DefaultUrlConvention(_configuration, null)
+            new DefaultUrlConvention(_configuration)
                 .GetUrls(CreateUrlContext<NoNamespace>(x => x.Post()))
                 .ShouldOnlyContain("");
         }
@@ -146,7 +146,7 @@ namespace Tests.Unit.Routing
                 .Add("NoMatch", "nomatch")
                 .Add(@"Tests\.Unit\.Routing", "match");
 
-            new DefaultUrlConvention(_configuration, null)
+            new DefaultUrlConvention(_configuration)
                 .GetUrls(CreateUrlContext<Handler>(x => x.NoOverride()))
                 .ShouldOnlyContain("match");
         }
@@ -158,7 +158,7 @@ namespace Tests.Unit.Routing
                 .Add("^.*$", "all")
                 .Add(@"Tests\.Unit\.Routing", "namespace");
 
-            new DefaultUrlConvention(_configuration, null)
+            new DefaultUrlConvention(_configuration)
                 .GetUrls(CreateUrlContext<Handler>(x => x.NoOverride()))
                 .ShouldOnlyContain("all", "namespace");
         }
@@ -170,7 +170,7 @@ namespace Tests.Unit.Routing
             _mappingDsl.Clear()
                 .Add(@"^Tests.Unit.Routing$", $"fark{delimiter}farker");
 
-            new DefaultUrlConvention(_configuration, null)
+            new DefaultUrlConvention(_configuration)
                 .GetUrls(CreateUrlContext<Handler>(x => x.NoOverride()))
                 .ShouldOnlyContain("fark/farker");
         }
@@ -182,7 +182,7 @@ namespace Tests.Unit.Routing
             _mappingDsl.Clear()
                 .Add(@"^Tests.Unit.Routing$", $"fark{delimiter}farker");
 
-            new DefaultUrlConvention(_configuration, null)
+            new DefaultUrlConvention(_configuration)
                 .GetUrls(CreateUrlContext<Handler>(x => x.NoOverride()))
                 .ShouldOnlyContain("fark/farker");
         }
@@ -191,7 +191,7 @@ namespace Tests.Unit.Routing
         public void Should_union_method_segments()
         {
             _methodSegments.AddRange(new UrlSegment("fark"), new UrlSegment("farker"));
-            new DefaultUrlConvention(_configuration, null)
+            new DefaultUrlConvention(_configuration)
                 .GetUrls(CreateUrlContext<Handler>(x => x.NoOverride()))
                 .ShouldOnlyContain("Unit/Routing/fark/farker");
         }

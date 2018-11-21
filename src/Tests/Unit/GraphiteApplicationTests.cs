@@ -43,7 +43,7 @@ namespace Tests.Unit
             var initializer = Substitute.For<IInitializer>();
 
             _application.Initialize(c => c
-                .IncludeThisAssembly()
+                .IncludeTypeAssembly<GraphiteApplicationTests>()
                 .UseContainer(_container)
                 .FilterHandlersBy((a, t) => false)
                 .WithInitializer(initializer)

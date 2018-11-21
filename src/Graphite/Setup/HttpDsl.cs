@@ -1,12 +1,22 @@
 ﻿using System;
 using System.Linq;
 using Graphite.Extensions;
+using Graphite.Http;
 using Graphite.Routing;
 
 namespace Graphite.Setup
 {
     public partial class ConfigurationDsl
     {
+        /// <summary>
+        /// Configure http methods.
+        /// </summary>
+        public ConfigurationDsl ConfigureHttpMethods(Action<HttpMethods> configure)
+        {
+            configure(_configuration.SupportedHttpMethods);
+            return this;
+        }
+
         public class QuerystringDelimiterDsl
         {
             private readonly Configuration _configuration;

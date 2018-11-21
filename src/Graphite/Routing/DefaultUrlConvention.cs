@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Http;
 using Graphite.Extensions;
 
 namespace Graphite.Routing
@@ -31,14 +30,10 @@ namespace Graphite.Routing
     public class DefaultUrlConvention : IUrlConvention
     {
         private readonly Configuration _configuration;
-        private readonly HttpConfiguration _httpConfiguration;
 
-        public DefaultUrlConvention(
-            Configuration configuration,
-            HttpConfiguration httpConfiguration)
+        public DefaultUrlConvention(Configuration configuration)
         {
             _configuration = configuration;
-            _httpConfiguration = httpConfiguration;
         }
 
         public virtual bool AppliesTo(UrlContext context)

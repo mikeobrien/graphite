@@ -26,7 +26,7 @@ namespace Tests.Common.Fakes
             return AppliesFunc?.Invoke() ?? true;
         }
 
-        public IEnumerable<ActionMethod> GetActionMethods()
+        public List<ActionMethod> GetActionMethods()
         {
             GetActionMethodsCalled = true;
             return _actionMethods;

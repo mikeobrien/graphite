@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Graphite;
 using Graphite.Actions;
-using Graphite.Binding;
 using Graphite.Extensions;
 using Graphite.Routing;
 using Tests.Common;
@@ -30,7 +29,7 @@ namespace Tests.Unit.Routing
             _configuration = new Configuration();
             _urlConventions = new List<IUrlConvention>
             {
-                new DefaultUrlConvention(_configuration, null)
+                new DefaultUrlConvention(_configuration)
             };
             _configuration.UrlConventions.Configure(c => c.Append<DefaultUrlConvention>());
             _routeConvention = new DefaultRouteConvention(

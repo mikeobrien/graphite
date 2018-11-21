@@ -178,7 +178,7 @@ namespace Graphite.Setup
         /// <summary>
         /// Specifies the route mapper to use.
         /// </summary>
-        public ConfigurationDsl WithRouteMapper<T>() where T : IHttpRouteMapper
+        public ConfigurationDsl WithHttpRouteMapper<T>() where T : IHttpRouteMapper
         {
             _configuration.HttpRouteMapper.Set<T>();
             return this;
@@ -187,7 +187,7 @@ namespace Graphite.Setup
         /// <summary>
         /// Specifies the route mapper to use.
         /// </summary>
-        public ConfigurationDsl WithRouteMapper<T>(T instance) where T : IHttpRouteMapper
+        public ConfigurationDsl WithHttpRouteMapper<T>(T instance) where T : IHttpRouteMapper
         {
             _configuration.HttpRouteMapper.Set(instance);
             return this;

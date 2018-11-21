@@ -37,7 +37,7 @@ namespace Graphite.Diagnostics
         {
             var configuration = new Configuration();
             var actionMethodSource = new DefaultActionMethodSource(configuration, _typeCache);
-            var urlConvention = new DefaultUrlConvention(configuration, _httpConfiguration);
+            var urlConvention = new DefaultUrlConvention(configuration);
             var routeConvention = new DefaultRouteConvention(configuration,
                 _httpConfiguration, urlConvention.AsList<IUrlConvention>(), _constraintBuilder);
 

@@ -12,7 +12,7 @@ namespace Graphite.Setup
         /// </summary>
         public ConfigurationDsl IncludeTypeAssembly<T>()
         {
-            IncludeTypeAssembly(typeof(T));
+            IncludeTypeAssemblies(typeof(T));
             return this;
         }
 
@@ -20,18 +20,9 @@ namespace Graphite.Setup
         /// Includes the assembly of the specified type.
         /// This call is additive, so you can specify multiple assemblies..
         /// </summary>
-        public ConfigurationDsl IncludeTypeAssembly(Type type)
+        public ConfigurationDsl IncludeTypeAssemblies(params Type[] types)
         {
-            return IncludeAssemblies(type.Assembly);
-        }
-
-        /// <summary>
-        /// Includes the current assemby.
-        /// </summary>
-        public ConfigurationDsl IncludeThisAssembly()
-        {
-            IncludeAssemblies(Assembly.GetCallingAssembly());
-            return this;
+            return IncludeAssemblies(types.Select(x => x.Assembly).ToArray());
         }
 
         /// <summary>
@@ -41,15 +32,6 @@ namespace Graphite.Setup
         {
             _configuration.Assemblies.AddRange(assemblies
                 .Where(x => !_configuration.Assemblies.Contains(x)));
-            return this;
-        }
-
-        /// <summary>
-        /// Clears the default assemblies.
-        /// </summary>
-        public ConfigurationDsl ClearAssemblies()
-        {
-            _configuration.Assemblies.Clear();
             return this;
         }
     }

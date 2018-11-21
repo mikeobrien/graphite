@@ -51,7 +51,7 @@ namespace Tests.Unit.Authentication
             _actionDescriptor = new ActionDescriptorFactory(_configuration, null, new TypeCache())
                 .CreateDescriptor(ActionMethod.From<GraphiteHandler>(x => x.Post()), null);
             _behavior = new AuthenticationBehavior(_behaviorChain, _requestMessage, 
-                _responseMessage, _authenticators, _configuration, _actionDescriptor);
+           _responseMessage     , _authenticators, _configuration, _actionDescriptor);
         }
 
         [Test]
