@@ -29,6 +29,7 @@ namespace TestHarness
                 //        .Reader(r => r.IgnoreComments = true)
                 //        .Writer(w => w.Indent = true)))
                 .UseStructureMapContainer<Registry>()
+                .UseStructureMapContainer(x => x.AddRegistry<Registry>())
                 .ConfigureActionDecorators(d => d.Append<TestActionDecorator>())
                 .BindCookies()
                 .BindRequestInfo()

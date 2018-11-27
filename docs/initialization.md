@@ -6,7 +6,7 @@ layout: documentation
 
 The following graphic illustrates the Graphite initialization flow:
 
-[![Architecture](img/initialization.png)](img/initialization.png)
+![Architecture](img/initialization.png)
 
 ### Initializer
 
@@ -190,5 +190,3 @@ HTTP route decorators can be registered in the configuration as follows:
 .InitializeGraphite(g => g    .ConfigureHttpRouteDecorators(d => d        .Append<MyHttpRouteDecorator>()        .Append<AnotherHttpRouteDecorator>(a => a
             .ActionMethod.HasAttribute<SomeAttribute>())));
 ```
-
-### Next: [Getting Started](getting-started)

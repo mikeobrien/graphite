@@ -179,26 +179,3 @@ The configuration DSL is covered briefly below but in more detail in following s
 | `ConfigureWebApi --> SetExceptionHandler<T>` | Sets a request scoped exception handler. |
 | `ConfigureWebApi --> RouteExistingFiles` | Allows you to have a url that is the same as a physical path. |
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### Next: [Dependency Injection](dependency-injection)

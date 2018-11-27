@@ -145,5 +145,3 @@ By default the first action parameter is assumed to be the request on verbs that
 ![Diagnostics](img/getting-started/diagnostics3.png) 
 
 Well, that covers the basics! What we've covered so far is pretty much all you need to know in order to use Graphite day-to-day. Of course, you'll probably want to customize and extend the framework. The topics to the left cover that in detail.
-
-### Next: [Bootstrap](bootstrap)

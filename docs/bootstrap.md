@@ -61,5 +61,3 @@ OWIN bootstrapping can be done in a startup class, a la:
 public class Program{    static void Main(string[] args)    {        WebApp.Start<Startup>(args[0]);        Console.WriteLine($"Server running at {args[0]}, press enter to exit.");        Console.ReadLine();    }}public class Startup{    public void Configuration(IAppBuilder appBuilder)    {        appBuilder.InitializeGraphite(g => g            .UseStructureMapContainer()            ...;
     }}
 ```
-
-### Next: [Configuration](configuration)

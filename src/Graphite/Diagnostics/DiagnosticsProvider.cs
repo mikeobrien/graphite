@@ -41,6 +41,7 @@ namespace Graphite.Diagnostics
                         name = x.Name,
                         selected = i == 0
                     }),
+                sectionCount = sections.Count + 1,
                 sections = sections.Select((x, i) => new 
                     {
                         id = x.Id,

@@ -238,6 +238,12 @@ public Response Get()
 
 Multiple aliases are supported and will create separate routes.
 
+You can also prefix all your urls as follows:
+
+```csharp
+.InitializeGraphite(g => g    .WithUrlPrefix("api/v1"));
+```
+
 ##### Response Parameter
 
 The response parameter is simply determined by the action method return type. The HTTP method must allow a response body in order for the response parameter to be recognized. If the action method returns nothing then no response parameter is configured for the action.
@@ -253,5 +259,3 @@ You can completely replace the built in route convention by implementing `IRoute
 ```
 
 Multiple route conventions are supported which can result in multiple routes for the same action. If you want to replace the default route convention, you will want to `Clear()` it before appending your own.
-
-### Next: [FAQ](faq)
