@@ -90,14 +90,6 @@ namespace Graphite.Setup
             }
 
             /// <summary>
-            /// Maps the namespace starting after the calling types' namespace.
-            /// </summary>
-            public NamespaceUrlMappingDsl MapNamespaceAfterCallingType()
-            {
-                return MapNamespaceAfter(new StackFrame(1).GetMethod().ReflectedType);
-            }
-
-            /// <summary>
             /// Maps the namespace starting after the types' namespace.
             /// </summary>
             public NamespaceUrlMappingDsl MapNamespaceAfter<T>()
@@ -141,16 +133,6 @@ namespace Graphite.Setup
             Func<Configuration, ActionMethod, string[]> segments)
         {
             _configuration.ActionSegmentsConvention = segments;
-            return this;
-        }
-
-        /// <summary>
-        /// Gets the http method of the action.
-        /// </summary>
-        public ConfigurationDsl WithHttpMethodConvention(Func<Configuration, 
-            ActionMethod, string> method)
-        {
-            _configuration.HttpMethodConvention = method;
             return this;
         }
 

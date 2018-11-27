@@ -61,18 +61,15 @@ namespace Graphite.Routing
 
         protected virtual string GetHttpMethod(ActionMethod action)
         {
-            return (_configuration.HttpMethodConvention ?? DefaultHttpMethodConvention)(_configuration, action)
-                .AssertNotEmptyOrWhitespace("Http method not found on " +
+            var actionMethod = action.MethodDescriptor.Name
+                .MatchGroupValue((_configuration.ActionNameConvention ?? 
+                    DefaultActionMethodSource.DefaultActionNameConvention)(_configuration), 
+                    DefaultActionMethodSource.HttpMethodGroupName);
+            var method = _configuration.SupportedHttpMethods[actionMethod]?.Method;
+
+            return method.AssertNotEmptyOrWhitespace("Http method not found on " +
                     $"action {action.HandlerTypeDescriptor.Type.FullName}.{action.MethodDescriptor.Name}.")
                 .Trim().ToUpper();
-        }
-
-        public static string DefaultHttpMethodConvention(Configuration configuration, ActionMethod action)
-        {
-            return configuration.SupportedHttpMethods[action.MethodDescriptor.Name
-                .MatchGroupValue((configuration.ActionNameConvention ?? 
-                    DefaultActionMethodSource.DefaultActionNameConvention)(configuration), 
-                    DefaultActionMethodSource.HttpMethodGroupName)]?.Method;
         }
 
         protected virtual ParameterDescriptor GetRequestParameter(ActionMethod action, string httpMethod)
@@ -106,8 +103,10 @@ namespace Graphite.Routing
                 actionParameters.AddRange(action.MethodDescriptor.Parameters
                     .Where(x => x.ParameterType.IsComplexType)
                     .SelectMany(param => param.ParameterType.Properties
-                        .Where(x => x.PropertyInfo.CanWrite && x.PropertyType.IsSimpleType)
-                        .Select(prop => new ActionParameter(action, param, prop))));
+                        .Where(x => x.PropertyInfo.CanWrite)
+                        .Select(prop => new ActionParameter(action, param, prop, 
+                            prop.GetAttribute<NameAttribute>()?.Name ?? 
+                            prop.GetAttribute<FromUriAttribute>()?.Name))));
 
             return actionParameters;
         }

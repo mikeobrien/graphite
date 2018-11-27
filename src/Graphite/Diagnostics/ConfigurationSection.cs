@@ -50,7 +50,6 @@ namespace Graphite.Diagnostics
                         urlPrefix = _configuration.UrlPrefix.ToOptionalModel(),
                         urlAliases = _configuration.UrlAliases.ToListModel(),
                         actionSegmentsConvention = _configuration.ActionSegmentsConvention.ToOptionalModel(DefaultConfiguration.ActionSegmentsConvention),
-                        httpMethodConvention = _configuration.HttpMethodConvention.ToOptionalModel(DefaultConfiguration.HttpMethodConvention),
                         automaticallyConstrainUrlParameterByType = _configuration.AutomaticallyConstrainUrlParameterByType.ToYesNoModel(),
                         querystringParameterDelimiters = _configuration.QuerystringParameterDelimiters.ToListModel(),
                         namespaceUrlMappings = _configuration.NamespaceUrlMappings.ToListModel(),

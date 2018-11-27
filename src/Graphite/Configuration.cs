@@ -128,7 +128,6 @@ namespace Graphite
         public Func<Configuration, Regex> ActionNameConvention { get; set; }
         public Func<Configuration, MethodDescriptor, bool> ActionFilter { get; set; }
         public Func<Configuration, ActionMethod, string[]> ActionSegmentsConvention { get; set; }
-        public Func<Configuration, ActionMethod, string> HttpMethodConvention { get; set; }
 
         public ConditionalPlugins<IUrlConvention, UrlContext> UrlConventions { get; } = 
             new ConditionalPlugins<IUrlConvention, UrlContext>(true)

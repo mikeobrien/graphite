@@ -2,7 +2,7 @@
 layout: documentation
 ---
 
-### Getting Started
+## Getting Started
 
 You can either start out with a new empty web project or with an existing one as Graphite can coexist with your existing Web Api controllers. Graphite only supports .NET 4.6.2 or later.
 

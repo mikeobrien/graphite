@@ -2,7 +2,7 @@
 layout: documentation
 ---
 
-### Overview
+## Overview
 
 Comming soon... For now see the [getting started guide](getting-started).
 

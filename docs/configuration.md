@@ -2,7 +2,7 @@
 layout: documentation
 ---
 
-### Configuration
+## Configuration
 
 Graphite is configured by the configuration DSL during initialization. For example:
 
@@ -138,13 +138,15 @@ The configuration DSL is covered briefly below but in more detail in following s
 | `ConfigureRouteConventions` | Allows you to configure route conventions. |
 | `ConfigureUrlConventions` | Allows you to configure url conventions. |
 | `WithUrlAlias` | Adds url aliases. |
-| `WithUrlPrefix` | Adds a prefix to all urls. |
+| `WithUrlPrefix` | Adds a prefix to all urls. Regex matching the namespace to map. |
 | `ConfigureNamespaceUrlMapping` | Enables you to configure the namespace to url mappings. |
+| `ConfigureNamespaceUrlMapping` --> `Add` | Adds a namespace url mapping. Supports substitutions e.g. `$1` or `${capturegroup}`. |
+| `ConfigureNamespaceUrlMapping` --> `MapNamespaceAfter` | Maps the namespace starting after the namespace. |
 | `WithActionSegmentsConvention` | Gets action segments. |
 | `WithHttpMethodConvention` | Gets the http method of the action. |
 | `WithHandlerNameConvention` | Specifies the regex used to identify handlers e.g. "Handler$". |
 | `WithActionNameConvention` | Specifies the regex used to identify actions and parse action names. By default the http method is pulled from the "method" capture group, the segements from from the "segment" capture group e.g. "^(?&lt;method&gt;{methods}?)(?&lt;segments&gt;.*)". |
-| `WithRouteMapper` | Specifies the route mapper to use. |
+| `WithHttpRouteMapper` | Specifies the route mapper to use. |
 | `AutomaticallyConstrainUrlParameterByType` | Automatically constrain url parameters by type. |
 | `WithInlineConstraintResolver` | Specifies the inline constraint resolver to use. |
 | `WithInlineConstraintBuilder` | Specifies the inline constraint builder to use. |

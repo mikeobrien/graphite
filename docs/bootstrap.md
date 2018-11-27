@@ -2,7 +2,7 @@
 layout: documentation
 ---
 
-### Bootstrap
+## Bootstrap
 
 Bootstrapping Graphite can be done in a few different ways. Either way the `InitializeGraphite()` extension method must be called on `HttpConfiguration` at app startup. 
 

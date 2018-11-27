@@ -584,7 +584,7 @@ namespace Tests.Unit.Routing
         [TestCase(nameof(ParseHttpMethod.Connect), "CONNECT")]
         public void Should_return_method_name_from_method_name_convention(string name, string expected)
         {
-            DefaultRouteConvention.DefaultHttpMethodConvention(_configuration,
+            DefaultRouteConvention.HttpMethodConvention(_configuration,
                     ActionMethod.From<ParseHttpMethod>(name))
                 .ShouldEqual(expected);
         }

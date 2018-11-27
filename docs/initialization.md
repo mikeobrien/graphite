@@ -2,7 +2,7 @@
 layout: documentation
 ---
 
-### Initialization
+## Initialization
 
 The following graphic illustrates the Graphite initialization flow:
 
