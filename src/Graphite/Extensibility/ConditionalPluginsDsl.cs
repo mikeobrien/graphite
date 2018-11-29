@@ -63,53 +63,58 @@ namespace Graphite.Extensibility
                 _defaultPredicate = defaultPredicate;
             }
 
-            public ConditionalPluginsDsl<TPlugin, TContext> WithOrPrepend<TReplacement>(
+            public ReplaceAppendPrependDsl<TReplace> With<TReplacement>(
                 Func<TContext, bool> predicate = null, bool @default = false)
                 where TReplacement : TPlugin
             {
-                return WithOrPrepend(ConditionalPlugin<TPlugin, TContext>
-                    .Create<TReplacement>(predicate ?? _defaultPredicate,
-                        _plugins.Singleton), @default);
-            }
-
-            public ConditionalPluginsDsl<TPlugin, TContext> WithOrPrepend<TReplacement>(
-                TReplacement instance, Func<TContext, bool> predicate = null,
-                bool dispose = false, bool @default = false)
-                where TReplacement : TPlugin
-            {
-                return WithOrPrepend(ConditionalPlugin<TPlugin, TContext>
-                    .Create(instance, predicate ?? _defaultPredicate, dispose), @default);
-            }
-
-            private ConditionalPluginsDsl<TPlugin, TContext> WithOrPrepend(
-                ConditionalPlugin<TPlugin, TContext> plugin, bool @default = false)
-            {
-                _plugins.ReplaceAllOfTypeWithOrPrepend<TReplace>(plugin, @default);
-                return _dsl;
-            }
-
-            public ConditionalPluginsDsl<TPlugin, TContext> WithOrAppend<TReplacement>(
-                Func<TContext, bool> predicate = null, bool @default = false)
-                where TReplacement : TPlugin
-            {
-                return WithOrAppend(ConditionalPlugin<TPlugin, TContext>
+                return With(ConditionalPlugin<TPlugin, TContext>
                     .Create<TReplacement>(predicate ?? _defaultPredicate, 
                         _plugins.Singleton), @default);
             }
 
-            public ConditionalPluginsDsl<TPlugin, TContext> WithOrAppend<TReplacement>(
+            public ReplaceAppendPrependDsl<TReplace> With<TReplacement>(
                 TReplacement instance, Func<TContext, bool> predicate = null, 
                 bool dispose = false, bool @default = false)
                 where TReplacement : TPlugin
             {
-                return WithOrAppend(ConditionalPlugin<TPlugin, TContext>
+                return With(ConditionalPlugin<TPlugin, TContext>
                     .Create(instance, predicate ?? _defaultPredicate, dispose), @default);
             }
 
-            private ConditionalPluginsDsl<TPlugin, TContext> WithOrAppend(
+            private ReplaceAppendPrependDsl<TReplace> With(
                 ConditionalPlugin<TPlugin, TContext> plugin, bool @default = false)
             {
                 _plugins.ReplaceAllOfTypeWithOrAppend<TReplace>(plugin, @default);
+                return new ReplaceAppendPrependDsl<TReplace>(_dsl, _plugins, plugin, @default);
+            }
+        }
+
+        public class ReplaceAppendPrependDsl<TReplace> where TReplace : TPlugin
+        {
+            private readonly ConditionalPluginsDsl<TPlugin, TContext> _dsl;
+            private readonly ConditionalPlugins<TPlugin, TContext> _plugins;
+            private readonly ConditionalPlugin<TPlugin, TContext> _plugin;
+            private readonly bool _default;
+
+            public ReplaceAppendPrependDsl(ConditionalPluginsDsl<TPlugin, TContext> dsl,
+                ConditionalPlugins<TPlugin, TContext> plugins,
+                ConditionalPlugin<TPlugin, TContext> plugin, bool @default)
+            {
+                _dsl = dsl;
+                _plugins = plugins;
+                _plugin = plugin;
+                _default = @default;
+            }
+
+            public ConditionalPluginsDsl<TPlugin, TContext> OrPrepend()
+            {
+                _plugins.Prepend(_plugin, _default);
+                return _dsl;
+            }
+
+            public ConditionalPluginsDsl<TPlugin, TContext> OrAppend()
+            {
+                // This is the default so NOOP but here for clarity. 
                 return _dsl;
             }
         }
@@ -141,25 +146,49 @@ namespace Graphite.Extensibility
         public class AppendDsl : ConditionalPluginsDsl<TPlugin, TContext>
         {
             private readonly ConditionalPlugin<TPlugin, TContext> _plugin;
+            private readonly ConditionalPlugins<TPlugin, TContext> _plugins;
+            private readonly Func<TContext, bool> _defaultPredicate;
 
             public AppendDsl(ConditionalPlugin<TPlugin, TContext> plugin,
                 ConditionalPlugins<TPlugin, TContext> plugins, 
                 Func<TContext, bool> defaultPredicate) : base(plugins, defaultPredicate)
             {
                 _plugin = plugin;
+                _plugins = plugins;
+                _defaultPredicate = defaultPredicate;
             }
 
-            public ConditionalPluginsDsl<TPlugin, TContext> AfterOrPrepend<TFind>()
+            public AppendOrPrependDsl<TFind> After<TFind>()
                 where TFind : TPlugin
             {
-                Plugins.AppendAfterOrPrepend<TFind>(_plugin);
+                _plugins.AppendAfterOrAppend<TFind>(_plugin);
+                return new AppendOrPrependDsl<TFind>(_plugin, _plugins, _defaultPredicate);
+            }
+        }
+
+        public class AppendOrPrependDsl<TFind> : ConditionalPluginsDsl<TPlugin, TContext>
+                where TFind : TPlugin
+        {
+            private readonly ConditionalPlugin<TPlugin, TContext> _plugin;
+            private readonly ConditionalPlugins<TPlugin, TContext> _plugins;
+
+            public AppendOrPrependDsl(ConditionalPlugin<TPlugin, TContext> plugin,
+                ConditionalPlugins<TPlugin, TContext> plugins, 
+                Func<TContext, bool> defaultPredicate) : base(plugins, defaultPredicate)
+            {
+                _plugin = plugin;
+                _plugins = plugins;
+            }
+
+            public ConditionalPluginsDsl<TPlugin, TContext> OrPrepend()
+            {
+                _plugins.AppendAfterOrPrepend<TFind>(_plugin);
                 return this;
             }
 
-            public ConditionalPluginsDsl<TPlugin, TContext> AfterOrAppend<TFind>()
-                where TFind : TPlugin
+            public ConditionalPluginsDsl<TPlugin, TContext> OrAppend()
             {
-                Plugins.AppendAfterOrAppend<TFind>(_plugin);
+                // This is the default so NOOP but here for clarity. 
                 return this;
             }
         }
@@ -191,25 +220,49 @@ namespace Graphite.Extensibility
         public class PrependDsl : ConditionalPluginsDsl<TPlugin, TContext>
         {
             private readonly ConditionalPlugin<TPlugin, TContext> _plugin;
+            private readonly ConditionalPlugins<TPlugin, TContext> _plugins;
+            private readonly Func<TContext, bool> _defaultPredicate;
 
             public PrependDsl(ConditionalPlugin<TPlugin, TContext> plugin,
                 ConditionalPlugins<TPlugin, TContext> plugins,
                 Func<TContext, bool> defaultPredicate) : base(plugins, defaultPredicate)
             {
                 _plugin = plugin;
+                _plugins = plugins;
+                _defaultPredicate = defaultPredicate;
             }
 
-            public ConditionalPluginsDsl<TPlugin, TContext> BeforeOrPrepend<TFind>()
+            public PrependOrAppendDsl<TFind> Before<TFind>()
                 where TFind : TPlugin
             {
-                Plugins.PrependBeforeOrPrepend<TFind>(_plugin);
+                _plugins.PrependBeforeOrPrepend<TFind>(_plugin);
+                return new PrependOrAppendDsl<TFind>(_plugin, _plugins, _defaultPredicate);
+            }
+        }
+
+        public class PrependOrAppendDsl<TFind> : ConditionalPluginsDsl<TPlugin, TContext>
+                where TFind : TPlugin
+        {
+            private readonly ConditionalPlugin<TPlugin, TContext> _plugin;
+            private readonly ConditionalPlugins<TPlugin, TContext> _plugins;
+
+            public PrependOrAppendDsl(ConditionalPlugin<TPlugin, TContext> plugin,
+                ConditionalPlugins<TPlugin, TContext> plugins,
+                Func<TContext, bool> defaultPredicate) : base(plugins, defaultPredicate)
+            {
+                _plugin = plugin;
+                _plugins = plugins;
+            }
+
+            public ConditionalPluginsDsl<TPlugin, TContext> OrPrepend()
+            {
+                // This is the default so NOOP but here for clarity. 
                 return this;
             }
 
-            public ConditionalPluginsDsl<TPlugin, TContext> BeforeOrAppend<TFind>()
-                where TFind : TPlugin
+            public ConditionalPluginsDsl<TPlugin, TContext> OrAppend()
             {
-                Plugins.PrependBeforeOrAppend<TFind>(_plugin);
+                _plugins.PrependBeforeOrAppend<TFind>(_plugin);
                 return this;
             }
         }

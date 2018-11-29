@@ -8,6 +8,7 @@ using Graphite.Http;
 using Graphite.Setup;
 using Graphite.StructureMap;
 using Graphite.Views;
+using Graphite.Writers;
 using TestHarness.Handlers;
 using TestHarness.Routing;
 
@@ -23,6 +24,8 @@ namespace TestHarness
                 .ConfigureWebApi(x => x
                     .RouteExistingFiles()
                     .SetExceptionHandler<DebugExceptionHandler>())
+                .ConfigureResponseWriters(x => x
+                    .Replace<JsonWriter>().With<JsonWriter>().OrAppend())
                 //.ConfigureSerialization(s => s
                 //    .Json(j => j.UseCamelCaseNaming())
                 //    .Xml(x => x

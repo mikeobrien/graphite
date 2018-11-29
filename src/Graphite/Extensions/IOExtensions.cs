@@ -24,13 +24,13 @@ namespace Graphite.Extensions
                 return reader.ReadToEnd();
             }
         }
+        
+        public const int DefaultBufferSize = 1024; 
 
         public static StreamWriter CreateWriter(this Stream stream, 
-            Encoding encoding, int? bufferSize)
+            Encoding encoding, int? bufferSize = null, bool leaveOpen = false)
         {
-            return bufferSize.HasValue
-                ? new StreamWriter(stream, encoding, bufferSize.Value)
-                : new StreamWriter(stream, encoding);
+            return new StreamWriter(stream, encoding, bufferSize ?? DefaultBufferSize, leaveOpen);
         }
 
         public static async Task<byte[]> ReadAsByteArray(this Task<Stream> stream)

@@ -220,23 +220,39 @@ namespace MyApp.Api.Users
 
 ...would result in the route template `api/users/{id}/permissions`.
 
-You can completely override the action's url with the `UrlAttriubute` as follows:
+##### Explicit Urls
+
+You can completely override the action's url with the `UrlAttriubute` as follows by specifying a route template:
 
 ```csharp
 [Url("some/url", "another/url")]
 public Response Get()
 ```
 
-Multiple urls are supported and will create separate routes.
+Multiple urls are supported and will create separate routes. As this is a route template, you can specify url parameters:
 
-If you simply want an alias to an action you can use the `UrlAliasAttribute` as follows:
+```csharp
+[Url("some/url/{id}")]
+public Response Get(Guid id)
+```
+
+##### Url Alias
+
+If you simply want an alias to an action you can use the `UrlAliasAttribute` as follows by specifying a route template:
 
 ```csharp
 [UrlAlias("some/alias", "another/alias")]
 public Response Get()
 ```
 
-Multiple aliases are supported and will create separate routes.
+Multiple aliases are supported and will create separate routes. As this is a route template, you can specify url parameters:
+
+```csharp
+[UrlAlias("some/alias/{id}")]
+public Response Get(Guid id)
+```
+
+##### Url Prefix 
 
 You can also prefix all your urls as follows:
 

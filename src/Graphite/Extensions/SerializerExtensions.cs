@@ -21,31 +21,7 @@ namespace Graphite.Extensions
             Action<Iso8601DateTimeConverter> configure = null)
         {
             settings.RemoveConverters<IsoDateTimeConverter>();
-            configure?.Invoke(settings.GetOrAddConverter<Iso8601DateTimeConverter>());
-            return settings;
-        }
-
-        public static T GetOrAddConverter<T>(this JsonSerializerSettings settings)
-            where T : JsonConverter, new()
-        {
-            var converter = settings.Converters.OfType<T>().FirstOrDefault();
-            if (converter != null) return converter;
-            converter = new T();
-            settings.Converters.Add(converter);
-            return converter;
-        }
-
-        public static void AddConverter<T>(this JsonSerializerSettings settings)
-            where T : JsonConverter, new()
-        {
-            settings.Converters.Add(new T());
-        }
-
-        public static JsonSerializerSettings RemoveConverters<T>(this JsonSerializerSettings settings) 
-            where T : JsonConverter
-        {
-            settings.Converters.OfType<T>().ToList()
-                .ForEach(x => settings.Converters.Remove(x));
+            settings.TryAddConverter(configure);
             return settings;
         }
 
@@ -53,11 +29,38 @@ namespace Graphite.Extensions
             Action<KindDateTimeConverter> configure = null)
         {
             settings.DateFormatHandling = DateFormatHandling.MicrosoftDateFormat;
-            if (configure != null)
+            settings.RemoveConverters<KindDateTimeConverter>();
+            settings.TryAddConverter(configure);
+            return settings;
+        }
+
+        public static JsonSerializerSettings TryAddConverter<T>(this JsonSerializerSettings settings, Action<T> configure = null)
+            where T : JsonConverter, new()
+        {
+            var converter = settings.Converters.OfType<T>().FirstOrDefault();
+            if (converter == null)
             {
-                settings.RemoveConverters<KindDateTimeConverter>();
-                configure(settings.GetOrAddConverter<KindDateTimeConverter>());
+                converter = new T();
+                settings.Converters.Add(converter);
             }
+            configure?.Invoke(converter);
+            return settings;
+        }
+
+        public static JsonSerializerSettings AddConverter<T>(this JsonSerializerSettings settings, Action<T> configure = null)
+            where T : JsonConverter, new()
+        {
+            var converter = new T();
+            configure?.Invoke(converter);
+            settings.Converters.Add(converter);
+            return settings;
+        }
+
+        public static JsonSerializerSettings RemoveConverters<T>(this JsonSerializerSettings settings) 
+            where T : JsonConverter
+        {
+            settings.Converters.OfType<T>().ToList()
+                .ForEach(x => settings.Converters.Remove(x));
             return settings;
         }
 
@@ -97,9 +100,9 @@ namespace Graphite.Extensions
             return settings;
         }
 
-        public static JsonSerializerSettings PrettyPrintInDebugMode(this JsonSerializerSettings settings)
+        public static JsonSerializerSettings PrettyPrintInDebugMode<T>(this JsonSerializerSettings settings)
         {
-            if (Assembly.GetCallingAssembly().IsInDebugMode())
+            if (typeof(T).Assembly.IsInDebugMode())
                 settings.Formatting = Formatting.Indented;
             return settings;
         }

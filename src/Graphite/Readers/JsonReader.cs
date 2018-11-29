@@ -17,9 +17,9 @@ namespace Graphite.Readers
         {
             try
             {
-                var jsonReader = new JsonTextReader(new System.IO.StringReader(data));
-                return ReadResult.Success(_serializer.Deserialize(
-                    jsonReader, context.ReadType.Type));
+                using (var jsonReader = new JsonTextReader(new System.IO.StringReader(data)))
+                    return ReadResult.Success(_serializer.Deserialize(
+                        jsonReader, context.ReadType.Type));
             }
             catch (JsonReaderException exception)
             {

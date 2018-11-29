@@ -79,7 +79,7 @@ namespace Tests.Unit.Extensibility
             _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create<Plugin2>(x => false));
             _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create(new Plugin2(), x => false));
 
-            RunInScope(when, (dsl, p) => dsl.Replace<Plugin2>().WithOrPrepend<Plugin3>(p, @default));
+            RunInScope(when, (dsl, p) => dsl.Replace<Plugin2>().With<Plugin3>(p, @default).OrPrepend());
 
             _plugins.Count().ShouldEqual(2);
             _plugins.First().Type.ShouldEqual(typeof(Plugin1));
@@ -105,7 +105,7 @@ namespace Tests.Unit.Extensibility
             _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create<Plugin2>(x => false));
             _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create(new Plugin2(), x => false));
             
-            RunInScope(when, (dsl, p) => dsl.Replace<Plugin2>().WithOrPrepend(instance3, p, dispose, @default));
+            RunInScope(when, (dsl, p) => dsl.Replace<Plugin2>().With(instance3, p, dispose, @default).OrPrepend());
 
             _plugins.Count().ShouldEqual(2);
             _plugins.First().Type.ShouldEqual(typeof(Plugin1));
@@ -130,7 +130,7 @@ namespace Tests.Unit.Extensibility
             _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create<Plugin2>(x => false));
             _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create(new Plugin2(), x => false));
 
-            RunInScope(when, (dsl, p) => dsl.Replace<Plugin2>().WithOrAppend<Plugin3>(p, @default));
+            RunInScope(when, (dsl, p) => dsl.Replace<Plugin2>().With<Plugin3>(p, @default).OrAppend());
 
             _plugins.Count().ShouldEqual(2);
             _plugins.First().Type.ShouldEqual(typeof(Plugin1));
@@ -156,7 +156,7 @@ namespace Tests.Unit.Extensibility
             _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create<Plugin2>(x => false));
             _plugins.Append(ConditionalPlugin<IPluginType, Context>.Create(new Plugin2(), x => false));
 
-            RunInScope(when, (dsl, p) => dsl.Replace<Plugin2>().WithOrAppend(instance3, p, dispose, @default));
+            RunInScope(when, (dsl, p) => dsl.Replace<Plugin2>().With(instance3, p, dispose, @default).OrAppend());
 
             _plugins.Count().ShouldEqual(2);
             _plugins.First().Type.ShouldEqual(typeof(Plugin1));
@@ -239,8 +239,8 @@ namespace Tests.Unit.Extensibility
             {
                 var appendDsl = dsl.Append<Plugin3>(_predicate, @default);
                 
-                if (orAppend) appendDsl.AfterOrAppend<Plugin1>();
-                else appendDsl.AfterOrPrepend<Plugin1>();
+                if (orAppend) appendDsl.After<Plugin1>().OrAppend();
+                else appendDsl.After<Plugin1>().OrPrepend();
             });
             
             _plugins.Count().ShouldEqual(3);
@@ -275,8 +275,8 @@ namespace Tests.Unit.Extensibility
             {
                 var appendDsl = dsl.Append(instance3, _predicate, dispose, @default);
 
-                if (orAppend) appendDsl.AfterOrAppend<Plugin1>();
-                else appendDsl.AfterOrPrepend<Plugin1>();
+                if (orAppend) appendDsl.After<Plugin1>().OrAppend();
+                else appendDsl.After<Plugin1>().OrPrepend();
             });
 
             _plugins.Count().ShouldEqual(3);
@@ -307,7 +307,7 @@ namespace Tests.Unit.Extensibility
 
             RunInScope(when, (dsl, p) => dsl
                 .Append<Plugin2>(p, @default)
-                .AfterOrAppend<Plugin3>());
+                .After<Plugin3>().OrAppend());
 
             _plugins.Count().ShouldEqual(2);
 
@@ -335,7 +335,7 @@ namespace Tests.Unit.Extensibility
 
             RunInScope(when, (dsl, p) => dsl
                 .Append(instance2, p, dispose, @default)
-                .AfterOrAppend<Plugin3>());
+                .After<Plugin3>().OrAppend());
 
             _plugins.Count().ShouldEqual(2);
 
@@ -363,7 +363,7 @@ namespace Tests.Unit.Extensibility
 
             RunInScope(when, (dsl, p) => dsl
                 .Append<Plugin2>(p, @default)
-                .AfterOrPrepend<Plugin3>());
+                .After<Plugin3>().OrPrepend());
 
             _plugins.Count().ShouldEqual(2);
 
@@ -391,7 +391,7 @@ namespace Tests.Unit.Extensibility
             
             RunInScope(when, (dsl, p) => dsl
                 .Append(instance2, p, dispose, @default)
-                .AfterOrPrepend<Plugin3>());
+                .After<Plugin3>().OrPrepend());
 
             _plugins.Count().ShouldEqual(2);
 
@@ -475,8 +475,8 @@ namespace Tests.Unit.Extensibility
             {
                 var prependDsl = dsl.Prepend<Plugin3>(p, @default);
 
-                if (orPrepend) prependDsl.BeforeOrPrepend<Plugin2>();
-                else prependDsl.BeforeOrAppend<Plugin2>();
+                if (orPrepend) prependDsl.Before<Plugin2>().OrPrepend();
+                else prependDsl.Before<Plugin2>().OrAppend();
             });
 
             _plugins.Count().ShouldEqual(3);
@@ -511,8 +511,8 @@ namespace Tests.Unit.Extensibility
             {
                 var prependDsl = dsl.Prepend(instance3, p, dispose, @default);
 
-                if (orPrepend) prependDsl.BeforeOrPrepend<Plugin2>();
-                else prependDsl.BeforeOrAppend<Plugin2>();
+                if (orPrepend) prependDsl.Before<Plugin2>().OrPrepend();
+                else prependDsl.Before<Plugin2>().OrAppend();
             });
 
             _plugins.Count().ShouldEqual(3);
@@ -543,7 +543,7 @@ namespace Tests.Unit.Extensibility
 
             RunInScope(when, (dsl, p) => dsl
                 .Prepend<Plugin2>(p, @default)
-                .BeforeOrAppend<Plugin3>());
+                .Before<Plugin3>().OrAppend());
 
             _plugins.Count().ShouldEqual(2);
 
@@ -571,7 +571,7 @@ namespace Tests.Unit.Extensibility
 
             RunInScope(when, (dsl, p) => dsl
                 .Prepend(instance2, p, dispose, @default)
-                .BeforeOrAppend<Plugin3>());
+                .Before<Plugin3>().OrAppend());
 
             _plugins.Count().ShouldEqual(2);
 
@@ -599,7 +599,7 @@ namespace Tests.Unit.Extensibility
 
             RunInScope(when, (dsl, p) => dsl
                 .Prepend<Plugin2>(p, @default)
-                .BeforeOrPrepend<Plugin3>());
+                .Before<Plugin3>().OrPrepend());
 
             _plugins.Count().ShouldEqual(2);
 
@@ -627,7 +627,7 @@ namespace Tests.Unit.Extensibility
 
             RunInScope(when, (dsl, p) => dsl
                 .Prepend(instance2, p, dispose, @default)
-                .BeforeOrPrepend<Plugin3>());
+                .Before<Plugin3>().OrPrepend());
 
             _plugins.Count().ShouldEqual(2);
 

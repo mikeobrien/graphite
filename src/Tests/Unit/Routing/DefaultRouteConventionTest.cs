@@ -262,7 +262,7 @@ namespace Tests.Unit.Routing
                 .Add(h => h.Get_(), null, null, null, false)
                 .Add(h => h.Get((string)null), null, null, "param", false)
                 .Add(h => h.Get((ParametersModel)null), null, null, "model", false)
-                .Add(h => h.Get((ParametersModel)null), null, null, "model,param", true)
+                .Add(h => h.Get((ParametersModel)null), null, null, "model,param,", true)
                 .Add(h => h.Get_(null), null, null, "param", false)
                 .Add(h => h.Get_Param((string)null), null, "param", null, false)
                 .Add(h => h.Get_Param((ParametersModel)null), null, null, "model", false)
@@ -558,35 +558,6 @@ namespace Tests.Unit.Routing
 
             urlConvention.AppliesToCalled.ShouldBeFalse();
             urlConvention.GetUrlsCalled.ShouldBeFalse();
-        }
-
-        public class ParseHttpMethod
-        {
-            public void GetFark() { }
-            public void Get() { }
-            public void Post() { }
-            public void Put() { }
-            public void Delete() { }
-            public void Options() { }
-            public void Head() { }
-            public void Trace() { }
-            public void Connect() { }
-        }
-
-        [TestCase(nameof(ParseHttpMethod.GetFark), "GET")]
-        [TestCase(nameof(ParseHttpMethod.Get), "GET")]
-        [TestCase(nameof(ParseHttpMethod.Post), "POST")]
-        [TestCase(nameof(ParseHttpMethod.Put), "PUT")]
-        [TestCase(nameof(ParseHttpMethod.Delete), "DELETE")]
-        [TestCase(nameof(ParseHttpMethod.Options), "OPTIONS")]
-        [TestCase(nameof(ParseHttpMethod.Head), "HEAD")]
-        [TestCase(nameof(ParseHttpMethod.Trace), "TRACE")]
-        [TestCase(nameof(ParseHttpMethod.Connect), "CONNECT")]
-        public void Should_return_method_name_from_method_name_convention(string name, string expected)
-        {
-            DefaultRouteConvention.HttpMethodConvention(_configuration,
-                    ActionMethod.From<ParseHttpMethod>(name))
-                .ShouldEqual(expected);
         }
 
         public class ParseSegments

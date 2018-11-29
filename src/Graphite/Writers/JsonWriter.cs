@@ -22,13 +22,20 @@ namespace Graphite.Writers
             _configuration = configuration;
         }
 
+        public override bool AppliesTo(ResponseWriterContext context)
+        {
+            return base.AppliesTo(context);
+        }
+
         protected override void WriteToStream(ResponseWriterContext context, Stream output)
         {
-            var streamWriter = output.CreateWriter(_configuration.DefaultEncoding,
-                _configuration.SerializerBufferSize);
-            var jsonWriter = new JsonTextWriter(streamWriter);
-            _serializer.Serialize(jsonWriter, context.Response);
-            jsonWriter.Flush();
+            using (var streamWriter = output.CreateWriter(_configuration.DefaultEncoding,
+                _configuration.SerializerBufferSize, true))
+            using (var jsonWriter = new JsonTextWriter(streamWriter))
+            {
+                _serializer.Serialize(jsonWriter, context.Response);
+                jsonWriter.Flush();
+            }
         }
     }
 }

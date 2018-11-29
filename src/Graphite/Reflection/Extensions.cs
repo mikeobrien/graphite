@@ -82,7 +82,7 @@ namespace Graphite.Reflection
         {
             return assembly.GetCustomAttributes(typeof(DebuggableAttribute), false)
                 .Cast<DebuggableAttribute>()
-                .Any(x => x.IsJITTrackingEnabled && x.IsJITOptimizerDisabled);
+                .Any(x => x.IsJITOptimizerDisabled);
         }
 
         public static string GetNestedName(this Type type)

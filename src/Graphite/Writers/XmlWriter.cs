@@ -26,11 +26,13 @@ namespace Graphite.Writers
 
         protected override void WriteToStream(ResponseWriterContext context, Stream output)
         {
-            var streamWriter = output.CreateWriter(_configuration.DefaultEncoding,
-                _configuration.SerializerBufferSize);
-            var writer = System.Xml.XmlWriter.Create(streamWriter, _xmlWriterSettings);
-            new XmlSerializer(context.Response.GetType())
-                .Serialize(writer, context.Response);
+            using (var streamWriter = output.CreateWriter(_configuration.DefaultEncoding,
+                _configuration.SerializerBufferSize, true))
+            using (var writer = System.Xml.XmlWriter.Create(streamWriter, _xmlWriterSettings))
+            {
+                new XmlSerializer(context.Response.GetType())
+                    .Serialize(writer, context.Response);
+            }
         }
     }
 }
