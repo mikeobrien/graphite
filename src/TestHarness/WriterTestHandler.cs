@@ -29,7 +29,8 @@ namespace TestHarness.Writer
             {
                 ContentType = "application/video",
                 Filename = "weddingsinger.mp4",
-                Data = "fark"
+                Data = "fark",
+                Encoding = Encoding.ASCII
             };
         }
 

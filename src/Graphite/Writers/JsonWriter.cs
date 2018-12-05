@@ -21,12 +21,7 @@ namespace Graphite.Writers
             _serializer = serializer;
             _configuration = configuration;
         }
-
-        public override bool AppliesTo(ResponseWriterContext context)
-        {
-            return base.AppliesTo(context);
-        }
-
+        
         protected override void WriteToStream(ResponseWriterContext context, Stream output)
         {
             using (var streamWriter = output.CreateWriter(_configuration.DefaultEncoding,

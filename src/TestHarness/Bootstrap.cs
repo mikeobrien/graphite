@@ -24,15 +24,15 @@ namespace TestHarness
                 .ConfigureWebApi(x => x
                     .RouteExistingFiles()
                     .SetExceptionHandler<DebugExceptionHandler>())
-                .ConfigureResponseWriters(x => x
-                    .Replace<JsonWriter>().With<JsonWriter>().OrAppend())
+                //.ConfigureResponseWriters(x => x
+                //    .Replace<JsonWriter>().With<JsonWriter>().OrAppend())
                 //.ConfigureSerialization(s => s
                 //    .Json(j => j.UseCamelCaseNaming())
                 //    .Xml(x => x
                 //        .Reader(r => r.IgnoreComments = true)
                 //        .Writer(w => w.Indent = true)))
                 .UseStructureMapContainer<Registry>()
-                .UseStructureMapContainer(x => x.AddRegistry<Registry>())
+                //.UseStructureMapContainer(x => x.AddRegistry<Registry>())
                 .ConfigureActionDecorators(d => d.Append<TestActionDecorator>())
                 .BindCookies()
                 .BindRequestInfo()

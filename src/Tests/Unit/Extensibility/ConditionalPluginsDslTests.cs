@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Graphite.Extensibility;
+using Graphite.Linq;
 using NUnit.Framework;
 using Should;
 using Tests.Common;
@@ -509,10 +510,20 @@ namespace Tests.Unit.Extensibility
             
             RunInScope(when, (dsl, p) =>
             {
+                PrintPlugins("Initial");
+
                 var prependDsl = dsl.Prepend(instance3, p, dispose, @default);
 
-                if (orPrepend) prependDsl.Before<Plugin2>().OrPrepend();
-                else prependDsl.Before<Plugin2>().OrAppend();
+                PrintPlugins($"Prepend {instance3.GetType().Name}");
+
+                var prependDsl2 = prependDsl.Before<Plugin2>();
+                
+                PrintPlugins("Before<Plugin2>");
+
+                if (orPrepend) prependDsl2.OrPrepend();
+                else prependDsl2.OrAppend();
+
+                PrintPlugins(orPrepend ? "OrPrepend" : "OrAppend");
             });
 
             _plugins.Count().ShouldEqual(3);
@@ -530,6 +541,12 @@ namespace Tests.Unit.Extensibility
             _plugins.IsDefault(ConditionalPlugin<IPluginType, Context>
                 .Create(instance3, x => false))
                 .ShouldEqual(@default);
+        }
+
+        private void PrintPlugins(string comments)
+        {
+            Console.WriteLine($"------------{comments}-------------");
+            _plugins.ForEach(x => Console.WriteLine($"{(x.HasInstance ? "Instance" : "Type    ")}: {x.Type.Name}"));
         }
 
         [Test]

@@ -222,7 +222,7 @@ namespace MyApp.Api.Users
 
 ##### Explicit Urls
 
-You can completely override the action's url with the `UrlAttriubute` as follows by specifying a route template:
+You can completely override the action's url with the `UrlAttribute` as follows by specifying a route template:
 
 ```csharp
 [Url("some/url", "another/url")]

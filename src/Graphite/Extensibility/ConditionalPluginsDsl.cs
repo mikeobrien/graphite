@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Graphite.Extensibility
 {
@@ -63,7 +64,7 @@ namespace Graphite.Extensibility
                 _defaultPredicate = defaultPredicate;
             }
 
-            public ReplaceAppendPrependDsl<TReplace> With<TReplacement>(
+            public ReplaceAppendPrependDsl With<TReplacement>(
                 Func<TContext, bool> predicate = null, bool @default = false)
                 where TReplacement : TPlugin
             {
@@ -72,7 +73,7 @@ namespace Graphite.Extensibility
                         _plugins.Singleton), @default);
             }
 
-            public ReplaceAppendPrependDsl<TReplace> With<TReplacement>(
+            public ReplaceAppendPrependDsl With<TReplacement>(
                 TReplacement instance, Func<TContext, bool> predicate = null, 
                 bool dispose = false, bool @default = false)
                 where TReplacement : TPlugin
@@ -81,40 +82,43 @@ namespace Graphite.Extensibility
                     .Create(instance, predicate ?? _defaultPredicate, dispose), @default);
             }
 
-            private ReplaceAppendPrependDsl<TReplace> With(
+            private ReplaceAppendPrependDsl With(
                 ConditionalPlugin<TPlugin, TContext> plugin, bool @default = false)
             {
-                _plugins.ReplaceAllOfTypeWithOrAppend<TReplace>(plugin, @default);
-                return new ReplaceAppendPrependDsl<TReplace>(_dsl, _plugins, plugin, @default);
+                var exists = _plugins.AnyOfType<TReplace>();
+                if (exists) _plugins.ReplaceAllOfTypeWith<TReplace>(plugin, @default);
+                return new ReplaceAppendPrependDsl(_dsl, _plugins, exists, plugin, @default);
             }
         }
 
-        public class ReplaceAppendPrependDsl<TReplace> where TReplace : TPlugin
+        public class ReplaceAppendPrependDsl
         {
             private readonly ConditionalPluginsDsl<TPlugin, TContext> _dsl;
             private readonly ConditionalPlugins<TPlugin, TContext> _plugins;
+            private readonly bool _existed;
             private readonly ConditionalPlugin<TPlugin, TContext> _plugin;
             private readonly bool _default;
 
             public ReplaceAppendPrependDsl(ConditionalPluginsDsl<TPlugin, TContext> dsl,
-                ConditionalPlugins<TPlugin, TContext> plugins,
+                ConditionalPlugins<TPlugin, TContext> plugins, bool existed,
                 ConditionalPlugin<TPlugin, TContext> plugin, bool @default)
             {
                 _dsl = dsl;
                 _plugins = plugins;
+                _existed = existed;
                 _plugin = plugin;
                 _default = @default;
             }
 
             public ConditionalPluginsDsl<TPlugin, TContext> OrPrepend()
             {
-                _plugins.Prepend(_plugin, _default);
+                if (!_existed) _plugins.Prepend(_plugin, _default);
                 return _dsl;
             }
 
             public ConditionalPluginsDsl<TPlugin, TContext> OrAppend()
             {
-                // This is the default so NOOP but here for clarity. 
+                if (!_existed) _plugins.Append(_plugin, _default); 
                 return _dsl;
             }
         }
@@ -158,37 +162,40 @@ namespace Graphite.Extensibility
                 _defaultPredicate = defaultPredicate;
             }
 
-            public AppendOrPrependDsl<TFind> After<TFind>()
+            public AppendOrPrependDsl After<TFind>()
                 where TFind : TPlugin
             {
-                _plugins.AppendAfterOrAppend<TFind>(_plugin);
-                return new AppendOrPrependDsl<TFind>(_plugin, _plugins, _defaultPredicate);
+                _plugins.Remove(_plugin);
+                var exists = _plugins.AnyOfType<TFind>();
+                if (exists) _plugins.AppendAfter<TFind>(_plugin);
+                return new AppendOrPrependDsl(_plugin, _plugins, exists, _defaultPredicate);
             }
         }
 
-        public class AppendOrPrependDsl<TFind> : ConditionalPluginsDsl<TPlugin, TContext>
-                where TFind : TPlugin
+        public class AppendOrPrependDsl : ConditionalPluginsDsl<TPlugin, TContext>
         {
             private readonly ConditionalPlugin<TPlugin, TContext> _plugin;
             private readonly ConditionalPlugins<TPlugin, TContext> _plugins;
+            private readonly bool _existed;
 
             public AppendOrPrependDsl(ConditionalPlugin<TPlugin, TContext> plugin,
-                ConditionalPlugins<TPlugin, TContext> plugins, 
+                ConditionalPlugins<TPlugin, TContext> plugins, bool existed,
                 Func<TContext, bool> defaultPredicate) : base(plugins, defaultPredicate)
             {
                 _plugin = plugin;
                 _plugins = plugins;
+                _existed = existed;
             }
 
             public ConditionalPluginsDsl<TPlugin, TContext> OrPrepend()
             {
-                _plugins.AppendAfterOrPrepend<TFind>(_plugin);
+                if (!_existed) _plugins.Prepend(_plugin);
                 return this;
             }
 
             public ConditionalPluginsDsl<TPlugin, TContext> OrAppend()
             {
-                // This is the default so NOOP but here for clarity. 
+                if (!_existed) _plugins.Append(_plugin);
                 return this;
             }
         }
@@ -235,8 +242,10 @@ namespace Graphite.Extensibility
             public PrependOrAppendDsl<TFind> Before<TFind>()
                 where TFind : TPlugin
             {
-                _plugins.PrependBeforeOrPrepend<TFind>(_plugin);
-                return new PrependOrAppendDsl<TFind>(_plugin, _plugins, _defaultPredicate);
+                _plugins.Remove(_plugin);
+                var exists = _plugins.AnyOfType<TFind>();
+                if (exists) _plugins.PrependBefore<TFind>(_plugin);
+                return new PrependOrAppendDsl<TFind>(_plugin, _plugins, exists, _defaultPredicate);
             }
         }
 
@@ -245,24 +254,26 @@ namespace Graphite.Extensibility
         {
             private readonly ConditionalPlugin<TPlugin, TContext> _plugin;
             private readonly ConditionalPlugins<TPlugin, TContext> _plugins;
+            private readonly bool _existed;
 
             public PrependOrAppendDsl(ConditionalPlugin<TPlugin, TContext> plugin,
-                ConditionalPlugins<TPlugin, TContext> plugins,
+                ConditionalPlugins<TPlugin, TContext> plugins, bool existed,
                 Func<TContext, bool> defaultPredicate) : base(plugins, defaultPredicate)
             {
                 _plugin = plugin;
                 _plugins = plugins;
+                _existed = existed;
             }
 
             public ConditionalPluginsDsl<TPlugin, TContext> OrPrepend()
             {
-                // This is the default so NOOP but here for clarity. 
+                if (!_existed) _plugins.Prepend(_plugin); 
                 return this;
             }
 
             public ConditionalPluginsDsl<TPlugin, TContext> OrAppend()
             {
-                _plugins.PrependBeforeOrAppend<TFind>(_plugin);
+                if (!_existed) _plugins.Append(_plugin);
                 return this;
             }
         }

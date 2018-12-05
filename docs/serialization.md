@@ -80,7 +80,34 @@ You can serialize dates in the Microsoft format as follows:
                 .AdjustToUtcBeforeSerializing());
 ```
 
-Graphite adds the ability to adjust to local time after deserializing with the `d.AdjustToLocalAfterDeserializing()` method. It also adds the ability to adjust to UTC before serializing with the `AdjustToUtcBeforeSerializing ` method.
+Graphite adds the ability to adjust to local time after deserializing with the `AdjustToLocalAfterDeserializing` method. It also adds the ability to adjust to UTC before serializing with the `AdjustToUtcBeforeSerializing ` method.
+
+### Custom Deserialization
+
+Graphite deserialization is accomplished with request readers. You can read more about request readers in the Request Readers section but we'll cover it here briefly in the context of deserialization. Lets take a look at the Json.NET reader:
+
+```csharp
+public class MyJsonReader : StringReaderBase{    private readonly JsonSerializer _serializer;    public JsonReader(JsonSerializer serializer) :         base(MimeTypes.ApplicationJson)    {        _serializer = serializer;    }
+        public override bool AppliesTo(ReaderContext context)    {        return base.AppliesTo(context);    }    protected override ReadResult GetRequest(string data, ReaderContext context)    {        try        {            using (var jsonReader = new JsonTextReader(new System.IO.StringReader(data)))                return ReadResult.Success(_serializer.Deserialize(                    jsonReader, context.ReadType.Type));        }        catch (JsonReaderException exception)        {            return ReadResult.Failure(exception.Message);        }        catch (JsonSerializationException exception)        {            return ReadResult.Failure(exception.Message);        }    }}
+```
+
+- Request readers must implement `IRequestReader` but it's better to simply inherit from `StringReaderBase` as this handles a lot of things required for serialization in general. You can pass the mime type to the base class as demonstrated above. 
+- If you want to only apply the reader to certain requests you can override `AppliesTo` and add your own logic. You will want to include the result of the base class `AppliesTo` as the base classes contain additional required logic. 
+- Next you'll need to deserialize the request string, `data `, and return a read result. 
+
+Next you'll need to register your reader as follows:
+
+```csharp
+.InitializeGraphite(g => g    .ConfigureRequestReaders(x => x
+        // Append after existing readers
+        .Append<MyJsonReader>()
+        
+        // Prepend to existing readers        .Prepend<MyJsonReader>().Before<JsonReader>().OrAppend()
+        
+        // Replace the existing json reader with your own        .Replace<JsonReader>().With<MyJsonReader>().OrAppend()));
+```
+
+There are a number of ways to register the reader, a few are shown above. The first one simply appends it to the existing readers. The problem with this is that the stock json reader will match before yours and be used instead. The second example prepends it before the stock reader so that it has a chance to run before the stock one but doesn't override readers before it. This would make sense if your custom reader only handles some requests but you want all the rest to be handled by the stock json reader. The last one replaces the stock json reader entirely in situ.
 
 ### Custom Serialization
 
@@ -110,17 +137,7 @@ Next you'll need to register your writer as follows:
         // Replace the existing json writer with your own        .Replace<JsonWriter>().With<MyJsonWriter>().OrAppend()));
 ```
 
-There are a number of ways to register the writer, a few are shown above. The first one simply appends it to the existing writers. The problem with this is that the stock json writer will match before yours and be used instead. The second example prepends it before the stock writer so that it has a chance to run before the stock one but doesn't override writers before it. This would make sense if your custom writer only handles some requests but you want all the rest to be handled by the stock json writer. The last one replaces the stock json writer entirely.
-
-### Custom Deserialization
-
-Graphite deserialization is accomplished with request readers. You can read more about request readers in the Request Readers section but we'll cover it here briefly in the context of deserialization. Lets take a look at the Json.NET reader:
-
-```csharp
-public class MyJsonWriter : SerializerWriterBase{    private readonly JsonSerializer _serializer;    private readonly Configuration _configuration;    public MyJsonWriter(JsonSerializer serializer,        HttpRequestMessage requestMessage,        HttpResponseMessage responseMessage,        Configuration configuration) :        base(requestMessage, responseMessage,            configuration, MimeTypes.ApplicationJson)    {        _serializer = serializer;        _configuration = configuration;    }
-        public override bool AppliesTo(ResponseWriterContext context)    {        return base.AppliesTo(context);    }
-        protected override void WriteToStream(ResponseWriterContext context, Stream output)    {        using (var streamWriter = output.CreateWriter(_configuration.DefaultEncoding,            _configuration.SerializerBufferSize, true))        using (var jsonWriter = new JsonTextWriter(streamWriter))        {            _serializer.Serialize(jsonWriter, context.Response);            jsonWriter.Flush();        }    }}
-```
+There are a number of ways to register the writer, a few are shown above. The first one simply appends it to the existing writers. The problem with this is that the stock json writer will match before yours and be used instead. The second example prepends it before the stock writer so that it has a chance to run before the stock one but doesn't override writers before it. This would make sense if your custom writer only handles some requests but you want all the rest to be handled by the stock json writer. The last one replaces the stock json writer entirely in situ.
 
 
 

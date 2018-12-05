@@ -237,6 +237,14 @@ namespace Graphite.Extensibility
             return ReplaceWithOrAppend(InstancePluginFor(replace), plugin, @default);
         }
 
+        public PluginsBase<TPlugin, T> ReplaceAllOfTypeWith<TReplace>(
+            T plugin, bool @default = false)
+            where TReplace : TPlugin
+        {
+            return ReplaceAllOfTypeWith<TReplace>( 
+                r => ReplaceWith(r, () => AppendAfter(plugin, r, @default)));
+        }
+
         public PluginsBase<TPlugin, T> ReplaceAllOfTypeWithOrAppend<TReplace>(
             T plugin, bool @default = false)
             where TReplace : TPlugin
@@ -270,15 +278,15 @@ namespace Graphite.Extensibility
                 () => Append(plugin, @default));
         }
 
-        private PluginsBase<TPlugin, T> ReplaceWith(
-            T replace, Action add, Action defaultAction)
+        private PluginsBase<TPlugin, T> ReplaceWith(T replace, 
+            Action add, Action defaultAction = null)
         {
             if (replace != null)
             {
                 add();
                 Remove(replace);
             }
-            else defaultAction();
+            else defaultAction?.Invoke();
             return this;
         }
 
@@ -288,6 +296,19 @@ namespace Graphite.Extensibility
             Plugins.Add(plugin);
             if (@default) DefaultIs(plugin);
             return this;
+        }
+
+        public PluginsBase<TPlugin, T> AppendAfter<TFind>(
+            T plugin, bool @default = false)
+            where TFind : TPlugin
+        {
+            return AppendAfter(plugin, LastOfType<TFind>(), @default);
+        }
+        
+        public PluginsBase<TPlugin, T> AppendAfter(
+            T plugin, T after, bool @default = false)
+        {
+            return AppendAfterOrDefault(plugin, after, @default);
         }
 
         public PluginsBase<TPlugin, T> AppendAfterOrAppend<TFind>(
@@ -320,13 +341,13 @@ namespace Graphite.Extensibility
 
         private PluginsBase<TPlugin, T> AppendAfterOrDefault(
             T plugin, T after, bool @default, 
-            Action<PluginsBase<TPlugin, T>, T, bool> defaultAction)
+            Action<PluginsBase<TPlugin, T>, T, bool> defaultAction = null)
         {
             Remove(plugin);
             var index = Plugins.IndexOf(after) + 1;
             if (index == Plugins.Count) return Append(plugin, @default);
             if (index >= 1) return Insert(plugin, index, @default);
-            defaultAction(this, plugin, @default);
+            defaultAction?.Invoke(this, plugin, @default);
             return this;
         }
 
@@ -338,6 +359,19 @@ namespace Graphite.Extensibility
             else Plugins.Add(plugin);
             if (@default) DefaultIs(plugin);
             return this;
+        }
+
+        public PluginsBase<TPlugin, T> PrependBefore<TFind>(
+            T plugin, bool @default = false)
+            where TFind : TPlugin
+        {
+            return PrependBefore(plugin, FirstOfType<TFind>(), @default);
+        }
+
+        public PluginsBase<TPlugin, T> PrependBefore(
+            T plugin, T before, bool @default = false)
+        {
+            return PrependBeforeOrDefault(plugin, before, @default);
         }
 
         public PluginsBase<TPlugin, T> PrependBeforeOrAppend<TFind>(
@@ -370,12 +404,12 @@ namespace Graphite.Extensibility
 
         private PluginsBase<TPlugin, T> PrependBeforeOrDefault(
             T plugin, T after, bool @default,
-            Action<PluginsBase<TPlugin, T>, T, bool> defaultAction)
+            Action<PluginsBase<TPlugin, T>, T, bool> defaultAction = null)
         {
             Remove(plugin);
             var index = Plugins.IndexOf(after);
             if (index >= 0) return Insert(plugin, index, @default);
-            defaultAction(this, plugin, @default);
+            defaultAction?.Invoke(this, plugin, @default);
             return this;
         }
 
